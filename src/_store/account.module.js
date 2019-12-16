@@ -37,7 +37,7 @@ const actions = {
                     router.push('/');
                     setTimeout(() => {
                         // display success message after route change completes
-                        dispatch('alert/success', 'Registration successful', { root: true });
+                        dispatch('alert/success', messages.alert_registration_success, { root: true });
                     })
                 },
                 error => {

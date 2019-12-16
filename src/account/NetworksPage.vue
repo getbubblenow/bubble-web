@@ -1,11 +1,8 @@
 <template>
     <div>
         <em v-if="loading">{{messages.loading_networks}}</em>
-        <h2>{{messages.table_title_networks}}</h2>
-        <div v-if="!networks || networks.length === 0">
-            {{messages.empty_networks}}
-        </div>
         <div v-if="networks && networks.length > 0">
+            <h2>{{messages.table_title_networks}}</h2>
             <table border="1">
                 <thead>
                 <tr>
@@ -31,9 +28,15 @@
                 </tr>
                 </tbody>
             </table>
+            <hr/>
+            <router-link to="/networks/new">{{messages.button_label_new_network}}</router-link>
         </div>
-        <hr/>
-        <router-link to="/networks/new">{{messages.button_label_new_network}}</router-link>
+
+        <div v-if="!networks || networks.length === 0">
+            {{messages.empty_networks}}
+            <router-view></router-view>
+        </div>
+
     </div>
 </template>
 

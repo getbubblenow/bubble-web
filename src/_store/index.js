@@ -8,6 +8,7 @@ import { users } from './users.module';
 import { plans } from './plans.module';
 import { footprints } from './footprints.module';
 import { domains } from './domains.module';
+import { paymentMethods } from './paymentMethods.module';
 import { accountPlans } from './accountPlans.module';
 import { networks } from './networks.module';
 
@@ -19,9 +20,10 @@ export const store = new Vuex.Store({
         system,
         account,
         users,
-        domains,
         plans,
         footprints,
+        domains,
+        paymentMethods,
         accountPlans,
         networks
     }

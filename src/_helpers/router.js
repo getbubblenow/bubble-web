@@ -19,9 +19,19 @@ export const router = new Router({
     {
       path: '/', component: HomePage,
       children: [
-        { path: '', component: NetworksPage },
+        {
+          path: '', component: NetworksPage,
+          children: [
+            { path: '', component: NewNetworkPage },
+          ]
+        },
         { path: '/profile', component: ProfilePage },
-        { path: '/networks', component: NetworksPage },
+        {
+          path: '/networks', component: NetworksPage ,
+          children: [
+            { path: '', component: NewNetworkPage },
+          ]
+        },
         { path: '/networks/new', component: NewNetworkPage },
         { path: '/networks/:uuid', component: NetworkPage }
       ]

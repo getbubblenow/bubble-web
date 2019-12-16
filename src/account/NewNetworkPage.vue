@@ -35,6 +35,24 @@
                 </div>
             </div>
             <div class="form-group">
+                <label htmlFor="paymentMethod">{{messages.field_label_paymentMethod}}</label>
+                <div v-if="submitted && errors.has('paymentMethod')" class="invalid-feedback">{{ errors.first('paymentMethod') }}</div>
+                <div v-if="submitted && errors.has('paymentMethodInfo')" class="invalid-feedback">{{ errors.first('paymentMethodInfo') }}</div>
+                <div v-if="submitted && errors.has('paymentMethodType')" class="invalid-feedback">{{ errors.first('paymentMethodType') }}</div>
+                <div v-if="submitted && errors.has('paymentMethodService')" class="invalid-feedback">{{ errors.first('paymentMethodService') }}</div>
+                <div v-if="submitted && errors.has('paymentInfo')" class="invalid-feedback">{{ errors.first('paymentInfo') }}</div>
+                <span v-for="pm in paymentMethods">
+                    <button class="btn btn-primary" :disabled="status.creating" @click="network.paymentMethodObject.paymentMethodType = pm.paymentMethodType">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
+                </span>
+            </div>
+            <div v-if="network.paymentMethodObject.paymentMethodType === 'credit'">
+                credit selected
+            </div>
+            <div v-if="network.paymentMethodObject.paymentMethodType === 'code'">
+                invite code selected
+            </div>
+
+            <div class="form-group">
                 <button class="btn btn-primary" :disabled="status.creating">{{messages.button_label_create_new_network}}</button>
                 <img v-show="status.creating" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
                 <router-link to="/" class="btn btn-link">{{messages.button_label_cancel}}</router-link>
@@ -56,7 +74,11 @@
                     locale: 'en_US',
                     timezone: '',
                     plan: 'bubble',
-                    footprint: 'Worldwide'
+                    footprint: 'Worldwide',
+                    paymentMethodObject: {
+                        paymentMethodType: null,
+                        paymentInfo: null
+                    }
                 },
                 user: currentUser(),
                 submitted: false,
@@ -68,6 +90,7 @@
             ...mapState('domains', ['domains']),
             ...mapState('plans', ['plans']),
             ...mapState('footprints', ['footprints']),
+            ...mapState('paymentMethods', ['paymentMethods']),
             ...mapState('networks', {
                 creating: state => state.loading,
                 error: state => state.error
@@ -122,6 +145,9 @@
             ...mapActions('footprints', {
                 loadFootprints: 'getAll'
             }),
+            ...mapActions('paymentMethods', {
+                loadPaymentMethods: 'getAll'
+            }),
             handleSubmit(e) {
                 this.submitted = true;
                 this.$validator.validate().then(valid => {
@@ -135,6 +161,7 @@
             this.loadDomains(currentUser().uuid);
             this.loadPlans();
             this.loadFootprints();
+            this.loadPaymentMethods();
         }
     };
 </script>

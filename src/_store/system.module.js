@@ -2,7 +2,8 @@ import { systemService } from '../_services';
 
 const state = {
     configs: {
-        allowRegistration: null
+        allowRegistration: null,
+        paymentsEnabled: true
     },
     messages: {},
     countries: [],
