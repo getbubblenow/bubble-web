@@ -10,6 +10,7 @@ const state = {
     locales: [],
     timezones: [],
     detectedTimezone: null,
+    detectedLocale: null,
     menu: [],
     error: null
 };
@@ -43,6 +44,13 @@ const actions = {
         systemService.detectTimezone().then(
             timezones => commit('detectTimezoneSuccess', timezones),
             error => commit('detectTimezoneFailure', error)
+        )
+    },
+    detectLocale({ commit }) {
+        commit('detectLocaleRequest');
+        systemService.detectLocale().then(
+            locales => commit('detectLocaleSuccess', locales),
+            error => commit('detectLocaleFailure', error)
         )
     }
 };
@@ -117,6 +125,13 @@ const mutations = {
         state.detectedTimezone = detectedTimezone;
     },
     detectTimezoneFailure(state, error) {
+        state.error = error;
+    },
+    detectLocaleRequest(state) {},
+    detectLocaleSuccess(state, detectedLocales) {
+        state.detectedLocale = detectedLocales.length > 0 ? detectedLocales[0] : null;
+    },
+    detectLocaleFailure(state, error) {
         state.error = error;
     }
 };

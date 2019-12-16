@@ -26,7 +26,7 @@ export default {
     },
     methods: {
         ...mapActions({ clearAlert: 'alert/clear' }),
-        ...mapActions('system', ['loadSystemConfigs', 'loadMessages', 'loadTimezones', 'detectTimezone'])
+        ...mapActions('system', ['loadSystemConfigs', 'loadMessages', 'loadTimezones', 'detectTimezone', 'detectLocale'])
     },
     watch: {
         $route (to, from){
@@ -35,14 +35,16 @@ export default {
         }
     },
     created() {
+        this.loadSystemConfigs();  // determine if we can show the registration link
+
         // todo: allow user to choose locale
         const locale = 'detect';
-        this.loadTimezones();
         this.loadMessages('pre_auth', locale);
         this.loadMessages('countries', locale);
         this.loadMessages('timezones', locale);
+        this.detectLocale();
+        this.loadTimezones();
         this.detectTimezone();
-        this.loadSystemConfigs();  // determine if we can show the registration link
     }
 };
 </script>

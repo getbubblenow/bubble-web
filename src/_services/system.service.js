@@ -5,7 +5,8 @@ export const systemService = {
     loadSystemConfigs,
     loadMessages,
     loadTimezones,
-    detectTimezone
+    detectTimezone,
+    detectLocale
 };
 
 function loadSystemConfigs() {
@@ -31,7 +32,15 @@ function loadTimezones() {
 }
 
 function detectTimezone() {
-    return fetch(`${config.apiUrl}/me/detect/timezone`, getWithAuth())
+    const requestOptions = userLoggedIn() ? getWithAuth() : { method: 'GET' };
+    return fetch(`${config.apiUrl}/auth/detect/timezone`, requestOptions)
         .then(handleBasicResponse)
         .then(timezone => { return timezone; });
+}
+
+function detectLocale () {
+    const requestOptions = userLoggedIn() ? getWithAuth() : { method: 'GET' };
+    return fetch(`${config.apiUrl}/auth/detect/locale`, requestOptions)
+        .then(handleBasicResponse)
+        .then(locales => { return locales; });
 }
