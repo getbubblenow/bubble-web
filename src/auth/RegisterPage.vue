@@ -13,9 +13,6 @@
                 <div v-if="submitted && errors.has('password')" class="invalid-feedback">{{ errors.first('password') }}</div>
             </div>
             <div class="form-group">
-                <label htmlFor="type">{{messages.field_label_contactType}}</label>
-            </div>
-            <div class="form-group">
                 <label for="email">{{messages.field_label_email}}</label>
                 <input type="text" v-model="user.contact.info" name="email" class="form-control" :class="{ 'is-invalid': submitted && errors.has('email') }" />
                 <div v-if="submitted && errors.has('email')" class="invalid-feedback">{{ errors.first('email') }}</div>
