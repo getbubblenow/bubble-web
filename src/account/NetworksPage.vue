@@ -21,8 +21,8 @@
                 <tbody>
                 <tr v-for="network in networks" :key="network.uuid">
                     <td>{{network.name}}.{{network.domainName}}</td>
-                    <td>{{network.locale}}</td>
-                    <td>{{network.timezone}}</td>
+                    <td nowrap="nowrap">{{messages['locale_'+network.locale] || network.locale}}</td>
+                    <td nowrap="nowrap">{{messages['tz_name_'+network.timezone] || network.timezone}}</td>
                     <td>{{network.state}}</td>
                     <td><router-link :to="{ path: '/networks/'+ network.uuid }">{{messages.table_row_networks_action_view}}</router-link></td>
                     <td v-if="network.state === 'running'">{{messages.table_row_networks_action_stop}}</td>
