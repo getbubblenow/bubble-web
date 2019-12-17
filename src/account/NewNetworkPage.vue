@@ -42,14 +42,17 @@
                 <div v-if="submitted && errors.has('paymentMethodService')" class="invalid-feedback">{{ errors.first('paymentMethodService') }}</div>
                 <div v-if="submitted && errors.has('paymentInfo')" class="invalid-feedback">{{ errors.first('paymentInfo') }}</div>
                 <span v-for="pm in paymentMethods">
-                    <button class="btn btn-primary" :disabled="status.creating" @click="network.paymentMethodObject.paymentMethodType = pm.paymentMethodType">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
+                    <button class="btn btn-primary" :disabled="status.creating" @click="setPaymentMethod(pm)">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
                 </span>
             </div>
-            <div v-if="network.paymentMethodObject.paymentMethodType === 'credit'">
-                credit selected
+
+            <div v-if="paymentMethod && paymentMethod.paymentMethodType === 'credit'">
+                <router-view name="stripe" v-if="paymentMethod.driverClass.endsWith('StripePaymentDriver')"></router-view>
+                <router-view name="unknown" v-else></router-view>
             </div>
-            <div v-if="network.paymentMethodObject.paymentMethodType === 'code'">
-                invite code selected
+            <div v-if="paymentMethod && paymentMethod.paymentMethodType === 'code'">
+                <router-view name="invite" v-if="paymentMethod.driverClass.endsWith('CodePaymentDriver')"></router-view>
+                <router-view name="unknown" v-else></router-view>
             </div>
 
             <div class="form-group">
@@ -90,7 +93,7 @@
             ...mapState('domains', ['domains']),
             ...mapState('plans', ['plans']),
             ...mapState('footprints', ['footprints']),
-            ...mapState('paymentMethods', ['paymentMethods']),
+            ...mapState('paymentMethods', ['paymentMethods', 'paymentMethod', 'paymentInfo']),
             ...mapState('networks', {
                 creating: state => state.loading,
                 error: state => state.error
@@ -146,13 +149,24 @@
                 loadFootprints: 'getAll'
             }),
             ...mapActions('paymentMethods', {
-                loadPaymentMethods: 'getAll'
+                loadPaymentMethods: 'getAll',
+                setPaymentMethod: 'setPaymentMethod'
             }),
             handleSubmit(e) {
                 this.submitted = true;
                 this.$validator.validate().then(valid => {
                     if (valid) {
-                        this.createNewNetwork(this.network);
+                        if (this.paymentInfo) {
+                            this.network.paymentMethodObject = {
+                                paymentMethodType: this.paymentMethod.paymentMethodType,
+                                paymentInfo: this.paymentInfo
+                            };
+                            this.createNewNetwork(this.network);
+                        }
+                    } else {
+                        console.log('handleSubmit: no payment info found');
+                        // console.log('handleSubmit: paymentMethod='+JSON.stringify(this.paymentMethod));
+                        if (this.paymentMethod) console.log('handleSubmit: paymentMethod.driverClass='+JSON.stringify(this.paymentMethod.driverClass));
                     }
                 });
             }

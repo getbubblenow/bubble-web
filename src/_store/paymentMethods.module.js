@@ -4,7 +4,8 @@ const state = {
     loading: null,
     error: null,
     paymentMethods: null,
-    paymentMethod: null
+    paymentMethod: null,
+    paymentInfo: null
 };
 
 const actions = {
@@ -17,13 +18,24 @@ const actions = {
             );
     },
 
-    getByUuid({ commit }, uuid) {
+    getById({ commit }, uuid) {
         commit('getByUuidRequest');
         paymentMethodService.getById(uuid)
             .then(
                 paymentMethod => commit('getByUuidSuccess', paymentMethod),
                 error => commit('getByUuidFailure', error)
             );
+    },
+
+    setPaymentMethod({ commit }, pm) {
+        console.log('setPaymentMethod: setting: '+JSON.stringify(pm));
+        commit('setPaymentMethodSuccess', pm);
+    },
+    setPaymentInfo({ commit }, info) {
+        commit('setPaymentInfoSuccess', info);
+    },
+    clearPaymentInfo({ commit }) {
+        commit('clearPaymentInfoSuccess');
     }
 };
 
@@ -49,6 +61,15 @@ const mutations = {
     getByUuidFailure(state, error) {
         state.loading = false;
         state.error = { error };
+    },
+    setPaymentMethodSuccess(state, pm) {
+        state.paymentMethod = pm;
+    },
+    setPaymentInfoSuccess(state, info) {
+        state.paymentInfo = info;
+    },
+    clearPaymentInfoSuccess(state) {
+        state.paymentInfo = null;
     }
 };
 

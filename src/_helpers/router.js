@@ -9,9 +9,24 @@ import NetworksPage from '../account/NetworksPage'
 import NewNetworkPage from '../account/NewNetworkPage'
 import NetworkPage from '../account/NetworkPage'
 import AccountsPage from '../admin/AccountsPage'
+import StripePayment from "../account/payment/StripePayment";
+import InviteCodePayment from "../account/payment/InviteCodePayment";
+import UnknownPayment from "../account/payment/UnknownPayment";
 import { currentUser } from '../_helpers'
 
 Vue.use(Router);
+
+const newNetworkChildren = [
+  { path: '', component: NewNetworkPage,
+    children: [{
+      'path': '', components: {
+        'stripe': StripePayment,
+        'invite': InviteCodePayment,
+        'unknown': UnknownPayment
+      }
+    }]
+  },
+];
 
 export const router = new Router({
   mode: 'history',
@@ -21,18 +36,21 @@ export const router = new Router({
       children: [
         {
           path: '', component: NetworksPage,
-          children: [
-            { path: '', component: NewNetworkPage },
-          ]
+          children: newNetworkChildren
         },
         { path: '/profile', component: ProfilePage },
         {
           path: '/networks', component: NetworksPage ,
           children: [
-            { path: '', component: NewNetworkPage },
+            {
+              path: '', component: NewNetworkPage,
+              children: newNetworkChildren
+            },
           ]
         },
-        { path: '/networks/new', component: NewNetworkPage },
+        { path: '/networks/new', component: NewNetworkPage,
+          children: newNetworkChildren
+        },
         { path: '/networks/:uuid', component: NetworkPage }
       ]
     },
