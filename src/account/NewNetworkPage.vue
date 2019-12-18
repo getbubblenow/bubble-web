@@ -15,7 +15,7 @@
             </div>
             <div class="form-group">
                 <label htmlFor="timezone">{{messages.field_label_timezone}}</label>
-                <v-select :options="timezoneObjects" :reduce="tz => tz.timezoneId" label="timezoneDescription" :value="detectedTimezone ? detectedTimezone.timeZoneId : null" type="text" v-model="network.timezone" name="timezone" class="form-control" :class="{ 'is-invalid': submitted && errors.has('timezone') }"></v-select>
+                <v-select :options="timezoneObjects" :reduce="tz => tz.timezoneId" label="timezoneDescription" type="text" v-model="network.timezone" name="timezone" class="form-control" :class="{ 'is-invalid': submitted && errors.has('timezone') }"></v-select>
                 <div v-if="submitted && errors.has('timezone')" class="invalid-feedback">{{ errors.first('timezone') }}</div>
             </div>
             <div class="form-group">
@@ -74,7 +74,7 @@
                 network: {
                     name: '',
                     domain: '',
-                    locale: 'en_US',
+                    locale: '',
                     timezone: '',
                     plan: 'bubble',
                     footprint: 'Worldwide',
@@ -89,7 +89,7 @@
             };
         },
         computed: {
-            ...mapState('system', ['messages', 'locales', 'timezones', 'detectedTimezone']),
+            ...mapState('system', ['messages', 'locales', 'timezones', 'detectedTimezone', 'detectedLocale']),
             ...mapState('domains', ['domains']),
             ...mapState('plans', ['plans']),
             ...mapState('footprints', ['footprints']),
@@ -169,6 +169,23 @@
                         if (this.paymentMethod) console.log('handleSubmit: paymentMethod.driverClass='+JSON.stringify(this.paymentMethod.driverClass));
                     }
                 });
+            }
+        },
+        watch: {
+            domains (doms) {
+                if (doms && doms[0]) {
+                    if (this.network.domain == null || this.network.domain === '') this.network.domain = doms[0].name;
+                }
+            },
+            detectedTimezone (tz) {
+                if (tz && tz.timeZoneId) {
+                    if (this.network.timezone == null || this.network.timezone === '') this.network.timezone = tz.timeZoneId;
+                }
+            },
+            detectedLocale (loc) {
+                if (loc) {
+                    if (this.network.locale == null || this.network.locale === '') this.network.locale = loc;
+                }
             }
         },
         created() {

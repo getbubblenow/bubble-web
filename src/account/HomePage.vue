@@ -15,7 +15,7 @@ export default {
             account: state => state.account,
             users: state => state.users.all
         }),
-        ...mapState('system', ['messages'])
+        ...mapState('system', ['messages', 'detectedTimezone', 'detectedLocale'])
     },
     methods: {
         ...mapActions('users', {

@@ -42,7 +42,7 @@ const actions = {
     detectTimezone({ commit }) {
         commit('detectTimezoneRequest');
         systemService.detectTimezone().then(
-            timezones => commit('detectTimezoneSuccess', timezones),
+            timezone => commit('detectTimezoneSuccess', timezone),
             error => commit('detectTimezoneFailure', error)
         )
     },
@@ -122,6 +122,7 @@ const mutations = {
     },
     detectTimezoneRequest(state) {},
     detectTimezoneSuccess(state, detectedTimezone) {
+        console.log('detectTimezoneSuccess: detectedTimezone='+JSON.stringify(detectedTimezone));
         state.detectedTimezone = detectedTimezone;
     },
     detectTimezoneFailure(state, error) {
