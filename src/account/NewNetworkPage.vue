@@ -6,13 +6,14 @@
             <div class="form-group">
                 <label for="name">{{messages.field_label_network_name}}</label>
                 <input type="text" v-model="network.name" v-validate="'required'" name="name" class="form-control" :class="{ 'is-invalid': submitted && errors.has('name') }" />
+                <div v-if="submitted && errors.has('name')" class="invalid-feedback">{{ errors.first('name') }}</div>
             </div>
 
             <!-- domain -->
             <div v-if="customize.domain === true" class="form-group">
                 <label for="domain">{{messages.field_label_network_domain}}</label>
                 <v-select v-validate="'required'" v-if="domains" :options="domains" label="name" type="text" v-model="network.domain" name="domain" class="form-control" :class="{ 'is-invalid': submitted && errors.has('domain') }"></v-select>
-                <div v-if="submitted && errors.has('name')" class="invalid-feedback">{{ errors.first('name') }}</div>
+                <div v-if="submitted && errors.has('domain')" class="invalid-feedback">{{ errors.first('domain') }}</div>
                 <button @click="customize.domain = false">{{messages.button_label_use_default}}</button>
             </div>
             <div v-if="customize.domain === false">
@@ -91,11 +92,6 @@
 
             <div class="form-group">
                 <label htmlFor="paymentMethod">{{messages.field_label_paymentMethod}}</label>
-                <div v-if="submitted && errors.has('paymentMethod')" class="invalid-feedback">{{ errors.first('paymentMethod') }}</div>
-                <div v-if="submitted && errors.has('paymentMethodInfo')" class="invalid-feedback">{{ errors.first('paymentMethodInfo') }}</div>
-                <div v-if="submitted && errors.has('paymentMethodType')" class="invalid-feedback">{{ errors.first('paymentMethodType') }}</div>
-                <div v-if="submitted && errors.has('paymentMethodService')" class="invalid-feedback">{{ errors.first('paymentMethodService') }}</div>
-                <div v-if="submitted && errors.has('paymentInfo')" class="invalid-feedback">{{ errors.first('paymentInfo') }}</div>
                 <span v-for="pm in paymentMethods">
                     <button class="btn btn-primary" :disabled="status.creating" @click="setPaymentMethod(pm)">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
                 </span>
@@ -170,7 +166,7 @@
                 error: state => state.error
             }),
             isComplete() {
-                return (this.name !== '')
+                return (this.network.name !== '')
                     && (this.customize.domain === false || this.network.domain !== '')
                     && (this.customize.locale === false || this.network.locale !== '')
                     && (this.customize.timezone === false || this.network.timezone !== '')

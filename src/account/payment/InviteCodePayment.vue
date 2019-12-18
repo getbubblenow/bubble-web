@@ -1,17 +1,20 @@
 <template>
-    <div>
-        <form @submit.prevent="setInviteCode">
-            <div class="form-group">
-                <label for="invite_code">{{messages.field_payment_invite_code}}</label>
-                <input type="text" v-model="invite_code" v-validate="'required'" name="invite_code" class="form-control" :class="{ 'is-invalid': submitted && errors.has('purchase') }" :disabled="paymentStatus.addingPaymentMethod || paymentStatus.addedPaymentMethod" />
-                <div v-if="submitted && errors.has('purchase')" class="invalid-feedback">{{ errors.first('purchase') }}</div>
-            </div>
-            <div class="form-group">
-                <button v-if="paymentStatus.addingPaymentMethod || !paymentStatus.addedPaymentMethod" class="btn btn-primary" :disabled="paymentStatus.addingPaymentMethod">{{messages.button_label_submit_invite_code}}</button>
-                <span v-if="paymentStatus.addedPaymentMethod">{{messages.message_verified_invite_code}}</span>
-            </div>
-        </form>
-    </div>
+    <form @submit.prevent="setInviteCode">
+        <div class="form-group">
+            <label for="invite_code">{{messages.field_payment_invite_code}}</label>
+            <input type="text" v-model="invite_code" v-validate="'required'" name="invite_code" class="form-control" :class="{ 'is-invalid': submitted && errors.has('purchase') }" :disabled="paymentStatus.addingPaymentMethod || paymentStatus.addedPaymentMethod" />
+            <div v-if="submitted && errors.has('purchase')" class="invalid-feedback d-block">{{ errors.first('purchase') }}</div>
+            <div v-if="submitted && errors.has('paymentMethod')" class="invalid-feedback d-block">{{ errors.first('paymentMethod') }}</div>
+            <div v-if="submitted && errors.has('paymentMethodInfo')" class="invalid-feedback d-block">{{ errors.first('paymentMethodInfo') }}</div>
+            <div v-if="submitted && errors.has('paymentMethodType')" class="invalid-feedback d-block">{{ errors.first('paymentMethodType') }}</div>
+            <div v-if="submitted && errors.has('paymentMethodService')" class="invalid-feedback d-block">{{ errors.first('paymentMethodService') }}</div>
+            <div v-if="submitted && errors.has('paymentInfo')" class="invalid-feedback d-block">{{ errors.first('paymentInfo') }}</div>
+        </div>
+        <div class="form-group">
+            <button v-if="paymentStatus.addingPaymentMethod || !paymentStatus.addedPaymentMethod" class="btn btn-primary" :disabled="paymentStatus.addingPaymentMethod">{{messages.button_label_submit_invite_code}}</button>
+            <span v-if="paymentStatus.addedPaymentMethod">{{messages.message_verified_invite_code}}</span>
+        </div>
+    </form>
 </template>
 
 <script>

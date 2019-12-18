@@ -1,7 +1,14 @@
 <template>
-    <div>
-        <div ref="card"></div>
-        <button v-on:click="authorizeCard">{{messages.button_label_submit_card}}</button>
+    <div class="form-group">
+        <div class="form-control" ref="card"></div>
+        <div v-if="submitted && errors.has('purchase')" class="invalid-feedback d-block">{{ errors.first('purchase') }}</div>
+        <div v-if="submitted && errors.has('paymentMethod')" class="invalid-feedback d-block">{{ errors.first('paymentMethod') }}</div>
+        <div v-if="submitted && errors.has('paymentMethodInfo')" class="invalid-feedback d-block">{{ errors.first('paymentMethodInfo') }}</div>
+        <div v-if="submitted && errors.has('paymentMethodType')" class="invalid-feedback d-block">{{ errors.first('paymentMethodType') }}</div>
+        <div v-if="submitted && errors.has('paymentMethodService')" class="invalid-feedback d-block">{{ errors.first('paymentMethodService') }}</div>
+        <div v-if="submitted && errors.has('paymentInfo')" class="invalid-feedback d-block">{{ errors.first('paymentInfo') }}</div>
+        <button v-if="paymentStatus.addingPaymentMethod || !paymentStatus.addedPaymentMethod" @click="authorizeCard" class="btn btn-primary" :disabled="paymentStatus.addingPaymentMethod">{{messages.button_label_submit_card}}</button>
+        <span v-if="paymentStatus.addedPaymentMethod">{{messages.message_verified_card}}</span>
     </div>
 </template>
 
@@ -13,11 +20,12 @@
         data() {
             return {
                 elements: null,
-                card: null
+                card: null,
+                submitted: false
             }
         },
         computed: {
-            ...mapState('paymentMethods', ['paymentMethod']),
+            ...mapState('paymentMethods', ['paymentMethod', 'paymentStatus', 'paymentInfo']),
             ...mapState('system', ['messages']),
         },
         created () {
@@ -30,8 +38,10 @@
             this.card.mount(this.$refs.card);
         },
         methods: {
-            ...mapActions('paymentMethods', ['setPaymentInfo']),
+            ...mapActions('paymentMethods', ['addAccountPaymentMethod']),
             authorizeCard(e) {
+                const comp = this;
+                console.log('this.errors='+JSON.stringify(this.errors));
                 window.stripe.createToken(this.card).then(function(result) {
                     console.log('authorizedCard: created token='+JSON.stringify(result.token));
                     if (result.error) {
@@ -39,6 +49,16 @@
                         self.hasCardErrors = true;
                         self.$forceUpdate(); // Forcing the DOM to update so the Stripe Element can update.
                         return;
+                    } else {
+                        comp.submitted = true;
+                        comp.addAccountPaymentMethod({
+                            paymentMethod: {
+                                paymentMethodType: 'credit',
+                                paymentInfo: result.token.id
+                            },
+                            messages: comp.messages,
+                            errors: comp.errors
+                        });
                     }
                 });
             }
