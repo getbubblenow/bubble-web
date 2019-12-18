@@ -7,6 +7,10 @@ export const userService = {
     register,
     getAll,
     getById,
+    getPolicyById,
+    updatePolicyById,
+    addPolicyContactById,
+    removePolicyContactByTypeAndInfo,
     update,
     delete: _delete
 };
@@ -57,6 +61,22 @@ function getAll(messages, errors) {
 
 function getById(id, messages, errors) {
     return fetch(`${config.apiUrl}/users/${id}`, getWithAuth()).then(handleCrudResponse(messages, errors));
+}
+
+function getPolicyById(id, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${id}/policy`, getWithAuth()).then(handleCrudResponse(messages, errors));
+}
+
+function updatePolicyById(id, policy, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${id}/policy`, postWithAuth(policy)).then(handleCrudResponse(messages, errors));
+}
+
+function addPolicyContactById(id, contact, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${id}/policy/contacts`, postWithAuth(contact)).then(handleCrudResponse(messages, errors));
+}
+
+function removePolicyContactByTypeAndInfo(id, type, info, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${id}/policy/contacts/${type}/${info}`, deleteWithAuth()).then(handleCrudResponse(messages, errors));
 }
 
 function update(user, messages, errors) {

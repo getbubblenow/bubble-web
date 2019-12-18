@@ -3,7 +3,8 @@ import { account } from '../_store/account.module';
 
 const state = {
     all: {},
-    user: null
+    user: null,
+    policy: {}
 };
 
 const actions = {
@@ -37,6 +38,46 @@ const actions = {
             );
     },
 
+    getPolicyByUuid({ commit }, {uuid, messages, errors}) {
+        commit('getPolicyByUuidRequest');
+
+        userService.getPolicyById(uuid, messages, errors)
+            .then(
+                policy => commit('getPolicyByUuidSuccess', policy),
+                error => commit('getPolicyByUuidFailure', error)
+            );
+    },
+
+    updatePolicyByUuid({ commit }, {uuid, policy, messages, errors}) {
+        commit('updatePolicyByUuidRequest');
+
+        userService.updatePolicyById(uuid, policy, messages, errors)
+            .then(
+                policy => commit('updatePolicyByUuidSuccess', policy),
+                error => commit('updatePolicyByUuidFailure', error)
+            );
+    },
+
+    addPolicyContactByUuid({ commit }, {uuid, contact, messages, errors}) {
+        commit('addPolicyContactByUuidRequest');
+
+        userService.updatePolicyById(uuid, contact, messages, errors)
+            .then(
+                policy => commit('addPolicyContactByUuidSuccess', policy),
+                error => commit('addPolicyContactByUuidFailure', error)
+            );
+    },
+
+    removePolicyContactByTypeAndInfo({ commit }, {uuid, type, info, messages, errors}) {
+        commit('removePolicyContactByTypeAndInfoRequest');
+
+        userService.removePolicyContactByTypeAndInfo(uuid, type, info, messages, errors)
+            .then(
+                policy => commit('removePolicyContactByTypeAndInfoSuccess', policy),
+                error => commit('removePolicyContactByTypeAndInfoFailure', error)
+            );
+    },
+
     delete({ commit }, {id, messages, errors}) {
         commit('deleteRequest', id);
 
@@ -58,6 +99,7 @@ const mutations = {
     getAllFailure(state, error) {
         state.all = { error };
     },
+
     getByUuidRequest(state) {
         state.user = { loading: true };
     },
@@ -67,6 +109,47 @@ const mutations = {
     getByUuidFailure(state, error) {
         state.user = { error };
     },
+
+    getPolicyByUuidRequest(state) {
+        state.user = { loading: true };
+    },
+    getPolicyByUuidSuccess(state, policy) {
+        state.policy = policy;
+    },
+    getPolicyByUuidFailure(state, error) {
+        state.policy = { error };
+    },
+
+    updatePolicyByUuidRequest(state) {
+        state.user = { loading: true };
+    },
+    updatePolicyByUuidSuccess(state, policy) {
+        state.policy = policy;
+    },
+    updatePolicyByUuidFailure(state, error) {
+        state.policy = { error };
+    },
+
+    addPolicyContactByUuidRequest(state) {
+        state.user = { loading: true };
+    },
+    addPolicyContactByUuidSuccess(state, policy) {
+        state.policy = policy;
+    },
+    addPolicyContactByUuidFailure(state, error) {
+        state.policy = { error };
+    },
+
+    removePolicyContactByTypeAndInfoRequest(state) {
+        state.user = { loading: true };
+    },
+    removePolicyContactByTypeAndInfoSuccess(state, policy) {
+        state.policy = policy;
+    },
+    removePolicyContactByTypeAndInfoFailure(state, error) {
+        state.policy = { error };
+    },
+
     updateRequest(state, user) {
         // todo: add 'updating:true' property to user being updated
     },
@@ -78,6 +161,7 @@ const mutations = {
     updateFailure(state, { id, error }) {
         // todo: remove 'updating:true' property and add 'updateError:[error]' property to user
     },
+
     deleteRequest(state, id) {
         // add 'deleting:true' property to user being deleted
         state.all.items = state.all.items.map(user =>

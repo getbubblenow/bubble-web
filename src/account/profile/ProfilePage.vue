@@ -1,6 +1,13 @@
 <template>
     <div>
-        <h2>Edit Profile</h2>
+        <h2>Account Profile</h2>
+
+        <hr/>
+        <router-link to="/me/changePassword">{{messages.link_label_change_password}}</router-link>
+        <hr/>
+        <router-link to="/me/policy">{{messages.link_label_account_policy}}</router-link>
+        <hr/>
+
         <form @submit.prevent="handleSubmit">
             <div class="form-group">
                 <span>{{messages.field_label_username}}: {{user.name}}</span>
@@ -63,7 +70,7 @@
 
 <script>
     import { mapState, mapActions } from 'vuex'
-    import { account } from '../_store/account.module'
+    import { account } from '../../_store/account.module'
 
     export default {
         data () {

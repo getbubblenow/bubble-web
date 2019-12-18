@@ -4,7 +4,10 @@ import Router from 'vue-router';
 import HomePage from '../account/HomePage'
 import RegisterPage from '../auth/RegisterPage'
 import LoginPage from '../auth/LoginPage'
-import ProfilePage from '../account/ProfilePage'
+import ProfilePage from '../account/profile/ProfilePage'
+import PolicyPage from '../account/profile/PolicyPage'
+import NotificationsPage from '../account/NotificationsPage'
+import ChangePasswordPage from '../account/profile/ChangePasswordPage'
 import NetworksPage from '../account/NetworksPage'
 import NewNetworkPage from '../account/NewNetworkPage'
 import NetworkPage from '../account/NetworkPage'
@@ -25,7 +28,7 @@ const newNetworkChildren = [
         'unknown': UnknownPayment
       }
     }]
-  },
+  }
 ];
 
 export const router = new Router({
@@ -38,7 +41,10 @@ export const router = new Router({
           path: '', component: NetworksPage,
           children: newNetworkChildren
         },
-        { path: '/profile', component: ProfilePage },
+        { path: '/me', component: ProfilePage },
+        { path: '/me/policy', component: PolicyPage },
+        { path: '/me/changePassword', component: ChangePasswordPage },
+        { path: '/notifications', component: NotificationsPage },
         {
           path: '/networks', component: NetworksPage ,
           children: [

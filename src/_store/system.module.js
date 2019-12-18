@@ -13,6 +13,7 @@ const state = {
     timezones: [],
     detectedTimezone: null,
     detectedLocale: null,
+    accountDeletionOptions: [],
     error: null
 };
 
@@ -65,35 +66,30 @@ const getters = {
             title: messages.label_menu_dashboard,
             icon: messages.label_menu_dashboard_icon
         }, {
-            href: '/profile',
+            href: '/me',
             title: messages.label_menu_account,
-            icon: messages.label_menu_account_icon,
-            child: [{
-                href: '/profile/policy',
-                title: messages.label_menu_account_policy,
-                icon: messages.label_menu_account_policy_icon
-            }, {
-                href: '/profile/contacts',
-                title: messages.label_menu_account_contacts,
-                icon: messages.label_menu_account_contacts_icon
-            }]
+            icon: messages.label_menu_account_icon
+        }, {
+            href: '/notifications',
+            title: messages.label_menu_notifications,
+            icon: messages.label_menu_notifications_icon
         }, {
             href: '/logout',
             title: messages.label_menu_logout,
             icon: messages.label_menu_logout_icon
         }];
-        if (configs.paymentsEnabled) {
-            menu[1].child.push({
-                href: '/me/bills',
-                title: messages.label_menu_bills,
-                icon: messages.label_menu_bills_icon
-            });
-        }
         if (configs.sageLauncher) {
-            menu.splice(2, 0, {
+            menu.splice(3, 0, {
                 href: '/me/networks',
                 title: messages.label_menu_networks,
                 icon: messages.label_menu_networks_icon
+            });
+        }
+        if (configs.paymentsEnabled) {
+            menu.splice(4, 0,{
+                href: '/me/bills',
+                title: messages.label_menu_bills,
+                icon: messages.label_menu_bills_icon
             });
         }
         if (account.state.user.admin === true) {
@@ -153,6 +149,9 @@ const mutations = {
                 locales.push({localeCode: codes[i], localeName: messages['locale_'+codes[i]]});
             }
             state.locales = locales;
+        }
+        if (messages.field_label_policy_account_deletion_options) {
+            state.accountDeletionOptions = messages.field_label_policy_account_deletion_options.split(',');
         }
     },
     loadMessagesFailure(state, error) {

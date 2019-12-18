@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>{{messages.label_homepage_hello && messages.label_homepage_hello.parseMessage(this)}}!</h1>
+        <h1>{{messages.label_homepage_hello && messages.label_homepage_hello.parseMessage(this)}}</h1>
         <hr/>
         <router-view></router-view>
     </div>
