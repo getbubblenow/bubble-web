@@ -7,14 +7,30 @@ const state = {
         paymentsEnabled: false,
         sageLauncher: false
     },
-    messages: {},
+    error: null,
+    messages: {
+        durationToMillis: function(count, units) {
+            return parseInt(count) * parseInt(state.messages['time_duration_'+units+'_factor']);
+        },
+        millisToDuration: function (ms) {
+            const durations = state.timeDurationOptionsReversed;
+            for (let i=0; i<durations.length; i++) {
+                const durationMillis = parseInt(state.messages['time_duration_'+durations[i]+'_factor']);
+                if (ms >= durationMillis && ((ms % durationMillis) === 0 || i === durations.length-1)) {
+                    return {count: parseInt(ms) / durationMillis, units: durations[i]};
+                }
+            }
+            return {count: parseInt(ms), units: ''};
+        }
+    },
     countries: [],
     locales: [],
     timezones: [],
     detectedTimezone: null,
     detectedLocale: null,
     accountDeletionOptions: [],
-    error: null
+    timeDurationOptions: [],
+    timeDurationOptionsReversed: []
 };
 
 const actions = {
@@ -153,6 +169,10 @@ const mutations = {
         if (messages.field_label_policy_account_deletion_options) {
             state.accountDeletionOptions = messages.field_label_policy_account_deletion_options.split(',');
         }
+        if (messages.time_duration_options) {
+            state.timeDurationOptions = messages.time_duration_options.split(',');
+            state.timeDurationOptionsReversed = state.timeDurationOptions.slice().reverse();
+        }
     },
     loadMessagesFailure(state, error) {
         state.error = error;
@@ -166,7 +186,7 @@ const mutations = {
     },
     detectTimezoneRequest(state) {},
     detectTimezoneSuccess(state, detectedTimezone) {
-        console.log('detectTimezoneSuccess: detectedTimezone='+JSON.stringify(detectedTimezone));
+        // console.log('detectTimezoneSuccess: detectedTimezone='+JSON.stringify(detectedTimezone));
         state.detectedTimezone = detectedTimezone;
     },
     detectTimezoneFailure(state, error) {

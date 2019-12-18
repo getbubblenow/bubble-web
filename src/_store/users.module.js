@@ -4,7 +4,8 @@ import { account } from '../_store/account.module';
 const state = {
     all: {},
     user: null,
-    policy: {}
+    policy: {},
+    policyStatus: {}
 };
 
 const actions = {
@@ -121,12 +122,14 @@ const mutations = {
     },
 
     updatePolicyByUuidRequest(state) {
-        state.user = { loading: true };
+        state.policyStatus = { updating: true };
     },
     updatePolicyByUuidSuccess(state, policy) {
+        state.policyStatus = {};
         state.policy = policy;
     },
     updatePolicyByUuidFailure(state, error) {
+        state.policyStatus = {};
         state.policy = { error };
     },
 
