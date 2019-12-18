@@ -11,7 +11,7 @@
             <!-- domain -->
             <div v-if="customize.domain === true" class="form-group">
                 <label for="domain">{{messages.field_label_network_domain}}</label>
-                <v-select v-if="domains" :options="domains" label="name" type="text" v-model="network.domain" name="domain" class="form-control" :class="{ 'is-invalid': submitted && errors.has('domain') }"></v-select>
+                <v-select v-validate="'required'" v-if="domains" :options="domains" label="name" type="text" v-model="network.domain" name="domain" class="form-control" :class="{ 'is-invalid': submitted && errors.has('domain') }"></v-select>
                 <div v-if="submitted && errors.has('name')" class="invalid-feedback">{{ errors.first('name') }}</div>
                 <button @click="customize.domain = false">{{messages.button_label_use_default}}</button>
             </div>
@@ -21,11 +21,12 @@
                 <span v-else>{{messages.message_auto_detecting}}</span>
                 <button @click="customize.domain = true">{{messages.button_label_customize}}</button>
             </div>
+            <hr/>
 
             <!-- locale -->
             <div v-if="customize.locale === true" class="form-group">
                 <label htmlFor="locale">{{messages.field_label_locale}}</label>
-                <v-select v-if="locales" :options="locales" :reduce="locale => locale.localeCode" label="localeName" type="text" v-model="network.locale" name="locale" class="form-control" :class="{ 'is-invalid': submitted && errors.has('locale') }"></v-select>
+                <v-select v-validate="'required'" v-if="locales" :options="locales" :reduce="locale => locale.localeCode" label="localeName" type="text" v-model="network.locale" name="locale" class="form-control" :class="{ 'is-invalid': submitted && errors.has('locale') }"></v-select>
                 <div v-if="submitted && errors.has('locale')" class="invalid-feedback">{{ errors.first('locale') }}</div>
                 <button @click="customize.locale = false">{{messages.button_label_use_default}}</button>
             </div>
@@ -35,11 +36,12 @@
                 <span v-else>{{messages.message_auto_detecting}}</span>
                 <button @click="customize.locale = true">{{messages.button_label_customize}}</button>
             </div>
+            <hr/>
 
             <!-- timezone -->
             <div v-if="customize.timezone === true" class="form-group">
                 <label htmlFor="timezone">{{messages.field_label_timezone}}</label>
-                <v-select :options="timezoneObjects" :reduce="tz => tz.timezoneId" label="timezoneDescription" type="text" v-model="network.timezone" name="timezone" class="form-control" :class="{ 'is-invalid': submitted && errors.has('timezone') }"></v-select>
+                <v-select v-validate="'required'" :options="timezoneObjects" :reduce="tz => tz.timezoneId" label="timezoneDescription" type="text" v-model="network.timezone" name="timezone" class="form-control" :class="{ 'is-invalid': submitted && errors.has('timezone') }"></v-select>
                 <div v-if="submitted && errors.has('timezone')" class="invalid-feedback">{{ errors.first('timezone') }}</div>
                 <button @click="customize.timezone = false">{{messages.button_label_use_default}}</button>
             </div>
@@ -49,11 +51,12 @@
                 <span v-else>{{messages.message_auto_detecting}}</span>
                 <button @click="customize.timezone = true">{{messages.button_label_customize}}</button>
             </div>
+            <hr/>
 
             <!-- plan -->
             <div v-if="customize.plan === true" class="form-group">
                 <label htmlFor="plan">{{messages.field_label_plan}}</label>
-                <v-select v-if="planObjects" :options="planObjects" :reduce="plan => plan.name" label="localName" type="text" v-model="network.plan" name="plan" class="form-control" :class="{ 'is-invalid': submitted && errors.has('plan') }"></v-select>
+                <v-select v-validate="'required'" v-if="planObjects" :options="planObjects" :reduce="plan => plan.name" label="localName" type="text" v-model="network.plan" name="plan" class="form-control" :class="{ 'is-invalid': submitted && errors.has('plan') }"></v-select>
                 <div v-if="submitted && errors.has('plan')" class="invalid-feedback">{{ errors.first('plan') }}</div>
                 <button @click="customize.plan = false">{{messages.button_label_use_default}}</button>
             </div>
@@ -66,11 +69,12 @@
             <div>
                 {{messages['plan_description_'+network.plan]}}
             </div>
+            <hr/>
 
             <!-- footprint -->
             <div v-if="customize.footprint === true" class="form-group">
                 <label htmlFor="footprint">{{messages.field_label_footprint}}</label>
-                <v-select v-if="footprintObjects" :options="footprintObjects" :reduce="footprint => footprint.name" label="name" :value="network.footprint" type="text" v-model="network.footprint" name="footprint" class="form-control" :class="{ 'is-invalid': submitted && errors.has('footprint') }"></v-select>
+                <v-select v-validate="'required'" v-if="footprintObjects" :options="footprintObjects" :reduce="footprint => footprint.name" label="name" :value="network.footprint" type="text" v-model="network.footprint" name="footprint" class="form-control" :class="{ 'is-invalid': submitted && errors.has('footprint') }"></v-select>
                 <div v-if="submitted && errors.has('footprint')" class="invalid-feedback">{{ errors.first('footprint') }}</div>
                 <button @click="customize.footprint = false">{{messages.button_label_use_default}}</button>
             </div>
@@ -83,6 +87,7 @@
             <div>
                 {{messages['footprint_description_'+network.footprint]}}
             </div>
+            <hr/>
 
             <div class="form-group">
                 <label htmlFor="paymentMethod">{{messages.field_label_paymentMethod}}</label>
@@ -104,11 +109,11 @@
                 <router-view name="invite" v-if="paymentMethod.driverClass.endsWith('CodePaymentDriver')"></router-view>
                 <router-view name="unknown" v-else></router-view>
             </div>
+            <hr/>
 
             <div class="form-group">
-                <button class="btn btn-primary" :disabled="status.creating">{{messages.button_label_create_new_network}}</button>
+                <button class="btn btn-primary" :disabled="status.creating || !isComplete">{{messages.button_label_create_new_network}}</button>
                 <img v-show="status.creating" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
-<!--                <router-link to="/" class="btn btn-link">{{messages.button_label_cancel}}</router-link>-->
             </div>
         </form>
     </div>
@@ -149,7 +154,9 @@
                 },
                 user: currentUser(),
                 submitted: false,
-                status: ''
+                status: {
+                    creating: false
+                }
             };
         },
         computed: {
@@ -162,6 +169,16 @@
                 creating: state => state.loading,
                 error: state => state.error
             }),
+            isComplete() {
+                return (this.name !== '')
+                    && (this.customize.domain === false || this.network.domain !== '')
+                    && (this.customize.locale === false || this.network.locale !== '')
+                    && (this.customize.timezone === false || this.network.timezone !== '')
+                    && (this.customize.plan === false || this.network.plan !== '')
+                    && (this.customize.footprint === false || this.network.footprint !== '')
+                    && (this.network.paymentMethodObject.paymentMethodType != null)
+                    && (this.network.paymentMethodObject.paymentInfo != null);
+            },
             timezoneObjects: function () {
                 const tz_objects = [];
                 for (let i=0; i<this.timezones.length; i++) {
@@ -255,6 +272,17 @@
                 if (loc) {
                     if (this.network.locale == null || this.network.locale === '') this.network.locale = loc;
                     if (this.defaults.locale == null || this.defaults.locale === '') this.defaults.locale = loc;
+                }
+            },
+            paymentMethod (pm) {
+                if (pm) {
+                    this.network.paymentMethodObject.paymentMethodType = pm.paymentMethodType;
+                    this.network.paymentMethodObject.paymentInfo = null;
+                }
+            },
+            paymentInfo (info) {
+                if (info) {
+                    this.network.paymentMethodObject.paymentInfo = info;
                 }
             }
         },

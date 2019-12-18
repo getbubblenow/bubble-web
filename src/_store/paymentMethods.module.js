@@ -92,6 +92,8 @@ const mutations = {
     },
 
     setPaymentMethodSuccess(state, pm) {
+        state.paymentInfo = null;
+        state.paymentStatus = {};
         state.paymentMethod = pm;
     },
 

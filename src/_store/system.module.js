@@ -130,7 +130,15 @@ const mutations = {
     },
     detectLocaleRequest(state) {},
     detectLocaleSuccess(state, detectedLocales) {
-        state.detectedLocale = detectedLocales.length > 0 ? detectedLocales[0] : null;
+        if (detectedLocales.length) {
+            for (let i=0; i<detectedLocales.length; i++) {
+                if (state.locales.indexOf(detectedLocales[i])) {
+                    state.detectedLocale = detectedLocales[i];
+                    return;
+                }
+            }
+        }
+        state.detectedLocale = state.locales[0];
     },
     detectLocaleFailure(state, error) {
         state.error = error;
