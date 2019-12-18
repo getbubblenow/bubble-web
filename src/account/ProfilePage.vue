@@ -3,9 +3,7 @@
         <h2>Edit Profile</h2>
         <form @submit.prevent="handleSubmit">
             <div class="form-group">
-                <label for="name">{{messages.field_label_username}}</label>
-                <input type="text" v-model="user.name" v-validate="'required'" name="name" class="form-control" :class="{ 'is-invalid': submitted && errors.has('name') }" />
-                <div v-if="submitted && errors.has('name')" class="invalid-feedback">{{ errors.first('name') }}</div>
+                <span>{{messages.field_label_username}}: {{user.name}}</span>
             </div>
             <div class="form-group">
                 <label htmlFor="url">{{messages.field_label_url}}</label>
@@ -13,7 +11,7 @@
                 <div v-if="submitted && errors.has('url')" class="invalid-feedback">{{ errors.first('url') }}</div>
             </div>
             <div class="form-group">
-                <label htmlFor="description">{{messages.field_label_bio}}</label>
+                <label htmlFor="description">{{messages.field_label_description}}</label>
                 <input type="text" v-model="user.description" name="description" class="form-control"/>
                 <div v-if="submitted && errors.has('description')" class="invalid-feedback">{{ errors.first('description') }}</div>
             </div>
@@ -95,8 +93,6 @@
             ...mapActions('users', ['update', 'loadUser']),
             handleSubmit (e) {
                 const updatedProfile = {
-                    uuid: this.user.uuid,
-                    name: this.user.name,
                     url: this.user.url,
                     description: this.user.description,
                     admin: this.user.admin,
