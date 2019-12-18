@@ -1,7 +1,7 @@
 <template>
     <div>
         <div ref="card"></div>
-        <button v-on:click="authorizeCard">{{messages.button_label_submit_card_authorization}}</button>
+        <button v-on:click="authorizeCard">{{messages.button_label_submit_card}}</button>
     </div>
 </template>
 
@@ -21,7 +21,6 @@
             ...mapState('system', ['messages']),
         },
         created () {
-            console.log('StripePayment.vue: created, stripe key='+this.paymentMethod.driverConfig.publicApiKey);
             window.stripe = Stripe(this.paymentMethod.driverConfig.publicApiKey);
             this.elements = window.stripe.elements();
             this.card = undefined;
@@ -33,8 +32,6 @@
         methods: {
             ...mapActions('paymentMethods', ['setPaymentInfo']),
             authorizeCard(e) {
-                console.log('authorizeCard: starting with key='+this.paymentMethod.driverConfig.publicApiKey);
-                // window.stripe.setPublishableKey(this.paymentMethod.driverConfig.publicApiKey);
                 window.stripe.createToken(this.card).then(function(result) {
                     console.log('authorizedCard: created token='+JSON.stringify(result.token));
                     if (result.error) {
