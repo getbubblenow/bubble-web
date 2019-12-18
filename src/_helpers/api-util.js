@@ -57,26 +57,26 @@ export function handleBasicResponse(response) {
     });
 }
 
-export function handleCrudResponse(response) {
-    return response.text().then(text => {
-        const data = text && JSON.parse(text);
-        if (!response.ok) {
-            if (response.status === 404) {
-                // set error from API
-                // todo: show nicer error message
-                console.log('handleResponse: received 404, user not found: '+JSON.stringify(data));
+export function handleCrudResponse(messages, errors) {
+    return function (response) {
+        return response.text().then(text => {
+            const data = text && JSON.parse(text);
+            if (!response.ok) {
+                if (response.status === 404) {
+                    // todo: show nicer error message
+                    console.log('handleCrudResponse: received 404, user not found: ' + JSON.stringify(data));
 
-            } else if (response.status === 422) {
-                // set error from API
-                // todo: load auth error messages, find text for error message
-                console.log('handleResponse: received 422, error: '+JSON.stringify(data));
+                } else if (response.status === 422) {
+                    console.log('handleCrudResponse: received 422, error: ' + JSON.stringify(data));
+                    setValidationErrors(data, messages, errors);
+                }
+
+                const error = (data && data.message) || response.statusText;
+                return Promise.reject(error);
             }
-
-            const error = (data && data.message) || response.statusText;
-            return Promise.reject(error);
-        }
-        return data;
-    });
+            return data;
+        });
+    }
 }
 
 export function setValidationErrors(data, messages, errors) {
@@ -91,5 +91,6 @@ export function setValidationErrors(data, messages, errors) {
                 console.log('>>>>> field '+field+' added error: '+message+', errors='+JSON.stringify(errors));
             }
         }
+        // todo: else add "global" error message for unrecognized/non-field error
     }
 }

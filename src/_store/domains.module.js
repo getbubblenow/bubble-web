@@ -8,18 +8,18 @@ const state = {
 };
 
 const actions = {
-    getAll({ commit }, userId) {
+    getAll({ commit }, {messages, errors}) {
         commit('getAllRequest');
-        domainService.getAll(userId)
+        domainService.getAll(messages, errors)
             .then(
                 domains => commit('getAllSuccess', domains),
                 error => commit('getAllFailure', error)
             );
     },
 
-    getByUuid({ commit }, userId, uuid) {
+    getByUuid({ commit }, {uuid, messages, errors}) {
         commit('getByUuidRequest');
-        domainService.getById(userId, uuid)
+        domainService.getById(uuid, messages, errors)
             .then(
                 domain => commit('getByUuidSuccess', domain),
                 error => commit('getByUuidFailure', error)

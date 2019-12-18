@@ -6,10 +6,10 @@ export const footprintService = {
     getById
 };
 
-function getAll() {
-    return fetch(`${config.apiUrl}/me/footprints`, getWithAuth()).then(handleCrudResponse);
+function getAll(messages, errors) {
+    return fetch(`${config.apiUrl}/me/footprints`, getWithAuth()).then(handleCrudResponse(messages, errors));
 }
 
-function getById(footprintId) {
-    return fetch(`${config.apiUrl}/me/footprints/${footprintId}`, getWithAuth()).then(handleCrudResponse);
+function getById(footprintId, messages, errors) {
+    return fetch(`${config.apiUrl}/me/footprints/${footprintId}`, getWithAuth()).then(handleCrudResponse(messages, errors));
 }

@@ -8,27 +8,27 @@ const state = {
 };
 
 const actions = {
-    getAll({ commit }) {
+    getAll({ commit }, {messages, errors}) {
         commit('getAllRequest');
-        planService.getAll()
+        planService.getAll(messages, errors)
             .then(
                 plans => commit('getAllSuccess', plans),
                 error => commit('getAllFailure', error)
             );
     },
 
-    getByUuid({ commit }, uuid) {
+    getByUuid({ commit }, {uuid, messages, errors}) {
         commit('getByUuidRequest');
-        planService.getById(uuid)
+        planService.getById(uuid, messages, errors)
             .then(
                 plan => commit('getByUuidSuccess', plan),
                 error => commit('getByUuidFailure', error)
             );
     },
 
-    delete({ commit }, id) {
+    delete({ commit }, {id, messages, errors}) {
         commit('deleteRequest', id);
-        planService.delete(id)
+        planService.delete(id, messages, errors)
             .then(
                 plan => commit('deleteSuccess', plan),
                 error => commit('deleteFailure', { id, error: error.toString() })

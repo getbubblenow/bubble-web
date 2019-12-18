@@ -33,7 +33,7 @@
         </div>
 
         <div v-if="!networks || networks.length === 0">
-            {{messages.empty_networks}}
+            {{messages.message_empty_networks}}
             <router-view></router-view>
         </div>
 
@@ -52,7 +52,7 @@
             ...mapState('system', ['messages'])
         },
         created () {
-            this.getAllNetworks();
+            this.getAllNetworks(this.messages, this.errors);
         },
         methods: {
             ...mapActions('networks', {

@@ -51,21 +51,21 @@ function register(user, messages, errors) {
         });
 }
 
-function getAll() {
-    return fetch(`${config.apiUrl}/users`, getWithAuth()).then(handleCrudResponse);
+function getAll(messages, errors) {
+    return fetch(`${config.apiUrl}/users`, getWithAuth()).then(handleCrudResponse(messages, errors));
 }
 
-function getById(id) {
-    return fetch(`${config.apiUrl}/users/${id}`, getWithAuth()).then(handleCrudResponse);
+function getById(id, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${id}`, getWithAuth()).then(handleCrudResponse(messages, errors));
 }
 
-function update(user) {
-    return fetch(`${config.apiUrl}/users/${user.uuid}`, postWithAuth(user)).then(handleCrudResponse);
+function update(user, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${user.uuid}`, postWithAuth(user)).then(handleCrudResponse(messages, errors));
 }
 
 // prefixed function name with underscore because delete is a reserved word in javascript
-function _delete(id) {
-    return fetch(`${config.apiUrl}/users/${id}`, deleteWithAuth()).then(handleCrudResponse);
+function _delete(id, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${id}`, deleteWithAuth()).then(handleCrudResponse(messages, errors));
 }
 
 function handleAuthResponse(messages, errors) {

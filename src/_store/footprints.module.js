@@ -8,18 +8,18 @@ const state = {
 };
 
 const actions = {
-    getAll({ commit }) {
+    getAll({ commit }, {messages, errors}) {
         commit('getAllRequest');
-        footprintService.getAll()
+        footprintService.getAll(messages, errors)
             .then(
                 footprints => commit('getAllSuccess', footprints),
                 error => commit('getAllFailure', error)
             );
     },
 
-    getByUuid({ commit }, uuid) {
+    getByUuid({ commit }, {uuid, messages, errors}) {
         commit('getByUuidRequest');
-        footprintService.getById(uuid)
+        footprintService.getById(uuid, messages, errors)
             .then(
                 footprint => commit('getByUuidSuccess', footprint),
                 error => commit('getByUuidFailure', error)

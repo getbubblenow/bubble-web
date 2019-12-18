@@ -7,40 +7,40 @@ const state = {
 };
 
 const actions = {
-    getAll({ commit }) {
+    getAll({ commit }, {messages, errors}) {
         commit('getAllRequest');
 
-        userService.getAll()
+        userService.getAll(messages, errors)
             .then(
                 users => commit('getAllSuccess', users),
                 error => commit('getAllFailure', error)
             );
     },
 
-    getByUuid({ commit }, uuid) {
+    getByUuid({ commit }, {uuid, messages, errors}) {
         commit('getByUuidRequest');
 
-        userService.getById(uuid)
+        userService.getById(uuid, messages, errors)
             .then(
                 users => commit('getByUuidSuccess', users),
                 error => commit('getByUuidFailure', error)
             );
     },
 
-    update({ commit }, user) {
+    update({ commit }, {user, messages, errors}) {
         commit('updateRequest', user);
 
-        userService.update(user)
+        userService.update(user, messages, errors)
             .then(
                 user => commit('updateSuccess', user),
                 error => commit('updateFailure', { user, error: error.toString() })
             );
     },
 
-    delete({ commit }, id) {
+    delete({ commit }, {id, messages, errors}) {
         commit('deleteRequest', id);
 
-        userService.delete(id)
+        userService.delete(id, messages, errors)
             .then(
                 id => commit('deleteSuccess', id),
                 error => commit('deleteFailure', { id, error: error.toString() })

@@ -1,15 +1,15 @@
 import config from 'config';
-import { getWithAuth, handleCrudResponse } from '../_helpers';
+import {currentUser, getWithAuth, handleCrudResponse} from '../_helpers';
 
 export const domainService = {
     getAll,
     getById
 };
 
-function getAll(userId) {
-    return fetch(`${config.apiUrl}/users/${userId}/domains`, getWithAuth()).then(handleCrudResponse);
+function getAll(messages, errors) {
+    return fetch(`${config.apiUrl}/me/domains`, getWithAuth()).then(handleCrudResponse(messages, errors));
 }
 
-function getById(userId, domainId) {
-    return fetch(`${config.apiUrl}/users/${userId}/domains/${domainId}`, getWithAuth()).then(handleCrudResponse);
+function getById(domainId, messages, errors) {
+    return fetch(`${config.apiUrl}/me/domains/${domainId}`, getWithAuth()).then(handleCrudResponse(messages, errors));
 }

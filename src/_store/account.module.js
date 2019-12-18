@@ -46,9 +46,9 @@ const actions = {
                 }
             );
     },
-    update({ dispatch, commit }, user) {
+    update({ dispatch, commit }, {user, messages, errors}) {
         commit('updateRequest', user);
-        userService.update(user)
+        userService.update(user, messages, errors)
             .then(
                 user => {
                     commit('updateSuccess', user);

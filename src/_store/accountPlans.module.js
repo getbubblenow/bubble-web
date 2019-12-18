@@ -9,30 +9,30 @@ const state = {
 };
 
 const actions = {
-    getAll({ commit }) {
+    getAll({ commit }, {messages, errors}) {
         commit('getAllRequest');
 
-        accountPlanService.getAll(account.user.uuid)
+        accountPlanService.getAll(account.user.uuid, messages, errors)
             .then(
                 accountPlans => commit('getAllSuccess', accountPlans),
                 error => commit('getAllFailure', error)
             );
     },
 
-    getByUuid({ commit }, uuid) {
+    getByUuid({ commit }, {uuid, messages, errors}) {
         commit('getByUuidRequest');
 
-        accountPlanService.getById(account.user.uuid, uuid)
+        accountPlanService.getById(account.user.uuid, uuid, messages, errors)
             .then(
                 accountPlan => commit('getByUuidSuccess', accountPlan),
                 error => commit('getByUuidFailure', error)
             );
     },
 
-    delete({ commit }, id) {
+    delete({ commit }, {id, messages, errors}) {
         commit('deleteRequest', id);
 
-        accountPlanService.delete(account.user.uuid, id)
+        accountPlanService.delete(account.user.uuid, id, messages, errors)
             .then(
                 accountPlan => commit('deleteSuccess', accountPlan),
                 error => commit('deleteFailure', { id, error: error.toString() })

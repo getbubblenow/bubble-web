@@ -6,10 +6,10 @@ export const planService = {
     getById
 };
 
-function getAll() {
-    return fetch(`${config.apiUrl}/plans`, getWithAuth()).then(handleCrudResponse);
+function getAll(messages, errors) {
+    return fetch(`${config.apiUrl}/plans`, getWithAuth()).then(handleCrudResponse(messages, errors));
 }
 
-function getById(planId) {
-    return fetch(`${config.apiUrl}/plans/${planId}`, getWithAuth()).then(handleCrudResponse);
+function getById(planId, messages, errors) {
+    return fetch(`${config.apiUrl}/plans/${planId}`, getWithAuth()).then(handleCrudResponse(messages, errors));
 }

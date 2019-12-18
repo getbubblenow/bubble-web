@@ -69,7 +69,8 @@
             };
         },
         computed: {
-            ...mapState('account', ['status'])
+            ...mapState('account', ['status']),
+            ...mapState('system', ['messages'])
         },
         methods: {
             ...mapActions('users', ['update', 'loadUser']),
@@ -85,7 +86,7 @@
                     autoUpdatePolicy: this.autoUpdatePolicy
                 };
                 if (this.name) {
-                    this.update(updatedProfile);
+                    this.update(updatedProfile, this.messages, this.errors);
                 }
             }
         }

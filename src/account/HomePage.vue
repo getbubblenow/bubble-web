@@ -17,17 +17,19 @@ export default {
         }),
         ...mapState('system', ['messages'])
     },
-    created () {
-        // todo: allow user to choose locale
-        const locale = 'detect';
-        this.loadMessages('post_auth', locale);
-    },
     methods: {
         ...mapActions('users', {
             getAllUsers: 'getAll',
             deleteUser: 'delete'
         }),
-        ...mapActions('system', ['loadMessages', 'loadTimezones'])
+        ...mapActions('system', ['loadMessages', 'loadTimezones', 'detectTimezone', 'detectLocale'])
+    },
+    created () {
+        // todo: allow user to choose locale
+        const locale = 'detect';
+        this.loadMessages('post_auth', locale);
+        this.detectLocale();
+        this.detectTimezone();
     }
 };
 </script>

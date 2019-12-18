@@ -22,7 +22,7 @@
                 <input type="checkbox" id="user.contact.receiveInformationalMessages" v-model="user.contact.receiveInformationalMessages">
             </div>
             <div class="form-group">
-                <label for="user.contact.receivePromotionalMessages">{{messages.field_label_receiveInformationalMessages}}</label>
+                <label for="user.contact.receivePromotionalMessages">{{messages.field_label_receivePromotionalMessages}}</label>
                 <input type="checkbox" id="user.contact.receivePromotionalMessages" v-model="user.contact.receivePromotionalMessages">
             </div>
             <div class="form-group">

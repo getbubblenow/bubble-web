@@ -26,7 +26,7 @@ export default {
     },
     methods: {
         ...mapActions({ clearAlert: 'alert/clear' }),
-        ...mapActions('system', ['loadSystemConfigs', 'loadMessages', 'loadTimezones', 'detectTimezone', 'detectLocale'])
+        ...mapActions('system', ['loadSystemConfigs', 'loadMessages', 'loadTimezones'])
     },
     watch: {
         $route (to, from){
@@ -42,9 +42,7 @@ export default {
         this.loadMessages('pre_auth', locale);
         this.loadMessages('countries', locale);
         this.loadMessages('timezones', locale);
-        this.detectLocale();
         this.loadTimezones();
-        this.detectTimezone();
     }
 };
 </script>

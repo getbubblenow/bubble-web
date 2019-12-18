@@ -6,10 +6,10 @@ export const networkService = {
     getById
 };
 
-function getAll(userId) {
-    return fetch(`${config.apiUrl}/users/${userId}/networks`, getWithAuth()).then(handleCrudResponse);
+function getAll(userId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/networks`, getWithAuth()).then(handleCrudResponse(messages, errors));
 }
 
-function getById(userId, networkId) {
-    return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}`, getWithAuth()).then(handleCrudResponse);
+function getById(userId, networkId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}`, getWithAuth()).then(handleCrudResponse(messages, errors));
 }

@@ -10,31 +10,31 @@ const state = {
 };
 
 const actions = {
-    getAll({ commit }) {
+    getAll({ commit }, {messages, errors}) {
         commit('getAllRequest');
-        networkService.getAll(account.state.user.uuid)
+        networkService.getAll(account.state.user.uuid, messages, errors)
             .then(
                 networks => commit('getAllSuccess', networks),
                 error => commit('getAllFailure', error)
             );
     },
 
-    getByUuid({ commit }, uuid) {
+    getByUuid({ commit }, {uuid, messages, errors}) {
         commit('getByUuidRequest');
-        networkService.getById(account.state.user.uuid, uuid)
+        networkService.getById(account.state.user.uuid, uuid, messages, errors)
             .then(
                 network => commit('getByUuidSuccess', network),
                 error => commit('getByUuidFailure', error)
             );
     },
 
-    create({ commit }, accountPlan) {
+    create({ commit }, {accountPlan, messages, errors}) {
         // todo
     },
 
-    delete({ commit }, id) {
+    delete({ commit }, {id, messages, errors}) {
         commit('deleteRequest', id);
-        networkService.delete(account.state.user.uuid, id)
+        networkService.delete(account.state.user.uuid, id, messages, errors)
             .then(
                 network => commit('deleteSuccess', network),
                 error => commit('deleteFailure', { id, error: error.toString() })
