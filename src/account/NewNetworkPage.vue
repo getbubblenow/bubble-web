@@ -243,10 +243,6 @@
                             };
                             this.createNewNetwork(this.network);
                         }
-                    } else {
-                        console.log('handleSubmit: no payment info found');
-                        // console.log('handleSubmit: paymentMethod='+JSON.stringify(this.paymentMethod));
-                        if (this.paymentMethod) console.log('handleSubmit: paymentMethod.driverClass='+JSON.stringify(this.paymentMethod.driverClass));
                     }
                 });
             }

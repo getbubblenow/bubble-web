@@ -71,9 +71,8 @@ const mutations = {
         // todo: add 'updating:true' property to user being updated
     },
     updateSuccess(state, user) {
-        // todo: why doesn't this work?
-        user.token = account.user.token;  // preserve token
-        state.user = account.user = user;
+        user.token = account.state.user.token;  // preserve token
+        state.user = account.state.user = user;
         localStorage.setItem('user', JSON.stringify(user));
     },
     updateFailure(state, { id, error }) {
