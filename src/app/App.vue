@@ -13,13 +13,14 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 
 export default {
     name: 'app',
     computed: {
         ...mapState('account', ['status']),
         ...mapState('system', ['configs', 'messages', 'menu']),
+        ...mapGetters('system', ['menu']),
         ...mapState({
             alert: state => state.alert
         })

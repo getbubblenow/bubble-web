@@ -3,8 +3,9 @@ import {account} from "./account.module";
 
 const state = {
     configs: {
-        allowRegistration: null,
-        paymentsEnabled: true
+        allowRegistration: false,
+        paymentsEnabled: false,
+        sageLauncher: false
     },
     messages: {},
     countries: [],
@@ -12,7 +13,6 @@ const state = {
     timezones: [],
     detectedTimezone: null,
     detectedLocale: null,
-    menu: [],
     error: null
 };
 
@@ -56,6 +56,76 @@ const actions = {
     }
 };
 
+const getters = {
+    menu: function () {
+        const configs = state.configs;
+        const messages = state.messages;
+        const menu = [{
+            href: '/',
+            title: messages.label_menu_dashboard,
+            icon: messages.label_menu_dashboard_icon
+        }, {
+            href: '/profile',
+            title: messages.label_menu_account,
+            icon: messages.label_menu_account_icon,
+            child: [{
+                href: '/profile/policy',
+                title: messages.label_menu_account_policy,
+                icon: messages.label_menu_account_policy_icon
+            }, {
+                href: '/profile/contacts',
+                title: messages.label_menu_account_contacts,
+                icon: messages.label_menu_account_contacts_icon
+            }]
+        }, {
+            href: '/logout',
+            title: messages.label_menu_logout,
+            icon: messages.label_menu_logout_icon
+        }];
+        if (configs.paymentsEnabled) {
+            menu[1].child.push({
+                href: '/me/bills',
+                title: messages.label_menu_bills,
+                icon: messages.label_menu_bills_icon
+            });
+        }
+        if (configs.sageLauncher) {
+            menu.splice(2, 0, {
+                href: '/me/networks',
+                title: messages.label_menu_networks,
+                icon: messages.label_menu_networks_icon
+            });
+        }
+        if (account.state.user.admin === true) {
+            const admin_menu = {
+                href: '/admin',
+                title: messages.label_menu_admin,
+                icon: messages.label_menu_admin_icon,
+                child: [{
+                    href: '/admin/users',
+                    title: messages.label_menu_admin_users,
+                    icon: messages.label_menu_admin_users_icon
+                }]
+            };
+            menu.splice(1, 0, admin_menu);
+            if (configs.sageLauncher)  {
+                admin_menu.child.push({
+                    href: '/admin/networks',
+                    title: messages.label_menu_admin_networks,
+                    icon: messages.label_menu_admin_networks_icon
+                });
+            }
+            if (configs.paymentsEnabled) {
+                admin_menu.child.push({
+                    href: '/admin/bills',
+                    title: messages.label_menu_admin_bills,
+                    icon: messages.label_menu_admin_bills_icon
+                });
+            }
+        }
+        return menu;
+    }
+}
 const mutations = {
     loadSystemConfigsRequest(state) {},
     loadSystemConfigsSuccess(state, configs) {
@@ -68,87 +138,6 @@ const mutations = {
     loadMessagesSuccess(state, {group, messages}) {
         // console.log('loadMessages (group='+group+'), messages='+JSON.stringify(messages));
         state.messages = Object.assign({}, state.messages, messages);
-        if (account.state.user.admin === true) {
-            state.menu = [{
-                href: '/',
-                title: messages.label_menu_dashboard,
-                icon: messages.label_menu_dashboard_icon
-            }, {
-                href: '/admin',
-                title: messages.label_menu_admin,
-                icon: messages.label_menu_admin_icon,
-                child: [{
-                    href: '/admin/users',
-                    title: messages.label_menu_admin_users,
-                    icon: messages.label_menu_admin_users_icon
-                }, {
-                    href: '/admin/networks',
-                    title: messages.label_menu_admin_networks,
-                    icon: messages.label_menu_admin_networks_icon
-                }, {
-                    href: '/admin/bills',
-                    title: messages.label_menu_admin_bills,
-                    icon: messages.label_menu_admin_bills_icon
-                }]
-            }, {
-                href: '/profile',
-                title: messages.label_menu_account,
-                icon: messages.label_menu_account_icon,
-                child: [{
-                    href: '/profile/policy',
-                    title: messages.label_menu_account_policy,
-                    icon: messages.label_menu_account_policy_icon
-                }, {
-                    href: '/profile/contacts',
-                    title: messages.label_menu_account_contacts,
-                    icon: messages.label_menu_account_contacts_icon
-                }, {
-                    href: '/me/bills',
-                    title: messages.label_menu_bills,
-                    icon: messages.label_menu_bills_icon
-                }]
-            }, {
-                href: '/me/networks',
-                title: messages.label_menu_networks,
-                icon: messages.label_menu_networks_icon
-            }, {
-                href: '/logout',
-                title: messages.label_menu_logout,
-                icon: messages.label_menu_logout_icon
-            }];
-
-        } else {
-            state.menu = [{
-                href: '/',
-                title: messages.label_menu_dashboard,
-                icon: messages.label_menu_dashboard_icon
-            }, {
-                href: '/profile',
-                title: messages.label_menu_account,
-                icon: messages.label_menu_account_icon,
-                child: [{
-                    href: '/profile/policy',
-                    title: messages.label_menu_account_policy,
-                    icon: messages.label_menu_account_policy_icon
-                }, {
-                    href: '/profile/contacts',
-                    title: messages.label_menu_account_contacts,
-                    icon: messages.label_menu_account_contacts_icon
-                }]
-            }, {
-                href: '/me/networks',
-                title: messages.label_menu_networks,
-                icon: messages.label_menu_networks_icon
-            }, {
-                href: '/me/bills',
-                title: messages.label_menu_bills,
-                icon: messages.label_menu_bills_icon
-            }, {
-                href: '/logout',
-                title: messages.label_menu_logout,
-                icon: messages.label_menu_logout_icon
-            }];
-        }
         if (messages.country_codes) {
             const countries = [];
             const codes = messages.country_codes.split(',');
@@ -203,6 +192,7 @@ const mutations = {
 
 export const system = {
     namespaced: true,
+    getters,
     state,
     actions,
     mutations
