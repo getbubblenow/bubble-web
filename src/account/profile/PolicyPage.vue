@@ -125,29 +125,29 @@
                 </td>
 
                 <td v-if="contact.requiredForNetworkUnlock">
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
+                    <i @click="contactFlag(contact, 'requiredForNetworkUnlock', false)" aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
                     <span class="sr-only">{{messages.message_true}}</span>
                 </td>
                 <td v-else>
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
+                    <i @click="contactFlag(contact, 'requiredForNetworkUnlock', true)" aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
                 <td v-if="contact.requiredForNodeOperations">
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
+                    <i @click="contactFlag(contact, 'requiredForNodeOperations', false)" aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
                     <span class="sr-only">{{messages.message_true}}</span>
                 </td>
                 <td v-else>
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
+                    <i @click="contactFlag(contact, 'requiredForNodeOperations', true)" aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
                 <td v-if="contact.requiredForAccountOperations">
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
+                    <i @click="contactFlag(contact, 'requiredForAccountOperations', false)" aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
                     <span class="sr-only">{{messages.message_true}}</span>
                 </td>
                 <td v-else>
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
+                    <i @click="contactFlag(contact, 'requiredForAccountOperations', true)" aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
@@ -156,11 +156,11 @@
                     <span class="sr-only">{{messages.field_label_policy_contact_value_not_applicable_name}}</span>
                 </td>
                 <td v-else-if="contact.receiveVerifyNotifications">
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
+                    <i @click="contactFlag(contact, 'receiveVerifyNotifications', false)" aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
                     <span class="sr-only">{{messages.message_true}}</span>
                 </td>
                 <td v-else>
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
+                    <i @click="contactFlag(contact, 'receiveVerifyNotifications', true)" aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
@@ -169,11 +169,11 @@
                     <span class="sr-only">{{messages.field_label_policy_contact_value_not_applicable_name}}</span>
                 </td>
                 <td v-else-if="contact.receiveLoginNotifications">
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
+                    <i @click="contactFlag(contact, 'receiveLoginNotifications', false)" aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
                     <span class="sr-only">{{messages.message_true}}</span>
                 </td>
                 <td v-else>
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
+                    <i @click="contactFlag(contact, 'receiveLoginNotifications', false)" aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
@@ -182,11 +182,11 @@
                     <span class="sr-only">{{messages.field_label_policy_contact_value_not_applicable_name}}</span>
                 </td>
                 <td v-else-if="contact.receivePasswordNotification">
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
+                    <i @click="contactFlag(contact, 'receivePasswordNotification', false)" aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
                     <span class="sr-only">{{messages.message_true}}</span>
                 </td>
                 <td v-else>
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
+                    <i @click="contactFlag(contact, 'receivePasswordNotification', true)" aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
@@ -195,11 +195,11 @@
                     <span class="sr-only">{{messages.field_label_policy_contact_value_not_applicable_name}}</span>
                 </td>
                 <td v-else-if="contact.receiveInformationalMessages">
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
+                    <i @click="contactFlag(contact, 'receiveInformationalMessages', false)" aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
                     <span class="sr-only">{{messages.message_true}}</span>
                 </td>
                 <td v-else>
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
+                    <i @click="contactFlag(contact, 'receiveInformationalMessages', true)" aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
@@ -208,13 +208,14 @@
                     <span class="sr-only">{{messages.field_label_policy_contact_value_not_applicable_name}}</span>
                 </td>
                 <td v-else-if="contact.receivePromotionalMessages">
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
+                    <i @click="contactFlag(contact, 'receivePromotionalMessages', false)" aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
                     <span class="sr-only">{{messages.message_true}}</span>
                 </td>
                 <td v-else>
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
+                    <i @click="contactFlag(contact, 'receivePromotionalMessages', true)" aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
+
                 <td>
                     <i @click="removeContact(contact.uuid)" aria-hidden="true" :class="messages.button_label_remove_contact_icon" :title="messages.button_label_remove_contact"></i>
                     <span class="sr-only">{{messages.button_label_remove_contact}}</span>
@@ -403,6 +404,16 @@
                 this.removePolicyContactByUuid({
                     uuid: this.currentUser.uuid,
                     contactUuid: uuid,
+                    messages: this.messages,
+                    errors: this.errors
+                });
+            },
+            contactFlag(contact, flag, val) {
+                contact[flag] = val;
+                console.log('contactFlag: update: '+JSON.stringify(contact));
+                this.addPolicyContactByUuid({
+                    uuid: this.currentUser.uuid,
+                    contact: contact,
                     messages: this.messages,
                     errors: this.errors
                 });
