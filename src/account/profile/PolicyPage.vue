@@ -89,7 +89,6 @@
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_receivePromotionalMessages_icon" :title="messages.field_label_policy_contact_receivePromotionalMessages"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_receivePromotionalMessages}}</span>
                 </td>
-                <td><!-- Edit --></td>
                 <td><!-- Delete --></td>
             </tr>
             </thead>
@@ -216,11 +215,6 @@
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
-
-                <td>
-                    <i aria-hidden="true" :class="messages.button_label_edit_contact_icon" :title="messages.button_label_edit_contact"></i>
-                    <span class="sr-only">{{messages.button_label_edit_contact}}</span>
-                </td>
                 <td>
                     <i @click="removeContact(contact.uuid)" aria-hidden="true" :class="messages.button_label_remove_contact_icon" :title="messages.button_label_remove_contact"></i>
                     <span class="sr-only">{{messages.button_label_remove_contact}}</span>
@@ -282,6 +276,13 @@
             <div v-if="newContact.type !== '' && newContact.type !== 'authenticator'" class="form-group">
                 <label for="receivePromotionalMessages">{{messages.field_label_policy_contact_receivePromotionalMessages}}</label>
                 <input type="checkbox" id="receivePromotionalMessages" v-model="newContact.receivePromotionalMessages">
+            </div>
+
+            <hr/>
+            <div class="form-group">
+                <label htmlFor="nick">{{messages.field_label_policy_contact_nick}}</label>
+                <input v-model="newContact.nick" name="nick" class="form-control"/>
+                <div v-if="contactSubmitted && errors.has('nick')" class="invalid-feedback d-block">{{ errors.first('nick') }}</div>
             </div>
 
             <hr/>
@@ -355,14 +356,12 @@
                     }
                 }
                 if (!hasAuth) {
-                    console.log('hasAuth is false, returning this.contactTypes='+JSON.stringify(this.contactTypes));
                     return this.contactTypes;
                 }
                 const types = [];
                 for (let i=0; i<this.contactTypes.length; i++) {
                     if (this.contactTypes[i] !== 'authenticator') types.push(this.contactTypes[i]);
                 }
-                console.log('hasAuth was true, returning types='+JSON.stringify(types));
                 return types;
             },
             newContactValid() {
