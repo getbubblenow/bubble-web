@@ -10,7 +10,7 @@ export const userService = {
     getPolicyById,
     updatePolicyById,
     addPolicyContactById,
-    removePolicyContactByTypeAndInfo,
+    removePolicyContactByUuid,
     update,
     delete: _delete
 };
@@ -75,8 +75,8 @@ function addPolicyContactById(id, contact, messages, errors) {
     return fetch(`${config.apiUrl}/users/${id}/policy/contacts`, postWithAuth(contact)).then(handleCrudResponse(messages, errors));
 }
 
-function removePolicyContactByTypeAndInfo(id, type, info, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${id}/policy/contacts/${type}/${info}`, deleteWithAuth()).then(handleCrudResponse(messages, errors));
+function removePolicyContactByUuid(id, uuid, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${id}/policy/contacts/${uuid}`, deleteWithAuth()).then(handleCrudResponse(messages, errors));
 }
 
 function update(user, messages, errors) {

@@ -64,7 +64,7 @@ export function handleCrudResponse(messages, errors) {
             if (!response.ok) {
                 if (response.status === 404) {
                     // todo: show nicer error message
-                    console.log('handleCrudResponse: received 404, user not found: ' + JSON.stringify(data));
+                    console.log('handleCrudResponse: received 404: ' + JSON.stringify(data));
 
                 } else if (response.status === 422) {
                     console.log('handleCrudResponse: received 422, error: ' + JSON.stringify(data));

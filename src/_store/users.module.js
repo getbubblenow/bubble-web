@@ -5,13 +5,13 @@ const state = {
     all: {},
     user: null,
     policy: {},
-    policyStatus: {}
+    policyStatus: {},
+    contact: null
 };
 
 const actions = {
     getAll({ commit }, {messages, errors}) {
         commit('getAllRequest');
-
         userService.getAll(messages, errors)
             .then(
                 users => commit('getAllSuccess', users),
@@ -21,7 +21,6 @@ const actions = {
 
     getByUuid({ commit }, {uuid, messages, errors}) {
         commit('getByUuidRequest');
-
         userService.getById(uuid, messages, errors)
             .then(
                 users => commit('getByUuidSuccess', users),
@@ -31,7 +30,6 @@ const actions = {
 
     update({ commit }, {user, messages, errors}) {
         commit('updateRequest', user);
-
         userService.update(user, messages, errors)
             .then(
                 user => commit('updateSuccess', user),
@@ -41,7 +39,6 @@ const actions = {
 
     getPolicyByUuid({ commit }, {uuid, messages, errors}) {
         commit('getPolicyByUuidRequest');
-
         userService.getPolicyById(uuid, messages, errors)
             .then(
                 policy => commit('getPolicyByUuidSuccess', policy),
@@ -51,7 +48,6 @@ const actions = {
 
     updatePolicyByUuid({ commit }, {uuid, policy, messages, errors}) {
         commit('updatePolicyByUuidRequest');
-
         userService.updatePolicyById(uuid, policy, messages, errors)
             .then(
                 policy => commit('updatePolicyByUuidSuccess', policy),
@@ -61,27 +57,24 @@ const actions = {
 
     addPolicyContactByUuid({ commit }, {uuid, contact, messages, errors}) {
         commit('addPolicyContactByUuidRequest');
-
-        userService.updatePolicyById(uuid, contact, messages, errors)
+        userService.addPolicyContactById(uuid, contact, messages, errors)
             .then(
-                policy => commit('addPolicyContactByUuidSuccess', policy),
+                contact => commit('addPolicyContactByUuidSuccess', contact),
                 error => commit('addPolicyContactByUuidFailure', error)
             );
     },
 
-    removePolicyContactByTypeAndInfo({ commit }, {uuid, type, info, messages, errors}) {
-        commit('removePolicyContactByTypeAndInfoRequest');
-
-        userService.removePolicyContactByTypeAndInfo(uuid, type, info, messages, errors)
+    removePolicyContactByUuid({ commit }, {uuid, contactUuid, messages, errors}) {
+        commit('removePolicyContactByUuidRequest');
+        userService.removePolicyContactByUuid(uuid, contactUuid, messages, errors)
             .then(
-                policy => commit('removePolicyContactByTypeAndInfoSuccess', policy),
-                error => commit('removePolicyContactByTypeAndInfoFailure', error)
+                policy => commit('removePolicyContactByUuidSuccess', policy),
+                error => commit('removePolicyContactByUuidFailure', error)
             );
     },
 
     delete({ commit }, {id, messages, errors}) {
         commit('deleteRequest', id);
-
         userService.delete(id, messages, errors)
             .then(
                 id => commit('deleteSuccess', id),
@@ -136,20 +129,20 @@ const mutations = {
     addPolicyContactByUuidRequest(state) {
         state.user = { loading: true };
     },
-    addPolicyContactByUuidSuccess(state, policy) {
-        state.policy = policy;
+    addPolicyContactByUuidSuccess(state, contact) {
+        state.contact = contact;
     },
     addPolicyContactByUuidFailure(state, error) {
-        state.policy = { error };
+        state.contact = { error };
     },
 
-    removePolicyContactByTypeAndInfoRequest(state) {
+    removePolicyContactByUuidRequest(state) {
         state.user = { loading: true };
     },
-    removePolicyContactByTypeAndInfoSuccess(state, policy) {
+    removePolicyContactByUuidSuccess(state, policy) {
         state.policy = policy;
     },
-    removePolicyContactByTypeAndInfoFailure(state, error) {
+    removePolicyContactByUuidFailure(state, error) {
         state.policy = { error };
     },
 

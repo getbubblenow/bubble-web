@@ -30,7 +30,8 @@ const state = {
     detectedLocale: null,
     accountDeletionOptions: [],
     timeDurationOptions: [],
-    timeDurationOptionsReversed: []
+    timeDurationOptionsReversed: [],
+    contactTypes: []
 };
 
 const actions = {
@@ -137,7 +138,8 @@ const getters = {
         }
         return menu;
     }
-}
+};
+
 const mutations = {
     loadSystemConfigsRequest(state) {},
     loadSystemConfigsSuccess(state, configs) {
@@ -172,6 +174,9 @@ const mutations = {
         if (messages.time_duration_options) {
             state.timeDurationOptions = messages.time_duration_options.split(',');
             state.timeDurationOptionsReversed = state.timeDurationOptions.slice().reverse();
+        }
+        if (messages.field_label_policy_contact_type_options) {
+            state.contactTypes = messages.field_label_policy_contact_type_options.split(',');
         }
     },
     loadMessagesFailure(state, error) {
