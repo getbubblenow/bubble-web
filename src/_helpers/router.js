@@ -62,6 +62,7 @@ export const router = new Router({
         { path: '/networks/:uuid', component: NetworkPage }
       ]
     },
+    { path: '/action', component: ActionPage },
     { path: '/register', component: RegisterPage },
     { path: '/login', component: LoginPage },
     { path: '/logout', component: LoginPage },

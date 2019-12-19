@@ -29,7 +29,6 @@ export function getWithAuth() {
 }
 
 function entityWithAuth(method, obj) {
-    console.log("entityWithAuth("+method+"): obj="+obj+" (type="+(typeof obj)+")");
     if (typeof obj === 'undefined' || obj === null || obj === 'undefined') {
         return {
             method: method,

@@ -17,7 +17,6 @@ const actions = {
                 user => {
                     commit('loginSuccess', user);
                     const landing = getLandingPage();
-                    console.log('getLandingPage returned: '+JSON.stringify(landing));
                     if (landing === null) {
                         router.push('/');
                     } else {

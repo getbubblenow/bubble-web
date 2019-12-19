@@ -532,7 +532,7 @@
         },
         created () {
             this.getPolicyByUuid({uuid: this.currentUser.uuid, messages: this.messages, errors: this.errors});
-            console.log('PolicyPage.created: $route.params='+JSON.stringify(this.$route.query));
+            // console.log('PolicyPage.created: $route.params='+JSON.stringify(this.$route.query));
             if (this.$route.query.action) {
                 this.inboundAction = {
                     actionType: this.$route.query.action
