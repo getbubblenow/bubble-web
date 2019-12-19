@@ -7,8 +7,22 @@ const state = {
     policy: {},
     policyStatus: {},
     contact: null,
-    authenticator: null
+    authenticator: {}
 };
+
+function setAuthenticator(policy) {
+    if (policy && policy.accountContacts) {
+        const contacts = policy.accountContacts;
+        for (let i=0; i<contacts.length; i++) {
+            if (contacts[i].type === 'authenticator') {
+                state.authenticator = JSON.parse(contacts[i].info);
+                return;
+            }
+        }
+    }
+    state.authenticator = {};
+    return state.authenticator;
+}
 
 const actions = {
     getAll({ commit }, {messages, errors}) {
@@ -110,6 +124,7 @@ const mutations = {
     },
     getPolicyByUuidSuccess(state, policy) {
         state.policy = policy;
+        setAuthenticator(policy);
     },
     getPolicyByUuidFailure(state, error) {
         state.policy = { error };
@@ -121,6 +136,7 @@ const mutations = {
     updatePolicyByUuidSuccess(state, policy) {
         state.policyStatus = {};
         state.policy = policy;
+        setAuthenticator(policy);
     },
     updatePolicyByUuidFailure(state, error) {
         state.policyStatus = {};
@@ -133,7 +149,7 @@ const mutations = {
     addPolicyContactByUuidSuccess(state, contact) {
         state.contact = contact;
         if (contact.type === 'authenticator') {
-            state.authenticator = contact.info;
+            state.authenticator = JSON.parse(contact.info);
         }
     },
     addPolicyContactByUuidFailure(state, error) {

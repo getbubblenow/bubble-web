@@ -110,13 +110,14 @@
                     <span class="sr-only">{{messages.message_true}}</span>
                 </td>
                 <td v-else>
-                    <form v-if="verifyingContact === contact.uuid" @submit.prevent="submitVerification(contact.uuid)">
+                    <form v-if="verifyingContact === contact.uuid || contact.type === 'authenticator'" @submit.prevent="submitVerification(contact)">
                         <div class="form-group">
                             <div v-if="contact.type === 'authenticator'">
-                                <canvas :id="'canvas_'+contact.uuid"></canvas>
+                                <div>{{messages.message_verify_authenticator_preamble}}</div>
+                                <canvas id="authenticator_qr_canvas"></canvas>
                                 <hr/>
                                 <span>{{messages.message_verify_authenticator_backupCodes}}<br/>
-                                    <span :id="'backupCodes_'+contact.uuid"></span>
+                                    <span id="authenticator_backupCodes"></span>
                                 </span>
                                 <hr/>
                                 <span>{{messages.message_verify_authenticator_backupCodes_description}}</span>
@@ -125,21 +126,21 @@
                             <input :disabled="actionStatus.requesting" :id="'verifyContactCode_'+contact.uuid" v-validate="'required'" name="verifyCode" type="text" size="8"/>
                             <div v-if="errors.has('token')" class="invalid-feedback d-block">{{ errors.first('token') }}</div>
                             <button class="btn btn-primary" :disabled="actionStatus.requesting">{{messages.button_label_submit_verify_code}}</button>
-                            <button class="btn btn-primary" :disabled="actionStatus.requesting" @click="cancelVerifyContact()">{{messages.button_label_cancel}}</button>
+                            <button v-if="contact.type !== 'authenticator'" class="btn btn-primary" :disabled="actionStatus.requesting" @click="cancelVerifyContact()">{{messages.button_label_cancel}}</button>
                         </div>
                     </form>
-                    <button v-if="verifyingContact !== contact.uuid" @click="startVerifyContact(contact)" class="btn btn-primary">{{messages.button_label_submit_verify_code}}</button>
+                    <button v-if="verifyingContact !== contact.uuid && contact.type !== 'authenticator'" @click="startVerifyContact(contact)" class="btn btn-primary">{{messages.button_label_submit_verify_code}}</button>
                 </td>
 
                 <td v-if="contact.authFactor === 'required'">
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_authFactor_name_required_icon" :title="messages.field_label_policy_contact_authFactor_name_required"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_authFactor_name_required}}</span>
                 </td>
-                <td v-if="contact.authFactor === 'sufficient'">
+                <td v-else-if="contact.authFactor === 'sufficient'">
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_authFactor_name_sufficient_icon" :title="messages.field_label_policy_contact_authFactor_name_sufficient"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_authFactor_name_sufficient}}</span>
                 </td>
-                <td v-if="contact.authFactor === 'not_required'">
+                <td v-else-if="contact.authFactor === 'not_required'">
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_authFactor_name_not_required_icon" :title="messages.field_label_policy_contact_authFactor_name_not_required"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_authFactor_name_not_required}}</span>
                 </td>
@@ -399,7 +400,7 @@
             }
         },
         methods: {
-            ...mapActions('account', ['approveAction', 'denyAction']),
+            ...mapActions('account', ['approveAction', 'denyAction', 'sendAuthenticatorCode']),
             ...mapActions('users', [
                 'getPolicyByUuid', 'updatePolicyByUuid', 'addPolicyContactByUuid', 'removePolicyContactByUuid',
             ]),
@@ -452,22 +453,6 @@
             startVerifyContact(contact) {
                 console.log('startVerifyContact: '+JSON.stringify(contact));
                 this.verifyingContact = contact.uuid;
-                if (contact.type === 'authenticator') {
-                    const canvas = document.getElementById('canvas_'+contact.uuid);
-                    QRCode.toCanvas(canvas, this.authenticator.key, function (error) {
-                        if (error) {
-                            console.error('QR generation error: '+error);
-                        } else {
-                            console.log('QR generation success');
-                        }
-                    });
-                    const backupCodes = document.getElementById('backupCodes_'+contact.uuid);
-                    if (backupCodes != null && typeof this.authenticator.backupCodes !== 'undefined' && this.authenticator.backupCodes != null && this.authenticator.backupCodes.length > 0) {
-                        backupCodes.innerText = this.authenticator.backupCodes.join(' ');
-                    } else {
-                        console.log('backupCodes element not found, or no backupCodes defined');
-                    }
-                }
                 return false; // do not follow the click
             },
             cancelVerifyContact() {
@@ -475,19 +460,31 @@
                 this.errors.clear();
                 return false; // do not follow the click
             },
-            submitVerification(uuid) {
+            submitVerification(contact) {
+                const uuid = contact.uuid;
+                const type = contact.type;
                 const codeElementId = 'verifyContactCode_'+uuid;
                 const codeElement = document.getElementById(codeElementId);
                 if (codeElement != null) {
                     const code = codeElement.value;
                     this.errors.clear();
-                    this.approveAction({
-                        uuid: this.currentUser.uuid,
-                        code: code,
-                        messages: this.messages,
-                        errors: this.errors
-                    });
-                    console.log('submitVerification: would submit: ' + code);
+                    if (type === 'authenticator') {
+                        // console.log('submitVerification: sending authenticator code: '+code);
+                        this.sendAuthenticatorCode({
+                            uuid: this.currentUser.uuid,
+                            code: code,
+                            verifyOnly: true,
+                            messages: this.messages,
+                            errors: this.errors
+                        });
+                    } else {
+                        this.approveAction({
+                            uuid: this.currentUser.uuid,
+                            code: code,
+                            messages: this.messages,
+                            errors: this.errors
+                        });
+                    }
                 } else {
                     console.log('submitVerification: DOM element not found: '+codeElementId);
                 }
@@ -524,9 +521,31 @@
                 }
             },
             actionStatus (status) {
-                console.log('watch.actionStatus: received: '+JSON.stringify(status));
+                // console.log('watch.actionStatus: received: '+JSON.stringify(status));
                 if (status.success) {
                     this.getPolicyByUuid({uuid: this.currentUser.uuid, messages: this.messages, errors: this.errors});
+                }
+            },
+            authenticator (auth) {
+                // console.log('watch.authenticator: received: '+JSON.stringify(auth));
+                if (auth.url) {
+                    const checkExist = setInterval(function() {
+                        if (document.getElementById('authenticator_qr_canvas') != null) {
+                            clearInterval(checkExist);
+                            const canvas = document.getElementById('authenticator_qr_canvas');
+                            if (canvas !== null) {
+                                QRCode.toCanvas(canvas, auth.url, function (error) {
+                                    if (error) console.error('QR generation error: ' + error);
+                                });
+                                const backupCodes = document.getElementById('authenticator_backupCodes');
+                                if (backupCodes != null && typeof auth.backupCodes !== 'undefined' && auth.backupCodes != null && auth.backupCodes.length > 0) {
+                                    backupCodes.innerHTML = auth.backupCodes.join('<br/>');
+                                } else {
+                                    console.log('backupCodes element not found, or no backupCodes defined');
+                                }
+                            }
+                        }
+                    }, 200);
                 }
             }
         },

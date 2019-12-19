@@ -14,7 +14,8 @@ export const userService = {
     update,
     delete: _delete,
     approveAction,
-    denyAction
+    denyAction,
+    sendAuthenticatorCode
 };
 
 function setSessionUser (user) {
@@ -79,6 +80,16 @@ function removePolicyContactByUuid(id, uuid, messages, errors) {
 
 function approveAction(id, code, messages, errors) {
     return fetch(`${config.apiUrl}/auth/approve/${code}`, postWithAuth())
+        .then(handleCrudResponse(messages, errors))
+        .then(setSessionUser);
+}
+
+function sendAuthenticatorCode(id, code, verifyOnly, messages, errors) {
+    return fetch(`${config.apiUrl}/auth/authenticator`, postWithAuth({
+        account: id,
+        token: parseInt(code),
+        verify: verifyOnly
+    }))
         .then(handleCrudResponse(messages, errors))
         .then(setSessionUser);
 }

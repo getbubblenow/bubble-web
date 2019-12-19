@@ -87,7 +87,14 @@ const actions = {
                 error => commit('denyActionFailure', error)
             );
     },
-
+    sendAuthenticatorCode({ commit }, {uuid, code, verifyOnly, messages, errors}) {
+        commit('sendAuthenticatorCodeRequest');
+        userService.sendAuthenticatorCode(uuid, code, verifyOnly, messages, errors)
+            .then(
+                policy => commit('sendAuthenticatorCodeSuccess', policy),
+                error => commit('sendAuthenticatorCodeFailure', error)
+            );
+    }
 };
 
 const mutations = {
@@ -140,6 +147,16 @@ const mutations = {
     },
     denyActionFailure(state, error) {
         state.actionStatus = { error: error, type: 'deny' };
+    },
+    sendAuthenticatorCodeRequest(state) {
+        state.actionStatus = { requesting: true, type: 'approve' };
+    },
+    sendAuthenticatorCodeSuccess(state, user) {
+        state.actionStatus = { success: true, type: 'approve', result: user };
+        if (user.token) state.user = user;
+    },
+    sendAuthenticatorCodeFailure(state, error) {
+        state.actionStatus = { error: error, type: 'approve' };
     }
 
 };
