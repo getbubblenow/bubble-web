@@ -10,6 +10,7 @@
     "start": "webpack-dev-server --open"
   },
   "dependencies": {
+    "qrcode": "^1.4.4",
     "safe-eval": "^0.4.1",
     "vee-validate": "^2.2.8",
     "vue": "^2.6.10",

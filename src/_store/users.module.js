@@ -6,7 +6,8 @@ const state = {
     user: null,
     policy: {},
     policyStatus: {},
-    contact: null
+    contact: null,
+    authenticator: null
 };
 
 const actions = {
@@ -131,6 +132,9 @@ const mutations = {
     },
     addPolicyContactByUuidSuccess(state, contact) {
         state.contact = contact;
+        if (contact.type === 'authenticator') {
+            state.authenticator = contact.info;
+        }
     },
     addPolicyContactByUuidFailure(state, error) {
         state.contact = { error };

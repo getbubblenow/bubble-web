@@ -1,3 +1,8 @@
+let landingPage = null;
+export function getLandingPage () { return landingPage; }
+export function setLandingPage (page) { landingPage = page; }
+export function resetLandingPage () { landingPage = null; }
+
 export function currentUser() {
     let userJson = localStorage.getItem('user');
     return userJson ? JSON.parse(userJson) : null;
@@ -23,21 +28,25 @@ export function getWithAuth() {
     };
 }
 
-export function postWithAuth(obj) {
-    return {
-        method: 'POST',
-        headers: { ...authHeader(), 'Content-Type': 'application/json' },
-        body: JSON.stringify(obj)
-    };
+function entityWithAuth(method, obj) {
+    console.log("entityWithAuth("+method+"): obj="+obj+" (type="+(typeof obj)+")");
+    if (typeof obj === 'undefined' || obj === null || obj === 'undefined') {
+        return {
+            method: method,
+            headers: { ...authHeader(), 'Content-Type': 'application/json' }
+        };
+    } else {
+        return {
+            method: method,
+            headers: { ...authHeader(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(obj)
+        };
+    }
 }
 
-export function putWithAuth(obj) {
-    return {
-        method: 'PUT',
-        headers: { ...authHeader(), 'Content-Type': 'application/json' },
-        body: JSON.stringify(obj)
-    };
-}
+export function postWithAuth(obj) { return entityWithAuth('POST', obj); }
+
+export function putWithAuth(obj) { return entityWithAuth('PUT', obj); }
 
 export function deleteWithAuth() {
     return {

@@ -5,6 +5,7 @@ import HomePage from '../account/HomePage'
 import RegisterPage from '../auth/RegisterPage'
 import LoginPage from '../auth/LoginPage'
 import ProfilePage from '../account/profile/ProfilePage'
+import ActionPage from '../account/profile/ActionPage'
 import PolicyPage from '../account/profile/PolicyPage'
 import NotificationsPage from '../account/NotificationsPage'
 import ChangePasswordPage from '../account/profile/ChangePasswordPage'
@@ -15,7 +16,7 @@ import AccountsPage from '../admin/AccountsPage'
 import StripePayment from "../account/payment/StripePayment";
 import InviteCodePayment from "../account/payment/InviteCodePayment";
 import UnknownPayment from "../account/payment/UnknownPayment";
-import { currentUser } from '../_helpers'
+import { currentUser, setLandingPage } from '../_helpers'
 
 Vue.use(Router);
 
@@ -43,6 +44,7 @@ export const router = new Router({
         },
         { path: '/me', component: ProfilePage },
         { path: '/me/policy', component: PolicyPage },
+        { path: '/me/action', component: ActionPage },
         { path: '/me/changePassword', component: ChangePasswordPage },
         { path: '/notifications', component: NotificationsPage },
         {
@@ -78,7 +80,10 @@ router.beforeEach((to, from, next) => {
 
   if (authRequired) {
     // redirect to login page if not logged in and trying to access a restricted page
-    if (!user) return next('/login');
+    if (!user) {
+      setLandingPage(to);
+      return next('/login');
+    }
 
     // redirect to home page if not admin and trying to access an admin page
     if (to.path.startsWith('/admin') && user.admin !== true) return next('/');

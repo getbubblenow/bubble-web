@@ -1,5 +1,12 @@
 <template>
     <div>
+        <div v-if="inboundAction" :class="`alert ${inboundAction.alertType}`">
+            {{messages['message_inbound_'+inboundAction.actionType]}}
+            {{messages['message_inbound_'+inboundAction.status]}}
+            <div v-if="errors.has('token')" class="invalid-feedback d-block">{{ errors.first('token') }}</div>
+            <div v-if="errors.has('request')" class="invalid-feedback d-block">{{ errors.first('request') }}</div>
+        </div>
+
         <h2>{{messages.form_label_title_account_policy}}</h2>
         <form @submit.prevent="updatePolicy">
             <hr/>
@@ -8,7 +15,7 @@
                 <select v-model="deletionPolicy" name="deletionPolicy" class="form-control">
                     <option v-for="opt in accountDeletionOptions" v-bind:value="opt">{{messages['account_deletion_name_'+opt]}}</option>
                 </select>
-                <span>{{messages['account_deletion_description_'+policy.deletionPolicy]}}</span>
+                <span>{{messages['account_deletion_description_'+deletionPolicy]}}</span>
                 <div v-if="submitted && errors.has('deletionPolicy')" class="invalid-feedback d-block">{{ errors.first('deletionPolicy') }}</div>
             </div>
 
@@ -103,8 +110,25 @@
                     <span class="sr-only">{{messages.message_true}}</span>
                 </td>
                 <td v-else>
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
-                    <span class="sr-only">{{messages.message_false}}</span>
+                    <form v-if="verifyingContact === contact.uuid" @submit.prevent="submitVerification(contact.uuid)">
+                        <div class="form-group">
+                            <div v-if="contact.type === 'authenticator'">
+                                <canvas :id="'canvas_'+contact.uuid"></canvas>
+                                <hr/>
+                                <span>{{messages.message_verify_authenticator_backupCodes}}<br/>
+                                    <span :id="'backupCodes_'+contact.uuid"></span>
+                                </span>
+                                <hr/>
+                                <span>{{messages.message_verify_authenticator_backupCodes_description}}</span>
+                            </div>
+                            <label htmlFor="verifyCode">{{messages.field_label_policy_contact_verify_code}}</label>
+                            <input :disabled="actionStatus.requesting" :id="'verifyContactCode_'+contact.uuid" v-validate="'required'" name="verifyCode" type="text" size="8"/>
+                            <div v-if="errors.has('token')" class="invalid-feedback d-block">{{ errors.first('token') }}</div>
+                            <button class="btn btn-primary" :disabled="actionStatus.requesting">{{messages.button_label_submit_verify_code}}</button>
+                            <button class="btn btn-primary" :disabled="actionStatus.requesting" @click="cancelVerifyContact()">{{messages.button_label_cancel}}</button>
+                        </div>
+                    </form>
+                    <button v-if="verifyingContact !== contact.uuid" @click="startVerifyContact(contact)" class="btn btn-primary">{{messages.button_label_submit_verify_code}}</button>
                 </td>
 
                 <td v-if="contact.authFactor === 'required'">
@@ -238,7 +262,7 @@
             <div v-if="newContact.type !== '' && newContact.type !== 'authenticator'" class="form-group">
                 <label htmlFor="contactInfo">{{messages['field_label_policy_contact_type_'+newContact.type+'_field']}}</label>
                 <v-select v-if="newContact.type !== '' && newContact.type === 'sms'" :options="countries" :reduce="c => c.code" label="countryName" v-model="newContactSmsCountry" name="newContactSmsCountry" class="form-control"/>
-                <input v-model="newContact.info" name="contactInfo" class="form-control"/>
+                <input v-model="newContact.info" :type="newContact.type === 'sms' ? 'tel' : 'text'" name="contactInfo" class="form-control"/>
                 <div v-if="contactSubmitted && errors.has('contactInfo')" class="invalid-feedback d-block">{{ errors.first('contactInfo') }}</div>
                 <div v-if="contactSubmitted && errors.has('email')" class="invalid-feedback d-block">{{ errors.first('email') }}</div>
                 <div v-if="contactSubmitted && errors.has('phone')" class="invalid-feedback d-block">{{ errors.first('phone') }}</div>
@@ -297,7 +321,8 @@
 </template>
 
 <script>
-    import { mapState, mapActions } from 'vuex'
+    import { mapState, mapActions } from 'vuex';
+    const QRCode = require('qrcode');
 
     function initNewContact () {
         return {
@@ -330,18 +355,21 @@
                 contacts: [],
                 contactSubmitted: false,
                 newContactSmsCountry: '',
-                newContact: initNewContact()
+                newContact: initNewContact(),
+                verifyingContact: null,
+                inboundAction: null
             }
         },
         computed: {
             ...mapState('account', {
                 currentUser: state => state.user
             }),
+            ...mapState('account', ['actionStatus']),
             ...mapState('system', [
                 'messages', 'accountDeletionOptions', 'timeDurationOptions', 'timeDurationOptionsReversed',
                 'contactTypes', 'detectedLocale', 'countries'
             ]),
-            ...mapState('users', ['policy', 'policyStatus', 'contact']),
+            ...mapState('users', ['policy', 'policyStatus', 'contact', 'authenticator']),
             hasAuthenticator() {
                 for (let i=0; i<this.contacts.length; i++) {
                     if (this.contacts[i].type === 'authenticator') return true;
@@ -371,7 +399,10 @@
             }
         },
         methods: {
-            ...mapActions('users', ['getPolicyByUuid', 'updatePolicyByUuid', 'addPolicyContactByUuid', 'removePolicyContactByUuid']),
+            ...mapActions('account', ['approveAction', 'denyAction']),
+            ...mapActions('users', [
+                'getPolicyByUuid', 'updatePolicyByUuid', 'addPolicyContactByUuid', 'removePolicyContactByUuid',
+            ]),
             updatePolicy(e) {
                 this.submitted = true;
                 this.updatePolicyByUuid({
@@ -417,11 +448,54 @@
                     messages: this.messages,
                     errors: this.errors
                 });
+            },
+            startVerifyContact(contact) {
+                console.log('startVerifyContact: '+JSON.stringify(contact));
+                this.verifyingContact = contact.uuid;
+                if (contact.type === 'authenticator') {
+                    const canvas = document.getElementById('canvas_'+contact.uuid);
+                    QRCode.toCanvas(canvas, this.authenticator.key, function (error) {
+                        if (error) {
+                            console.error('QR generation error: '+error);
+                        } else {
+                            console.log('QR generation success');
+                        }
+                    });
+                    const backupCodes = document.getElementById('backupCodes_'+contact.uuid);
+                    if (backupCodes != null && typeof this.authenticator.backupCodes !== 'undefined' && this.authenticator.backupCodes != null && this.authenticator.backupCodes.length > 0) {
+                        backupCodes.innerText = this.authenticator.backupCodes.join(' ');
+                    } else {
+                        console.log('backupCodes element not found, or no backupCodes defined');
+                    }
+                }
+                return false; // do not follow the click
+            },
+            cancelVerifyContact() {
+                this.verifyingContact = null;
+                this.errors.clear();
+                return false; // do not follow the click
+            },
+            submitVerification(uuid) {
+                const codeElementId = 'verifyContactCode_'+uuid;
+                const codeElement = document.getElementById(codeElementId);
+                if (codeElement != null) {
+                    const code = codeElement.value;
+                    this.errors.clear();
+                    this.approveAction({
+                        uuid: this.currentUser.uuid,
+                        code: code,
+                        messages: this.messages,
+                        errors: this.errors
+                    });
+                    console.log('submitVerification: would submit: ' + code);
+                } else {
+                    console.log('submitVerification: DOM element not found: '+codeElementId);
+                }
             }
         },
         watch: {
             policy (p) {
-                console.log('watch.policy: received: '+JSON.stringify(p));
+                // console.log('watch.policy: received: '+JSON.stringify(p));
                 if (typeof p.deletionPolicy !== 'undefined' && p.deletionPolicy !== null) {
                     this.deletionPolicy = p.deletionPolicy;
                 }
@@ -443,17 +517,40 @@
                 this.newContact = initNewContact();
             },
             contact (c) {
-                console.log('watch.contact: received: '+JSON.stringify(c));
+                // console.log('watch.contact: received: '+JSON.stringify(c));
                 if (typeof c.error === 'undefined' || c.error === null) {
                     // force reload policy, refreshes contacts
+                    this.getPolicyByUuid({uuid: this.currentUser.uuid, messages: this.messages, errors: this.errors});
+                }
+            },
+            actionStatus (status) {
+                console.log('watch.actionStatus: received: '+JSON.stringify(status));
+                if (status.success) {
                     this.getPolicyByUuid({uuid: this.currentUser.uuid, messages: this.messages, errors: this.errors});
                 }
             }
         },
         created () {
             this.getPolicyByUuid({uuid: this.currentUser.uuid, messages: this.messages, errors: this.errors});
+            console.log('PolicyPage.created: $route.params='+JSON.stringify(this.$route.query));
+            if (this.$route.query.action) {
+                this.inboundAction = {
+                    actionType: this.$route.query.action
+                };
+                if (this.inboundAction.actionType === 'invalid') {
+                    this.inboundAction.status = 'invalid';
+                    this.inboundAction.alertType = 'alert-danger';
+                } else {
+                    if (this.$route.query.ok) {
+                        this.inboundAction.status = 'success';
+                        this.inboundAction.alertType = 'alert-success';
+                    } else {
+                        this.inboundAction.status = 'failure';
+                        this.inboundAction.alertType = 'alert-danger';
+                    }
+                }
+            }
             this.newContactSmsCountry = countryFromLocale(this.detectedLocale);
-            console.log('set this.newContactSmsCountry='+this.newContactSmsCountry);
         }
     };
 </script>

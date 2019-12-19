@@ -12,8 +12,19 @@ export const userService = {
     addPolicyContactById,
     removePolicyContactByUuid,
     update,
-    delete: _delete
+    delete: _delete,
+    approveAction,
+    denyAction
 };
+
+function setSessionUser (user) {
+    // login successful if there's a session token in the response
+    if (user.token) {
+        // store user details and session token in local storage to keep user logged in between page refreshes
+        localStorage.setItem('user', JSON.stringify(user));
+    }
+    return user;
+}
 
 function login(name, password, messages, errors) {
     const requestOptions = {
@@ -23,14 +34,7 @@ function login(name, password, messages, errors) {
     };
     return fetch(`${config.apiUrl}/auth/login`, requestOptions)
         .then(handleAuthResponse(messages, errors))
-        .then(user => {
-            // login successful if there's a session token in the response
-            if (user.token) {
-                // store user details and session token in local storage to keep user logged in between page refreshes
-                localStorage.setItem('user', JSON.stringify(user));
-            }
-            return user;
-        });
+        .then(setSessionUser);
 }
 
 function logout() {
@@ -46,13 +50,7 @@ function register(user, messages, errors) {
     };
     return fetch(`${config.apiUrl}/auth/register`, requestOptions)
         .then(handleAuthResponse(messages, errors))
-        .then(user => {
-            if (user.token) {
-                // store user details and session token in local storage to keep user logged in between page refreshes
-                localStorage.setItem('user', JSON.stringify(user));
-            }
-            return user;
-        });
+        .then(setSessionUser);
 }
 
 function getAll(messages, errors) {
@@ -77,6 +75,16 @@ function addPolicyContactById(id, contact, messages, errors) {
 
 function removePolicyContactByUuid(id, uuid, messages, errors) {
     return fetch(`${config.apiUrl}/users/${id}/policy/contacts/${uuid}`, deleteWithAuth()).then(handleCrudResponse(messages, errors));
+}
+
+function approveAction(id, code, messages, errors) {
+    return fetch(`${config.apiUrl}/auth/approve/${code}`, postWithAuth())
+        .then(handleCrudResponse(messages, errors))
+        .then(setSessionUser);
+}
+
+function denyAction(id, code, messages, errors) {
+    return fetch(`${config.apiUrl}/auth/deny/${code}`, postWithAuth()).then(handleCrudResponse(messages, errors));
 }
 
 function update(user, messages, errors) {
