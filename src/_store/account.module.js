@@ -5,11 +5,16 @@ import { router, getLandingPage, resetLandingPage } from '../_helpers';
 // when I try to do that, webpack succeeds but then an error occurs loading any page, with the
 // error message "_helpers.currentUser is not defined"
 const user = JSON.parse(localStorage.getItem('user'));
-const state = user
-    ? { status: { loggedIn: true }, user, actionStatus: {} }
-    : { status: {}, user: null, actionStatus: {} };
+const state = {
+    status: { loggedIn: (user !== null) },
+    user: user,
+    actionStatus: {}
+};
 
 const actions = {
+    refreshUser({ commit }) {
+        commit('refreshUser', JSON.parse(localStorage.getItem('user')));
+    },
     login({ dispatch, commit }, { user, messages, errors }) {
         commit('loginRequest', { name: user.name });
         userService.login(user.name, user.password, messages, errors)
@@ -25,9 +30,7 @@ const actions = {
                             router.push(landing.fullPath);
                         }
                     } else if (user.multifactorAuth) {
-                        // todo: create a page that shows what auths are required and allows the user
-                        // to manually enter each code
-                        // periodically poll for status, if all auths have been provided, log the user in
+                        router.push('/auth');
                     }
                 },
                 error => {
@@ -104,6 +107,9 @@ const actions = {
 };
 
 const mutations = {
+    refreshUser(state, user) {
+        state.user = user;
+    },
     loginRequest(state, user) {
         state.status = { loggingIn: true };
         state.user = user;
@@ -116,6 +122,7 @@ const mutations = {
         } else {
             state.status = {};
         }
+        localStorage.setItem('user', JSON.stringify(user));
         state.user = user;
     },
     loginFailure(state) {

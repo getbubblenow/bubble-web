@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2>{{messages.form_label_title_new_network}}</h2>
+        <h2>{{messages.form_title_new_network}}</h2>
         <form @submit.prevent="handleSubmit">
             <!-- name -->
             <div class="form-group">

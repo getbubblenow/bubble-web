@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2>{{messages.form_label_title_register}}</h2>
+        <h2>{{messages.form_title_register}}</h2>
         <form @submit.prevent="handleSubmit">
             <div class="form-group">
                 <label for="name">{{messages.field_label_username}}</label>

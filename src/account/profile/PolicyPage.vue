@@ -7,7 +7,7 @@
             <div v-if="errors.has('request')" class="invalid-feedback d-block">{{ errors.first('request') }}</div>
         </div>
 
-        <h2>{{messages.form_label_title_account_policy}}</h2>
+        <h2>{{messages.form_title_account_policy}}</h2>
         <form @submit.prevent="updatePolicy">
             <hr/>
             <div class="form-group">
@@ -50,7 +50,7 @@
         </form>
 
         <hr/>
-        <h2>{{messages.form_label_title_account_contacts}}</h2>
+        <h2>{{messages.form_title_account_contacts}}</h2>
         <table v-if="contacts && contacts.length > 0" border="1">
             <thead>
             <tr>
@@ -253,7 +253,7 @@
             </tbody>
         </table>
 
-        <h4>{{messages.form_label_title_account_add_contact}}</h4>
+        <h4>{{messages.form_title_account_add_contact}}</h4>
         <form @submit.prevent="addContact">
             <hr/>
             <div class="form-group">
