@@ -26,7 +26,7 @@ module.exports = {
             template: './src/index.html'
         }),
         new CopyWebpackPlugin([
-            { from:'src/public', to:'' }
+            { from: 'src/public', to: '' }
         ])
     ],
     devServer: {
