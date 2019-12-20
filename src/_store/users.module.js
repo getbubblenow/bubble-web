@@ -10,13 +10,33 @@ const state = {
     authenticator: {}
 };
 
+export const CONTACT_TYPE_AUTHENTICATOR = 'authenticator';
+export function isAuthenticator (val) {
+    return val === CONTACT_TYPE_AUTHENTICATOR || (val != null && typeof val.type !== 'undefined' && val.type === CONTACT_TYPE_AUTHENTICATOR);
+}
+export function isNotAuthenticator (val) { return !isAuthenticator(val); }
+
+const LOCALSTORAGE_AUTHENTICATOR = 'authenticator';
+
 function setAuthenticator(policy) {
+    const storedAuthJson = localStorage.getItem(LOCALSTORAGE_AUTHENTICATOR);
+    const storedAuth = storedAuthJson !== null ? JSON.parse(storedAuthJson) : null;
     if (policy && policy.accountContacts) {
         const contacts = policy.accountContacts;
         for (let i=0; i<contacts.length; i++) {
-            if (contacts[i].type === 'authenticator') {
-                state.authenticator = JSON.parse(contacts[i].info);
-                return;
+            if (isAuthenticator(contacts[i])) {
+                const newAuth = JSON.parse(contacts[i].info);
+                if (newAuth.masked) {
+                    if (storedAuth != null) {
+                        state.authenticator = contacts[i].info = storedAuth;
+                        return;
+                    } else {
+                        contacts[i].masked = true;
+                    }
+                } else {
+                    state.authenticator = contacts[i].info = storedAuth;
+                    localStorage.setItem(LOCALSTORAGE_AUTHENTICATOR, JSON.stringify(state.authenticator));
+                }
             }
         }
     }
@@ -148,8 +168,9 @@ const mutations = {
     },
     addPolicyContactByUuidSuccess(state, contact) {
         state.contact = contact;
-        if (contact.type === 'authenticator') {
+        if (isAuthenticator(contact)) {
             state.authenticator = JSON.parse(contact.info);
+            localStorage.setItem(LOCALSTORAGE_AUTHENTICATOR, JSON.stringify(state.authenticator));
         }
     },
     addPolicyContactByUuidFailure(state, error) {

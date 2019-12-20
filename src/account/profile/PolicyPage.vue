@@ -103,16 +103,20 @@
             <tr v-for="contact in contacts">
                 <td>{{contact.nick}}</td>
                 <td>{{messages['field_label_policy_contact_type_'+contact.type]}}</td>
-                <td><span v-if="contact.type !== 'authenticator'">{{contact.info}}</span></td>
+                <td><span v-if="isNotAuthenticator(contact)">{{contact.info}}</span></td>
 
                 <td v-if="contact.verified">
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
                     <span class="sr-only">{{messages.message_true}}</span>
                 </td>
                 <td v-else>
-                    <form v-if="verifyingContact === contact.uuid || contact.type === 'authenticator'" @submit.prevent="submitVerification(contact)">
-                        <div class="form-group">
-                            <div v-if="contact.type === 'authenticator'">
+                    <form v-if="verifyingContact === contact.uuid || isAuthenticator(contact)" @submit.prevent="submitVerification(contact)">
+                        <div v-if="isAuthenticator(contact) && contact.masked">
+                            <i aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_verify_authenticator_masked"></i>
+                            <span class="sr-only">{{messages.message_verify_authenticator_masked}}</span>
+                        </div>
+                        <div v-else class="form-group">
+                            <div v-if="isAuthenticator(contact)">
                                 <div>{{messages.message_verify_authenticator_preamble}}</div>
                                 <canvas id="authenticator_qr_canvas"></canvas>
                                 <hr/>
@@ -126,10 +130,10 @@
                             <input :disabled="actionStatus.requesting" :id="'verifyContactCode_'+contact.uuid" v-validate="'required'" name="verifyCode" type="text" size="8"/>
                             <div v-if="errors.has('token')" class="invalid-feedback d-block">{{ errors.first('token') }}</div>
                             <button class="btn btn-primary" :disabled="actionStatus.requesting">{{messages.button_label_submit_verify_code}}</button>
-                            <button v-if="contact.type !== 'authenticator'" class="btn btn-primary" :disabled="actionStatus.requesting" @click="cancelVerifyContact()">{{messages.button_label_cancel}}</button>
+                            <button v-if="isNotAuthenticator(contact)" class="btn btn-primary" :disabled="actionStatus.requesting" @click="cancelVerifyContact()">{{messages.button_label_cancel}}</button>
                         </div>
                     </form>
-                    <button v-if="verifyingContact !== contact.uuid && contact.type !== 'authenticator'" @click="startVerifyContact(contact)" class="btn btn-primary">{{messages.button_label_submit_verify_code}}</button>
+                    <button v-if="verifyingContact !== contact.uuid && isNotAuthenticator(contact)" @click="startVerifyContact(contact)" class="btn btn-primary">{{messages.button_label_submit_verify_code}}</button>
                 </td>
 
                 <td v-if="contact.authFactor === 'required'">
@@ -176,7 +180,7 @@
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
-                <td v-if="contact.type === 'authenticator'">
+                <td v-if="isAuthenticator(contact)">
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_value_not_applicable_icon" :title="messages.field_label_policy_contact_value_not_applicable_name"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_value_not_applicable_name}}</span>
                 </td>
@@ -189,7 +193,7 @@
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
-                <td v-if="contact.type === 'authenticator'">
+                <td v-if="isAuthenticator(contact)">
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_value_not_applicable_icon" :title="messages.field_label_policy_contact_value_not_applicable_name"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_value_not_applicable_name}}</span>
                 </td>
@@ -202,7 +206,7 @@
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
-                <td v-if="contact.type === 'authenticator'">
+                <td v-if="isAuthenticator(contact)">
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_value_not_applicable_icon" :title="messages.field_label_policy_contact_value_not_applicable_name"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_value_not_applicable_name}}</span>
                 </td>
@@ -215,7 +219,7 @@
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
-                <td v-if="contact.type === 'authenticator'">
+                <td v-if="isAuthenticator(contact)">
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_value_not_applicable_icon" :title="messages.field_label_policy_contact_value_not_applicable_name"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_value_not_applicable_name}}</span>
                 </td>
@@ -228,7 +232,7 @@
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
-                <td v-if="contact.type === 'authenticator'">
+                <td v-if="isAuthenticator(contact)">
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_value_not_applicable_icon" :title="messages.field_label_policy_contact_value_not_applicable_name"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_value_not_applicable_name}}</span>
                 </td>
@@ -260,7 +264,7 @@
                 <div v-if="contactSubmitted && errors.has('contactType')" class="invalid-feedback d-block">{{ errors.first('contactType') }}</div>
             </div>
 
-            <div v-if="newContact.type !== '' && newContact.type !== 'authenticator'" class="form-group">
+            <div v-if="newContact.type !== '' && isNotAuthenticator(newContact)" class="form-group">
                 <label htmlFor="contactInfo">{{messages['field_label_policy_contact_type_'+newContact.type+'_field']}}</label>
                 <v-select v-if="newContact.type !== '' && newContact.type === 'sms'" :options="countries" :reduce="c => c.code" label="countryName" v-model="newContactSmsCountry" name="newContactSmsCountry" class="form-control"/>
                 <input v-model="newContact.info" :type="newContact.type === 'sms' ? 'tel' : 'text'" name="contactInfo" class="form-control"/>
@@ -283,23 +287,23 @@
                 <label for="requiredForAccountOperations">{{messages.field_label_policy_contact_requiredForAccountOperations}}</label>
                 <input type="checkbox" id="requiredForAccountOperations" v-model="newContact.requiredForAccountOperations">
             </div>
-            <div v-if="newContact.type !== '' && newContact.type !== 'authenticator'" class="form-group">
+            <div v-if="newContact.type !== '' && isNotAuthenticator(newContact)" class="form-group">
                 <label for="receiveVerifyNotifications">{{messages.field_label_policy_contact_receiveVerifyNotifications}}</label>
                 <input type="checkbox" id="receiveVerifyNotifications" v-model="newContact.receiveVerifyNotifications">
             </div>
-            <div v-if="newContact.type !== '' && newContact.type !== 'authenticator'" class="form-group">
+            <div v-if="newContact.type !== '' && isNotAuthenticator(newContact)" class="form-group">
                 <label for="receiveLoginNotifications">{{messages.field_label_policy_contact_receiveLoginNotifications}}</label>
                 <input type="checkbox" id="receiveLoginNotifications" v-model="newContact.receiveLoginNotifications">
             </div>
-            <div v-if="newContact.type !== '' && newContact.type !== 'authenticator'" class="form-group">
+            <div v-if="newContact.type !== '' && isNotAuthenticator(newContact)" class="form-group">
                 <label for="receivePasswordNotification">{{messages.field_label_policy_contact_receivePasswordNotification}}</label>
                 <input type="checkbox" id="receivePasswordNotification" v-model="newContact.receivePasswordNotification">
             </div>
-            <div v-if="newContact.type !== '' && newContact.type !== 'authenticator'" class="form-group">
+            <div v-if="newContact.type !== '' && isNotAuthenticator(newContact)" class="form-group">
                 <label for="receiveInformationalMessages">{{messages.field_label_policy_contact_receiveInformationalMessages}}</label>
                 <input type="checkbox" id="receiveInformationalMessages" v-model="newContact.receiveInformationalMessages">
             </div>
-            <div v-if="newContact.type !== '' && newContact.type !== 'authenticator'" class="form-group">
+            <div v-if="newContact.type !== '' && isNotAuthenticator(newContact)" class="form-group">
                 <label for="receivePromotionalMessages">{{messages.field_label_policy_contact_receivePromotionalMessages}}</label>
                 <input type="checkbox" id="receivePromotionalMessages" v-model="newContact.receivePromotionalMessages">
             </div>
@@ -323,6 +327,12 @@
 
 <script>
     import { mapState, mapActions } from 'vuex';
+
+    // convenience methods
+    import { isAuthenticator, isNotAuthenticator } from '../../_store/users.module';
+    window.isAuthenticator = isAuthenticator;
+    window.isNotAuthenticator = isNotAuthenticator;
+
     const QRCode = require('qrcode');
 
     function initNewContact () {
@@ -373,14 +383,14 @@
             ...mapState('users', ['policy', 'policyStatus', 'contact', 'authenticator']),
             hasAuthenticator() {
                 for (let i=0; i<this.contacts.length; i++) {
-                    if (this.contacts[i].type === 'authenticator') return true;
+                    if (isAuthenticator(this.contacts[i])) return true;
                 }
                 return false;
             },
             newContactTypes() {
                 let hasAuth = false;
                 for (let i=0; i<this.contacts.length; i++) {
-                    if (this.contacts[i].type === 'authenticator') {
+                    if (isAuthenticator(this.contacts[i])) {
                         hasAuth = true;
                         break;
                     }
@@ -390,13 +400,13 @@
                 }
                 const types = [];
                 for (let i=0; i<this.contactTypes.length; i++) {
-                    if (this.contactTypes[i] !== 'authenticator') types.push(this.contactTypes[i]);
+                    if (isNotAuthenticator(this.contactTypes[i])) types.push(this.contactTypes[i]);
                 }
                 return types;
             },
             newContactValid() {
                 return (this.newContact.type !== null && this.newContact.type !== '')
-                    && (this.newContact.type === 'authenticator' || (this.newContact.info !== null && this.newContact.info !== ''));
+                    && (isAuthenticator(this.newContact)|| (this.newContact.info !== null && this.newContact.info !== ''));
             }
         },
         methods: {
@@ -404,6 +414,8 @@
             ...mapActions('users', [
                 'getPolicyByUuid', 'updatePolicyByUuid', 'addPolicyContactByUuid', 'removePolicyContactByUuid',
             ]),
+            isAuthenticator(val) { return window.isAuthenticator(val); },
+            isNotAuthenticator(val) { return window.isNotAuthenticator(val); },
             updatePolicy(e) {
                 this.submitted = true;
                 this.updatePolicyByUuid({
@@ -468,7 +480,7 @@
                 if (codeElement != null) {
                     const code = codeElement.value;
                     this.errors.clear();
-                    if (type === 'authenticator') {
+                    if (isAuthenticator(type)) {
                         // console.log('submitVerification: sending authenticator code: '+code);
                         this.sendAuthenticatorCode({
                             uuid: this.currentUser.uuid,

@@ -16,12 +16,18 @@ const actions = {
             .then(
                 user => {
                     commit('loginSuccess', user);
-                    const landing = getLandingPage();
-                    if (landing === null) {
-                        router.push('/');
-                    } else {
-                        resetLandingPage();
-                        router.push(landing.fullPath);
+                    if (user.token) {
+                        const landing = getLandingPage();
+                        if (landing === null) {
+                            router.push('/');
+                        } else {
+                            resetLandingPage();
+                            router.push(landing.fullPath);
+                        }
+                    } else if (user.multifactorAuth) {
+                        // todo: create a page that shows what auths are required and allows the user
+                        // to manually enter each code
+                        // periodically poll for status, if all auths have been provided, log the user in
                     }
                 },
                 error => {
@@ -103,7 +109,13 @@ const mutations = {
         state.user = user;
     },
     loginSuccess(state, user) {
-        state.status = { loggedIn: true };
+        if (user.token) {
+            state.status = { loggedIn: true };
+        } else if (user.multifactorAuth) {
+            state.status = { multifactorAuth: true };
+        } else {
+            state.status = {};
+        }
         state.user = user;
     },
     loginFailure(state) {
