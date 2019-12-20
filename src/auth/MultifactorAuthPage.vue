@@ -31,6 +31,7 @@
 
 <script>
     import { mapState, mapActions } from 'vuex'
+    import { getLandingPage, resetLandingPage } from '../_helpers';
 
     // convenience methods
     import { isAuthenticator, isNotAuthenticator } from '../_store/users.module';
@@ -49,6 +50,8 @@
             ]),
             isAuthenticator(val) { return window.isAuthenticator(val); },
             isNotAuthenticator(val) { return window.isNotAuthenticator(val); },
+            getLandingPage() { return getLandingPage(); },
+            resetLandingPage() { return resetLandingPage(); },
             submitVerification(auth) {
                 const uuid = auth.uuid;
                 const type = auth.type;
@@ -81,8 +84,17 @@
         },
         watch: {
             user: function (u) {
+                console.log('watch.user: received: '+JSON.stringify(u));
                 this.currentUser = u;
-                // todo: if current user has no multifactor auth, show fatal error
+                if (this.currentUser.token) {
+                    const landing = this.getLandingPage();
+                    if (landing === null) {
+                        this.$router.replace('/');
+                    } else {
+                        this.resetLandingPage();
+                        this.$router.replace(landing.fullPath);
+                    }
+                }
             },
             actionStatus (status) {
                 console.log('watch.actionStatus: received: '+JSON.stringify(status));

@@ -24,13 +24,13 @@ const actions = {
                     if (user.token) {
                         const landing = getLandingPage();
                         if (landing === null) {
-                            router.push('/');
+                            router.replace('/');
                         } else {
                             resetLandingPage();
-                            router.push(landing.fullPath);
+                            router.replace(landing.fullPath);
                         }
                     } else if (user.multifactorAuth) {
-                        router.push('/auth');
+                        router.replace('/auth');
                     }
                 },
                 error => {
@@ -100,7 +100,7 @@ const actions = {
         commit('sendAuthenticatorCodeRequest');
         userService.sendAuthenticatorCode(uuid, code, verifyOnly, messages, errors)
             .then(
-                policy => commit('sendAuthenticatorCodeSuccess', policy),
+                user => commit('sendAuthenticatorCodeSuccess', user),
                 error => commit('sendAuthenticatorCodeFailure', error)
             );
     }
@@ -171,6 +171,7 @@ const mutations = {
         state.actionStatus = { requesting: true, type: 'approve' };
     },
     sendAuthenticatorCodeSuccess(state, user) {
+        console.log("sendAuthenticatorCodeSuccess: user="+JSON.stringify(user));
         state.actionStatus = { success: true, type: 'approve', result: user };
         if (user.token) state.user = user;
     },
