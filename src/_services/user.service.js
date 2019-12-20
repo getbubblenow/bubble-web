@@ -15,7 +15,8 @@ export const userService = {
     delete: _delete,
     approveAction,
     denyAction,
-    sendAuthenticatorCode
+    sendAuthenticatorCode,
+    resendVerificationCode
 };
 
 function setSessionUser (user) {
@@ -92,6 +93,11 @@ function sendAuthenticatorCode(id, code, verifyOnly, messages, errors) {
     }))
         .then(handleCrudResponse(messages, errors))
         .then(setSessionUser);
+}
+
+function resendVerificationCode(id, contact, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${id}/policy/contacts/verify`, postWithAuth(contact))
+        .then(handleCrudResponse(messages, errors));
 }
 
 function denyAction(id, code, messages, errors) {

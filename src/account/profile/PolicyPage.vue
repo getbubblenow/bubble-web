@@ -130,6 +130,7 @@
                             <input :disabled="actionStatus.requesting" :id="'verifyContactCode_'+contact.uuid" v-validate="'required'" name="verifyCode" type="text" size="8"/>
                             <div v-if="errors.has('token')" class="invalid-feedback d-block">{{ errors.first('token') }}</div>
                             <button class="btn btn-primary" :disabled="actionStatus.requesting">{{messages.button_label_submit_verify_code}}</button>
+                            <button v-if="isNotAuthenticator(contact)" class="btn btn-primary" :disabled="actionStatus.requesting" @click="resendVerification(contact)">{{messages.button_label_resend_verify_code}}</button>
                             <button v-if="isNotAuthenticator(contact)" class="btn btn-primary" :disabled="actionStatus.requesting" @click="cancelVerifyContact()">{{messages.button_label_cancel}}</button>
                         </div>
                     </form>
@@ -410,7 +411,7 @@
             }
         },
         methods: {
-            ...mapActions('account', ['approveAction', 'denyAction', 'sendAuthenticatorCode']),
+            ...mapActions('account', ['approveAction', 'denyAction', 'sendAuthenticatorCode', 'resendVerificationCode']),
             ...mapActions('users', [
                 'getPolicyByUuid', 'updatePolicyByUuid', 'addPolicyContactByUuid', 'removePolicyContactByUuid',
             ]),
@@ -480,8 +481,17 @@
                 });
             },
             startVerifyContact(contact) {
-                console.log('startVerifyContact: '+JSON.stringify(contact));
+                // console.log('startVerifyContact: '+JSON.stringify(contact));
                 this.verifyingContact = contact.uuid;
+                return false; // do not follow the click
+            },
+            resendVerification(contact) {
+                this.resendVerificationCode({
+                    uuid: this.currentUser.uuid,
+                    contact: contact,
+                    messages: this.messages,
+                    errors: this.errors
+                });
                 return false; // do not follow the click
             },
             cancelVerifyContact() {
@@ -496,6 +506,7 @@
                 const codeElement = document.getElementById(codeElementId);
                 if (codeElement != null) {
                     const code = codeElement.value;
+                    if (code === null || code === '') return;
                     this.errors.clear();
                     if (isAuthenticator(type)) {
                         // console.log('submitVerification: sending authenticator code: '+code);

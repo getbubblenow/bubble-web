@@ -1,6 +1,34 @@
 <template>
     <div>
         <h2>{{messages.form_title_new_network}}</h2>
+
+        <div v-if="!anyContacts">
+            <h3>{{messages.message_no_contacts}}</h3>
+            <router-link v-if="!anyContacts" to="/me/policy">{{messages.link_label_no_contacts}}</router-link>
+        </div>
+        <div v-else-if="!verifiedContacts">
+            <h3>{{messages.message_no_verified_contacts}}</h3>
+            {{messages.message_no_verified_contacts_subtext}}
+            <table border="1">
+                <tr>
+                    <td v-if="typeof firstContact.nick !== 'undefined' && firstContact.nick !== null && firstContact.nick !== ''">
+                        {{firstContact.nick}}
+                    </td>
+                    <td>{{messages['field_label_policy_contact_type_'+firstContact.type]}}</td>
+                    <td>{{firstContact.info}}</td>
+                    <td>
+                        <form @submit.prevent="submitVerification()">
+        <label htmlFor="verifyCode">{{messages.field_label_policy_contact_verify_code}}</label>
+        <input :disabled="actionStatus.requesting" :id="'verifyContactCode'" v-validate="'required'" name="verifyCode" type="text" size="8"/>
+        <div v-if="errors.has('token')" class="invalid-feedback d-block">{{ errors.first('token') }}</div>
+        <button class="btn btn-primary" :disabled="actionStatus.requesting">{{messages.button_label_submit_verify_code}}</button>
+        <button class="btn btn-primary" :disabled="actionStatus.requesting" @click="resendVerification(firstContact)">{{messages.button_label_resend_verify_code}}</button>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div v-else>
         <form @submit.prevent="handleSubmit">
             <!-- name -->
             <div class="form-group">
@@ -112,12 +140,28 @@
                 <img v-show="status.creating" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
             </div>
         </form>
+        </div>
     </div>
 </template>
 
 <script>
     import { mapState, mapActions } from 'vuex'
     import { currentUser } from '../_helpers'
+
+    // convenience methods
+    import { isAuthenticator, isNotAuthenticator } from '../_store/users.module';
+    window.isAuthenticator = isAuthenticator;
+    window.isNotAuthenticator = isNotAuthenticator;
+
+    function initDefaults(comp) {
+        comp.getPolicyByUuid({uuid: currentUser().uuid, messages: comp.messages, errors: comp.errors});
+        comp.detectTimezone();
+        comp.detectLocale();
+        comp.loadDomains(currentUser().uuid, comp.messages, comp.errors);
+        comp.loadPlans(comp.messages, comp.errors);
+        comp.loadFootprints(comp.messages, comp.errors);
+        comp.loadPaymentMethods(comp.messages, comp.errors);
+    }
 
     export default {
         data() {
@@ -152,7 +196,10 @@
                 submitted: false,
                 status: {
                     creating: false
-                }
+                },
+                verifiedContacts: false,
+                anyContacts: false,
+                firstContact: null
             };
         },
         computed: {
@@ -165,6 +212,8 @@
                 creating: state => state.loading,
                 error: state => state.error
             }),
+            ...mapState('users', ['policy']),
+            ...mapState('account', ['actionStatus']),
             isComplete() {
                 return (this.network.name !== '')
                     && (this.customize.domain === false || this.network.domain !== '')
@@ -213,6 +262,9 @@
             }
         },
         methods: {
+            ...mapActions('users', ['getPolicyByUuid']),
+            ...mapActions('account', ['approveAction', 'resendVerificationCode']),
+            ...mapActions('system', ['detectTimezone', 'detectLocale']),
             ...mapActions('networks', {
                 createNewNetwork: 'create'
             }),
@@ -229,6 +281,64 @@
                 loadPaymentMethods: 'getAll',
                 setPaymentMethod: 'setPaymentMethod'
             }),
+            isAuthenticator(val) { return window.isAuthenticator(val); },
+            isNotAuthenticator(val) { return window.isNotAuthenticator(val); },
+            hasVerifiedContact(policy) {
+                if (policy && policy.accountContacts) {
+                    const contacts = policy.accountContacts;
+                    for (let i=0; i<contacts.length; i++) {
+                        if (contacts[i].verified && isNotAuthenticator(contacts[i])) return true;
+                    }
+                    return false;
+                }
+                return false;
+            },
+            hasAnyContacts(policy) {
+                if (policy && policy.accountContacts) {
+                    const contacts = policy.accountContacts;
+                    for (let i=0; i<contacts.length; i++) {
+                        if (isNotAuthenticator(contacts[i])) return true;
+                    }
+                    return false;
+                }
+                return false;
+            },
+            getFirstContact(policy) {
+                if (policy && policy.accountContacts) {
+                    const contacts = policy.accountContacts;
+                    for (let i=0; i<contacts.length; i++) {
+                        if (isNotAuthenticator(contacts[i])) return contacts[i];
+                    }
+                    return null;
+                }
+                return null;
+            },
+            submitVerification() {
+                const codeElementId = 'verifyContactCode';
+                const codeElement = document.getElementById(codeElementId);
+                if (codeElement != null) {
+                    const code = codeElement.value;
+                    if (code === null || code === '') return;
+                    this.errors.clear();
+                    this.approveAction({
+                        uuid: currentUser().uuid,
+                        code: code,
+                        messages: this.messages,
+                        errors: this.errors
+                    });
+                } else {
+                    console.log('submitVerification: DOM element not found: '+codeElementId);
+                }
+            },
+            resendVerification(contact) {
+                this.resendVerificationCode({
+                    uuid: currentUser().uuid,
+                    contact: contact,
+                    messages: this.messages,
+                    errors: this.errors
+                });
+                return false; // do not follow the click
+            },
             tzDescription(tz) {
                 return this.messages['tz_name_'+tz] + " - " + this.messages['tz_description_'+tz]
             },
@@ -276,13 +386,22 @@
                 if (info) {
                     this.network.paymentMethodObject.paymentInfo = info;
                 }
+            },
+            policy (p) {
+                // console.log('watch.policy: received '+JSON.stringify(p));
+                this.anyContacts = this.hasAnyContacts(p);
+                this.verifiedContacts = this.hasVerifiedContact(p);
+                this.firstContact = this.getFirstContact(p);
+            },
+            actionStatus (status) {
+                // console.log('watch.actionStatus: received: '+JSON.stringify(status));
+                if (status.success) {
+                    initDefaults(this);
+                }
             }
         },
         created() {
-            this.loadDomains(currentUser().uuid, this.messages, this.errors);
-            this.loadPlans(this.messages, this.errors);
-            this.loadFootprints(this.messages, this.errors);
-            this.loadPaymentMethods(this.messages, this.errors);
+            initDefaults(this);
         }
     };
 </script>

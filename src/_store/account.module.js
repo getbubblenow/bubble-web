@@ -103,6 +103,20 @@ const actions = {
                 user => commit('sendAuthenticatorCodeSuccess', user),
                 error => commit('sendAuthenticatorCodeFailure', error)
             );
+    },
+    resendVerificationCode({ dispatch, commit }, {uuid, contact, messages, errors}) {
+        commit('resendVerificationCodeRequest');
+        userService.resendVerificationCode(uuid, contact, messages, errors)
+            .then(
+                policy => {
+                    commit('resendVerificationCodeSuccess', policy);
+                    setTimeout(() => {
+                        // display success message after message sent
+                        dispatch('alert/success', messages.alert_resend_verification_success, { root: true });
+                    });
+                },
+                error => commit('resendVerificationCodeFailure', error)
+            );
     }
 };
 
@@ -182,8 +196,18 @@ const mutations = {
     },
     sendAuthenticatorCodeFailure(state, error) {
         state.actionStatus = { error: error, type: 'approve' };
-    }
+    },
 
+    resendVerificationCodeRequest(state) {
+        state.actionStatus = { requesting: true, type: 'verify' };
+    },
+    resendVerificationCodeSuccess(state, policy) {
+        console.log("resendVerificationCodeSuccess: policy="+JSON.stringify(policy));
+        state.actionStatus = { success: true, type: 'verify', result: policy };
+    },
+    resendVerificationCodeFailure(state, error) {
+        state.actionStatus = { error: error, type: 'verify' };
+    }
 };
 
 export const account = {

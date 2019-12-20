@@ -1,5 +1,5 @@
 import { systemService } from '../_services';
-import {account} from "./account.module";
+import { account } from "./account.module";
 
 const state = {
     configs: {

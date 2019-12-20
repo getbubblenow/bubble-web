@@ -29,7 +29,7 @@ const actions = {
     },
 
     create({ commit }, {accountPlan, messages, errors}) {
-        // todo
+        // todo: create account plan, then start network
     },
 
     delete({ commit }, {id, messages, errors}) {
