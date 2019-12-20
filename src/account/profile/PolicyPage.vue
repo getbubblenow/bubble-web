@@ -137,15 +137,15 @@
                 </td>
 
                 <td v-if="contact.authFactor === 'required'">
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_authFactor_name_required_icon" :title="messages.field_label_policy_contact_authFactor_name_required"></i>
+                    <i @click="toggleAuthFactor(contact)" aria-hidden="true" :class="messages.field_label_policy_contact_authFactor_name_required_icon" :title="messages.field_label_policy_contact_authFactor_name_required"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_authFactor_name_required}}</span>
                 </td>
                 <td v-else-if="contact.authFactor === 'sufficient'">
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_authFactor_name_sufficient_icon" :title="messages.field_label_policy_contact_authFactor_name_sufficient"></i>
+                    <i @click="toggleAuthFactor(contact)" aria-hidden="true" :class="messages.field_label_policy_contact_authFactor_name_sufficient_icon" :title="messages.field_label_policy_contact_authFactor_name_sufficient"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_authFactor_name_sufficient}}</span>
                 </td>
                 <td v-else-if="contact.authFactor === 'not_required'">
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_authFactor_name_not_required_icon" :title="messages.field_label_policy_contact_authFactor_name_not_required"></i>
+                    <i @click="toggleAuthFactor(contact)" aria-hidden="true" :class="messages.field_label_policy_contact_authFactor_name_not_required_icon" :title="messages.field_label_policy_contact_authFactor_name_not_required"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_authFactor_name_not_required}}</span>
                 </td>
                 <td v-else>
@@ -455,6 +455,23 @@
             contactFlag(contact, flag, val) {
                 contact[flag] = val;
                 console.log('contactFlag: update: '+JSON.stringify(contact));
+                this.addPolicyContactByUuid({
+                    uuid: this.currentUser.uuid,
+                    contact: contact,
+                    messages: this.messages,
+                    errors: this.errors
+                });
+            },
+            toggleAuthFactor(contact) {
+                if (isAuthenticator(contact)) return;
+                switch (contact.authFactor) {
+                    case 'required': this.setAuthFactor(contact, 'sufficient'); break;
+                    case 'sufficient': this.setAuthFactor(contact, 'not_required'); break;
+                    case 'not_required': this.setAuthFactor(contact, 'required'); break;
+                }
+            },
+            setAuthFactor(contact, factor) {
+                contact.authFactor = factor;
                 this.addPolicyContactByUuid({
                     uuid: this.currentUser.uuid,
                     contact: contact,

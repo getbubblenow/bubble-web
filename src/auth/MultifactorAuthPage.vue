@@ -1,31 +1,33 @@
 <template>
     <div>
         <h2>{{messages.form_title_multifactor_auth}}</h2>
-        <div v-for="auth in currentUser.multifactorAuth">
-            <table border="1">
-                <thead>
-                <tr>
-                    <td>{{messages.field_label_policy_contact_nick}}</td>
-                    <td>{{messages.field_label_policy_contact_type}}</td>
-                    <td>{{messages.field_label_policy_contact_verify_code}}</td>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>{{auth.nick}}</td>
-                    <td>{{messages['field_label_policy_contact_type_'+auth.type]}}</td>
-                    <td>
-                        <form @submit.prevent="submitVerification(auth)">
-                            <label htmlFor="verifyCode">{{messages.field_label_policy_contact_verify_code}}</label>
-                            <input :disabled="actionStatus.requesting" :id="'verifyContactCode_'+auth.uuid" v-validate="'required'" name="verifyCode" type="text" size="8"/>
-                            <div v-if="errors.has('token')" class="invalid-feedback d-block">{{ errors.first('token') }}</div>
-                            <button class="btn btn-primary" :disabled="actionStatus.requesting">{{messages.button_label_submit_verify_code}}</button>
-                        </form>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+        <table border="1">
+            <thead>
+            <tr>
+                <td>{{messages.field_label_policy_contact_nick}}</td>
+                <td>{{messages.field_label_policy_contact_type}}</td>
+                <td>{{messages.field_label_policy_contact_verify_code}}</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="auth in currentUser.multifactorAuth">
+                <td>{{auth.nick}}</td>
+                <td>{{messages['field_label_policy_contact_type_'+auth.type]}}</td>
+                <td>
+                    <form @submit.prevent="submitVerification(auth)">
+                        <label htmlFor="verifyCode">{{messages.field_label_policy_contact_verify_code}}</label>
+                        <input :disabled="actionStatus.requesting" :id="'verifyContactCode_'+auth.uuid" v-validate="'required'" name="verifyCode" type="text" size="8"/>
+                        <button class="btn btn-primary" :disabled="actionStatus.requesting">{{messages.button_label_submit_verify_code}}</button>
+                    </form>
+                </td>
+            </tr>
+            <tr v-if="errors.has('token')">
+                <td colspan="3">
+                    <div v-if="errors.has('token')" class="invalid-feedback d-block">{{ errors.first('token') }}</div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </template>
 
@@ -39,14 +41,19 @@
     window.isNotAuthenticator = isNotAuthenticator;
 
     export default {
-        data() { return { currentUser: {} } },
+        data() {
+            return { username: null }
+        },
         computed: {
-            ...mapState('account', ['user']),
+            ...mapState('account', {
+                currentUser: state => state.user
+            }),
+            ...mapState('account', ['actionStatus']),
             ...mapState('system', ['messages'])
         },
         methods: {
             ...mapActions('account', [
-                'refreshUser', 'actionStatus', 'approveAction', 'denyAction', 'sendAuthenticatorCode'
+                'refreshUser', 'approveAction', 'denyAction', 'sendAuthenticatorCode'
             ]),
             isAuthenticator(val) { return window.isAuthenticator(val); },
             isNotAuthenticator(val) { return window.isNotAuthenticator(val); },
@@ -63,7 +70,7 @@
                     if (isAuthenticator(type)) {
                         console.log('submitVerification: sending authenticator code: '+code);
                         this.sendAuthenticatorCode({
-                            uuid: this.currentUser.name,
+                            uuid: this.username,
                             code: code,
                             verifyOnly: false,
                             messages: this.messages,
@@ -71,7 +78,7 @@
                         });
                     } else {
                         this.approveAction({
-                            uuid: this.currentUser.name,
+                            uuid: this.username,
                             code: code,
                             messages: this.messages,
                             errors: this.errors
@@ -83,10 +90,10 @@
             }
         },
         watch: {
-            user: function (u) {
-                console.log('watch.user: received: '+JSON.stringify(u));
-                this.currentUser = u;
-                if (this.currentUser.token) {
+            currentUser (u) {
+                // console.log('watch.user: received: '+JSON.stringify(u));
+                if (u.name) this.username = u.name;
+                if (u.token) {
                     const landing = this.getLandingPage();
                     if (landing === null) {
                         this.$router.replace('/');
@@ -97,9 +104,11 @@
                 }
             },
             actionStatus (status) {
-                console.log('watch.actionStatus: received: '+JSON.stringify(status));
+                // console.log('watch.actionStatus: received: '+JSON.stringify(status));
+                if (status.requesting) return;
                 if (status.success) {
-                    // are we logged in? go to home page if we now have a session token
+                    console.log('watch.actionStatus: success, refreshing user');
+                    this.refreshUser();
                 }
             }
         },

@@ -79,7 +79,7 @@ function removePolicyContactByUuid(id, uuid, messages, errors) {
 }
 
 function approveAction(id, code, messages, errors) {
-    return fetch(`${config.apiUrl}/auth/approve/${code}`, postWithAuth())
+    return fetch(`${config.apiUrl}/auth/approve/${code}`, postWithAuth([{'name': 'account', 'value': id}]))
         .then(handleCrudResponse(messages, errors))
         .then(setSessionUser);
 }

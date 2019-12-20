@@ -173,7 +173,12 @@ const mutations = {
     sendAuthenticatorCodeSuccess(state, user) {
         console.log("sendAuthenticatorCodeSuccess: user="+JSON.stringify(user));
         state.actionStatus = { success: true, type: 'approve', result: user };
-        if (user.token) state.user = user;
+        if (user.token) {
+            state.user = user;
+        } else if (user.multifactorAuth) {
+            state.user.multifactorAuth = user.multifactorAuth;
+            localStorage.setItem('user', JSON.stringify(user));
+        }
     },
     sendAuthenticatorCodeFailure(state, error) {
         state.actionStatus = { error: error, type: 'approve' };
