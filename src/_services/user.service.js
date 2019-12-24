@@ -88,7 +88,7 @@ function approveAction(id, code, messages, errors) {
 function sendAuthenticatorCode(id, code, verifyOnly, messages, errors) {
     return fetch(`${config.apiUrl}/auth/authenticator`, postWithAuth({
         account: id,
-        token: parseInt(code),
+        token: code,
         verify: verifyOnly
     }))
         .then(handleCrudResponse(messages, errors))
