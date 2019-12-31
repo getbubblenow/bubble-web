@@ -33,14 +33,14 @@ function loadTimezones() {
 
 function detectTimezone() {
     const requestOptions = userLoggedIn() ? getWithAuth() : { method: 'GET' };
-    return fetch(`${config.apiUrl}/auth/detect/timezone`, requestOptions)
+    return fetch(`${config.apiUrl}/detect/timezone`, requestOptions)
         .then(handleBasicResponse)
         .then(timezone => { return timezone; });
 }
 
 function detectLocale () {
     const requestOptions = userLoggedIn() ? getWithAuth() : { method: 'GET' };
-    return fetch(`${config.apiUrl}/auth/detect/locale`, requestOptions)
+    return fetch(`${config.apiUrl}/detect/locale`, requestOptions)
         .then(handleBasicResponse)
         .then(locales => { return locales; });
 }
