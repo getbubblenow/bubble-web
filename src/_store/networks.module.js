@@ -1,12 +1,16 @@
 import { networkService } from '../_services';
 import { account } from '../_store/account.module';
+import { checkLoading } from "../_helpers";
 
 const state = {
-    loading: null,
+    loading: {
+        networks: false, network: false, deleting: false, nearestRegions: false
+    },
     creating: null,
     error: null,
     networks: null,
-    network: null
+    network: null,
+    nearestRegions: null
 };
 
 const actions = {
@@ -39,52 +43,77 @@ const actions = {
                 network => commit('deleteSuccess', network),
                 error => commit('deleteFailure', { id, error: error.toString() })
             );
-    }
+    },
+
+    getNearestRegions({ commit }, {footprint, messages, errors}) {
+        commit('getNearestRegionsRequest');
+        networkService.getNearestRegions(account.state.user.uuid, footprint, messages, errors)
+            .then(
+                regions => commit('getNearestRegionsSuccess', regions),
+                error => commit('getNearestRegionsFailure', error)
+            );
+    },
 };
 
 const mutations = {
     getAllRequest(state) {
-        state.loading = true;
+        state.loading.networks = true;
     },
     getAllSuccess(state, networks) {
-        state.loading = false;
+        state.loading.networks = false;
         state.networks = networks;
     },
     getAllFailure(state, error) {
-        state.loading = false;
+        state.loading.networks = false;
         state.error = { error };
     },
     getByUuidRequest(state) {
-        state.loading = true;
+        state.loading.network = true;
     },
     getByUuidSuccess(state, network) {
-        state.loading = false;
+        state.loading.network = false;
         state.network = network;
     },
     getByUuidFailure(state, error) {
-        state.loading = false;
+        state.loading.network = false;
         state.error = { error };
     },
     deleteRequest(state, id) {
-        state.loading = true;
+        state.loading.deleting = true;
     },
     deleteSuccess(state, id) {
-        state.loading = false;
+        state.loading.deleting = false;
         // remove deleted network from state
         if (state.networks) {
             state.networks = state.networks.filter(network => network.uuid !== id)
         }
     },
     deleteFailure(state, { id, error }) {
-        state.loading = false;
+        state.loading.deleting = false;
         // remove 'deleting:true' property and add 'deleteError:[error]' property to network
         state.error = error;
+    },
+    getNearestRegionsRequest(state) {
+        state.loading.nearestRegions = true;
+    },
+    getNearestRegionsSuccess(state, regions) {
+        state.loading.nearestRegions = false;
+        state.nearestRegions = regions;
+    },
+    getNearestRegionsFailure(state, error) {
+        state.loading.nearestRegions = false;
+        state.error = { error };
     }
+};
+
+const getters = {
+    loading: checkLoading(state.loading)
 };
 
 export const networks = {
     namespaced: true,
     state,
     actions,
-    mutations
+    mutations,
+    getters
 };

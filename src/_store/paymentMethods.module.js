@@ -1,7 +1,12 @@
-import {footprintService, paymentMethodService} from '../_services';
+import { paymentMethodService } from '../_services';
+import { checkLoading } from "../_helpers";
 
 const state = {
-    loading: null,
+    loading: {
+        paymentMethods: false, paymentMethod: false,
+        accountPaymentMethods: false, accountPaymentMethod: false,
+        adding: false
+    },
     paymentStatus: {},
     error: null,
     errors: null,
@@ -69,25 +74,25 @@ const actions = {
 
 const mutations = {
     getAllRequest(state) {
-        state.loading = true;
+        state.loading.paymentMethods = true;
     },
     getAllSuccess(state, paymentMethods) {
-        state.loading = false;
+        state.loading.paymentMethods = false;
         state.paymentMethods = paymentMethods;
     },
     getAllFailure(state, error) {
-        state.loading = false;
+        state.loading.paymentMethods = false;
         state.error = { error };
     },
     getByUuidRequest(state) {
-        state.loading = true;
+        state.loading.paymentMethod = true;
     },
     getByUuidSuccess(state, paymentMethod) {
-        state.loading = false;
+        state.loading.paymentMethod = false;
         state.paymentMethod = paymentMethod;
     },
     getByUuidFailure(state, error) {
-        state.loading = false;
+        state.loading.paymentMethod = false;
         state.error = { error };
     },
 
@@ -98,44 +103,43 @@ const mutations = {
     },
 
     getAllByAccountRequest(state) {
-        state.loading = true;
+        state.loading.accountPaymentMethods = true;
     },
     getAllByAccountSuccess(state, paymentMethods) {
-        state.loading = false;
+        state.loading.accountPaymentMethods = false;
         state.accountPaymentMethods = paymentMethods;
     },
     getAllByAccountFailure(state, error) {
-        state.loading = false;
+        state.loading.accountPaymentMethods = false;
         state.error = { error };
     },
 
     getByAccountAndIdRequest(state) {
-        state.loading = true;
+        state.loading.accountPaymentMethod = true;
     },
     getByAccountAndIdSuccess(state, paymentMethod) {
-        state.loading = false;
+        state.loading.accountPaymentMethod = false;
         state.accountPaymentMethod = paymentMethod;
     },
     getByAccountAndIdFailure(state, error) {
-        state.loading = false;
+        state.loading.accountPaymentMethod = false;
         state.error = { error };
     },
 
     addAccountPaymentMethodRequest(state) {
+        state.loading.adding = true;
         state.errors = null;
         state.paymentStatus = { addingPaymentMethod: true };
-        state.loading = true;
     },
     addAccountPaymentMethodSuccess(state, {paymentMethod, originalPaymentMethod}) {
+        state.loading.adding = false;
         state.paymentStatus = { addedPaymentMethod: true };
-        state.loading = false;
         state.accountPaymentMethod = paymentMethod;
         state.paymentInfo = originalPaymentMethod.paymentInfo;
     },
     addAccountPaymentMethodFailure(state, errors) {
-        console.log("addAccountPaymentMethodFailure: errors="+JSON.stringify(errors));
+        state.loading.adding = false;
         state.paymentStatus = {};
-        state.loading = false;
         state.errors = errors;
     },
 
@@ -144,9 +148,14 @@ const mutations = {
     }
 };
 
+const getters = {
+    loading: checkLoading(state.loading)
+};
+
 export const paymentMethods = {
     namespaced: true,
     state,
     actions,
-    mutations
+    mutations,
+    getters
 };

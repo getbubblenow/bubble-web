@@ -1,7 +1,10 @@
 import { domainService } from '../_services';
+import { checkLoading } from "../_helpers";
 
 const state = {
-    loading: null,
+    loading: {
+        domains: false, domain: false
+    },
     error: null,
     domains: null,
     domain: null
@@ -29,32 +32,37 @@ const actions = {
 
 const mutations = {
     getAllRequest(state) {
-        state.loading = true;
+        state.loading.domains = true;
     },
     getAllSuccess(state, domains) {
-        state.loading = false;
+        state.loading.domains = false;
         state.domains = domains;
     },
     getAllFailure(state, error) {
-        state.loading = false;
+        state.loading.domains = false;
         state.error = { error };
     },
     getByUuidRequest(state) {
-        state.loading = true;
+        state.loading.domain = true;
     },
     getByUuidSuccess(state, domain) {
-        state.loading = false;
+        state.loading.domain = false;
         state.domain = domain;
     },
     getByUuidFailure(state, error) {
-        state.loading = false;
+        state.loading.domain = false;
         state.error = { error };
     }
+};
+
+const getters = {
+    loading: checkLoading(state.loading)
 };
 
 export const domains = {
     namespaced: true,
     state,
     actions,
-    mutations
+    mutations,
+    getters
 };

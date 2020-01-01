@@ -5,12 +5,11 @@
 </template>
 
 <script>
-    import { mapState, mapActions } from 'vuex'
+    import { mapState, mapActions, mapGetters } from 'vuex'
 
     export default {
         computed: {
             ...mapState({
-                loading: state => state.loading,
                 network: state => state.network,
                 error: state => state.error
             })
@@ -22,7 +21,8 @@
             ...mapActions('networks', {
                 getById: 'getByUuid',
                 deleteNetwork: 'delete'
-            })
+            }),
+            ...mapGetters('networks', ['loading'])
         }
     };
 </script>

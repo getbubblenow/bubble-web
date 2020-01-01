@@ -1,7 +1,8 @@
 import { footprintService } from '../_services';
+import { checkLoading } from "../_helpers";
 
 const state = {
-    loading: null,
+    loading: { footprints: false, footprint: false },
     error: null,
     footprints: null,
     footprint: null
@@ -29,32 +30,37 @@ const actions = {
 
 const mutations = {
     getAllRequest(state) {
-        state.loading = true;
+        state.loading.footprints = true;
     },
     getAllSuccess(state, footprints) {
-        state.loading = false;
+        state.loading.footprints = false;
         state.footprints = footprints;
     },
     getAllFailure(state, error) {
-        state.loading = false;
+        state.loading.footprints = false;
         state.error = { error };
     },
     getByUuidRequest(state) {
-        state.loading = true;
+        state.loading.footprint = true;
     },
     getByUuidSuccess(state, footprint) {
-        state.loading = false;
+        state.loading.footprint = false;
         state.footprint = footprint;
     },
     getByUuidFailure(state, error) {
-        state.loading = false;
+        state.loading.footprint = false;
         state.error = { error };
     }
+};
+
+const getters = {
+    loading: checkLoading(state.loading)
 };
 
 export const footprints = {
     namespaced: true,
     state,
     actions,
-    mutations
+    mutations,
+    getters
 };

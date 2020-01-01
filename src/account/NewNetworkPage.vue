@@ -100,6 +100,24 @@
             </div>
             <hr/>
 
+            <!-- cloud+region -->
+            <div v-if="customize.region === true" class="form-group">
+                <label htmlFor="region">{{messages.field_label_region}}</label>
+                <v-select v-validate="'required'" v-if="regionObjects" :options="regionObjects" :reduce="region => region.cloud+':'+region.internalName" label="name" :value="cloudRegion" type="text" v-model="cloudRegion" name="region" class="form-control" :class="{ 'is-invalid': submitted && errors.has('region') }"></v-select>
+                <div v-if="submitted && errors.has('region')" class="invalid-feedback">{{ errors.first('region') }}</div>
+                <button @click="customize.region = false">{{messages.button_label_use_default}}</button>
+            </div>
+            <div v-if="customize.region === false">
+                {{messages.field_label_region}}:
+                <span v-if="defaults.region">{{defaults.region.name}}</span>
+                <span v-else>{{messages.message_auto_detecting}}</span>
+                <button @click="customize.region = true">{{messages.button_label_customize}}</button>
+            </div>
+            <div>
+                {{cloudRegion.name}}
+            </div>
+            <hr/>
+
             <!-- footprint -->
             <div v-if="customize.footprint === true" class="form-group">
                 <label htmlFor="footprint">{{messages.field_label_footprint}}</label>
@@ -121,7 +139,7 @@
             <div class="form-group">
                 <label htmlFor="paymentMethod">{{messages.field_label_paymentMethod}}</label>
                 <span v-for="pm in paymentMethods">
-                    <button class="btn btn-primary" :disabled="status.creating" @click="setPaymentMethod(pm)">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
+                    <button class="btn btn-primary" :disabled="status.loading" @click="setPaymentMethod(pm)">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
                 </span>
             </div>
 
@@ -136,8 +154,8 @@
             <hr/>
 
             <div class="form-group">
-                <button class="btn btn-primary" :disabled="status.creating || !isComplete">{{messages.button_label_create_new_network}}</button>
-                <img v-show="status.creating" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                <button class="btn btn-primary" :disabled="status.loading || !isComplete">{{messages.button_label_create_new_network}}</button>
+                <img v-show="status.loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
             </div>
         </form>
         </div>
@@ -145,7 +163,7 @@
 </template>
 
 <script>
-    import { mapState, mapActions } from 'vuex'
+    import { mapState, mapActions, mapGetters } from 'vuex'
     import { currentUser } from '../_helpers'
 
     // convenience methods
@@ -178,19 +196,22 @@
                         paymentInfo: null
                     }
                 },
+                cloudRegion: '',
                 customize: {
                     domain: false,
                     locale: false,
                     timezone: false,
                     plan: false,
-                    footprint: false
+                    footprint: false,
+                    region: false
                 },
                 defaults: {
                     domain: '',
                     locale: '',
                     timezone: '',
                     plan: 'bubble',
-                    footprint: 'Worldwide'
+                    footprint: 'Worldwide',
+                    region: ''
                 },
                 user: currentUser(),
                 submitted: false,
@@ -208,8 +229,8 @@
             ...mapState('plans', ['plans']),
             ...mapState('footprints', ['footprints']),
             ...mapState('paymentMethods', ['paymentMethods', 'paymentMethod', 'paymentInfo']),
+            ...mapState('networks', ['nearestRegions']),
             ...mapState('networks', {
-                creating: state => state.loading,
                 error: state => state.error
             }),
             ...mapState('users', ['policy']),
@@ -259,6 +280,19 @@
                     }
                 }
                 return fp_array;
+            },
+            regionObjects: function () {
+                const regions_array = [];
+                if (this.footprints) {
+                    for (let i = 0; i < this.footprints.length; i++) {
+                        fp_array.push({
+                            ...this.footprints[i],
+                            localName: this.messages['footprint_name_' + this.footprints[i].name],
+                            description: this.messages['footprint_description_' + this.footprints[i].name]
+                        })
+                    }
+                }
+                return regions_array;
             }
         },
         methods: {
@@ -266,8 +300,10 @@
             ...mapActions('account', ['approveAction', 'resendVerificationCode']),
             ...mapActions('system', ['detectTimezone', 'detectLocale']),
             ...mapActions('networks', {
-                createNewNetwork: 'create'
+                createNewNetwork: 'create',
+                getNearestRegions: 'getNearestRegions'
             }),
+            ...mapGetters('networks', ['loading']),
             ...mapActions('domains', {
                 loadDomains: 'getAll'
             }),

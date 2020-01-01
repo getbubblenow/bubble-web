@@ -102,3 +102,12 @@ export function setValidationErrors(data, messages, errors) {
         // todo: else add "global" error message for unrecognized/non-field error
     }
 }
+
+export function checkLoading(loadingArray) {
+    return function() {
+        for (const key in loadingArray) {
+            if (key === true) return true;
+        }
+        return false;
+    };
+}

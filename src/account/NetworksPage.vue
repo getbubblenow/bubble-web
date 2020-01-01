@@ -41,12 +41,11 @@
 </template>
 
 <script>
-    import { mapState, mapActions } from 'vuex'
+    import { mapState, mapActions, mapGetters } from 'vuex'
 
     export default {
         computed: {
             ...mapState({
-                loading: state => state.networks.loading,
                 networks: state => state.networks.networks
             }),
             ...mapState('system', ['messages'])
@@ -58,7 +57,8 @@
             ...mapActions('networks', {
                 getAllNetworks: 'getAll',
                 deleteNetwork: 'delete'
-            })
+            }),
+            ...mapGetters('networks', ['loading'])
         }
     };
 </script>

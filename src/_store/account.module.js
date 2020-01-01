@@ -122,6 +122,7 @@ const actions = {
 
 const mutations = {
     refreshUser(state, user) {
+        state.status = { loggedIn: (user !== null) };
         state.user = user;
     },
     loginRequest(state, user) {

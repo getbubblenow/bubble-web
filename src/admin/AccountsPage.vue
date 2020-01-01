@@ -20,13 +20,13 @@
 </template>
 
 <script>
-    import { mapState, mapActions } from 'vuex'
+    import { mapState, mapActions, mapGetters } from 'vuex'
 
     export default {
         computed: {
             ...mapState({
                 account: state => state.account,
-                users: state => state.users.all
+                users: state => state.users
             })
         },
         created () {
@@ -36,7 +36,8 @@
             ...mapActions('users', {
                 getAllUsers: 'getAll',
                 deleteUser: 'delete'
-            })
+            }),
+            ...mapGetters('users', ['loading'])
         }
     };
 </script>

@@ -1,11 +1,16 @@
 import { userService } from '../_services';
 import { account } from '../_store/account.module';
+import { checkLoading } from "../_helpers";
 
 const state = {
-    all: {},
+    loading: {
+        users: false, user: false, updating: false, deleting: false,
+        policy: false, updatingPolicy: false, addPolicyContact: false, removePolicyContact: false
+    },
+    errors: {},
+    users: null,
     user: null,
     policy: {},
-    policyStatus: {},
     contact: null,
     authenticator: {}
 };
@@ -120,53 +125,61 @@ const actions = {
 
 const mutations = {
     getAllRequest(state) {
-        state.all = { loading: true };
+        state.loading.users = true;
     },
     getAllSuccess(state, users) {
-        state.all = { items: users };
+        state.loading.users = false;
+        state.users = users;
     },
     getAllFailure(state, error) {
-        state.all = { error };
+        state.loading.users = false;
+        state.errors.all = error;
     },
 
     getByUuidRequest(state) {
-        state.user = { loading: true };
+        state.loading.user = true;
     },
     getByUuidSuccess(state, user) {
+        state.loading.user = false;
         state.user = user;
     },
     getByUuidFailure(state, error) {
-        state.user = { error };
+        state.loading.user = false;
+        state.errors.user = error;
     },
 
     getPolicyByUuidRequest(state) {
+        state.loading.policy = true;
         state.user = { loading: true };
     },
     getPolicyByUuidSuccess(state, policy) {
+        state.loading.policy = false;
         state.policy = policy;
         setAuthenticator(policy);
     },
     getPolicyByUuidFailure(state, error) {
-        state.policy = { error };
+        state.loading.policy = false;
+        state.errors.policy = error;
     },
 
     updatePolicyByUuidRequest(state) {
-        state.policyStatus = { updating: true };
+        state.loading.updatingPolicy = true;
     },
     updatePolicyByUuidSuccess(state, policy) {
-        state.policyStatus = {};
+        state.loading.updatingPolicy = false;
         state.policy = policy;
         setAuthenticator(policy);
     },
     updatePolicyByUuidFailure(state, error) {
-        state.policyStatus = {};
+        state.loading.updatingPolicy = false;
         state.policy = { error };
     },
 
     addPolicyContactByUuidRequest(state) {
-        state.user = { loading: true };
+        state.loading.addPolicyContact = true;
     },
     addPolicyContactByUuidSuccess(state, contact) {
+        state.loading.addPolicyContact = false;
         state.contact = contact;
         if (isAuthenticator(contact)) {
             state.authenticator = JSON.parse(contact.info);
@@ -174,46 +187,55 @@ const mutations = {
         }
     },
     addPolicyContactByUuidFailure(state, error) {
-        state.contact = { error };
+        state.loading.addPolicyContact = false;
+        state.errors.contact = error;
     },
 
     removePolicyContactByUuidRequest(state) {
-        state.user = { loading: true };
+        state.loading.removePolicyContact = true;
     },
     removePolicyContactByUuidSuccess(state, policy) {
+        state.loading.removePolicyContact = false;
         state.policy = policy;
     },
     removePolicyContactByUuidFailure(state, error) {
-        state.policy = { error };
+        state.loading.removePolicyContact = false;
+        state.errors.policy = error;
     },
 
     updateRequest(state, user) {
-        // todo: add 'updating:true' property to user being updated
+        state.loading.updating = true;
     },
     updateSuccess(state, user) {
+        state.loading.updating = false;
         user.token = account.state.user.token;  // preserve token
         state.user = account.state.user = user;
         localStorage.setItem('user', JSON.stringify(user));
     },
     updateFailure(state, { id, error }) {
-        // todo: remove 'updating:true' property and add 'updateError:[error]' property to user
+        state.loading.updating = false;
+        state.errors.update = error;
     },
 
     deleteRequest(state, id) {
+        // todo: use proper delete API
         // add 'deleting:true' property to user being deleted
-        state.all.items = state.all.items.map(user =>
+        state.loading.deleting = true;
+        state.users = state.users.map(user =>
             user.uuid === id
                 ? { ...user, deleting: true }
                 : user
         )
     },
     deleteSuccess(state, id) {
+        state.loading.deleting = false;
         // remove deleted user from state
-        state.all.items = state.all.items.filter(user => user.uuid !== id)
+        state.users = state.users.filter(user => user.uuid !== id)
     },
     deleteFailure(state, { id, error }) {
+        state.loading.deleting = false;
         // remove 'deleting:true' property and add 'deleteError:[error]' property to user 
-        state.all.items = state.items.map(user => {
+        state.users = state.users.map(user => {
             if (user.uuid === id) {
                 // make copy of user without 'deleting:true' property
                 const { deleting, ...userCopy } = user;
@@ -226,9 +248,14 @@ const mutations = {
     }
 };
 
+const getters = {
+    loading: checkLoading(state.loading)
+};
+
 export const users = {
     namespaced: true,
     state,
     actions,
-    mutations
+    mutations,
+    getters
 };
