@@ -17,7 +17,7 @@ import AccountsPage from '../admin/AccountsPage'
 import StripePayment from "../account/payment/StripePayment";
 import InviteCodePayment from "../account/payment/InviteCodePayment";
 import UnknownPayment from "../account/payment/UnknownPayment";
-import { currentUser, setLandingPage } from '../_helpers'
+import { util } from '../_helpers'
 
 Vue.use(Router);
 
@@ -79,12 +79,12 @@ export const router = new Router({
 router.beforeEach((to, from, next) => {
   const publicPages = ['/login', '/logout', '/register', '/auth'];
   const authRequired = !publicPages.includes(to.path);
-  const user = currentUser();
+  const user = util.currentUser();
 
   if (authRequired) {
     // redirect to login page if not logged in and trying to access a restricted page
     if (!user) {
-      setLandingPage(to);
+      util.setLandingPage(to);
       return next('/login');
     }
 

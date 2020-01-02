@@ -33,7 +33,7 @@
 
 <script>
     import { mapState, mapActions } from 'vuex'
-    import { getLandingPage, resetLandingPage } from '../_helpers';
+    import { util } from '../_helpers';
 
     // convenience methods
     import { isAuthenticator, isNotAuthenticator } from '../_store/users.module';
@@ -57,8 +57,8 @@
             ]),
             isAuthenticator(val) { return window.isAuthenticator(val); },
             isNotAuthenticator(val) { return window.isNotAuthenticator(val); },
-            getLandingPage() { return getLandingPage(); },
-            resetLandingPage() { return resetLandingPage(); },
+            getLandingPage() { return util.getLandingPage(); },
+            resetLandingPage() { return util.resetLandingPage(); },
             submitVerification(auth) {
                 const uuid = auth.uuid;
                 const type = auth.type;

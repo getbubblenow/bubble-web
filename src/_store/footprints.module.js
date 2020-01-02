@@ -1,5 +1,5 @@
 import { footprintService } from '../_services';
-import { checkLoading } from "../_helpers";
+import { util } from '../_helpers';
 
 const state = {
     loading: { footprints: false, footprint: false },
@@ -54,7 +54,7 @@ const mutations = {
 };
 
 const getters = {
-    loading: checkLoading(state.loading)
+    loading: util.checkLoading(state.loading)
 };
 
 export const footprints = {

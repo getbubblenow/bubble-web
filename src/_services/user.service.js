@@ -1,5 +1,5 @@
 import config from 'config';
-import { getWithAuth, postWithAuth, deleteWithAuth, handleCrudResponse, setValidationErrors } from '../_helpers';
+import { util } from '../_helpers';
 
 export const userService = {
     login,
@@ -56,61 +56,61 @@ function register(user, messages, errors) {
 }
 
 function getAll(messages, errors) {
-    return fetch(`${config.apiUrl}/users`, getWithAuth()).then(handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/users`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function getById(id, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${id}`, getWithAuth()).then(handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/users/${id}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function getPolicyById(id, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${id}/policy`, getWithAuth()).then(handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/users/${id}/policy`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function updatePolicyById(id, policy, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${id}/policy`, postWithAuth(policy)).then(handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/users/${id}/policy`, util.postWithAuth(policy)).then(util.handleCrudResponse(messages, errors));
 }
 
 function addPolicyContactById(id, contact, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${id}/policy/contacts`, postWithAuth(contact)).then(handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/users/${id}/policy/contacts`, util.postWithAuth(contact)).then(util.handleCrudResponse(messages, errors));
 }
 
 function removePolicyContactByUuid(id, uuid, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${id}/policy/contacts/${uuid}`, deleteWithAuth()).then(handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/users/${id}/policy/contacts/${uuid}`, util.deleteWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function approveAction(id, code, messages, errors) {
-    return fetch(`${config.apiUrl}/auth/approve/${code}`, postWithAuth([{'name': 'account', 'value': id}]))
-        .then(handleCrudResponse(messages, errors))
+    return fetch(`${config.apiUrl}/auth/approve/${code}`, util.postWithAuth([{'name': 'account', 'value': id}]))
+        .then(util.handleCrudResponse(messages, errors))
         .then(setSessionUser);
 }
 
 function sendAuthenticatorCode(id, code, verifyOnly, messages, errors) {
-    return fetch(`${config.apiUrl}/auth/authenticator`, postWithAuth({
+    return fetch(`${config.apiUrl}/auth/authenticator`, util.postWithAuth({
         account: id,
         token: code,
         verify: verifyOnly
     }))
-        .then(handleCrudResponse(messages, errors))
+        .then(util.handleCrudResponse(messages, errors))
         .then(setSessionUser);
 }
 
 function resendVerificationCode(id, contact, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${id}/policy/contacts/verify`, postWithAuth(contact))
-        .then(handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/users/${id}/policy/contacts/verify`, util.postWithAuth(contact))
+        .then(util.handleCrudResponse(messages, errors));
 }
 
 function denyAction(id, code, messages, errors) {
-    return fetch(`${config.apiUrl}/auth/deny/${code}`, postWithAuth()).then(handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/auth/deny/${code}`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function update(user, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${user.uuid}`, postWithAuth(user)).then(handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/users/${user.uuid}`, util.postWithAuth(user)).then(util.handleCrudResponse(messages, errors));
 }
 
 // prefixed function name with underscore because delete is a reserved word in javascript
 function _delete(id, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${id}`, deleteWithAuth()).then(handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/users/${id}`, util.deleteWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function handleAuthResponse(messages, errors) {
@@ -129,7 +129,7 @@ function handleAuthResponse(messages, errors) {
                     console.log('handleAuthResponse: received 404, user not found: '+JSON.stringify(data));
 
                 } else if (response.status === 422) {
-                    setValidationErrors(data, messages, errors);
+                    util.setValidationErrors(data, messages, errors);
                 }
                 const error = (data && data.message) || response.statusText;
                 return Promise.reject(error);

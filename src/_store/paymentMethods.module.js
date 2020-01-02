@@ -1,5 +1,5 @@
 import { paymentMethodService } from '../_services';
-import { checkLoading } from "../_helpers";
+import { util } from '../_helpers';
 
 const state = {
     loading: {
@@ -149,7 +149,7 @@ const mutations = {
 };
 
 const getters = {
-    loading: checkLoading(state.loading)
+    loading: util.checkLoading(state.loading)
 };
 
 export const paymentMethods = {

@@ -164,7 +164,7 @@
 
 <script>
     import { mapState, mapActions, mapGetters } from 'vuex'
-    import { currentUser } from '../_helpers'
+    import { util } from '../_helpers'
 
     // convenience methods
     import { isAuthenticator, isNotAuthenticator } from '../_store/users.module';
@@ -172,10 +172,10 @@
     window.isNotAuthenticator = isNotAuthenticator;
 
     function initDefaults(comp) {
-        comp.getPolicyByUuid({uuid: currentUser().uuid, messages: comp.messages, errors: comp.errors});
+        comp.getPolicyByUuid({uuid: util.currentUser().uuid, messages: comp.messages, errors: comp.errors});
         comp.detectTimezone();
         comp.detectLocale();
-        comp.loadDomains(currentUser().uuid, comp.messages, comp.errors);
+        comp.loadDomains(util.currentUser().uuid, comp.messages, comp.errors);
         comp.loadPlans(comp.messages, comp.errors);
         comp.loadFootprints(comp.messages, comp.errors);
         comp.loadPaymentMethods(comp.messages, comp.errors);
@@ -213,7 +213,7 @@
                     footprint: 'Worldwide',
                     region: ''
                 },
-                user: currentUser(),
+                user: util.currentUser(),
                 submitted: false,
                 status: {
                     creating: false
@@ -357,7 +357,7 @@
                     if (code === null || code === '') return;
                     this.errors.clear();
                     this.approveAction({
-                        uuid: currentUser().uuid,
+                        uuid: util.currentUser().uuid,
                         code: code,
                         messages: this.messages,
                         errors: this.errors
@@ -368,7 +368,7 @@
             },
             resendVerification(contact) {
                 this.resendVerificationCode({
-                    uuid: currentUser().uuid,
+                    uuid: util.currentUser().uuid,
                     contact: contact,
                     messages: this.messages,
                     errors: this.errors

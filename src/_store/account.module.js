@@ -1,5 +1,5 @@
 import { userService } from '../_services';
-import { router, getLandingPage, resetLandingPage } from '../_helpers';
+import { router, util } from '../_helpers';
 
 // todo: why can't we import currentUser from api-util and use that here?
 // when I try to do that, webpack succeeds but then an error occurs loading any page, with the
@@ -22,11 +22,11 @@ const actions = {
                 user => {
                     commit('loginSuccess', user);
                     if (user.token) {
-                        const landing = getLandingPage();
+                        const landing = util.getLandingPage();
                         if (landing === null) {
                             router.replace('/');
                         } else {
-                            resetLandingPage();
+                            util.resetLandingPage();
                             router.replace(landing.fullPath);
                         }
                     } else if (user.multifactorAuth) {

@@ -1,5 +1,5 @@
 import config from 'config';
-import { getWithAuth, handleCrudResponse } from '../_helpers';
+import { util } from '../_helpers';
 
 export const footprintService = {
     getAll,
@@ -7,9 +7,9 @@ export const footprintService = {
 };
 
 function getAll(messages, errors) {
-    return fetch(`${config.apiUrl}/me/footprints`, getWithAuth()).then(handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/me/footprints`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function getById(footprintId, messages, errors) {
-    return fetch(`${config.apiUrl}/me/footprints/${footprintId}`, getWithAuth()).then(handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/me/footprints/${footprintId}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
