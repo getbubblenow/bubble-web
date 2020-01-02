@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 
 import HomePage from '../account/HomePage'
+import ActivationPage from '../auth/ActivationPage'
 import RegisterPage from '../auth/RegisterPage'
 import LoginPage from '../auth/LoginPage'
 import MultifactorAuthPage from '../auth/MultifactorAuthPage'
@@ -64,10 +65,13 @@ export const router = new Router({
       ]
     },
     { path: '/action', component: ActionPage },
+
+    { path: '/activate', component: ActivationPage },
     { path: '/register', component: RegisterPage },
     { path: '/auth', component: MultifactorAuthPage },
     { path: '/login', component: LoginPage },
     { path: '/logout', component: LoginPage },
+
     { path: '/admin/accounts', component: AccountsPage },
     { path: '/admin/accounts/:uuid', component: ProfilePage },
 
@@ -77,7 +81,7 @@ export const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/login', '/logout', '/register', '/auth'];
+  const publicPages = ['/login', '/logout', '/register', '/auth', '/activate'];
   const authRequired = !publicPages.includes(to.path);
   const user = util.currentUser();
 

@@ -26,33 +26,51 @@ export const util = {
     getWithAuth: function() {
         return {
             method: 'GET',
-            headers: authHeader()
+            headers: util.authHeader()
         };
     },
 
-    entityWithAuth: function(method, obj) {
+    entityNoAuth: function(method, obj) {
         if (typeof obj === 'undefined' || obj === null || obj === 'undefined') {
             return {
                 method: method,
-                headers: { ...authHeader(), 'Content-Type': 'application/json' }
+                headers: { 'Content-Type': 'application/json' }
             };
         } else {
             return {
                 method: method,
-                headers: { ...authHeader(), 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(obj)
             };
         }
     },
 
-    postWithAuth: function(obj) { return entityWithAuth('POST', obj); },
+    postNoAuth: function(obj) { return util.entityNoAuth('POST', obj); },
+    putNoAuth: function(obj) { return util.entityNoAuth('PUT', obj); },
 
-    putWithAuth: function(obj) { return entityWithAuth('PUT', obj); },
+    entityWithAuth: function(method, obj) {
+        if (typeof obj === 'undefined' || obj === null || obj === 'undefined') {
+            return {
+                method: method,
+                headers: { ...util.authHeader(), 'Content-Type': 'application/json' }
+            };
+        } else {
+            return {
+                method: method,
+                headers: { ...util.authHeader(), 'Content-Type': 'application/json' },
+                body: JSON.stringify(obj)
+            };
+        }
+    },
+
+    postWithAuth: function(obj) { return util.entityWithAuth('POST', obj); },
+
+    putWithAuth: function(obj) { return util.entityWithAuth('PUT', obj); },
 
     deleteWithAuth: function() {
         return {
             method: 'DELETE',
-            headers: authHeader()
+            headers: util.authHeader()
         };
     },
 
@@ -116,5 +134,5 @@ export const util = {
             }
             return false;
         };
-    },
+    }
 };

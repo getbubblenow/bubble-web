@@ -1,12 +1,26 @@
-import { userService } from '../_services';
+import { userService, systemService } from '../_services';
 import { router, util } from '../_helpers';
 
 // todo: why can't we import currentUser from api-util and use that here?
 // when I try to do that, webpack succeeds but then an error occurs loading any page, with the
 // error message "_helpers.currentUser is not defined"
-const user = JSON.parse(localStorage.getItem('user'));
+// const user = JSON.parse(localStorage.getItem('user'));
+const user = util.currentUser();
+
+const defaultStatus = {
+    loggingIn: false,
+    loggedIn: false,
+    registering: false,
+    activating: false,
+    approving: false,
+    denying: false,
+    authenticating: false,
+    sendingVerification: false
+};
+
 const state = {
-    status: { loggedIn: (user !== null) },
+    activated: null,
+    status: Object.assign({}, defaultStatus, {loggedIn: (user != null)}),
     user: user,
     actionStatus: {}
 };
@@ -122,16 +136,17 @@ const actions = {
 
 const mutations = {
     refreshUser(state, user) {
-        state.status = { loggedIn: (user !== null) };
+        state.status.loggedIn = (user !== null);
         state.user = user;
     },
     loginRequest(state, user) {
-        state.status = { loggingIn: true };
+        state.status.loggingIn = true;
         state.user = user;
     },
     loginSuccess(state, user) {
         if (user.token) {
-            state.status = { loggedIn: true };
+            state.status.loggingIn = false;
+            state.status.loggedIn = true;
         } else if (user.multifactorAuth) {
             state.status = { multifactorAuth: true };
         } else {
@@ -141,51 +156,60 @@ const mutations = {
         state.user = user;
     },
     loginFailure(state) {
-        state.status = {};
+        state.status.loggingIn = false;
         state.user = null;
     },
 
     logout(state) {
-        state.status = {};
+        state.status = Object.assign({}, defaultStatus);
         state.user = null;
     },
 
     registerRequest(state, user) {
-        state.status = { registering: true };
+        state.status.registering = true;
         state.user = user;
     },
     registerSuccess(state, user) {
-        state.status = {};
+        state.status.registering = false;
         state.user = user;
     },
     registerFailure(state) {
+        state.status.registering = false;
         state.status = {};
     },
 
     approveActionRequest(state) {
+        state.status.approving = true;
         state.actionStatus = { requesting: true, type: 'approve' };
     },
     approveActionSuccess(state, user) {
+        state.status.approving = false;
         state.actionStatus = { success: true, type: 'approve', result: user };
         if (user.token) state.user = user;
     },
     approveActionFailure(state, error) {
+        state.status.approving = false;
         state.actionStatus = { error: error, type: 'approve' };
     },
     denyActionRequest(state) {
+        state.status.denying = true;
         state.actionStatus = { requesting: true, type: 'deny' };
     },
     denyActionSuccess(state, denial) {
+        state.status.denying = false;
         state.actionStatus = { success: true, type: 'deny', result: denial };
         state.denial = denial;
     },
     denyActionFailure(state, error) {
+        state.status.denying = false;
         state.actionStatus = { error: error, type: 'deny' };
     },
     sendAuthenticatorCodeRequest(state) {
+        state.status.authenticating = true;
         state.actionStatus = { requesting: true, type: 'approve' };
     },
     sendAuthenticatorCodeSuccess(state, user) {
+        state.status.authenticating = false;
         console.log("sendAuthenticatorCodeSuccess: user="+JSON.stringify(user));
         state.actionStatus = { success: true, type: 'approve', result: user };
         if (user.token) {
@@ -196,17 +220,21 @@ const mutations = {
         }
     },
     sendAuthenticatorCodeFailure(state, error) {
+        state.status.authenticating = false;
         state.actionStatus = { error: error, type: 'approve' };
     },
 
     resendVerificationCodeRequest(state) {
+        state.status.sendingVerification = true;
         state.actionStatus = { requesting: true, type: 'verify' };
     },
     resendVerificationCodeSuccess(state, policy) {
+        state.status.sendingVerification = false;
         console.log("resendVerificationCodeSuccess: policy="+JSON.stringify(policy));
         state.actionStatus = { success: true, type: 'verify', result: policy };
     },
     resendVerificationCodeFailure(state, error) {
+        state.status.sendingVerification = false;
         state.actionStatus = { error: error, type: 'verify' };
     }
 };

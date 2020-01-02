@@ -7,6 +7,7 @@ const state = {
         paymentsEnabled: false,
         sageLauncher: false
     },
+    activated: null,
     error: null,
     messages: {
         durationToMillis: function(count, units) {
@@ -35,6 +36,15 @@ const state = {
 };
 
 const actions = {
+    loadIsActivated({ commit }) {
+        commit('loadIsActivatedRequest');
+        systemService.loadIsActivated()
+            .then(
+                activated => commit('loadIsActivatedSuccess', activated),
+                error => commit('loadIsActivatedFailure', error)
+            );
+    },
+
     loadSystemConfigs({ commit }) {
         commit('loadSystemConfigsRequest');
         systemService.loadSystemConfigs()
@@ -150,6 +160,32 @@ const messageNotFoundHandler = {
 };
 
 const mutations = {
+    loadIsActivatedRequest(state) {
+        console.log('loadIsActivatedRequest: starting');
+    },
+    loadIsActivatedSuccess(state, activated) {
+        console.log('loadIsActivatedSuccess: received '+activated);
+        state.activated = activated;
+    },
+    loadIsActivatedFailure(state, error) {
+        console.log('loadIsActivatedFailure: failed: '+error);
+        state.errors.activated = error;
+    },
+
+    activateRequest(state) {
+        state.status.activating = true;
+    },
+    activateSuccess(state, admin) {
+        state.status.activating = false;
+        state.activated = true;
+        state.user = admin;
+        state.status = { loggedIn: (admin !== null) };
+    },
+    activateFailure(state, error) {
+        state.status.activating = false;
+        state.errors.activated = error;
+    },
+
     loadSystemConfigsRequest(state) {},
     loadSystemConfigsSuccess(state, configs) {
         state.configs = configs;

@@ -2,12 +2,28 @@ import config from 'config';
 import { util } from '../_helpers';
 
 export const systemService = {
+    loadIsActivated,
+    activate,
     loadSystemConfigs,
     loadMessages,
     loadTimezones,
     detectTimezone,
     detectLocale
 };
+
+function loadIsActivated () {
+    const requestOptions = { method: 'GET' };
+    return fetch(`${config.apiUrl}/auth/activate`, requestOptions)
+        .then(util.handleBasicResponse)
+        .then(activated => { return activated; });
+}
+
+function activate (activation) {
+    const requestOptions = util.putNoAuth(activation);
+    return fetch(`${config.apiUrl}/auth/activate`, requestOptions)
+        .then(util.handleBasicResponse)
+        .then(admin => { return admin; });
+}
 
 function loadSystemConfigs() {
     const requestOptions = util.userLoggedIn() ? util.getWithAuth() : { method: 'GET' };

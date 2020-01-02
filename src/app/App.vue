@@ -19,7 +19,7 @@ export default {
     name: 'app',
     computed: {
         ...mapState('account', ['status']),
-        ...mapState('system', ['configs', 'messages', 'menu']),
+        ...mapState('system', ['activated', 'configs', 'messages', 'menu']),
         ...mapGetters('system', ['menu']),
         ...mapState({
             alert: state => state.alert
@@ -27,15 +27,20 @@ export default {
     },
     methods: {
         ...mapActions({ clearAlert: 'alert/clear' }),
-        ...mapActions('system', ['loadSystemConfigs', 'loadMessages', 'loadTimezones'])
+        ...mapActions('system', ['loadIsActivated', 'loadSystemConfigs', 'loadMessages', 'loadTimezones'])
     },
     watch: {
         $route (to, from){
             // clear alert on location change
             this.clearAlert();
+        },
+        activated (active) {
+            console.log('App.watch.activated: received: '+active);
+            if (!active) this.$router.replace('/activate');
         }
     },
     created() {
+        this.loadIsActivated();
         this.loadSystemConfigs();  // determine if we can show the registration link
 
         // todo: allow user to choose locale
