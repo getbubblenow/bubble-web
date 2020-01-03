@@ -1,5 +1,6 @@
 import { systemService } from '../_services';
 import { account } from "./account.module";
+import {router} from "../_helpers";
 
 const state = {
     configs: {
@@ -43,6 +44,17 @@ const actions = {
             .then(
                 activated => commit('loadIsActivatedSuccess', activated),
                 error => commit('loadIsActivatedFailure', error)
+            );
+    },
+    activate({ commit }, activation) {
+        commit('activateRequest');
+        systemService.activate(activation)
+            .then(
+                admin => {
+                    commit('activateSuccess', admin);
+                    router.replace('/');
+                },
+                error => commit('activateFailure', error)
             );
     },
 
@@ -184,6 +196,7 @@ const mutations = {
         state.activated = true;
         state.user = admin;
         state.status = { loggedIn: (admin !== null) };
+        localStorage.setItem('user', JSON.stringify(admin));
     },
     activateFailure(state, error) {
         state.status.activating = false;

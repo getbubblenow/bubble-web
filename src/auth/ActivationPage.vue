@@ -1,7 +1,7 @@
 <template>
     <div>
         <h2>{{messages.form_title_activation}}</h2>
-        <form @submit.prevent="handleSubmit">
+        <form @submit.prevent="submitActivation">
             <div class="form-group">
                 <label for="name">{{messages.field_label_username}}</label>
                 <input type="text" v-model="name" v-validate="'required'" name="name" class="form-control" :class="{ 'is-invalid': submitted && errors.has('name') }" />
@@ -32,6 +32,12 @@
                 </select>
                 <span v-html="messages['description_'+dnsByName[dnsName].driverClass]"></span>
                 <div v-if="submitted && errors.has('dns')" class="invalid-feedback">{{ errors.first('dns') }}</div>
+            </div>
+            <div class="form-group">
+                <label for="domainName">{{messages.field_label_domain}}</label>
+                <input type="text" v-model="domainName" name="domainName" class="form-control" :class="{ 'is-invalid': submitted && errors.has('domain') }" />
+                <div v-if="submitted && errors.has('domain')" class="invalid-feedback">{{ errors.first('domain') }}</div>
+                <span>{{messages.field_label_domain_description}}</span>
             </div>
 
             <!-- DNS fields -->
@@ -127,8 +133,8 @@
         },
         credentials: {
             params: [
-                {name: "AWS_ACCESS_KEY_ID", "value": null},
-                {name: "AWS_SECRET_KEY", "value": null}
+                {name: "AWS_ACCESS_KEY_ID", value: null},
+                {name: "AWS_SECRET_KEY", value: null}
             ]
         },
         template: true
@@ -145,6 +151,12 @@
     STORAGE_BY_NAME[STORAGE_S3.name] = STORAGE_S3;
     STORAGE_BY_NAME[STORAGE_LOCAL.name] = STORAGE_LOCAL;
 
+    function toCredentialsMap(creds) {
+        const map = {};
+        for (let i=0; i<creds.length; i++) map[creds.name] = creds.value;
+        return map;
+    }
+
     export default {
         data() {
             return {
@@ -160,41 +172,48 @@
                 networkName: null,
 
                 dnsName: DNS_TEMPLATES[0].name,
-                dns: Object.assign({}, DNS_TEMPLATES[0]),
-                dnsCredentials: {},
-                dnsConfig: {},
+                dnsCredentials: toCredentialsMap(DNS_TEMPLATES[0].credentials),
+                dnsConfig: DNS_TEMPLATES[0].driverConfig,
 
                 storageName: STORAGE_TEMPLATES[0].name,
-                storage: Object.assign({}, STORAGE_TEMPLATES[0]),
-                storageCredentials: {},
-                storageConfig: {},
+                storageCredentials: toCredentialsMap(STORAGE_TEMPLATES[0].credentials),
+                storageConfig: STORAGE_TEMPLATES[0].driverConfig,
 
                 domainName: null,
                 domain: {}
             };
         },
         computed: {
-            ...mapState('system', ['status', 'activated', 'configs', 'messages']),
-            activationRequest () {
-                return {
-                    name: this.name,
-                    password: this.password,
-                    description: this.description,
-                    networkName: this.networkName,
-                    dns: {
-                    },
-                    domain: {
-                    },
-                    storage: {
-
-                    }
-                }
-            }
+            ...mapState('system', ['status', 'activated', 'configs', 'messages'])
         },
         created () {
+            this.loadIsActivated();
         },
         methods: {
-            ...mapActions('system', ['loadIsActivated']),
+            ...mapActions('system', ['loadIsActivated', 'activate']),
+            cloudActivationObject (cloud, creds, configs) {
+                const obj = Object.assign({}, cloud);
+                if (obj.credentials && obj.credentials.params) {
+                    for (let i=0; i<obj.credentials.params.length; i++) {
+                        obj.credentials.params[i].value = creds[obj.credentials.params[i].name];
+                    }
+                }
+                if (obj.driverConfig) {
+                    for (let k in configs) {
+                        if (configs.hasOwnProperty(k)) {
+                            obj.driverConfig[k] = configs[k];
+                        }
+                    }
+                }
+                return obj;
+            },
+            domainActivationObject: function () {
+                return {
+                    name: this.domainName,
+                    template: true,
+                    publicDns: this.dnsName
+                };
+            },
             cloudConfigFields (cloud) {
                 const fields = { config: [], credentials: [] };
                 if (typeof cloud.driverConfig !== 'undefined' && cloud.driverConfig !== null) {
@@ -218,13 +237,44 @@
                     }
                 }
                 return fields;
+            },
+            submitActivation (e) {
+                const activation = {
+                    name: this.name,
+                    password: this.password,
+                    description: this.description,
+                    networkName: this.networkName,
+                    dns: this.cloudActivationObject(this.dnsByName[this.dnsName], this.dnsCredentials, this.dnsConfig),
+                    storage: this.cloudActivationObject(this.storageByName[this.storageName], this.storageCredentials, this.storageConfig),
+                    domain: this.domainActivationObject()
+                };
+                console.log('sending activation JSON = '+JSON.stringify(activation));
+                this.submitted = true;
+                this.activate(activation);
             }
         },
         watch: {
             activated (active) {
-                console.log('ActivationPage.watch.activated: received: '+active);
                 if (active) this.$router.replace('/');
-            }
+            },
+            dnsName (name) {
+                console.log('dns changed to '+name);
+                if (typeof this.dnsByName[name].credentials !== 'undefined') {
+                    this.dnsCredentials = toCredentialsMap(this.dnsByName[name].credentials);
+                }
+                if (typeof this.dnsByName[name].driverConfig !== 'undefined') {
+                    this.dnsConfig = this.dnsByName[name].driverConfig;
+                }
+            },
+            storageName (name) {
+                console.log('storage changed to '+name);
+                if (typeof this.storageByName[name].credentials !== 'undefined') {
+                    this.storageCredentials = toCredentialsMap(this.storageByName[name].credentials);
+                }
+                if (typeof this.storageByName[name].driverConfig !== 'undefined') {
+                    this.storageConfig = this.storageByName[name].driverConfig;
+                }
+            },
         }
     };
 </script>
