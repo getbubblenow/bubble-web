@@ -7,6 +7,7 @@ const state = {
         paymentsEnabled: false,
         sageLauncher: false
     },
+    status: { activating: false },
     activated: null,
     error: null,
     messages: {
@@ -155,7 +156,10 @@ const messageNotFoundHandler = {
         if (typeof name === 'undefined') return '???undefined';
         if (name === null) return '???null';
         if (name === '') return '???empty';
-        return target.hasOwnProperty(name) ? target[name] : '???'+name.toString();
+        if (target.hasOwnProperty(name)) return target[name];
+        const altName = name.toString().replace(/\./g, '_');
+        if (target.hasOwnProperty(altName)) return target[altName];
+        return '???'+name.toString();
     }
 };
 
