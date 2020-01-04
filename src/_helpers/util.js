@@ -49,6 +49,20 @@ export const util = {
     postNoAuth: function(obj) { return util.entityNoAuth('POST', obj); },
     putNoAuth: function(obj) { return util.entityNoAuth('PUT', obj); },
 
+    jsonWithAuth: function(method, json) {
+        if (typeof json === 'undefined' || json === null || json === 'undefined') {
+            return {
+                method: method,
+                headers: { ...util.authHeader(), 'Content-Type': 'application/json' }
+            };
+        } else {
+            return {
+                method: method,
+                headers: { ...util.authHeader(), 'Content-Type': 'application/json' },
+                body: json
+            };
+        }
+    },
     entityWithAuth: function(method, obj) {
         if (typeof obj === 'undefined' || obj === null || obj === 'undefined') {
             return {
@@ -65,8 +79,10 @@ export const util = {
     },
 
     postWithAuth: function(obj) { return util.entityWithAuth('POST', obj); },
+    postJsonWithAuth: function(json) { return util.jsonWithAuth('POST', json); },
 
     putWithAuth: function(obj) { return util.entityWithAuth('PUT', obj); },
+    putJsonWithAuth: function(json) { return util.jsonWithAuth('PUT', json); },
 
     deleteWithAuth: function() {
         return {

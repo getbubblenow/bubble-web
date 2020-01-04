@@ -10,7 +10,16 @@
             </div>
         </form>
 
-        <table border="1" v-if="this.ec && this.ec[this.lcType] && this.ec[this.lcType].listFields && this.selectedEntity === null">
+        <div v-if="this.ec && this.ec[this.lcType] && this.ec[this.lcType].createMethod !== 'DISABLED'">
+            <button @click="showingAddDialog = true">{{messages.button_label_add_entity}}</button>
+            <div v-if="showingAddDialog">
+                <textarea v-bind="newEntityJson"></textarea>
+                <button @click="createNewEntity()">{{messages.button_label_save_add_entity}}</button>
+                <button @click="showingAddDialog = false">{{messages.button_label_close_add_entity}}</button>
+            </div>
+        </div>
+
+        <table border="1" v-if="this.ec && this.ec[this.lcType] && this.ec[this.lcType].listFields && this.selectedEntity === null && !showingAddDialog">
             <thead>
             <tr>
                 <td v-for="field in this.ec[this.lcType].listFields">{{field}}</td>
@@ -35,6 +44,10 @@
                     <td>{{field}}:</td>
                     <td>{{selectedEntity[field]}}</td>
                 </tr>
+                <tr>
+                    <td>JSON:</td>
+                    <td>{{JSON.stringify(selectedEntity)}}</td>
+                </tr>
             </table>
             <button @click="closeEntity()">{{messages.button_label_close_view_entity}}</button>
         </div>
@@ -56,7 +69,9 @@
                     sort: ''
                 },
                 results: [],
-                selectedEntity: null
+                selectedEntity: null,
+                showingAddDialog: false,
+                newEntityJson: ''
             };
         },
         computed: {
@@ -74,7 +89,8 @@
         methods: {
             // ...mapActions('system', ['loadIsActivated', 'activate']),
             ...mapActions('system', [
-                'loadIsActivated', 'loadSystemConfigs', 'loadMessages', 'loadTimezones', 'loadEntityConfigs', 'search'
+                'loadIsActivated', 'loadSystemConfigs', 'loadMessages', 'loadTimezones', 'loadEntityConfigs',
+                'search', 'createEntity'
             ]),
             setupModel(e) {
                 console.log('setupModel called');
@@ -87,6 +103,9 @@
             },
             closeEntity() {
                 this.selectedEntity = null;
+            },
+            createNewEntity() {
+                this.createEntity(this.type, this.newEntityJson, this.messages, this.errors);
             }
         },
         watch: {

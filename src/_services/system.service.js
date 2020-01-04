@@ -47,6 +47,21 @@ function search(type, query) {
         .then(config => { return config; });
 }
 
+function createEntity(config, json, messages, errors) {
+    let requestOptions = null;
+    if (config.createMethod) {
+        if (config.createMethod === 'PUT') {
+            requestOptions = util.putJsonWithAuth(json);
+        } else if (config.createMethod === 'POST') {
+            requestOptions = util.putJsonWithAuth(json);
+        }
+    }
+    if (requestOptions === null) requestOptions = util.putJsonWithAuth(json);
+    return fetch(`${config.apiUrl}/${config.createUri}`, requestOptions)
+        .then(util.handleCrudResponse(messages, errors))
+        .then(config => { return config; });
+}
+
 function loadMessages(group, locale) {
     const requestOptions = util.userLoggedIn() ? util.getWithAuth() : { method: 'GET' };
     if (!locale || locale === '') locale = 'detect';
