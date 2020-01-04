@@ -11,7 +11,9 @@ const state = {
         entityClasses: [],
         locales: ['en_US']
     },
-    status: { activating: false },
+    entityConfigs: {},
+    searchResults: [],
+    status: { activating: false, searching: false },
     activated: null,
     error: null,
     messages: {
@@ -68,6 +70,22 @@ const actions = {
             .then(
                 configs => commit('loadSystemConfigsSuccess', configs),
                 error => commit('loadSystemConfigsFailure', error)
+            );
+    },
+    loadEntityConfigs({ commit }) {
+        commit('loadEntityConfigsRequest');
+        systemService.loadEntityConfigs()
+            .then(
+                configs => commit('loadEntityConfigsSuccess', configs),
+                error => commit('loadEntityConfigsFailure', error)
+            );
+    },
+    search({ commit }, type, query) {
+        commit('searchRequest');
+        systemService.search(type, query)
+            .then(
+                results => commit('searchSuccess', {type, query, results}),
+                error => commit('searchFailure', error)
             );
     },
     loadMessages({ commit }, group, locale) {
@@ -212,6 +230,32 @@ const mutations = {
         state.configs = configs;
     },
     loadSystemConfigsFailure(state, error) {
+        state.error = error;
+    },
+    loadEntityConfigsRequest(state) {},
+    loadEntityConfigsSuccess(state, configs) {
+        // console.log('loadEntityConfigsSuccess: received configs='+JSON.stringify(configs));
+        const newConfigs = {};
+        for (let i=0; i<configs.length; i++) {
+            for (let j=0; j<configs[i].names.length; j++) {
+                newConfigs[configs[i].names[j]] = configs[i].entityConfig;
+            }
+        }
+        state.entityConfigs = newConfigs;
+    },
+    loadEntityConfigsFailure(state, error) {
+        state.error = error;
+    },
+    searchRequest(state) {
+        state.status.searching = true;
+    },
+    searchSuccess(state, {type, query, results}) {
+        console.log('searchSuccess: '+JSON.stringify(results));
+        state.status.searching = false;
+        state.searchResults = results;
+    },
+    searchFailure(state, error) {
+        state.status.searching = false;
         state.error = error;
     },
     loadMessagesRequest(state) {},

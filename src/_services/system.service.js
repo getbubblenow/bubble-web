@@ -5,6 +5,8 @@ export const systemService = {
     loadIsActivated,
     activate,
     loadSystemConfigs,
+    loadEntityConfigs,
+    search,
     loadMessages,
     loadTimezones,
     detectTimezone,
@@ -30,6 +32,19 @@ function loadSystemConfigs() {
     return fetch(`${config.apiUrl}/auth/configs`, requestOptions)
         .then(util.handleBasicResponse)
         .then(configs => { return configs; });
+}
+
+function loadEntityConfigs() {
+    const requestOptions = util.userLoggedIn() ? util.getWithAuth() : { method: 'GET' };
+    return fetch(`${config.apiUrl}/ec?full=true`, requestOptions)
+        .then(util.handleBasicResponse)
+        .then(config => { return config; });
+}
+
+function search(type, query) {
+    return fetch(`${config.apiUrl}/search/${type}`, util.postWithAuth(query))
+        .then(util.handleBasicResponse)
+        .then(config => { return config; });
 }
 
 function loadMessages(group, locale) {
