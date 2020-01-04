@@ -5,7 +5,7 @@
             <div class="form-group">
                 <label for="configType">{{messages.field_label_entity_type}}</label>
                 <select v-model="configType" name="configType" class="form-control">
-                    <option v-for="opt in system.configs.entityClasses" v-bind:value="opt">{{opt}}</option>
+                    <option v-for="opt in this.configs.entityClasses" v-bind:value="opt.value">{{opt.name}}</option>
                 </select>
             </div>
         </form>
@@ -18,18 +18,17 @@
     export default {
         data() {
             return {
-                configType: system.configs.entityClasses[0]
+                configType: 'Account'
             };
         },
         computed: {
+            ...mapState('account', ['locale']),
             ...mapState('system', ['configs', 'messages'])
         },
         created () {
-            const locale = 'detect';
-            this.loadSystemConfigs();  // determine if we can show the registration link
-            this.loadMessages('pre_auth', locale);
-            this.loadMessages('post_auth', locale);
-
+            this.loadSystemConfigs(); // ensure config.entityClasses is refreshed
+            this.loadMessages('pre_auth', this.locale);
+            this.loadMessages('post_auth', this.locale);
         },
         methods: {
             // ...mapActions('system', ['loadIsActivated', 'activate']),

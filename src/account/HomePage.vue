@@ -15,6 +15,7 @@ export default {
             account: state => state.account,
             users: state => state.users.all
         }),
+        ...mapState('account', ['locale']),
         ...mapState('system', ['messages', 'detectedTimezone', 'detectedLocale'])
     },
     methods: {
@@ -25,9 +26,7 @@ export default {
         ...mapActions('system', ['loadMessages', 'loadTimezones', 'detectTimezone', 'detectLocale'])
     },
     created () {
-        // todo: allow user to choose locale
-        const locale = 'detect';
-        this.loadMessages('post_auth', locale);
+        this.loadMessages('post_auth', this.locale);
         this.detectLocale();
         this.detectTimezone();
     }
