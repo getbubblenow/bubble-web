@@ -1,16 +1,14 @@
 import { userService, systemService } from '../_services';
 import { router, util } from '../_helpers';
 
-// todo: why can't we import currentUser from api-util and use that here?
-// when I try to do that, webpack succeeds but then an error occurs loading any page, with the
-// error message "_helpers.currentUser is not defined"
-// const user = JSON.parse(localStorage.getItem('user'));
 const user = util.currentUser();
 
 const defaultStatus = {
     loggingIn: false,
     loggedIn: false,
     registering: false,
+    updating: false,
+    settingLocale: false,
     activating: false,
     approving: false,
     denying: false,
@@ -22,12 +20,13 @@ const state = {
     activated: null,
     status: Object.assign({}, defaultStatus, {loggedIn: (user != null)}),
     user: user,
-    actionStatus: {}
+    actionStatus: {},
+    locale: user == null ? 'detect' : (typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : 'detect')
 };
 
 const actions = {
     refreshUser({ commit }) {
-        commit('refreshUser', JSON.parse(localStorage.getItem('user')));
+        commit('refreshUser', JSON.parse(localStorage.getItem(util.USER_KEY)));
     },
     login({ dispatch, commit }, { user, messages, errors }) {
         commit('loginRequest', { name: user.name });
@@ -73,6 +72,15 @@ const actions = {
                     commit('registerFailure');
                     dispatch('alert/error', error, { root: true });
                 }
+            );
+    },
+    setLocale({ commit }, {locale, messages, errors}) {
+        state.locale = locale;
+        commit('setLocaleRequest', locale);
+        userService.setLocale(locale, messages, errors)
+            .then(
+                user => commit('setLocaleSuccess', user),
+                error => commit('setLocaleFailure', error)
             );
     },
     update({ dispatch, commit }, {user, messages, errors}) {
@@ -152,8 +160,9 @@ const mutations = {
         } else {
             state.status = {};
         }
-        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem(util.USER_KEY, JSON.stringify(user));
         state.user = user;
+        state.locale = (typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : state.locale);
     },
     loginFailure(state) {
         state.status.loggingIn = false;
@@ -171,10 +180,51 @@ const mutations = {
     },
     registerSuccess(state, user) {
         state.status.registering = false;
+        localStorage.setItem(util.USER_KEY, JSON.stringify(user));
         state.user = user;
+        state.locale = (typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : state.locale);
     },
     registerFailure(state) {
         state.status.registering = false;
+        state.status = {};
+    },
+
+    setLocaleRequest(state, locale) {
+        console.log('setLocaleRequest: setting locale='+locale);
+        state.status.settingLocale = true;
+        state.locale = locale;
+        const user = util.currentUser();
+        if (user === null) {
+            localStorage.setItem(util.USER_KEY, JSON.stringify({locale: locale}));
+        } else {
+            user.locale = locale;
+            localStorage.setItem(util.USER_KEY, JSON.stringify(user));
+        }
+        state.user = user;
+    },
+    setLocaleSuccess(state, user) {
+        console.log('setLocaleSuccess: user='+JSON.stringify(user));
+        state.locale = ''+state.locale;
+        state.status.settingLocale = false;
+    },
+    setLocaleFailure(state) {
+        console.log('setLocaleFailure');
+        state.status.settingLocale = false;
+        state.status = {};
+    },
+
+    updateRequest(state, user) {
+        state.status.updating = true;
+        state.user = user;
+    },
+    updateSuccess(state, user) {
+        state.status.updating = false;
+        localStorage.setItem(util.USER_KEY, JSON.stringify(user));
+        state.user = user;
+        state.locale = (typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : state.locale);
+    },
+    updateFailure(state) {
+        state.status.updating = false;
         state.status = {};
     },
 
@@ -216,7 +266,7 @@ const mutations = {
             state.user = user;
         } else if (user.multifactorAuth) {
             state.user.multifactorAuth = user.multifactorAuth;
-            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem(util.USER_KEY, JSON.stringify(user));
         }
     },
     sendAuthenticatorCodeFailure(state, error) {

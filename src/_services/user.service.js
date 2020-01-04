@@ -11,6 +11,7 @@ export const userService = {
     updatePolicyById,
     addPolicyContactById,
     removePolicyContactByUuid,
+    setLocale,
     update,
     delete: _delete,
     approveAction,
@@ -102,6 +103,16 @@ function resendVerificationCode(id, contact, messages, errors) {
 
 function denyAction(id, code, messages, errors) {
     return fetch(`${config.apiUrl}/auth/deny/${code}`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
+}
+
+function setLocale(locale, messages, errors) {
+    const user = util.currentUser();
+    if (user != null && user.token) {
+        return fetch(`${config.apiUrl}/me/locale/${locale}`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
+    } else {
+        const loc = {locale: locale};
+        return Promise.resolve(loc);
+    }
 }
 
 function update(user, messages, errors) {

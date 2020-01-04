@@ -3,6 +3,7 @@ import Router from 'vue-router';
 
 import HomePage from '../account/HomePage'
 import ActivationPage from '../auth/ActivationPage'
+import ModelSetupPage from '../admin/ModelSetupPage'
 import RegisterPage from '../auth/RegisterPage'
 import LoginPage from '../auth/LoginPage'
 import MultifactorAuthPage from '../auth/MultifactorAuthPage'
@@ -74,6 +75,7 @@ export const router = new Router({
 
     { path: '/admin/accounts', component: AccountsPage },
     { path: '/admin/accounts/:uuid', component: ProfilePage },
+    { path: '/admin/model', component: ModelSetupPage },
 
     // otherwise redirect to home
     { path: '*', redirect: '/' }

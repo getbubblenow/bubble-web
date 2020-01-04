@@ -1,6 +1,7 @@
 let landingPage = null;
 
 export const util = {
+    USER_KEY: 'user',
     getLandingPage: function () { return landingPage; },
     setLandingPage: function (page) { landingPage = page; },
     resetLandingPage: function () { landingPage = null; },

@@ -1,12 +1,15 @@
 import { systemService } from '../_services';
 import { account } from "./account.module";
-import {router} from "../_helpers";
+import { router } from "../_helpers";
 
 const state = {
     configs: {
         allowRegistration: false,
         paymentsEnabled: false,
-        sageLauncher: false
+        sageLauncher: false,
+        cloudDrivers: [],
+        entityClasses: [],
+        locales: ['en_US']
     },
     status: { activating: false },
     activated: null,
@@ -26,6 +29,7 @@ const state = {
             return {count: parseInt(ms), units: ''};
         }
     },
+    messageGroupsLoaded: [],
     countries: [],
     locales: [],
     timezones: [],
@@ -73,6 +77,11 @@ const actions = {
                 messages => commit('loadMessagesSuccess', {group, messages}),
                 error => commit('loadMessagesFailure', error)
             );
+    },
+    reloadMessages({ commit }, locale) {
+        for (let i=0; i<this.messageGroupsLoaded.length; i++) {
+            this.loadMessages(this.messageGroupsLoaded[i], locale);
+        }
     },
     loadTimezones({ commit }) {
         commit('loadTimezonesRequest');
@@ -141,6 +150,10 @@ const getters = {
                     href: '/admin/users',
                     title: messages.label_menu_admin_users,
                     icon: messages.label_menu_admin_users_icon
+                }, {
+                    href: '/admin/model',
+                    title: messages.label_menu_admin_model,
+                    icon: messages.label_menu_admin_model_icon
                 }]
             };
             menu.splice(1, 0, admin_menu);
@@ -213,6 +226,7 @@ const mutations = {
     loadMessagesRequest(state) {},
     loadMessagesSuccess(state, {group, messages}) {
         // console.log('loadMessages (group='+group+'), messages='+JSON.stringify(messages));
+        if (state.messageGroupsLoaded.indexOf(group) === -1) state.messageGroupsLoaded.push(group);
         state.messages = new Proxy(Object.assign({}, state.messages, messages), messageNotFoundHandler);
         if (messages.country_codes) {
             const countries = [];
