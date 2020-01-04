@@ -28,6 +28,14 @@ const actions = {
     refreshUser({ commit }) {
         commit('refreshUser', JSON.parse(localStorage.getItem(util.USER_KEY)));
     },
+    checkSession({ commit }, { messages, errors }) {
+        commit('checkSessionRequest');
+        userService.getMe(messages, errors)
+            .then(
+                user => commit('checkSessionSuccess', user),
+                error => commit('checkSessionFailure', error)
+            );
+    },
     login({ dispatch, commit }, { user, messages, errors }) {
         commit('loginRequest', { name: user.name });
         userService.login(user.name, user.password, messages, errors)
@@ -147,6 +155,18 @@ const mutations = {
         state.status.loggedIn = (user !== null);
         state.user = user;
     },
+    checkSessionRequest(state) {},
+    checkSessionSuccess(state, user) {
+        if (user.token) {
+            localStorage.setItem(util.USER_KEY, JSON.stringify(user));
+            state.user = user;
+        }
+        state.locale = (typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : state.locale);
+    },
+    checkSessionFailure(state, error) {
+        state.user = null;
+        state.status.loggedIn = false;
+    },
     loginRequest(state, user) {
         state.status.loggingIn = true;
         state.user = user;
@@ -190,7 +210,6 @@ const mutations = {
     },
 
     setLocaleRequest(state, locale) {
-        console.log('setLocaleRequest: setting locale='+locale);
         state.status.settingLocale = true;
         state.locale = locale;
         const user = util.currentUser();
@@ -203,12 +222,10 @@ const mutations = {
         state.user = user;
     },
     setLocaleSuccess(state, user) {
-        console.log('setLocaleSuccess: user='+JSON.stringify(user));
         state.locale = ''+state.locale;
         state.status.settingLocale = false;
     },
     setLocaleFailure(state) {
-        console.log('setLocaleFailure');
         state.status.settingLocale = false;
         state.status = {};
     },
@@ -260,7 +277,6 @@ const mutations = {
     },
     sendAuthenticatorCodeSuccess(state, user) {
         state.status.authenticating = false;
-        console.log("sendAuthenticatorCodeSuccess: user="+JSON.stringify(user));
         state.actionStatus = { success: true, type: 'approve', result: user };
         if (user.token) {
             state.user = user;
@@ -280,7 +296,6 @@ const mutations = {
     },
     resendVerificationCodeSuccess(state, policy) {
         state.status.sendingVerification = false;
-        console.log("resendVerificationCodeSuccess: policy="+JSON.stringify(policy));
         state.actionStatus = { success: true, type: 'verify', result: policy };
     },
     resendVerificationCodeFailure(state, error) {

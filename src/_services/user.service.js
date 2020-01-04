@@ -6,6 +6,7 @@ export const userService = {
     logout,
     register,
     getAll,
+    getMe,
     getById,
     getPolicyById,
     updatePolicyById,
@@ -58,6 +59,10 @@ function register(user, messages, errors) {
 
 function getAll(messages, errors) {
     return fetch(`${config.apiUrl}/users`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+}
+
+function getMe(messages, errors) {
+    return fetch(`${config.apiUrl}/me`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function getById(id, messages, errors) {

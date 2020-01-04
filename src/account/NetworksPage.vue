@@ -51,7 +51,7 @@
             ...mapState('system', ['messages'])
         },
         created () {
-            this.getAllNetworks(this.messages, this.errors);
+            this.getAllNetworks({messages: this.messages, errors: this.errors});
         },
         methods: {
             ...mapActions('networks', {

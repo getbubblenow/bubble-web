@@ -15,13 +15,12 @@
             <div v-if="showLocaleSelector">
                 <div class="form-group">
                     <label for="locale">{{messages.field_label_locale}}</label>
-                    <select v-if="this.locales && this.locales.length > 0" v-model="selectedLocale" name="locale" class="form-control">
+                    <select @change="updateLocale()"  v-if="this.locales && this.locales.length > 0" v-model="selectedLocale" name="locale" class="form-control">
                         <option value="detect">{{messages['locale_detect']}}</option>
                         <option v-for="opt in this.locales" v-bind:value="opt">{{messages['locale_'+opt]}}</option>
                     </select>
                     <div v-if="errors.has('locale')" class="invalid-feedback">{{ errors.first('locale') }}</div>
                 </div>
-                <button @click="updateLocale" class="btn btn-primary">{{messages.button_label_set_locale}}</button>
             </div>
         </div>
     </div>
@@ -41,7 +40,7 @@ export default {
     },
     computed: {
         ...mapState('account', ['status', 'user', 'locale']),
-        ...mapState('system', ['activated', 'configs', 'messages', 'menu']),
+        ...mapState('system', ['activated', 'configs', 'messages', 'messageGroupsLoaded', 'menu']),
         ...mapGetters('system', ['menu']),
         ...mapState({
             alert: state => state.alert
@@ -50,12 +49,20 @@ export default {
     },
     methods: {
         ...mapActions({ clearAlert: 'alert/clear' }),
-        ...mapActions('account', ['setLocale']),
-        ...mapActions('system', ['loadIsActivated', 'loadSystemConfigs', 'loadMessages', 'reloadMessages', 'loadTimezones']),
+        ...mapActions('account', ['setLocale', 'checkSession', 'logout']),
+        ...mapActions('system', ['loadIsActivated', 'loadSystemConfigs', 'loadMessages', 'loadTimezones']),
         toggleLocaleView() { this.showLocaleSelector = !this.showLocaleSelector; },
         updateLocale() {
             if (this.selectedLocale) {
+                console.log('updateLocale: this.selectedLocale='+this.selectedLocale);
                 this.setLocale({locale: this.selectedLocale, messages: this.messages, errors: this.errors});
+            }
+        },
+        reloadMessages() {
+            if (this.selectedLocale) {
+                for (let i = 0; i < this.messageGroupsLoaded.length; i++) {
+                    this.loadMessages(this.messageGroupsLoaded[i], this.selectedLocale);
+                }
             }
         }
     },
@@ -69,18 +76,23 @@ export default {
         },
         user (u) {
             if (typeof u === 'undefined' || u === null || typeof u.locale === 'undefined' || u.locale === null) {
+                this.logout();
+                this.$router.replace('/logout');
                 return;
             }
             this.selectedLocale = u.locale;
-            this.reloadMessages(this.selectedLocale);
+            this.reloadMessages();
         },
         locale (loc) {
             this.selectedLocale = loc;
-            this.reloadMessages(this.selectedLocale)
+            this.reloadMessages()
         }
     },
     created() {
         const user = util.currentUser();
+        if (user !== null && (typeof user.token !== 'undefined' && user.token !== null)) {
+            this.checkSession({messages: this.messages, errors: this.errors});
+        }
         this.selectedLocale = (user !== null && typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : 'detect');
         this.loadIsActivated();
         this.loadSystemConfigs();  // determine if we can show the registration link

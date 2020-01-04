@@ -1,4 +1,4 @@
-import { systemService } from '../_services';
+import { systemService, userService } from '../_services';
 import { account } from "./account.module";
 import { router } from "../_helpers";
 
@@ -77,11 +77,6 @@ const actions = {
                 messages => commit('loadMessagesSuccess', {group, messages}),
                 error => commit('loadMessagesFailure', error)
             );
-    },
-    reloadMessages({ commit }, locale) {
-        for (let i=0; i<this.messageGroupsLoaded.length; i++) {
-            this.loadMessages(this.messageGroupsLoaded[i], locale);
-        }
     },
     loadTimezones({ commit }) {
         commit('loadTimezonesRequest');
@@ -189,15 +184,11 @@ const messageNotFoundHandler = {
 };
 
 const mutations = {
-    loadIsActivatedRequest(state) {
-        console.log('loadIsActivatedRequest: starting');
-    },
+    loadIsActivatedRequest(state) {},
     loadIsActivatedSuccess(state, activated) {
-        console.log('loadIsActivatedSuccess: received '+activated);
         state.activated = activated;
     },
     loadIsActivatedFailure(state, error) {
-        console.log('loadIsActivatedFailure: failed: '+error);
         state.errors.activated = error;
     },
 
@@ -225,7 +216,6 @@ const mutations = {
     },
     loadMessagesRequest(state) {},
     loadMessagesSuccess(state, {group, messages}) {
-        // console.log('loadMessages (group='+group+'), messages='+JSON.stringify(messages));
         if (state.messageGroupsLoaded.indexOf(group) === -1) state.messageGroupsLoaded.push(group);
         state.messages = new Proxy(Object.assign({}, state.messages, messages), messageNotFoundHandler);
         if (messages.country_codes) {
@@ -267,7 +257,6 @@ const mutations = {
     },
     detectTimezoneRequest(state) {},
     detectTimezoneSuccess(state, detectedTimezone) {
-        // console.log('detectTimezoneSuccess: detectedTimezone='+JSON.stringify(detectedTimezone));
         state.detectedTimezone = detectedTimezone;
     },
     detectTimezoneFailure(state, error) {
