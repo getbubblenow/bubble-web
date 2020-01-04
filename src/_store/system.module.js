@@ -250,7 +250,6 @@ const mutations = {
         state.status.searching = true;
     },
     searchSuccess(state, {type, query, results}) {
-        console.log('searchSuccess: '+JSON.stringify(results));
         state.status.searching = false;
         state.searchResults = results;
     },
