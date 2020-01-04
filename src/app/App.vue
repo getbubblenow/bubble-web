@@ -54,7 +54,6 @@ export default {
         toggleLocaleView() { this.showLocaleSelector = !this.showLocaleSelector; },
         updateLocale() {
             if (this.selectedLocale) {
-                console.log('updateLocale: this.selectedLocale='+this.selectedLocale);
                 this.setLocale({locale: this.selectedLocale, messages: this.messages, errors: this.errors});
             }
         },

@@ -272,10 +272,16 @@ const mutations = {
                 }
             }
         }
-        state.detectedLocale = state.locales[0];
+        console.warn('detectLocaleSuccess: server detected locales '+JSON.stringify(detectedLocales)+' but none were found in locales list: '+JSON.stringify(state.locales));
+
+        // keep current value, or assign default if no current value
+        if (state.detectedLocale === null && state.locales && state.locales.length > 0) state.detectedLocale = state.locales[0];
     },
     detectLocaleFailure(state, error) {
         state.error = error;
+
+        // keep current value, or assign default if no current value
+        if (state.detectedLocale === null && state.locales && state.locales.length > 0) state.detectedLocale = state.locales[0];
     }
 };
 
