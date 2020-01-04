@@ -10,18 +10,34 @@
             </div>
         </form>
 
-        <table border="1" v-if="this.ec && this.ec[this.lcType] && this.ec[this.lcType].listFields">
+        <table border="1" v-if="this.ec && this.ec[this.lcType] && this.ec[this.lcType].listFields && this.selectedEntity === null">
             <thead>
             <tr>
                 <td v-for="field in this.ec[this.lcType].listFields">{{field}}</td>
+                <td>{{messages.button_label_view_entity}}</td>
+<!--                <td>{{messages.button_label_edit_entity}}</td>-->
+<!--                <td>{{messages.button_label_delete_entity}}</td>-->
             </tr>
             </thead>
             <tbody v-if="this.results && this.results.results">
             <tr v-for="row in this.results.results">
                 <td v-for="field in ec[lcType].listFields">{{row[field]}}</td>
+                <td><button @click="viewEntity(row)">{{messages.button_label_view_entity}}</button></td>
+<!--                <td><button >{{messages.button_label_edit_entity}}</button></td>-->
+<!--                <td><button >{{messages.button_label_delete_entity}}</button></td>-->
             </tr>
             </tbody>
         </table>
+
+        <div style="min-height: 100%;" v-if="this.selectedEntity">
+            <table border="1">
+                <tr v-for="field in this.ec[this.lcType].fieldNames">
+                    <td>{{field}}:</td>
+                    <td>{{selectedEntity[field]}}</td>
+                </tr>
+            </table>
+            <button @click="closeEntity()">{{messages.button_label_close_view_entity}}</button>
+        </div>
     </div>
 </template>
 
@@ -39,7 +55,8 @@
                     size: 10,
                     sort: ''
                 },
-                results: []
+                results: [],
+                selectedEntity: null
             };
         },
         computed: {
@@ -64,6 +81,12 @@
             },
             selectType() {
                 this.search(this.type, this.query);
+            },
+            viewEntity(row) {
+                this.selectedEntity = row;
+            },
+            closeEntity() {
+                this.selectedEntity = null;
             }
         },
         watch: {
