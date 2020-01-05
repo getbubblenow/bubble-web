@@ -13,7 +13,7 @@
         <div v-if="this.ec && this.ec[this.lcType] && this.ec[this.lcType].createMethod !== 'DISABLED'">
             <button @click="showingAddDialog = true">{{messages.button_label_add_entity}}</button>
             <div v-if="showingAddDialog">
-                <textarea v-bind="newEntityJson"></textarea>
+                <textarea v-model="newEntityJson"></textarea>
                 <button @click="createNewEntity()">{{messages.button_label_save_add_entity}}</button>
                 <button @click="showingAddDialog = false">{{messages.button_label_close_add_entity}}</button>
             </div>
@@ -105,7 +105,8 @@
                 this.selectedEntity = null;
             },
             createNewEntity() {
-                this.createEntity(this.type, this.newEntityJson, this.messages, this.errors);
+                console.log('this.newEntityJson='+this.newEntityJson);
+                this.createEntity({entityConfig: this.ec[this.lcType], json: this.newEntityJson, messages: this.messages, errors: this.errors});
             }
         },
         watch: {
@@ -113,7 +114,7 @@
                 if (configs) this.ec = configs;
             },
             searchResults (results) {
-                console.log('updating this.results='+JSON.stringify(results));
+                // console.log('updating this.results='+JSON.stringify(results));
                 if (results) this.results = results;
             }
         }

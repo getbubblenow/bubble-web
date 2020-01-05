@@ -7,6 +7,7 @@ export const systemService = {
     loadSystemConfigs,
     loadEntityConfigs,
     search,
+    createEntity,
     loadMessages,
     loadTimezones,
     detectTimezone,
@@ -47,19 +48,23 @@ function search(type, query) {
         .then(config => { return config; });
 }
 
-function createEntity(config, json, messages, errors) {
+function createEntity(entityConfig, json, messages, errors) {
+    console.log('createEntity: sending json='+json);
     let requestOptions = null;
-    if (config.createMethod) {
-        if (config.createMethod === 'PUT') {
+    if (entityConfig.createMethod && entityConfig.createUri) {
+        if (entityConfig.createMethod === 'PUT') {
             requestOptions = util.putJsonWithAuth(json);
-        } else if (config.createMethod === 'POST') {
+        } else if (entityConfig.createMethod === 'POST') {
             requestOptions = util.putJsonWithAuth(json);
+        } else {
+            return Promise.reject("invalid createMethod: " + entityConfig.createMethod);
         }
+    } else {
+        return Promise.reject("no createMethod");
     }
-    if (requestOptions === null) requestOptions = util.putJsonWithAuth(json);
-    return fetch(`${config.apiUrl}/${config.createUri}`, requestOptions)
+    return fetch(`${config.apiUrl}${entityConfig.createUri}`, requestOptions)
         .then(util.handleCrudResponse(messages, errors))
-        .then(config => { return config; });
+        .then(entity => { return entity; });
 }
 
 function loadMessages(group, locale) {

@@ -88,9 +88,9 @@ const actions = {
                 error => commit('searchFailure', error)
             );
     },
-    createEntity({ commit }, type, json, messages, errors) {
+    createEntity({ commit }, {entityConfig, json, messages, errors}) {
         commit('createEntityRequest');
-        systemService.createEntity(state.entityConfigs[type], json, messages, errors)
+        systemService.createEntity(entityConfig, json, messages, errors)
             .then(
                 entity => commit('createEntitySuccess', entity),
                 error => commit('createEntityFailure', error)
