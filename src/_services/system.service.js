@@ -8,6 +8,7 @@ export const systemService = {
     loadEntityConfigs,
     search,
     createEntity,
+    modelSetup,
     loadMessages,
     loadTimezones,
     detectTimezone,
@@ -49,7 +50,6 @@ function search(type, query) {
 }
 
 function createEntity(entityConfig, json, messages, errors) {
-    console.log('createEntity: sending json='+json);
     let requestOptions = null;
     if (entityConfig.createMethod && entityConfig.createUri) {
         if (entityConfig.createMethod === 'PUT') {
@@ -63,6 +63,14 @@ function createEntity(entityConfig, json, messages, errors) {
         return Promise.reject("no createMethod");
     }
     return fetch(`${config.apiUrl}${entityConfig.createUri}`, requestOptions)
+        .then(util.handleCrudResponse(messages, errors))
+        .then(entity => { return entity; });
+}
+
+function modelSetup(file, messages, errors) {
+    let formData = new FormData();
+    formData.append('file', file);
+    return fetch(`${config.apiUrl}/me/model`, util.postFileWithAuth(formData))
         .then(util.handleCrudResponse(messages, errors))
         .then(entity => { return entity; });
 }

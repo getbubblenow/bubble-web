@@ -81,6 +81,14 @@ export const util = {
     postWithAuth: function(obj) { return util.entityWithAuth('POST', obj); },
     postJsonWithAuth: function(json) { return util.jsonWithAuth('POST', json); },
 
+    postFileWithAuth: function(file) {
+        return {
+            method: 'POST',
+            headers: { ...util.authHeader() },
+            body: file
+        }
+    },
+
     putWithAuth: function(obj) { return util.entityWithAuth('PUT', obj); },
     putJsonWithAuth: function(json) { return util.jsonWithAuth('PUT', json); },
 

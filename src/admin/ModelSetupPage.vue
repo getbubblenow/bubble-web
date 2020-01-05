@@ -1,7 +1,18 @@
 <template>
     <div>
         <h2>{{messages.form_title_model_setup}}</h2>
-        <form @submit.prevent="setupModel">
+
+        <button @click="showingUploadDialog = true">{{messages.button_label_upload_model}}</button>
+        <div v-if="showingUploadDialog">
+            <label>{{messages.field_label_upload_file}}
+            <input id="file" type="file" ref="file" @change="handleFileUpload()"/>
+            </label>
+            {{messages.field_description_upload_file}}
+            <button @click="uploadModel()">{{messages.button_label_save_upload_model}}</button>
+            <button @click="showingUploadDialog = false">{{messages.button_label_close_upload_model}}</button>
+        </div>
+
+        <form>
             <div class="form-group">
                 <label for="type">{{messages.field_label_entity_type}}</label>
                 <select @change="selectType()" v-model="type" name="type" class="form-control">
@@ -71,7 +82,9 @@
                 results: [],
                 selectedEntity: null,
                 showingAddDialog: false,
-                newEntityJson: ''
+                newEntityJson: '',
+                showingUploadDialog: false,
+                file: null
             };
         },
         computed: {
@@ -90,10 +103,15 @@
             // ...mapActions('system', ['loadIsActivated', 'activate']),
             ...mapActions('system', [
                 'loadIsActivated', 'loadSystemConfigs', 'loadMessages', 'loadTimezones', 'loadEntityConfigs',
-                'search', 'createEntity'
+                'search', 'createEntity', 'modelSetup'
             ]),
-            setupModel(e) {
-                console.log('setupModel called');
+            handleFileUpload(){
+                this.file = document.getElementById('file').files[0];
+                console.log('handleFileUpload, set this.file='+JSON.stringify(this.file.name));
+            },
+            uploadModel(e) {
+                this.modelSetup({file: this.file, messages: this.messages, errors: this.errors});
+                this.showingUploadDialog = false;
             },
             selectType() {
                 this.search(this.type, this.query);

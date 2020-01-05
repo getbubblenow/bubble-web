@@ -13,7 +13,7 @@ const state = {
     },
     entityConfigs: {},
     searchResults: [],
-    status: { activating: false, searching: false, creatingEntity: false },
+    status: { activating: false, searching: false, creatingEntity: false, modelSetupInProgress: false },
     activated: null,
     error: null,
     messages: {
@@ -94,6 +94,14 @@ const actions = {
             .then(
                 entity => commit('createEntitySuccess', entity),
                 error => commit('createEntityFailure', error)
+            );
+    },
+    modelSetup({ commit }, {file, messages, errors}) {
+        commit('modelSetupRequest');
+        systemService.modelSetup(file, messages, errors)
+            .then(
+                ok => commit('modelSetupSuccess'),
+                errors => commit('modelSetupFailure', errors)
             );
     },
     loadMessages({ commit }, group, locale) {
@@ -274,6 +282,16 @@ const mutations = {
     createEntityFailure(state, error) {
         state.status.creatingEntity = false;
         state.error = error;
+    },
+    modelSetupRequest(state) {
+        state.status.modelSetupInProgress = true;
+    },
+    modelSetupSuccess(state) {
+        state.status.modelSetupInProgress = false;
+    },
+    modelSetupFailure(state, errors) {
+        state.status.modelSetupInProgress = false;
+        state.error = errors;
     },
     loadMessagesRequest(state) {},
     loadMessagesSuccess(state, {group, messages}) {
