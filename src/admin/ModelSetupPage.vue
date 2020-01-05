@@ -107,11 +107,10 @@
             ]),
             handleFileUpload(){
                 this.file = document.getElementById('file').files[0];
-                console.log('handleFileUpload, set this.file='+JSON.stringify(this.file.name));
             },
             uploadModel(e) {
                 if (this.file === null) {
-                    console.log('uploadModel: no file set, not uploading');
+                    console.warn('uploadModel: no file set, not uploading');
                     return;
                 }
                 this.modelSetup({file: this.file, messages: this.messages, errors: this.errors});
@@ -127,7 +126,7 @@
                 this.selectedEntity = null;
             },
             createNewEntity() {
-                console.log('this.newEntityJson='+this.newEntityJson);
+                // console.log('this.newEntityJson='+this.newEntityJson);
                 this.createEntity({entityConfig: this.ec[this.lcType], json: this.newEntityJson, messages: this.messages, errors: this.errors});
             }
         },
