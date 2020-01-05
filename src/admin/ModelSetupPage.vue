@@ -110,6 +110,10 @@
                 console.log('handleFileUpload, set this.file='+JSON.stringify(this.file.name));
             },
             uploadModel(e) {
+                if (this.file === null) {
+                    console.log('uploadModel: no file set, not uploading');
+                    return;
+                }
                 this.modelSetup({file: this.file, messages: this.messages, errors: this.errors});
                 this.showingUploadDialog = false;
             },

@@ -70,6 +70,7 @@ function createEntity(entityConfig, json, messages, errors) {
 function modelSetup(file, messages, errors) {
     let formData = new FormData();
     formData.append('file', file);
+    formData.append('name', file.name);
     return fetch(`${config.apiUrl}/me/model`, util.postFileWithAuth(formData))
         .then(util.handleCrudResponse(messages, errors))
         .then(entity => { return entity; });
