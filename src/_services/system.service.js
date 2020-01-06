@@ -22,10 +22,10 @@ function loadIsActivated () {
         .then(activated => { return activated; });
 }
 
-function activate (activation) {
+function activate (activation, messages, errors) {
     const requestOptions = util.putNoAuth(activation);
     return fetch(`${config.apiUrl}/auth/activate`, requestOptions)
-        .then(util.handleBasicResponse)
+        .then(util.handleCrudResponse(messages, errors))
         .then(admin => { return admin; });
 }
 

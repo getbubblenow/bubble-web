@@ -121,7 +121,7 @@ export const util = {
 
                     } else if (response.status === 422) {
                         console.log('handleCrudResponse: received 422, error: ' + JSON.stringify(data));
-                        setValidationErrors(data, messages, errors);
+                        util.setValidationErrors(data, messages, errors);
                     }
 
                     const error = (data && data.message) || response.statusText;
@@ -139,9 +139,11 @@ export const util = {
                 if (parts.length === 3 && parts[0] === 'err') {
                     const field = parts[1];
                     const messageTemplate = data[i].messageTemplate.replace(/\./g, '_');
-                    const message = messages.hasOwnProperty(messageTemplate) ? messages[messageTemplate] : '???'+messageTemplate;
+                    const message = messages[messageTemplate];
                     errors.add({field: field, msg: message});
-                    console.log('>>>>> field '+field+' added error: '+message+', errors='+JSON.stringify(errors));
+                //     console.log('>>>>> field '+field+' added error: '+message+', errors='+JSON.stringify(errors));
+                // } else {
+                //     console.log('>>>>> data item did not contain a valid error: '+JSON.stringify(data[i]));
                 }
             }
             // todo: else add "global" error message for unrecognized/non-field error

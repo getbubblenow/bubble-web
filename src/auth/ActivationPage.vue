@@ -5,38 +5,38 @@
             <div class="form-group">
                 <label for="name">{{messages.field_label_username}}</label>
                 <input type="text" v-model="name" v-validate="'required'" name="name" class="form-control" :class="{ 'is-invalid': submitted && errors.has('name') }" />
-                <div v-if="submitted && errors.has('name')" class="invalid-feedback">{{ errors.first('name') }}</div>
+                <div v-if="submitted && errors.has('name')" class="invalid-feedback d-block">{{ errors.first('name') }}</div>
             </div>
             <div class="form-group">
                 <label htmlFor="password">{{messages.field_label_password}}</label>
                 <input type="password" v-model="password" v-validate="{ required: true, min: 6 }" name="password" class="form-control" :class="{ 'is-invalid': submitted && errors.has('password') }" />
-                <div v-if="submitted && errors.has('password')" class="invalid-feedback">{{ errors.first('password') }}</div>
+                <div v-if="submitted && errors.has('password')" class="invalid-feedback d-block">{{ errors.first('password') }}</div>
             </div>
             <div class="form-group">
                 <label for="description">{{messages.field_label_description}}</label>
                 <input type="text" v-model="description" name="description" class="form-control" :class="{ 'is-invalid': submitted && errors.has('description') }" />
-                <div v-if="submitted && errors.has('description')" class="invalid-feedback">{{ errors.first('description') }}</div>
+                <div v-if="submitted && errors.has('description')" class="invalid-feedback d-block">{{ errors.first('description') }}</div>
             </div>
             <div class="form-group">
                 <label for="networkName">{{messages.field_label_network_name}}</label>
                 <input type="text" v-model="networkName" name="networkName" class="form-control" :class="{ 'is-invalid': submitted && errors.has('networkName') }" />
-                <div v-if="submitted && errors.has('networkName')" class="invalid-feedback">{{ errors.first('networkName') }}</div>
+                <div v-if="submitted && errors.has('networkName')" class="invalid-feedback d-block">{{ errors.first('networkName') }}</div>
             </div>
 
             <!-- DNS -->
             <div class="form-group">
                 <h3>{{messages.form_section_title_dns}}</h3>
+                <div v-if="submitted && errors.has('dns')" class="invalid-feedback d-block"><h5>{{ errors.first('dns') }}</h5></div>
                 <label for="dnsName">{{messages.field_label_dns_service}}</label>
                 <select v-model="dnsName" name="dnsName" class="form-control">
                     <option v-for="opt in dnsTemplates" v-bind:value="opt.name">{{messages['driver_'+opt.driverClass]}}</option>
                 </select>
                 <span v-html="messages['description_'+dnsByName[dnsName].driverClass]"></span>
-                <div v-if="submitted && errors.has('dns')" class="invalid-feedback">{{ errors.first('dns') }}</div>
             </div>
             <div class="form-group">
                 <label for="domainName">{{messages.field_label_domain}}</label>
                 <input type="text" v-model="domainName" name="domainName" class="form-control" :class="{ 'is-invalid': submitted && errors.has('domain') }" />
-                <div v-if="submitted && errors.has('domain')" class="invalid-feedback">{{ errors.first('domain') }}</div>
+                <div v-if="submitted && errors.has('domain')" class="invalid-feedback d-block">{{ errors.first('domain') }}</div>
                 <span>{{messages.field_label_domain_description}}</span>
             </div>
 
@@ -60,12 +60,12 @@
             <!-- Storage -->
             <div class="form-group">
                 <h3>{{messages.form_section_title_storage}}</h3>
+                <div v-if="submitted && errors.has('storage')" class="invalid-feedback d-block"><h5>{{ errors.first('storage') }}</h5></div>
                 <label for="storageName">{{messages.field_label_storage_service}}</label>
                 <select v-model="storageName" name="storage" class="form-control">
                     <option v-for="opt in storageTemplates" v-bind:value="opt.name">{{messages['driver_'+opt.driverClass]}}</option>
                 </select>
                 <span v-html="messages['description_'+storageByName[storageName].driverClass]"></span>
-                <div v-if="submitted && errors.has('storage')" class="invalid-feedback">{{ errors.first('storage') }}</div>
             </div>
 
             <!-- Storage fields -->
@@ -248,9 +248,9 @@
                     storage: this.cloudActivationObject(this.storageByName[this.storageName], this.storageCredentials, this.storageConfig),
                     domain: this.domainActivationObject()
                 };
-                console.log('sending activation JSON = '+JSON.stringify(activation));
+                // console.log('sending activation: '+JSON.stringify(activation));
                 this.submitted = true;
-                this.activate(activation);
+                this.activate({activation: activation, messages: this.messages, errors: this.errors});
             }
         },
         watch: {
@@ -258,7 +258,7 @@
                 if (active) this.$router.replace('/');
             },
             dnsName (name) {
-                console.log('dns changed to '+name);
+                // console.log('dns changed to '+name);
                 if (typeof this.dnsByName[name].credentials !== 'undefined') {
                     this.dnsCredentials = toCredentialsMap(this.dnsByName[name].credentials);
                 }
@@ -267,7 +267,7 @@
                 }
             },
             storageName (name) {
-                console.log('storage changed to '+name);
+                // console.log('storage changed to '+name);
                 if (typeof this.storageByName[name].credentials !== 'undefined') {
                     this.storageCredentials = toCredentialsMap(this.storageByName[name].credentials);
                 }

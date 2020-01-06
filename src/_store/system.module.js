@@ -52,9 +52,9 @@ const actions = {
                 error => commit('loadIsActivatedFailure', error)
             );
     },
-    activate({ commit }, activation) {
+    activate({ commit }, {activation, messages, errors}) {
         commit('activateRequest');
-        systemService.activate(activation)
+        systemService.activate(activation, messages, errors)
             .then(
                 admin => {
                     commit('activateSuccess', admin);
@@ -223,7 +223,7 @@ const mutations = {
         state.activated = activated;
     },
     loadIsActivatedFailure(state, error) {
-        state.errors.activated = error;
+        state.error = error;
     },
 
     activateRequest(state) {
@@ -238,7 +238,7 @@ const mutations = {
     },
     activateFailure(state, error) {
         state.status.activating = false;
-        state.errors.activated = error;
+        state.error = error;
     },
 
     loadSystemConfigsRequest(state) {},
