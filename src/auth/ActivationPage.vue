@@ -18,69 +18,62 @@
                 <div v-if="submitted && errors.has('description')" class="invalid-feedback d-block">{{ errors.first('description') }}</div>
             </div>
 
-            <!-- DNS -->
+    <div v-for="csType in cloudTypes">
+        <div class="form-group">
+            <h3>{{messages['form_section_title_'+csType]}}</h3>
+            <div v-if="submitted && errors.has(csType)" class="invalid-feedback d-block"><h5>{{ errors.first(csType) }}</h5></div>
+        </div>
+
+        <div v-for="cloud in cloudsByType(csType)" class="form-group">
+            <hr/>
             <div class="form-group">
-                <h3>{{messages.form_section_title_dns}}</h3>
-                <div v-if="submitted && errors.has('dns')" class="invalid-feedback d-block"><h5>{{ errors.first('dns') }}</h5></div>
-                <label for="dnsName">{{messages.field_label_dns_service}}</label>
-                <select v-model="dnsName" name="dnsName" class="form-control">
-                    <option v-for="opt in dnsTemplates" v-bind:value="opt.name">{{messages['driver_'+opt.driverClass]}}</option>
-                </select>
-                <span v-html="messages['description_'+dnsByName[dnsName].driverClass]"></span>
-            </div>
-            <div class="form-group">
-                <label for="domainName">{{messages.field_label_domain}}</label>
-                <input type="text" v-model="domainName" name="domainName" class="form-control" :class="{ 'is-invalid': submitted && errors.has('domain') }" />
-                <div v-if="submitted && errors.has('domain')" class="invalid-feedback d-block">{{ errors.first('domain') }}</div>
-                <span>{{messages.field_label_domain_description}}</span>
+                <label :for="cloud.name+'_enabled'">
+                    <h4 v-html="messages['driver_'+cloud.driverClass]"></h4>
+                </label>
+                <input :name="cloud.name+'_enabled'" type="checkbox" v-model="cloudsEnabled[cloud.name]"/>
+                <div v-html="messages['description_'+cloud.driverClass]"></div>
             </div>
 
-            <!-- DNS fields -->
-            <div v-if="cloudConfigFields(dnsByName[dnsName]).credentials && cloudConfigFields(dnsByName[dnsName]).credentials.length > 0">
-                <h4>{{messages.form_section_title_dns}} {{messages.form_section_title_credentials}}</h4>
-                <div v-for="credential in cloudConfigFields(dnsByName[dnsName]).credentials" class="form-group">
-                    <label :for="credential.name">{{messages['driver_credential_'+credential.name+'_'+dnsByName[dnsName].driverClass]}}</label>
-                    <input type="text" v-model="dnsCredentials[credential.name]" :name="credential.name" class="form-control" />
+            <div v-if="cloudsEnabled[cloud.name]">
+                <!-- credential fields -->
+                <div v-if="cloudConfigFields(cloud).credentials && cloudConfigFields(cloud).credentials.length > 0">
+                    <h5>{{messages['driver_'+cloud.driverClass]}} {{messages.form_section_title_credentials}}</h5>
+                    <div v-for="credential in cloudConfigFields(cloud).credentials" class="form-group">
+                        <label :for="credential.name">{{messages['driver_credential_'+credential.name+'_'+cloud.driverClass]}}</label>
+                        <input type="text" v-model="credentialValues[cloud.name][credential.name]" :name="credential.name" class="form-control" />
+                    </div>
+                </div>
+                <!-- config fields -->
+                <div v-if="cloudConfigFields(cloud).config && cloudConfigFields(cloud).config.length > 0">
+                    <h5>{{messages['driver_'+cloud.driverClass]}} {{messages.form_section_title_config}}</h5>
+                    <div v-for="config in cloudConfigFields(cloud).config" class="form-group">
+                        <label :for="config.name">{{messages['driver_config_'+config.name+'_'+cloud.driverClass]}}</label>
+                        <textarea v-if="config.inputType === 'textarea'" v-model="configValues[cloud.name][config.name]" class="form-control"></textarea>
+                        <input v-else :type="config.inputType" v-model="configValues[cloud.name][config.name]" :name="config.name" class="form-control" />
+                        <span v-html="messages['driver_config_description_'+config.name+'_'+cloud.driverClass]"></span>
+                    </div>
                 </div>
             </div>
-            <div v-if="cloudConfigFields(dnsByName[dnsName]).config && cloudConfigFields(dnsByName[dnsName]).config.length > 0">
-                <h4>{{messages.form_section_title_dns}} {{messages.form_section_title_config}}</h4>
-                <div v-for="config in cloudConfigFields(dnsByName[dnsName]).config" class="form-group">
-                    <label :for="config.name">{{messages['driver_config_'+config.name+'_'+dnsByName[dnsName].driverClass]}}</label>
-                    <input type="text" v-model="dnsConfig[config.name]" :name="config.name" class="form-control" />
-                    <span v-html="messages['driver_config_description_'+config.name+'_'+dnsByName[dnsName].driverClass]"></span>
-                </div>
-            </div>
+        </div>
+    </div>
 
-            <!-- Storage -->
-            <div class="form-group">
-                <h3>{{messages.form_section_title_storage}}</h3>
-                <div v-if="submitted && errors.has('storage')" class="invalid-feedback d-block"><h5>{{ errors.first('storage') }}</h5></div>
-                <label for="storageName">{{messages.field_label_storage_service}}</label>
-<!--                <select v-model="storageName" name="storage" class="form-control">-->
-<!--                    <option v-for="opt in storageTemplates" v-bind:value="opt.name">{{messages['driver_'+opt.driverClass]}}</option>-->
-<!--                </select>-->
-                <span v-html="messages['description_'+storageByName[storageName].driverClass]"></span>
-            </div>
+        <div class="form-group">
+            <label for="domainName">{{messages.field_label_domain}}</label>
+            <input type="text" v-model="domainName" name="domainName" class="form-control" :class="{ 'is-invalid': submitted && errors.has('domain') }" />
+            <div v-if="submitted && errors.has('domain')" class="invalid-feedback d-block">{{ errors.first('domain') }}</div>
+            <span>{{messages.field_label_domain_description}}</span>
+        </div>
 
-            <!-- Storage fields -->
-            <div v-if="cloudConfigFields(storageByName[storageName]).credentials && cloudConfigFields(storageByName[storageName]).credentials.length > 0">
-                <h4>{{messages.form_section_title_storage}} {{messages.form_section_title_credentials}}</h4>
-                <div v-for="credential in cloudConfigFields(storageByName[storageName]).credentials" class="form-group">
-                    <label :for="credential.name">{{messages['driver_credential_'+credential.name+'_'+storageByName[storageName].driverClass]}}</label>
-                    <input type="text" v-model="storageCredentials[credential.name]" :name="credential.name" class="form-control" />
-                </div>
-            </div>
-            <div v-if="cloudConfigFields(storageByName[storageName]).config && cloudConfigFields(storageByName[storageName]).config.length > 0">
-                <h4>{{messages.form_section_title_storage}} {{messages.form_section_title_config}}</h4>
-                <div v-for="config in cloudConfigFields(storageByName[storageName]).config" class="form-group">
-                    <label :for="config.name">{{messages['driver_config_'+config.name+'_'+storageByName[storageName].driverClass]}}</label>
-                    <input type="text" v-model="storageConfig[config.name]" :name="config.name" class="form-control" />
-                    <span v-html="messages['driver_config_description_'+config.name+'_'+storageByName[storageName].driverClass]"></span>
-                </div>
-            </div>
+        <div class="form-group">
+            <label for="publicDns">{{messages.field_label_domain_publicDns}}</label>
+            <select v-model="publicDns" name="publicDns" class="form-control">
+                <option v-for="dns in availableDnsServices" :value="dns.name">{{messages['driver_'+dns.driverClass]}}</option>
+            </select>
+            <span>{{messages.field_label_domain_publicDns_description}}</span>
+            <div v-if="submitted && errors.has('publicDns')" class="invalid-feedback d-block"><h5>{{ errors.first('publicDns') }}</h5></div>
+        </div>
 
-            <div class="form-group">
+        <div class="form-group">
                 <button class="btn btn-primary" :disabled="status.activating">{{messages.button_label_activate}}</button>
                 <img v-show="status.activating" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
             </div>
@@ -91,124 +84,117 @@
 <script>
     import { mapState, mapActions } from 'vuex'
 
-    const DNS_ROUTE53 = {
-        name: 'Route53Dns',
-        driverClass: 'bubble.cloud.dns.route53.Route53DnsDriver',
-        credentials: {
-            params: [
-                {name: 'AWS_ACCESS_KEY_ID', value: null},
-                {name: 'AWS_SECRET_KEY', value: null},
-            ]
-        },
-        template: true
-    };
-    const DNS_GODADDY = {
-        name: 'GoDaddyDns',
-        driverClass: 'bubble.cloud.dns.godaddy.GoDaddyDnsDriver',
-        credentials: {
-            params: [
-                {name: 'GODADDY_API_KEY', value: null},
-                {name: 'GODADDY_API_SECRET', value: null},
-            ]
-        },
-        template: true
-    };
-    const DNS_TEMPLATES = [ DNS_ROUTE53, DNS_GODADDY ];
-    const DNS_BY_NAME = {};
-    DNS_BY_NAME[DNS_ROUTE53.name] = DNS_ROUTE53;
-    DNS_BY_NAME[DNS_GODADDY.name] = DNS_GODADDY;
-
-    const STORAGE_S3 = {
-        name: "S3_US_Standard",
-        type: "storage",
-        driverClass: "bubble.cloud.storage.s3.S3StorageDriver",
-        driverConfig: {
-            region: "US_EAST_1",
-            bucket: '',
-            prefix: '',
-            listFetchSize: 100
-        },
-        credentials: {
-            params: [
-                {name: "AWS_ACCESS_KEY_ID", value: null},
-                {name: "AWS_SECRET_KEY", value: null}
-            ]
-        },
-        template: true
-    };
-    const STORAGE_LOCAL = {
-        name: "LocalStorage",
-        type: "storage",
-        driverClass: "bubble.cloud.storage.local.LocalStorageDriver",
-        driverConfig: { baseDir: '.bubble_local_storage' },
-        template: false
-    };
-    // const STORAGE_TEMPLATES = [ STORAGE_S3, STORAGE_LOCAL ];
-    const STORAGE_TEMPLATES = [ STORAGE_S3 ];
-    const STORAGE_BY_NAME = {};
-    STORAGE_BY_NAME[STORAGE_S3.name] = STORAGE_S3;
-    STORAGE_BY_NAME[STORAGE_LOCAL.name] = STORAGE_LOCAL;
-
     function toCredentialsMap(creds) {
         const map = {};
         for (let i=0; i<creds.length; i++) map[creds.name] = creds.value;
         return map;
     }
 
+    const cloudNotFoundHandler = function (vue, fieldGroup) {
+        return {
+            get: function (target, name) {
+                if (typeof name === 'undefined') return null;
+                if (name === null) return null;
+                if (name === '') return null;
+                if (!target.hasOwnProperty(name)) target[name] = vue.populateDefaults(fieldGroup, name);
+                return target[name];
+            }
+        };
+    };
+
     export default {
         data() {
             return {
                 submitted: false,
-                dnsTemplates: DNS_TEMPLATES,
-                storageTemplates: STORAGE_TEMPLATES,
-                dnsByName: DNS_BY_NAME,
-                storageByName: STORAGE_BY_NAME,
+                cloudTemplates: null,
 
                 name: 'root',
                 password: null,
                 description: 'root user',
 
-                dnsName: DNS_TEMPLATES[0].name,
-                dnsCredentials: toCredentialsMap(DNS_TEMPLATES[0].credentials),
-                dnsConfig: DNS_TEMPLATES[0].driverConfig,
-
-                storageName: STORAGE_TEMPLATES[0].name,
-                storageCredentials: toCredentialsMap(STORAGE_TEMPLATES[0].credentials),
-                storageConfig: STORAGE_TEMPLATES[0].driverConfig,
+                cloudsEnabled: {},
+                configValues: new Proxy(Object.assign({}), cloudNotFoundHandler(this, 'config')),
+                credentialValues: new Proxy(Object.assign({}), cloudNotFoundHandler(this, 'credentials')),
 
                 domainName: null,
-                domain: {}
+                publicDns: null
             };
         },
         computed: {
-            ...mapState('system', ['status', 'activated', 'configs', 'messages'])
+            ...mapState('system', ['status', 'activated', 'configs', 'messages']),
+            cloudTypes () {
+                const types = [];
+                const typesFound = {};
+                if (this.configs && this.configs.cloudConfigs) {
+                    for (let i=0; i<this.configs.cloudConfigs.length; i++) {
+                        if (this.configs.cloudConfigs[i].type) {
+                            if (!(this.configs.cloudConfigs[i].type in typesFound)) {
+                                types.push(this.configs.cloudConfigs[i].type);
+                                typesFound[this.configs.cloudConfigs[i].type] = true;
+                            }
+                        }
+                    }
+                }
+                return types;
+            },
+            availableDnsServices () {
+                const dns = [];
+                if (this.configs && this.configs.cloudConfigs) {
+                    for (let i=0; i<this.configs.cloudConfigs.length; i++) {
+                        if (this.configs.cloudConfigs[i].type && this.configs.cloudConfigs[i].type === 'dns') {
+                            if (this.cloudsEnabled[this.configs.cloudConfigs[i].name]) {
+                                dns.push(this.configs.cloudConfigs[i]);
+                            }
+                        }
+                    }
+                }
+                return dns;
+            }
         },
         created () {
             this.loadIsActivated();
         },
         methods: {
             ...mapActions('system', ['loadIsActivated', 'activate']),
-            cloudActivationObject (cloud, creds, configs) {
-                const obj = Object.assign({}, cloud);
-                if (obj.credentials && obj.credentials.params) {
-                    for (let i=0; i<obj.credentials.params.length; i++) {
-                        obj.credentials.params[i].value = creds[obj.credentials.params[i].name];
-                    }
-                }
-                if (obj.driverConfig) {
-                    for (let k in configs) {
-                        if (configs.hasOwnProperty(k)) {
-                            obj.driverConfig[k] = configs[k];
+            cloudsByType (csType) {
+                const clouds = [];
+                if (this.configs && this.configs.cloudConfigs) {
+                    for (let i=0; i<this.configs.cloudConfigs.length; i++) {
+                        if (this.configs.cloudConfigs[i].type) {
+                            const t = this.configs.cloudConfigs[i].type;
+                            if (t === csType) clouds.push(this.configs.cloudConfigs[i]);
                         }
                     }
                 }
-                return obj;
+                return clouds;
+            },
+            cloudByName (cloudName) {
+                if (this.configs && this.configs.cloudConfigs) {
+                    for (let i=0; i<this.configs.cloudConfigs.length; i++) {
+                        if (this.configs.cloudConfigs[i].name === cloudName.toString()) {
+                            return this.configs.cloudConfigs[i];
+                        }
+                    }
+                }
+                console.warn('cloudByName('+cloudName.toString()+'): cloud not found, returning null');
+                return null;
+            },
+            populateDefaults (fieldGroup, cloudName) {
+                const cloud = this.cloudByName(cloudName);
+                if (cloud === null) return {};
+                const fields = this.cloudConfigFields(cloud);
+                const defaults = {};
+                for (let i=0; i<fields[fieldGroup].length; i++) {
+                    defaults[fields[fieldGroup][i].name] = fields[fieldGroup][i].value;
+                }
+                console.log('returning '+cloudName.toString()+'/'+fieldGroup+' defaults: '+JSON.stringify(defaults));
+                return defaults;
             },
             domainActivationObject: function () {
                 return {
                     name: this.domainName,
                     template: true,
-                    publicDns: this.dnsName
+                    publicDns: this.publicDns
                 };
             },
             cloudConfigFields (cloud) {
@@ -218,7 +204,11 @@
                         if (cloud.driverConfig.hasOwnProperty(prop)) {
                             fields.config.push({
                                 name: prop,
-                                value: cloud.driverConfig[prop]
+                                value: (typeof cloud.driverConfig[prop] === 'object')
+                                    ? JSON.stringify(cloud.driverConfig[prop])
+                                    : cloud.driverConfig[prop],
+                                inputType: (cloud.driverConfig[prop] === true || cloud.driverConfig[prop] === false)
+                                    ? 'checkbox' : (typeof cloud.driverConfig[prop] === 'object' ? 'textarea' : 'text')
                             });
                         }
                     }
@@ -241,12 +231,20 @@
                     password: this.password,
                     description: this.description,
                     networkName: 'boot-network',
-                    dns: this.cloudActivationObject(this.dnsByName[this.dnsName], this.dnsCredentials, this.dnsConfig),
-                    storage: this.cloudActivationObject(this.storageByName[this.storageName], this.storageCredentials, this.storageConfig),
+                    cloudConfigs: {},
                     domain: this.domainActivationObject()
                 };
-                // console.log('sending activation: '+JSON.stringify(activation));
+                for (let cloud in this.cloudsEnabled) {
+                    if (this.cloudsEnabled.hasOwnProperty(cloud)) {
+                        activation.cloudConfigs[cloud] = {
+                            config: this.configValues[cloud],
+                            credentials: this.credentialValues[cloud]
+                        };
+                    }
+                }
+                this.errors.clear();
                 this.submitted = true;
+                // console.log('sending activation: '+JSON.stringify(activation));
                 this.activate({activation: activation, messages: this.messages, errors: this.errors});
             }
         },

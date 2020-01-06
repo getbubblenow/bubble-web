@@ -9,7 +9,8 @@ const state = {
         sageLauncher: false,
         cloudDrivers: [],
         entityClasses: [],
-        locales: ['en_US']
+        locales: ['en_US'],
+        cloudConfigs: {}
     },
     entityConfigs: {},
     searchResults: [],
