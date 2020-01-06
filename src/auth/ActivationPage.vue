@@ -17,11 +17,6 @@
                 <input type="text" v-model="description" name="description" class="form-control" :class="{ 'is-invalid': submitted && errors.has('description') }" />
                 <div v-if="submitted && errors.has('description')" class="invalid-feedback d-block">{{ errors.first('description') }}</div>
             </div>
-            <div class="form-group">
-                <label for="networkName">{{messages.field_label_network_name}}</label>
-                <input type="text" v-model="networkName" name="networkName" class="form-control" :class="{ 'is-invalid': submitted && errors.has('networkName') }" />
-                <div v-if="submitted && errors.has('networkName')" class="invalid-feedback d-block">{{ errors.first('networkName') }}</div>
-            </div>
 
             <!-- DNS -->
             <div class="form-group">
@@ -62,9 +57,9 @@
                 <h3>{{messages.form_section_title_storage}}</h3>
                 <div v-if="submitted && errors.has('storage')" class="invalid-feedback d-block"><h5>{{ errors.first('storage') }}</h5></div>
                 <label for="storageName">{{messages.field_label_storage_service}}</label>
-                <select v-model="storageName" name="storage" class="form-control">
-                    <option v-for="opt in storageTemplates" v-bind:value="opt.name">{{messages['driver_'+opt.driverClass]}}</option>
-                </select>
+<!--                <select v-model="storageName" name="storage" class="form-control">-->
+<!--                    <option v-for="opt in storageTemplates" v-bind:value="opt.name">{{messages['driver_'+opt.driverClass]}}</option>-->
+<!--                </select>-->
                 <span v-html="messages['description_'+storageByName[storageName].driverClass]"></span>
             </div>
 
@@ -96,16 +91,6 @@
 <script>
     import { mapState, mapActions } from 'vuex'
 
-    const DNS_GODADDY = {
-        name: 'GoDaddyDns',
-        driverClass: 'bubble.cloud.dns.godaddy.GoDaddyDnsDriver',
-        credentials: {
-            params: [
-                {name: 'GODADDY_API_KEY', value: null},
-                {name: 'GODADDY_API_SECRET', value: null},
-            ]
-        }
-    };
     const DNS_ROUTE53 = {
         name: 'Route53Dns',
         driverClass: 'bubble.cloud.dns.route53.Route53DnsDriver',
@@ -114,12 +99,24 @@
                 {name: 'AWS_ACCESS_KEY_ID', value: null},
                 {name: 'AWS_SECRET_KEY', value: null},
             ]
-        }
+        },
+        template: true
     };
-    const DNS_TEMPLATES = [ DNS_GODADDY, DNS_ROUTE53 ];
+    const DNS_GODADDY = {
+        name: 'GoDaddyDns',
+        driverClass: 'bubble.cloud.dns.godaddy.GoDaddyDnsDriver',
+        credentials: {
+            params: [
+                {name: 'GODADDY_API_KEY', value: null},
+                {name: 'GODADDY_API_SECRET', value: null},
+            ]
+        },
+        template: true
+    };
+    const DNS_TEMPLATES = [ DNS_ROUTE53, DNS_GODADDY ];
     const DNS_BY_NAME = {};
-    DNS_BY_NAME[DNS_GODADDY.name] = DNS_GODADDY;
     DNS_BY_NAME[DNS_ROUTE53.name] = DNS_ROUTE53;
+    DNS_BY_NAME[DNS_GODADDY.name] = DNS_GODADDY;
 
     const STORAGE_S3 = {
         name: "S3_US_Standard",
@@ -146,7 +143,8 @@
         driverConfig: { baseDir: '.bubble_local_storage' },
         template: false
     };
-    const STORAGE_TEMPLATES = [ STORAGE_S3, STORAGE_LOCAL ];
+    // const STORAGE_TEMPLATES = [ STORAGE_S3, STORAGE_LOCAL ];
+    const STORAGE_TEMPLATES = [ STORAGE_S3 ];
     const STORAGE_BY_NAME = {};
     STORAGE_BY_NAME[STORAGE_S3.name] = STORAGE_S3;
     STORAGE_BY_NAME[STORAGE_LOCAL.name] = STORAGE_LOCAL;
@@ -169,7 +167,6 @@
                 name: 'root',
                 password: null,
                 description: 'root user',
-                networkName: null,
 
                 dnsName: DNS_TEMPLATES[0].name,
                 dnsCredentials: toCredentialsMap(DNS_TEMPLATES[0].credentials),
@@ -243,7 +240,7 @@
                     name: this.name,
                     password: this.password,
                     description: this.description,
-                    networkName: this.networkName,
+                    networkName: 'boot-network',
                     dns: this.cloudActivationObject(this.dnsByName[this.dnsName], this.dnsCredentials, this.dnsConfig),
                     storage: this.cloudActivationObject(this.storageByName[this.storageName], this.storageCredentials, this.storageConfig),
                     domain: this.domainActivationObject()
