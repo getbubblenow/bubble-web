@@ -28,7 +28,7 @@
             <hr/>
             <div class="form-group">
                 <label :for="cloud.name+'_enabled'">
-                    <h4 v-html="messages['driver_'+cloud.driverClass]"></h4>
+                    <h5 v-html="messages['driver_'+cloud.driverClass]"></h5>
                 </label>
                 <input :name="cloud.name+'_enabled'" type="checkbox" v-model="cloudsEnabled[cloud.name]"/>
                 <div v-html="messages['description_'+cloud.driverClass]"></div>
@@ -37,7 +37,7 @@
             <div v-if="cloudsEnabled[cloud.name]">
                 <!-- credential fields -->
                 <div v-if="cloudConfigFields(cloud).credentials && cloudConfigFields(cloud).credentials.length > 0">
-                    <h5>{{messages['driver_'+cloud.driverClass]}} {{messages.form_section_title_credentials}}</h5>
+                    <h6><b>{{messages['driver_'+cloud.driverClass]}} {{messages.form_section_title_credentials}}</b></h6>
                     <div v-for="credential in cloudConfigFields(cloud).credentials" class="form-group">
                         <label :for="credential.name">{{messages['driver_credential_'+credential.name+'_'+cloud.driverClass]}}</label>
                         <input type="text" v-model="credentialValues[cloud.name][credential.name]" :name="credential.name" class="form-control" />
@@ -45,9 +45,9 @@
                 </div>
                 <!-- config fields -->
                 <div v-if="allCloudConfigFields(cloud).config && allCloudConfigFields(cloud).config.length > 0">
-                    <h5 v-if="showAllConfigs[cloud.name] || displayCloudConfigFields(cloud).length === allCloudConfigFields(cloud).length">
-                        {{messages['driver_'+cloud.driverClass]}} {{messages.form_section_title_config}}
-                    </h5>
+                    <h6 v-if="showAllConfigs[cloud.name] || displayCloudConfigFields(cloud).length === allCloudConfigFields(cloud).length">
+                        <b>{{messages['driver_'+cloud.driverClass]}} {{messages.form_section_title_config}}</b>
+                    </h6>
                     <div v-if="displayShowAllControl(cloud.name)" class="form-group">
                         <label :for="cloud.name+'_showAllConfig'">
                             {{messages.field_label_show_all_config}}
