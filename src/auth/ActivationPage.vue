@@ -45,7 +45,9 @@
                 </div>
                 <!-- config fields -->
                 <div v-if="allCloudConfigFields(cloud).config && allCloudConfigFields(cloud).config.length > 0">
-                    <h5>{{messages['driver_'+cloud.driverClass]}} {{messages.form_section_title_config}}</h5>
+                    <h5 v-if="showAllConfigs[cloud.name] || displayCloudConfigFields(cloud).length === allCloudConfigFields(cloud).length">
+                        {{messages['driver_'+cloud.driverClass]}} {{messages.form_section_title_config}}
+                    </h5>
                     <div v-if="displayShowAllControl(cloud.name)" class="form-group">
                         <label :for="cloud.name+'_showAllConfig'">
                             {{messages.field_label_show_all_config}}
@@ -205,7 +207,7 @@
                 for (let i=0; i<fields[fieldGroup].length; i++) {
                     defaults[fields[fieldGroup][i].name] = fields[fieldGroup][i].value;
                 }
-                console.log('returning '+cloudName.toString()+'/'+fieldGroup+' defaults: '+JSON.stringify(defaults));
+                // console.log('returning '+cloudName.toString()+'/'+fieldGroup+' defaults: '+JSON.stringify(defaults));
                 return defaults;
             },
             domainActivationObject: function () {
