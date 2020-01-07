@@ -44,9 +44,15 @@
                     </div>
                 </div>
                 <!-- config fields -->
-                <div v-if="cloudConfigFields(cloud).config && cloudConfigFields(cloud).config.length > 0">
+                <div v-if="allCloudConfigFields(cloud).config && allCloudConfigFields(cloud).config.length > 0">
                     <h5>{{messages['driver_'+cloud.driverClass]}} {{messages.form_section_title_config}}</h5>
-                    <div v-for="config in cloudConfigFields(cloud).config" class="form-group">
+                    <div v-if="displayShowAllControl(cloud.name)" class="form-group">
+                        <label :for="cloud.name+'_showAllConfig'">
+                            {{messages.field_label_show_all_config}}
+                        </label>
+                        <input :name="cloud.name+'_showAllConfig'" type="checkbox" v-model="showAllConfigs[cloud.name]"/>
+                    </div>
+                    <div v-for="config in displayCloudConfigFields(cloud).config" class="form-group">
                         <label :for="config.name">{{messages['driver_config_'+config.name+'_'+cloud.driverClass]}}</label>
                         <textarea v-if="config.inputType === 'textarea'" v-model="configValues[cloud.name][config.name]" class="form-control"></textarea>
                         <input v-else :type="config.inputType" v-model="configValues[cloud.name][config.name]" :name="config.name" class="form-control" />
@@ -93,9 +99,7 @@
     const cloudNotFoundHandler = function (vue, fieldGroup) {
         return {
             get: function (target, name) {
-                if (typeof name === 'undefined') return null;
-                if (name === null) return null;
-                if (name === '') return null;
+                if (typeof name === 'undefined' || name === null || name === '') return null;
                 if (!target.hasOwnProperty(name)) target[name] = vue.populateDefaults(fieldGroup, name);
                 return target[name];
             }
@@ -113,11 +117,14 @@
                 description: 'root user',
 
                 cloudsEnabled: {},
+                showAllConfigs: {},
                 configValues: new Proxy(Object.assign({}), cloudNotFoundHandler(this, 'config')),
                 credentialValues: new Proxy(Object.assign({}), cloudNotFoundHandler(this, 'credentials')),
 
                 domainName: null,
-                publicDns: null
+                publicDns: null,
+
+                displayShowAllCheckbox: null
             };
         },
         computed: {
@@ -156,6 +163,17 @@
         },
         methods: {
             ...mapActions('system', ['loadIsActivated', 'activate']),
+            displayShowAllControl (cloudName) {
+                if (this.displayShowAllCheckbox == null) {
+                    const showAll = {};
+                    for (let i = 0; i < this.configs.cloudConfigs.length; i++) {
+                        const cloud = this.configs.cloudConfigs[i];
+                        showAll[cloud.name] = this.displayCloudConfigFields(cloud).config.length !== this.allCloudConfigFields(cloud).config.length;
+                    }
+                    this.displayShowAllCheckbox = showAll;
+                }
+                return this.displayShowAllCheckbox[cloudName];
+            },
             cloudsByType (csType) {
                 const clouds = [];
                 if (this.configs && this.configs.cloudConfigs) {
@@ -182,7 +200,7 @@
             populateDefaults (fieldGroup, cloudName) {
                 const cloud = this.cloudByName(cloudName);
                 if (cloud === null) return {};
-                const fields = this.cloudConfigFields(cloud);
+                const fields = this.allCloudConfigFields(cloud);
                 const defaults = {};
                 for (let i=0; i<fields[fieldGroup].length; i++) {
                     defaults[fields[fieldGroup][i].name] = fields[fieldGroup][i].value;
@@ -197,19 +215,24 @@
                     publicDns: this.publicDns
                 };
             },
-            cloudConfigFields (cloud) {
+            allCloudConfigFields (cloud) { return this.cloudConfigFields(cloud, true); },
+            displayCloudConfigFields (cloud) { return this.cloudConfigFields(cloud, false); },
+            cloudConfigFields (cloud, returnAll) {
                 const fields = { config: [], credentials: [] };
                 if (typeof cloud.driverConfig !== 'undefined' && cloud.driverConfig !== null) {
                     for (let prop in cloud.driverConfig) {
                         if (cloud.driverConfig.hasOwnProperty(prop)) {
-                            fields.config.push({
-                                name: prop,
-                                value: (typeof cloud.driverConfig[prop] === 'object')
-                                    ? JSON.stringify(cloud.driverConfig[prop])
-                                    : cloud.driverConfig[prop],
-                                inputType: (cloud.driverConfig[prop] === true || cloud.driverConfig[prop] === false)
-                                    ? 'checkbox' : (typeof cloud.driverConfig[prop] === 'object' ? 'textarea' : 'text')
-                            });
+                            const isEmpty = cloud.driverConfig[prop] === null || cloud.driverConfig[prop].toString() === '';
+                            if (returnAll || isEmpty || this.showAllConfigs[cloud.name]) {
+                                fields.config.push({
+                                    name: prop,
+                                    value: (typeof cloud.driverConfig[prop] === 'object')
+                                        ? JSON.stringify(cloud.driverConfig[prop])
+                                        : cloud.driverConfig[prop],
+                                    inputType: (cloud.driverConfig[prop] === true || cloud.driverConfig[prop] === false)
+                                        ? 'checkbox' : (typeof cloud.driverConfig[prop] === 'object' ? 'textarea' : 'text')
+                                });
+                            }
                         }
                     }
                 }
@@ -269,7 +292,7 @@
                 if (typeof this.storageByName[name].driverConfig !== 'undefined') {
                     this.storageConfig = this.storageByName[name].driverConfig;
                 }
-            },
+            }
         }
     };
 </script>
