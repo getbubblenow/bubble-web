@@ -42,6 +42,7 @@
 
 <script>
     import { mapState, mapActions, mapGetters } from 'vuex'
+    import { util } from '../_helpers'
 
     export default {
         computed: {
@@ -51,7 +52,7 @@
             ...mapState('system', ['messages'])
         },
         created () {
-            this.getAllNetworks({messages: this.messages, errors: this.errors});
+            this.getAllNetworks({userId: util.currentUser().uuid, messages: this.messages, errors: this.errors});
         },
         methods: {
             ...mapActions('networks', {

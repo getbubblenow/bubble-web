@@ -232,7 +232,7 @@
             ...mapState('plans', ['plans']),
             ...mapState('footprints', ['footprints']),
             ...mapState('paymentMethods', ['paymentMethods', 'accountPaymentMethod', 'paymentMethod', 'paymentInfo']),
-            ...mapState('networks', ['nearestRegions']),
+            ...mapState('networks', ['nearestRegions', 'newNodeNotification']),
             ...mapState('networks', {
                 error: state => state.error
             }),
@@ -313,7 +313,7 @@
                 this.loadPlans(this.messages, this.errors);
                 this.loadFootprints(this.messages, this.errors);
                 this.loadPaymentMethods(this.messages, this.errors);
-                this.getNearestRegions(currentUser.uuid, null, this.messages, this.errors);
+                this.getNearestRegions(null, this.messages, this.errors);
             },
             isAuthenticator(val) { return window.isAuthenticator(val); },
             isNotAuthenticator(val) { return window.isNotAuthenticator(val); },
@@ -459,6 +459,11 @@
             actionStatus (status) {
                 if (status.success) {
                     this.initDefaults();
+                }
+            },
+            newNodeNotification (nn) {
+                if (nn && nn.uuid) {
+                    this.$router.push({path:'/networks', params: {uuid: nn.network}, query: {'status': nn.uuid}});
                 }
             }
         },
