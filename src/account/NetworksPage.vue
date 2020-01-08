@@ -1,6 +1,6 @@
 <template>
     <div>
-        <em v-if="loading">{{messages.loading_networks}}</em>
+        <em v-if="loading && loading.networks">{{messages.loading_networks}}</em>
         <div v-if="networks && networks.length > 0">
             <h2>{{messages.table_title_networks}}</h2>
             <table border="1">

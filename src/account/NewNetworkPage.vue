@@ -2,11 +2,11 @@
     <div>
         <h2>{{messages.form_title_new_network}}</h2>
 
-        <div v-if="!anyContacts">
+        <div v-if="!anyContacts && !user.admin">
             <h3>{{messages.message_no_contacts}}</h3>
             <router-link v-if="!anyContacts" to="/me/policy">{{messages.link_label_no_contacts}}</router-link>
         </div>
-        <div v-else-if="!verifiedContacts">
+        <div v-else-if="!verifiedContacts && !user.admin">
             <h3>{{messages.message_no_verified_contacts}}</h3>
             {{messages.message_no_verified_contacts_subtext}}
             <table border="1">
@@ -47,7 +47,7 @@
             <div v-if="customize.domain === false">
                 {{messages.field_label_network_domain}}:
                 <span v-if="defaults.domain">{{defaults.domain}}</span>
-                <span v-else>{{messages.message_auto_detecting}}</span>
+                <span v-else v-html="messages.message_auto_detecting"></span>
                 <button @click="customize.domain = true">{{messages.button_label_customize}}</button>
             </div>
             <hr/>
@@ -62,7 +62,7 @@
             <div v-if="customize.locale === false">
                 {{messages.field_label_locale}}:
                 <span v-if="defaults.locale">{{messages['locale_'+defaults.locale]}}</span>
-                <span v-else>{{messages.message_auto_detecting}}</span>
+                <span v-else v-html="messages.message_auto_detecting"></span>
                 <button @click="customize.locale = true">{{messages.button_label_customize}}</button>
             </div>
             <hr/>
@@ -77,7 +77,7 @@
             <div v-if="customize.timezone === false">
                 {{messages.field_label_timezone}}:
                 <span v-if="defaults.timezone">{{tzDescription(defaults.timezone)}}</span>
-                <span v-else>{{messages.message_auto_detecting}}</span>
+                <span v-else v-html="messages.message_auto_detecting"></span>
                 <button @click="customize.timezone = true">{{messages.button_label_customize}}</button>
             </div>
             <hr/>
@@ -92,7 +92,7 @@
             <div v-if="customize.plan === false">
                 {{messages.field_label_plan}}:
                 <span v-if="defaults.plan">{{messages['plan_name_'+defaults.plan]}}</span>
-                <span v-else>{{messages.message_auto_detecting}}</span>
+                <span v-else v-html="messages.message_auto_detecting"></span>
                 <button @click="customize.plan = true">{{messages.button_label_customize}}</button>
             </div>
             <div>
@@ -110,7 +110,7 @@
             <div v-if="customize.region === false">
                 {{messages.field_label_region}}:
                 <span v-if="defaults.region">{{defaults.region.name}}</span>
-                <span v-else>{{messages.message_auto_detecting}}</span>
+                <span v-else v-html="messages.message_auto_detecting"></span>
                 <button @click="customize.region = true">{{messages.button_label_customize}}</button>
             </div>
             <div>
@@ -128,7 +128,7 @@
             <div v-if="customize.footprint === false">
                 {{messages.field_label_footprint}}:
                 <span v-if="defaults.footprint">{{messages['footprint_name_'+defaults.footprint]}}</span>
-                <span v-else>{{messages.message_auto_detecting}}</span>
+                <span v-else v-html="messages.message_auto_detecting"></span>
                 <button @click="customize.footprint = true">{{messages.button_label_customize}}</button>
             </div>
             <div>
@@ -138,6 +138,9 @@
 
             <div class="form-group">
                 <label htmlFor="paymentMethod">{{messages.field_label_paymentMethod}}</label>
+                <div v-if="typeof paymentMethods === 'undefined' || paymentMethods === null || paymentMethods.length === 0" class="invalid-feedback d-block">
+                    <h5>{{messages.err_noPaymentMethods}}</h5>
+                </div>
                 <span v-for="pm in paymentMethods">
                     <button class="btn btn-primary" :disabled="status.loading" @click="setPaymentMethod(pm)">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
                 </span>
@@ -170,16 +173,6 @@
     import { isAuthenticator, isNotAuthenticator } from '../_store/users.module';
     window.isAuthenticator = isAuthenticator;
     window.isNotAuthenticator = isNotAuthenticator;
-
-    function initDefaults(comp) {
-        comp.getPolicyByUuid({uuid: util.currentUser().uuid, messages: comp.messages, errors: comp.errors});
-        comp.detectTimezone();
-        comp.detectLocale();
-        comp.loadDomains(util.currentUser().uuid, comp.messages, comp.errors);
-        comp.loadPlans(comp.messages, comp.errors);
-        comp.loadFootprints(comp.messages, comp.errors);
-        comp.loadPaymentMethods(comp.messages, comp.errors);
-    }
 
     export default {
         data() {
@@ -317,6 +310,15 @@
                 loadPaymentMethods: 'getAll',
                 setPaymentMethod: 'setPaymentMethod'
             }),
+            initDefaults() {
+                this.getPolicyByUuid({uuid: util.currentUser().uuid, messages: this.messages, errors: this.errors});
+                this.detectTimezone();
+                this.detectLocale();
+                this.loadDomains(util.currentUser().uuid, this.messages, this.errors);
+                this.loadPlans(this.messages, this.errors);
+                this.loadFootprints(this.messages, this.errors);
+                this.loadPaymentMethods(this.messages, this.errors);
+            },
             isAuthenticator(val) { return window.isAuthenticator(val); },
             isNotAuthenticator(val) { return window.isNotAuthenticator(val); },
             hasVerifiedContact(policy) {
@@ -397,7 +399,8 @@
             domains (doms) {
                 if (doms && doms[0]) {
                     if (this.network.domain == null || this.network.domain === '') this.network.domain = doms[0].name;
-                    if (this.defaults.domain == null || this.defaults.domain === '') this.defaults.domain = doms[0].name;
+                    this.defaults.domain = doms[0].name;
+                    console.log('watch.domains, set this.defaults.domain='+this.defaults.domain);
                 }
             },
             detectedTimezone (tz) {
@@ -408,8 +411,8 @@
             },
             detectedLocale (loc) {
                 if (loc) {
-                    if (this.network.locale == null || this.network.locale === '') this.network.locale = loc;
-                    if (this.defaults.locale == null || this.defaults.locale === '') this.defaults.locale = loc;
+                    if (this.network.locale === null || this.network.locale === '') this.network.locale = loc;
+                    this.defaults.locale = loc;
                 }
             },
             paymentMethod (pm) {
@@ -432,12 +435,12 @@
             actionStatus (status) {
                 // console.log('watch.actionStatus: received: '+JSON.stringify(status));
                 if (status.success) {
-                    initDefaults(this);
+                    this.initDefaults();
                 }
             }
         },
         created() {
-            initDefaults(this);
+            this.initDefaults();
         }
     };
 </script>
