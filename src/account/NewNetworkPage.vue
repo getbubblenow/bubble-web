@@ -103,13 +103,15 @@
             <!-- cloud+region -->
             <div v-if="customize.region === true" class="form-group">
                 <label htmlFor="region">{{messages.field_label_region}}</label>
-                <v-select v-validate="'required'" v-if="regionObjects" :options="regionObjects" :reduce="region => region.cloud+':'+region.internalName" label="name" :value="cloudRegion" type="text" v-model="cloudRegion" name="region" class="form-control" :class="{ 'is-invalid': submitted && errors.has('region') }"></v-select>
+                <select name="region" v-validate="'required'" v-if="regions" class="form-control" :class="{ 'is-invalid': submitted && errors.has('region') }">
+                    <option v-for="region in regions" :value="regionId(region)">{{region.name}} (~{{parseInt(region.distance/1000)}} {{messages.msg_km_distance_away}})</option>
+                </select>
                 <div v-if="submitted && errors.has('region')" class="invalid-feedback">{{ errors.first('region') }}</div>
                 <button @click="customize.region = false">{{messages.button_label_use_default}}</button>
             </div>
             <div v-if="customize.region === false">
                 {{messages.field_label_region}}:
-                <span v-if="defaults.region">{{defaults.region.name}}</span>
+                <span v-if="defaults.region">{{defaults.region.name}} (~{{parseInt(defaults.region.distance/1000)}} {{messages.msg_km_distance_away}})</span>
                 <span v-else v-html="messages.message_auto_detecting"></span>
                 <button @click="customize.region = true">{{messages.button_label_customize}}</button>
             </div>
@@ -183,6 +185,7 @@
                     locale: '',
                     timezone: '',
                     plan: 'bubble',
+                    region: '',
                     footprint: 'Worldwide',
                     paymentMethodObject: {
                         paymentMethodType: null,
@@ -190,6 +193,7 @@
                     }
                 },
                 cloudRegion: '',
+                regions: [],
                 customize: {
                     domain: false,
                     locale: false,
@@ -200,7 +204,7 @@
                 },
                 defaults: {
                     domain: '',
-                    locale: '',
+                    locale: 'en_US',
                     timezone: '',
                     plan: 'bubble',
                     footprint: 'Worldwide',
@@ -273,19 +277,6 @@
                     }
                 }
                 return fp_array;
-            },
-            regionObjects: function () {
-                const regions_array = [];
-                if (this.footprints) {
-                    for (let i = 0; i < this.footprints.length; i++) {
-                        fp_array.push({
-                            ...this.footprints[i],
-                            localName: this.messages['footprint_name_' + this.footprints[i].name],
-                            description: this.messages['footprint_description_' + this.footprints[i].name]
-                        })
-                    }
-                }
-                return regions_array;
             }
         },
         methods: {
@@ -311,13 +302,15 @@
                 setPaymentMethod: 'setPaymentMethod'
             }),
             initDefaults() {
-                this.getPolicyByUuid({uuid: util.currentUser().uuid, messages: this.messages, errors: this.errors});
+                const currentUser = util.currentUser();
+                this.getPolicyByUuid({uuid: currentUser.uuid, messages: this.messages, errors: this.errors});
                 this.detectTimezone();
                 this.detectLocale();
-                this.loadDomains(util.currentUser().uuid, this.messages, this.errors);
+                this.loadDomains(currentUser.uuid, this.messages, this.errors);
                 this.loadPlans(this.messages, this.errors);
                 this.loadFootprints(this.messages, this.errors);
                 this.loadPaymentMethods(this.messages, this.errors);
+                this.getNearestRegions(currentUser.uuid, null, this.messages, this.errors);
             },
             isAuthenticator(val) { return window.isAuthenticator(val); },
             isNotAuthenticator(val) { return window.isNotAuthenticator(val); },
@@ -380,6 +373,9 @@
             tzDescription(tz) {
                 return this.messages['tz_name_'+tz] + " - " + this.messages['tz_description_'+tz]
             },
+            regionId(region) {
+                return region.cloud+':'+region.internalName;
+            },
             handleSubmit(e) {
                 this.submitted = true;
                 this.$validator.validate().then(valid => {
@@ -400,7 +396,6 @@
                 if (doms && doms[0]) {
                     if (this.network.domain == null || this.network.domain === '') this.network.domain = doms[0].name;
                     this.defaults.domain = doms[0].name;
-                    console.log('watch.domains, set this.defaults.domain='+this.defaults.domain);
                 }
             },
             detectedTimezone (tz) {
@@ -413,6 +408,13 @@
                 if (loc) {
                     if (this.network.locale === null || this.network.locale === '') this.network.locale = loc;
                     this.defaults.locale = loc;
+                }
+            },
+            nearestRegions (regions) {
+                if (regions) {
+                    this.regions = regions;
+                    if (this.network.region === '') this.network.region = this.regionId(regions[0]);
+                    if (this.defaults.region === '') this.defaults.region = regions[0];
                 }
             },
             paymentMethod (pm) {

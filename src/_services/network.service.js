@@ -3,7 +3,8 @@ import { util } from '../_helpers';
 
 export const networkService = {
     getAll,
-    getById
+    getById,
+    getNearestRegions
 };
 
 function getAll(userId, messages, errors) {
