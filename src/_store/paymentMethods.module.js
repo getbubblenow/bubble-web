@@ -59,7 +59,6 @@ const actions = {
     },
 
     addAccountPaymentMethod({ commit }, {paymentMethod, messages, errors}) {
-        console.log("pmModule: paymentMethod="+JSON.stringify(paymentMethod));
         commit('addAccountPaymentMethodRequest');
         paymentMethodService.addAccountPaymentMethod(paymentMethod, messages, errors)
             .then(

@@ -103,8 +103,8 @@
             <!-- cloud+region -->
             <div v-if="customize.region === true" class="form-group">
                 <label htmlFor="region">{{messages.field_label_region}}</label>
-                <select name="region" v-validate="'required'" v-if="regions" class="form-control" :class="{ 'is-invalid': submitted && errors.has('region') }">
-                    <option v-for="region in regions" :value="regionId(region)">{{region.name}} (~{{parseInt(region.distance/1000)}} {{messages.msg_km_distance_away}})</option>
+                <select name="region" v-validate="'required'" v-model="cloudRegionUuid" v-if="regions" class="form-control" :class="{ 'is-invalid': submitted && errors.has('region') }">
+                    <option v-for="region in regions" :value="region.uuid">{{region.name}} (~{{parseInt(region.distance/1000)}} {{messages.msg_km_distance_away}})</option>
                 </select>
                 <div v-if="submitted && errors.has('region')" class="invalid-feedback">{{ errors.first('region') }}</div>
                 <button @click="customize.region = false">{{messages.button_label_use_default}}</button>
@@ -114,9 +114,6 @@
                 <span v-if="defaults.region">{{defaults.region.name}} (~{{parseInt(defaults.region.distance/1000)}} {{messages.msg_km_distance_away}})</span>
                 <span v-else v-html="messages.message_auto_detecting"></span>
                 <button @click="customize.region = true">{{messages.button_label_customize}}</button>
-            </div>
-            <div>
-                {{cloudRegion.name}}
             </div>
             <hr/>
 
@@ -138,6 +135,7 @@
             </div>
             <hr/>
 
+            <!-- payment -->
             <div class="form-group">
                 <label htmlFor="paymentMethod">{{messages.field_label_paymentMethod}}</label>
                 <div v-if="typeof paymentMethods === 'undefined' || paymentMethods === null || paymentMethods.length === 0" class="invalid-feedback d-block">
@@ -148,13 +146,20 @@
                 </span>
             </div>
 
-            <div v-if="paymentMethod && paymentMethod.paymentMethodType === 'credit'">
-                <router-view name="stripe" v-if="paymentMethod.driverClass.endsWith('StripePaymentDriver')"></router-view>
-                <router-view name="unknown" v-else></router-view>
+            <div v-if="selectedPaymentMethod !== null && selectedPaymentMethod.paymentMethodType === 'credit'">
+                <router-view name="pay_stripe" v-if="selectedPaymentMethod.driverClass.endsWith('StripePaymentDriver')"></router-view>
+                <router-view name="pay_unknown" v-else></router-view>
             </div>
-            <div v-if="paymentMethod && paymentMethod.paymentMethodType === 'code'">
-                <router-view name="invite" v-if="paymentMethod.driverClass.endsWith('CodePaymentDriver')"></router-view>
-                <router-view name="unknown" v-else></router-view>
+            <div v-else-if="selectedPaymentMethod !== null && selectedPaymentMethod.paymentMethodType === 'code'">
+                <router-view name="pay_invite" v-if="selectedPaymentMethod.driverClass.endsWith('CodePaymentDriver')"></router-view>
+                <router-view name="pay_unknown" v-else></router-view>
+            </div>
+            <div v-else-if="selectedPaymentMethod !== null && selectedPaymentMethod.paymentMethodType === 'free'">
+                <router-view name="pay_free" v-if="selectedPaymentMethod.driverClass.endsWith('FreePaymentDriver')"></router-view>
+                <router-view name="pay_unknown" v-else></router-view>
+            </div>
+            <div v-else-if="selectedPaymentMethod !== null">
+                <router-view name="pay_unknown"></router-view>
             </div>
             <hr/>
 
@@ -185,14 +190,13 @@
                     locale: '',
                     timezone: '',
                     plan: 'bubble',
-                    region: '',
                     footprint: 'Worldwide',
                     paymentMethodObject: {
                         paymentMethodType: null,
                         paymentInfo: null
                     }
                 },
-                cloudRegion: '',
+                cloudRegionUuid: null,
                 regions: [],
                 customize: {
                     domain: false,
@@ -217,7 +221,8 @@
                 },
                 verifiedContacts: false,
                 anyContacts: false,
-                firstContact: null
+                firstContact: null,
+                selectedPaymentMethod: null
             };
         },
         computed: {
@@ -373,8 +378,14 @@
             tzDescription(tz) {
                 return this.messages['tz_name_'+tz] + " - " + this.messages['tz_description_'+tz]
             },
-            regionId(region) {
-                return region.cloud+':'+region.internalName;
+            findRegion(uuid) {
+                if (this.regions) {
+                    for (let i = 0; i < this.regions.length; i++) {
+                        if (this.regions[i].uuid === uuid) return this.regions[i];
+                    }
+                }
+                console.log('findRegion: uuid not found: '+uuid);
+                return null;
             },
             handleSubmit(e) {
                 this.submitted = true;
@@ -385,7 +396,13 @@
                                 paymentMethodType: this.paymentMethod.paymentMethodType,
                                 paymentInfo: this.paymentInfo
                             };
-                            this.createNewNetwork(this.network);
+                            const cloudRegion = this.findRegion(this.cloudRegionUuid);
+                            if (cloudRegion === null) {
+                                console.log('no region selected');
+                            } else {
+                                console.log('sending create network: ' + JSON.stringify(this.network) + ' cloud/region=' + cloudRegion.cloud + '/' + cloudRegion.internalName);
+                            }
+                            // this.createNewNetwork(this.network);
                         }
                     }
                 });
@@ -413,12 +430,13 @@
             nearestRegions (regions) {
                 if (regions) {
                     this.regions = regions;
-                    if (this.network.region === '') this.network.region = this.regionId(regions[0]);
+                    if (this.cloudRegionUuid === null) this.cloudRegionUuid = regions[0].uuid;
                     if (this.defaults.region === '') this.defaults.region = regions[0];
                 }
             },
             paymentMethod (pm) {
                 if (pm) {
+                    this.selectedPaymentMethod = pm;
                     this.network.paymentMethodObject.paymentMethodType = pm.paymentMethodType;
                     this.network.paymentMethodObject.paymentInfo = null;
                 }
@@ -429,13 +447,11 @@
                 }
             },
             policy (p) {
-                // console.log('watch.policy: received '+JSON.stringify(p));
                 this.anyContacts = this.hasAnyContacts(p);
                 this.verifiedContacts = this.hasVerifiedContact(p);
                 this.firstContact = this.getFirstContact(p);
             },
             actionStatus (status) {
-                // console.log('watch.actionStatus: received: '+JSON.stringify(status));
                 if (status.success) {
                     this.initDefaults();
                 }

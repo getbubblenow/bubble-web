@@ -1,13 +1,12 @@
 <template>
-    <div>
-        This site is not configured to handle payments of this type
+    <div class="invalid-feedback d-block">
+        <h5>{{messages.message_payment_not_supported}}</h5>
     </div>
 </template>
 
 <script>
+    import { mapState } from 'vuex'
     export default {
-        created () {
-            console.log('UnknownPayment.vue: created, paymentMethod='+JSON.stringify(this.paymentMethod));
-        }
+        computed: { ...mapState('system', ['messages']) }
     };
 </script>

@@ -18,20 +18,20 @@ import NetworkPage from '../account/NetworkPage'
 import AccountsPage from '../admin/AccountsPage'
 import StripePayment from "../account/payment/StripePayment";
 import InviteCodePayment from "../account/payment/InviteCodePayment";
+import FreePayment from "../account/payment/FreePayment";
 import UnknownPayment from "../account/payment/UnknownPayment";
 import { util } from '../_helpers'
 
 Vue.use(Router);
 
 const newNetworkChildren = [
-  { path: '', component: NewNetworkPage,
-    children: [{
-      'path': '', components: {
-        'stripe': StripePayment,
-        'invite': InviteCodePayment,
-        'unknown': UnknownPayment
-      }
-    }]
+  { path: '', components: {
+      default: NewNetworkPage,
+      pay_stripe: StripePayment,
+      pay_invite: InviteCodePayment,
+      pay_free: FreePayment,
+      pay_unknown: UnknownPayment
+    }
   }
 ];
 

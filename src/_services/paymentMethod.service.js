@@ -26,6 +26,5 @@ function getByAccountAndId(paymentMethodId, messages, errors) {
 }
 
 function addAccountPaymentMethod(paymentMethod, messages, errors) {
-    console.log("pmService: paymentMethod="+JSON.stringify(paymentMethod));
     return fetch(`${config.apiUrl}/me/paymentMethods`, util.putWithAuth(paymentMethod)).then(util.handleCrudResponse(messages, errors));
 }
