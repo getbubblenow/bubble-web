@@ -1,16 +1,18 @@
 import { networkService } from '../_services';
+import { accountPlanService } from '../_services';
 import { account } from '../_store/account.module';
 import { util } from '../_helpers';
 
 const state = {
     loading: {
-        networks: false, network: false, deleting: false, nearestRegions: false
+        networks: false, network: false, deleting: false, nearestRegions: false, startingNetwork: false
     },
     creating: null,
     error: null,
     networks: null,
     network: null,
-    nearestRegions: null
+    nearestRegions: null,
+    newNodeNotification: null
 };
 
 const actions = {
@@ -32,8 +34,19 @@ const actions = {
             );
     },
 
-    create({ commit }, {accountPlan, messages, errors}) {
-        // todo: create account plan, then start network
+    addPlanAndStartNetwork({ commit }, {accountPlan, cloud, region, messages, errors}) {
+        commit('addPlanAndStartNetworkRequest');
+        accountPlanService.newAccountPlan(account.state.user.uuid, accountPlan, messages, errors)
+            .then(
+                plan => {
+                    networkService.startNetwork(account.state.user.uuid, plan.name, cloud, region)
+                        .then(
+                            network => commit('addPlanAndStartNetworkSuccess', network),
+                            error => commit('addPlanSuccessStartNetworkFailure', error)
+                        );
+                },
+                error => commit('addPlanFailure', error)
+            );
     },
 
     delete({ commit }, {id, messages, errors}) {
@@ -78,6 +91,23 @@ const mutations = {
         state.loading.network = false;
         state.error = { error };
     },
+
+    addPlanAndStartNetworkRequest(state) {
+        state.loading.startingNetwork = true;
+    },
+    addPlanAndStartNetworkSuccess(state, newNodeNotification) {
+        state.loading.startingNetwork = false;
+        state.newNodeNotification = newNodeNotification;
+    },
+    addPlanSuccessStartNetworkFailure(state, error) {
+        state.loading.startingNetwork = false;
+        state.error = { error };
+    },
+    addPlanFailure(state, error) {
+        state.loading.startingNetwork = false;
+        state.error = { error };
+    },
+
     deleteRequest(state, id) {
         state.loading.deleting = true;
     },

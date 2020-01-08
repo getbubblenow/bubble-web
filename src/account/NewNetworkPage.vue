@@ -33,14 +33,14 @@
             <!-- name -->
             <div class="form-group">
                 <label for="name">{{messages.field_label_network_name}}</label>
-                <input type="text" v-model="network.name" v-validate="'required'" name="name" class="form-control" :class="{ 'is-invalid': submitted && errors.has('name') }" />
+                <input type="text" v-model="accountPlan.name" v-validate="'required'" name="name" class="form-control" :class="{ 'is-invalid': submitted && errors.has('name') }" />
                 <div v-if="submitted && errors.has('name')" class="invalid-feedback">{{ errors.first('name') }}</div>
             </div>
 
             <!-- domain -->
             <div v-if="customize.domain === true" class="form-group">
                 <label for="domain">{{messages.field_label_network_domain}}</label>
-                <v-select v-validate="'required'" v-if="domains" :options="domains" label="name" type="text" v-model="network.domain" name="domain" class="form-control" :class="{ 'is-invalid': submitted && errors.has('domain') }"></v-select>
+                <v-select v-validate="'required'" v-if="domains" :options="domains" label="name" type="text" v-model="accountPlan.domain" name="domain" class="form-control" :class="{ 'is-invalid': submitted && errors.has('domain') }"></v-select>
                 <div v-if="submitted && errors.has('domain')" class="invalid-feedback">{{ errors.first('domain') }}</div>
                 <button @click="customize.domain = false">{{messages.button_label_use_default}}</button>
             </div>
@@ -55,7 +55,7 @@
             <!-- locale -->
             <div v-if="customize.locale === true" class="form-group">
                 <label htmlFor="locale">{{messages.field_label_locale}}</label>
-                <v-select v-validate="'required'" v-if="locales" :options="locales" :reduce="locale => locale.localeCode" label="localeName" type="text" v-model="network.locale" name="locale" class="form-control" :class="{ 'is-invalid': submitted && errors.has('locale') }"></v-select>
+                <v-select v-validate="'required'" v-if="locales" :options="locales" :reduce="locale => locale.localeCode" label="localeName" type="text" v-model="accountPlan.locale" name="locale" class="form-control" :class="{ 'is-invalid': submitted && errors.has('locale') }"></v-select>
                 <div v-if="submitted && errors.has('locale')" class="invalid-feedback">{{ errors.first('locale') }}</div>
                 <button @click="customize.locale = false">{{messages.button_label_use_default}}</button>
             </div>
@@ -70,7 +70,7 @@
             <!-- timezone -->
             <div v-if="customize.timezone === true" class="form-group">
                 <label htmlFor="timezone">{{messages.field_label_timezone}}</label>
-                <v-select v-validate="'required'" :options="timezoneObjects" :reduce="tz => tz.timezoneId" label="timezoneDescription" type="text" v-model="network.timezone" name="timezone" class="form-control" :class="{ 'is-invalid': submitted && errors.has('timezone') }"></v-select>
+                <v-select v-validate="'required'" :options="timezoneObjects" :reduce="tz => tz.timezoneId" label="timezoneDescription" type="text" v-model="accountPlan.timezone" name="timezone" class="form-control" :class="{ 'is-invalid': submitted && errors.has('timezone') }"></v-select>
                 <div v-if="submitted && errors.has('timezone')" class="invalid-feedback">{{ errors.first('timezone') }}</div>
                 <button @click="customize.timezone = false">{{messages.button_label_use_default}}</button>
             </div>
@@ -85,7 +85,7 @@
             <!-- plan -->
             <div v-if="customize.plan === true" class="form-group">
                 <label htmlFor="plan">{{messages.field_label_plan}}</label>
-                <v-select v-validate="'required'" v-if="planObjects" :options="planObjects" :reduce="plan => plan.name" label="localName" type="text" v-model="network.plan" name="plan" class="form-control" :class="{ 'is-invalid': submitted && errors.has('plan') }"></v-select>
+                <v-select v-validate="'required'" v-if="planObjects" :options="planObjects" :reduce="plan => plan.name" label="localName" type="text" v-model="accountPlan.plan" name="plan" class="form-control" :class="{ 'is-invalid': submitted && errors.has('plan') }"></v-select>
                 <div v-if="submitted && errors.has('plan')" class="invalid-feedback">{{ errors.first('plan') }}</div>
                 <button @click="customize.plan = false">{{messages.button_label_use_default}}</button>
             </div>
@@ -96,7 +96,7 @@
                 <button @click="customize.plan = true">{{messages.button_label_customize}}</button>
             </div>
             <div>
-                {{messages['plan_description_'+network.plan]}}
+                {{messages['plan_description_'+accountPlan.plan]}}
             </div>
             <hr/>
 
@@ -120,7 +120,7 @@
             <!-- footprint -->
             <div v-if="customize.footprint === true" class="form-group">
                 <label htmlFor="footprint">{{messages.field_label_footprint}}</label>
-                <v-select v-validate="'required'" v-if="footprintObjects" :options="footprintObjects" :reduce="footprint => footprint.name" label="name" :value="network.footprint" type="text" v-model="network.footprint" name="footprint" class="form-control" :class="{ 'is-invalid': submitted && errors.has('footprint') }"></v-select>
+                <v-select v-validate="'required'" v-if="footprintObjects" :options="footprintObjects" :reduce="footprint => footprint.name" label="name" :value="accountPlan.footprint" type="text" v-model="accountPlan.footprint" name="footprint" class="form-control" :class="{ 'is-invalid': submitted && errors.has('footprint') }"></v-select>
                 <div v-if="submitted && errors.has('footprint')" class="invalid-feedback">{{ errors.first('footprint') }}</div>
                 <button @click="customize.footprint = false">{{messages.button_label_use_default}}</button>
             </div>
@@ -131,7 +131,7 @@
                 <button @click="customize.footprint = true">{{messages.button_label_customize}}</button>
             </div>
             <div>
-                {{messages['footprint_description_'+network.footprint]}}
+                {{messages['footprint_description_'+accountPlan.footprint]}}
             </div>
             <hr/>
 
@@ -184,7 +184,7 @@
     export default {
         data() {
             return {
-                network: {
+                accountPlan: {
                     name: '',
                     domain: '',
                     locale: '',
@@ -238,14 +238,14 @@
             ...mapState('users', ['policy']),
             ...mapState('account', ['actionStatus']),
             isComplete() {
-                return (this.network.name !== '')
-                    && (this.customize.domain === false || this.network.domain !== '')
-                    && (this.customize.locale === false || this.network.locale !== '')
-                    && (this.customize.timezone === false || this.network.timezone !== '')
-                    && (this.customize.plan === false || this.network.plan !== '')
-                    && (this.customize.footprint === false || this.network.footprint !== '')
-                    && (this.network.paymentMethodObject.paymentMethodType != null)
-                    && (this.network.paymentMethodObject.paymentInfo != null);
+                return (this.accountPlan.name !== '')
+                    && (this.customize.domain === false || this.accountPlan.domain !== '')
+                    && (this.customize.locale === false || this.accountPlan.locale !== '')
+                    && (this.customize.timezone === false || this.accountPlan.timezone !== '')
+                    && (this.customize.plan === false || this.accountPlan.plan !== '')
+                    && (this.customize.footprint === false || this.accountPlan.footprint !== '')
+                    && (this.accountPlan.paymentMethodObject.paymentMethodType != null)
+                    && (this.accountPlan.paymentMethodObject.paymentInfo != null);
             },
             timezoneObjects: function () {
                 const tz_objects = [];
@@ -288,10 +288,7 @@
             ...mapActions('users', ['getPolicyByUuid']),
             ...mapActions('account', ['approveAction', 'resendVerificationCode']),
             ...mapActions('system', ['detectTimezone', 'detectLocale']),
-            ...mapActions('networks', {
-                createNewNetwork: 'create',
-                getNearestRegions: 'getNearestRegions'
-            }),
+            ...mapActions('networks', ['getNearestRegions', 'addPlanAndStartNetwork']),
             ...mapGetters('networks', ['loading']),
             ...mapActions('domains', {
                 loadDomains: 'getAll'
@@ -392,7 +389,7 @@
                 this.$validator.validate().then(valid => {
                     if (valid) {
                         if (this.paymentInfo) {
-                            this.network.paymentMethodObject = {
+                            this.accountPlan.paymentMethodObject = {
                                 paymentMethodType: this.paymentMethod.paymentMethodType,
                                 paymentInfo: this.paymentInfo
                             };
@@ -400,9 +397,15 @@
                             if (cloudRegion === null) {
                                 console.log('no region selected');
                             } else {
-                                console.log('sending create network: ' + JSON.stringify(this.network) + ' cloud/region=' + cloudRegion.cloud + '/' + cloudRegion.internalName);
+                                console.log('sending accountPlan: ' + JSON.stringify(this.accountPlan) + ' cloud/region=' + cloudRegion.cloud + '/' + cloudRegion.internalName);
+                                this.addPlanAndStartNetwork({
+                                    accountPlan: this.accountPlan,
+                                    cloud: cloudRegion.cloud,
+                                    region: cloudRegion.internalName,
+                                    messages: this.messages,
+                                    errors: this.errors
+                                });
                             }
-                            // this.createNewNetwork(this.network);
                         }
                     }
                 });
@@ -411,19 +414,19 @@
         watch: {
             domains (doms) {
                 if (doms && doms[0]) {
-                    if (this.network.domain == null || this.network.domain === '') this.network.domain = doms[0].name;
+                    if (this.accountPlan.domain == null || this.accountPlan.domain === '') this.accountPlan.domain = doms[0].name;
                     this.defaults.domain = doms[0].name;
                 }
             },
             detectedTimezone (tz) {
                 if (tz && tz.timeZoneId) {
-                    if (this.network.timezone == null || this.network.timezone === '') this.network.timezone = tz.timeZoneId;
+                    if (this.accountPlan.timezone == null || this.accountPlan.timezone === '') this.accountPlan.timezone = tz.timeZoneId;
                     if (this.defaults.timezone == null || this.defaults.timezone === '') this.defaults.timezone = tz.timeZoneId;
                 }
             },
             detectedLocale (loc) {
                 if (loc) {
-                    if (this.network.locale === null || this.network.locale === '') this.network.locale = loc;
+                    if (this.accountPlan.locale === null || this.accountPlan.locale === '') this.accountPlan.locale = loc;
                     this.defaults.locale = loc;
                 }
             },
@@ -437,13 +440,13 @@
             paymentMethod (pm) {
                 if (pm) {
                     this.selectedPaymentMethod = pm;
-                    this.network.paymentMethodObject.paymentMethodType = pm.paymentMethodType;
-                    this.network.paymentMethodObject.paymentInfo = null;
+                    this.accountPlan.paymentMethodObject.paymentMethodType = pm.paymentMethodType;
+                    this.accountPlan.paymentMethodObject.paymentInfo = null;
                 }
             },
             paymentInfo (info) {
                 if (info) {
-                    this.network.paymentMethodObject.paymentInfo = info;
+                    this.accountPlan.paymentMethodObject.paymentInfo = info;
                 }
             },
             policy (p) {

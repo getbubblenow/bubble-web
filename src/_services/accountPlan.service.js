@@ -17,5 +17,5 @@ function getById(userId, accountPlanId, messages, errors) {
 }
 
 function newAccountPlan(userId, accountPlan, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/accountPlans`, util.putWithAuth(accountPlan)).then(util.handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/me/plans`, util.putWithAuth(accountPlan)).then(util.handleCrudResponse(messages, errors));
 }
