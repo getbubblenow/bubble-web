@@ -392,7 +392,7 @@
                         if (this.paymentInfo) {
                             const cloudRegion = this.findRegion(this.cloudRegionUuid);
                             if (cloudRegion === null) {
-                                console.log('no region selected');
+                                console.log('no region selected'); // todo: set error
                             } else {
                                 console.log('sending accountPlan: ' + JSON.stringify(this.accountPlan) + ' cloud/region=' + cloudRegion.cloud + '/' + cloudRegion.internalName);
                                 this.addPlanAndStartNetwork({
@@ -448,7 +448,6 @@
             },
             accountPaymentMethod (apm) {
                 if (apm) {
-                    console.log('watch.accountPaymentMethod: set uuid from: '+JSON.stringify(apm));
                     this.accountPlan.paymentMethodObject.uuid = apm.uuid
                 }
             },
