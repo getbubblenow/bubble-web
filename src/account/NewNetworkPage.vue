@@ -192,6 +192,7 @@
                     plan: 'bubble',
                     footprint: 'Worldwide',
                     paymentMethodObject: {
+                        uuid: null,
                         paymentMethodType: null,
                         paymentInfo: null
                     }
@@ -230,7 +231,7 @@
             ...mapState('domains', ['domains']),
             ...mapState('plans', ['plans']),
             ...mapState('footprints', ['footprints']),
-            ...mapState('paymentMethods', ['paymentMethods', 'paymentMethod', 'paymentInfo']),
+            ...mapState('paymentMethods', ['paymentMethods', 'accountPaymentMethod', 'paymentMethod', 'paymentInfo']),
             ...mapState('networks', ['nearestRegions']),
             ...mapState('networks', {
                 error: state => state.error
@@ -389,10 +390,6 @@
                 this.$validator.validate().then(valid => {
                     if (valid) {
                         if (this.paymentInfo) {
-                            this.accountPlan.paymentMethodObject = {
-                                paymentMethodType: this.paymentMethod.paymentMethodType,
-                                paymentInfo: this.paymentInfo
-                            };
                             const cloudRegion = this.findRegion(this.cloudRegionUuid);
                             if (cloudRegion === null) {
                                 console.log('no region selected');
@@ -447,6 +444,12 @@
             paymentInfo (info) {
                 if (info) {
                     this.accountPlan.paymentMethodObject.paymentInfo = info;
+                }
+            },
+            accountPaymentMethod (apm) {
+                if (apm) {
+                    console.log('watch.accountPaymentMethod: set uuid from: '+JSON.stringify(apm));
+                    this.accountPlan.paymentMethodObject.uuid = apm.uuid
                 }
             },
             policy (p) {

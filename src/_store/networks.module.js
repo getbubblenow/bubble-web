@@ -39,7 +39,7 @@ const actions = {
         accountPlanService.newAccountPlan(account.state.user.uuid, accountPlan, messages, errors)
             .then(
                 plan => {
-                    networkService.startNetwork(account.state.user.uuid, plan.name, cloud, region)
+                    networkService.startNetwork(account.state.user.uuid, plan.name, cloud, region, messages, errors)
                         .then(
                             network => commit('addPlanAndStartNetworkSuccess', network),
                             error => commit('addPlanSuccessStartNetworkFailure', error)
