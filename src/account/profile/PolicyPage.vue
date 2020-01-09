@@ -43,8 +43,8 @@
 
             <hr/>
             <div class="form-group">
-                <button class="btn btn-primary" :disabled="policyStatus.updating">{{messages.button_label_update_policy}}</button>
-                <img v-show="policyStatus.updating" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                <button class="btn btn-primary" :disabled="loading()">{{messages.button_label_update_policy}}</button>
+                <img v-show="loading()" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
             </div>
 
         </form>
@@ -318,8 +318,8 @@
 
             <hr/>
             <div class="form-group">
-                <button class="btn btn-primary" :disabled="policyStatus.updating || !newContactValid">{{messages.button_label_add_contact}}</button>
-                <img v-show="policyStatus.updating" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                <button class="btn btn-primary" :disabled="loading() || !newContactValid">{{messages.button_label_add_contact}}</button>
+                <img v-show="loading()" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
             </div>
         </form>
 
@@ -327,7 +327,7 @@
 </template>
 
 <script>
-    import { mapState, mapActions } from 'vuex';
+    import { mapState, mapActions, mapGetters } from 'vuex';
 
     // convenience methods
     import { isAuthenticator, isNotAuthenticator } from '../../_store/users.module';
@@ -381,7 +381,7 @@
                 'messages', 'accountDeletionOptions', 'timeDurationOptions', 'timeDurationOptionsReversed',
                 'contactTypes', 'detectedLocale', 'countries'
             ]),
-            ...mapState('users', ['policy', 'policyStatus', 'contact', 'authenticator']),
+            ...mapState('users', ['policy', 'contact', 'authenticator']),
             hasAuthenticator() {
                 for (let i=0; i<this.contacts.length; i++) {
                     if (isAuthenticator(this.contacts[i])) return true;
@@ -413,14 +413,15 @@
         methods: {
             ...mapActions('account', ['approveAction', 'denyAction', 'sendAuthenticatorCode', 'resendVerificationCode']),
             ...mapActions('users', [
-                'getPolicyByUuid', 'updatePolicyByUuid', 'addPolicyContactByUuid', 'removePolicyContactByUuid',
+                'getPolicyByUserId', 'updatePolicyByUserId', 'addPolicyContactByUserId', 'removePolicyContactByUuid',
             ]),
+            ...mapGetters('users', ['loading']),
             isAuthenticator(val) { return window.isAuthenticator(val); },
             isNotAuthenticator(val) { return window.isNotAuthenticator(val); },
             updatePolicy(e) {
                 this.submitted = true;
-                this.updatePolicyByUuid({
-                    uuid: this.currentUser.uuid,
+                this.updatePolicyByUserId({
+                    userId: this.currentUser.uuid,
                     policy: {
                         deletionPolicy: this.deletionPolicy,
                         accountOperationTimeout: this.messages.durationToMillis(this.accountOperationTimeout, this.accountOperationTimeoutUnits),
@@ -438,8 +439,8 @@
                 this.contactSubmitted = true;
                 this.errors.clear();
                 console.log('addContact: adding: '+JSON.stringify(contactToAdd));
-                this.addPolicyContactByUuid({
-                    uuid: this.currentUser.uuid,
+                this.addPolicyContactByUserId({
+                    userId: this.currentUser.uuid,
                     contact: contactToAdd,
                     messages: this.messages,
                     errors: this.errors
@@ -447,7 +448,7 @@
             },
             removeContact(uuid) {
                 this.removePolicyContactByUuid({
-                    uuid: this.currentUser.uuid,
+                    userId: this.currentUser.uuid,
                     contactUuid: uuid,
                     messages: this.messages,
                     errors: this.errors
@@ -456,8 +457,8 @@
             contactFlag(contact, flag, val) {
                 contact[flag] = val;
                 console.log('contactFlag: update: '+JSON.stringify(contact));
-                this.addPolicyContactByUuid({
-                    uuid: this.currentUser.uuid,
+                this.addPolicyContactByUserId({
+                    userId: this.currentUser.uuid,
                     contact: contact,
                     messages: this.messages,
                     errors: this.errors
@@ -473,8 +474,8 @@
             },
             setAuthFactor(contact, factor) {
                 contact.authFactor = factor;
-                this.addPolicyContactByUuid({
-                    uuid: this.currentUser.uuid,
+                this.addPolicyContactByUserId({
+                    userId: this.currentUser.uuid,
                     contact: contact,
                     messages: this.messages,
                     errors: this.errors
@@ -487,7 +488,7 @@
             },
             resendVerification(contact) {
                 this.resendVerificationCode({
-                    uuid: this.currentUser.uuid,
+                    userId: this.currentUser.uuid,
                     contact: contact,
                     messages: this.messages,
                     errors: this.errors
@@ -511,7 +512,7 @@
                     if (isAuthenticator(type)) {
                         // console.log('submitVerification: sending authenticator code: '+code);
                         this.sendAuthenticatorCode({
-                            uuid: this.currentUser.uuid,
+                            userId: this.currentUser.uuid,
                             code: code,
                             verifyOnly: true,
                             messages: this.messages,
@@ -519,7 +520,7 @@
                         });
                     } else {
                         this.approveAction({
-                            uuid: this.currentUser.uuid,
+                            userId: this.currentUser.uuid,
                             code: code,
                             messages: this.messages,
                             errors: this.errors
@@ -557,13 +558,13 @@
                 // console.log('watch.contact: received: '+JSON.stringify(c));
                 if (typeof c.error === 'undefined' || c.error === null) {
                     // force reload policy, refreshes contacts
-                    this.getPolicyByUuid({uuid: this.currentUser.uuid, messages: this.messages, errors: this.errors});
+                    this.getPolicyByUserId({userId: this.currentUser.uuid, messages: this.messages, errors: this.errors});
                 }
             },
             actionStatus (status) {
                 // console.log('watch.actionStatus: received: '+JSON.stringify(status));
                 if (status.success) {
-                    this.getPolicyByUuid({uuid: this.currentUser.uuid, messages: this.messages, errors: this.errors});
+                    this.getPolicyByUserId({userId: this.currentUser.uuid, messages: this.messages, errors: this.errors});
                 }
             },
             authenticator (auth) {
@@ -590,7 +591,7 @@
             }
         },
         created () {
-            this.getPolicyByUuid({uuid: this.currentUser.uuid, messages: this.messages, errors: this.errors});
+            this.getPolicyByUserId({userId: this.currentUser.uuid, messages: this.messages, errors: this.errors});
             // console.log('PolicyPage.created: $route.params='+JSON.stringify(this.$route.query));
             if (this.$route.query.action) {
                 this.inboundAction = {

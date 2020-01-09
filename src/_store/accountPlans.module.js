@@ -10,57 +10,57 @@ const state = {
 };
 
 const actions = {
-    getAll({ commit }, {messages, errors}) {
-        commit('getAllRequest');
+    getAllAccountPlans({ commit }, {userId, messages, errors}) {
+        commit('getAllAccountPlansRequest');
 
-        accountPlanService.getAll(account.user.uuid, messages, errors)
+        accountPlanService.getAllAccountPlans(userId, messages, errors)
             .then(
-                accountPlans => commit('getAllSuccess', accountPlans),
-                error => commit('getAllFailure', error)
+                accountPlans => commit('getAllAccountPlansSuccess', accountPlans),
+                error => commit('getAllAccountPlansFailure', error)
             );
     },
 
-    getByUuid({ commit }, {uuid, messages, errors}) {
-        commit('getByUuidRequest');
+    getAccountPlanById({ commit }, {userId, accountPlanId, messages, errors}) {
+        commit('getAccountPlanByIdRequest');
 
-        accountPlanService.getById(account.user.uuid, uuid, messages, errors)
+        accountPlanService.getAccountPlanById(userId, accountPlanId, messages, errors)
             .then(
-                accountPlan => commit('getByUuidSuccess', accountPlan),
-                error => commit('getByUuidFailure', error)
+                accountPlan => commit('getAccountPlanByIdSuccess', accountPlan),
+                error => commit('getAccountPlanByIdFailure', error)
             );
     },
 
-    delete({ commit }, {id, messages, errors}) {
-        commit('deleteRequest', id);
+    delete({ commit }, {userId, accountPlanId, messages, errors}) {
+        commit('deleteRequest', accountPlanId);
 
-        accountPlanService.delete(account.user.uuid, id, messages, errors)
+        accountPlanService.delete(userId, accountPlanId, messages, errors)
             .then(
                 accountPlan => commit('deleteSuccess', accountPlan),
-                error => commit('deleteFailure', { id, error: error.toString() })
+                error => commit('deleteFailure', { accountPlanId, error: error.toString() })
             );
     }
 };
 
 const mutations = {
-    getAllRequest(state) {
+    getAllAccountPlansRequest(state) {
         state.loading.plans = true;
     },
-    getAllSuccess(state, accountPlans) {
+    getAllAccountPlansSuccess(state, accountPlans) {
         state.loading.plans = false;
         state.accountPlans = accountPlans;
     },
-    getAllFailure(state, error) {
+    getAllAccountPlansFailure(state, error) {
         state.loading.plans = false;
         state.error = { error };
     },
-    getByUuidRequest(state) {
+    getAccountPlanByIdRequest(state) {
         state.loading.plan = true;
     },
-    getByUuidSuccess(state, accountPlan) {
+    getAccountPlanByIdSuccess(state, accountPlan) {
         state.loading.plan = false;
         state.accountPlan = accountPlan;
     },
-    getByUuidFailure(state, error) {
+    getAccountPlanByIdFailure(state, error) {
         state.loading.plan = false;
         state.error = { error };
     },

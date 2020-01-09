@@ -33,10 +33,7 @@
             this.getAllUsers();
         },
         methods: {
-            ...mapActions('users', {
-                getAllUsers: 'getAll',
-                deleteUser: 'delete'
-            }),
+            ...mapActions('users', ['getAllUsers', 'deleteUser']),
             ...mapGetters('users', ['loading'])
         }
     };

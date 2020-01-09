@@ -19,10 +19,12 @@
 
 <script>
     import {mapActions, mapState} from 'vuex'
+    import { util } from '../../_helpers'
 
     export default {
         data() {
             return {
+                user: util.currentUser(),
                 invite_code: null,
                 submitted: false
             };
@@ -42,6 +44,7 @@
                 this.submitted = true;
                 this.errors.clear();
                 this.addAccountPaymentMethod({
+                    userId: this.user.uuid,
                     paymentMethod: {
                         paymentMethodType: 'code',
                         paymentInfo: this.invite_code

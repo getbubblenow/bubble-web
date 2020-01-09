@@ -27,7 +27,7 @@
                 this.actionType = 'approve';
                 console.log('ActionPage.created: calling approveAction');
                 this.approveAction({
-                    uuid: this.currentUser.uuid,
+                    userId: this.currentUser.uuid,
                     code: this.$route.query.approve,
                     messages: this.messages,
                     errors: this.errors
@@ -36,7 +36,7 @@
                 this.actionType = 'deny';
                 console.log('ActionPage.created: calling denyAction');
                 this.denyAction({
-                    uuid: this.currentUser.uuid,
+                    userId: this.currentUser.uuid,
                     code: this.$route.query.deny,
                     messages: this.messages,
                     errors: this.errors

@@ -2,29 +2,29 @@ import config from 'config';
 import { util } from '../_helpers';
 
 export const paymentMethodService = {
-    getAll,
-    getById,
+    getAllPaymentMethods,
+    getPublicById,
     getAllByAccount,
     getByAccountAndId,
     addAccountPaymentMethod
 };
 
-function getAll(messages, errors) {
+function getAllPaymentMethods(messages, errors) {
     return fetch(`${config.apiUrl}/paymentMethods`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
-function getById(paymentMethodId, messages, errors) {
+function getPublicById(paymentMethodId, messages, errors) {
     return fetch(`${config.apiUrl}/paymentMethods/${paymentMethodId}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
-function getAllByAccount(messages, errors) {
-    return fetch(`${config.apiUrl}/me/paymentMethods`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+function getAllByAccount(userId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/paymentMethods`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
-function getByAccountAndId(paymentMethodId, messages, errors) {
-    return fetch(`${config.apiUrl}/me/paymentMethods/${paymentMethodId}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+function getByAccountAndId(userId, paymentMethodId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/paymentMethods/${paymentMethodId}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
-function addAccountPaymentMethod(paymentMethod, messages, errors) {
-    return fetch(`${config.apiUrl}/me/paymentMethods`, util.putWithAuth(paymentMethod)).then(util.handleCrudResponse(messages, errors));
+function addAccountPaymentMethod(userId, paymentMethod, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/paymentMethods`, util.putWithAuth(paymentMethod)).then(util.handleCrudResponse(messages, errors));
 }

@@ -5,7 +5,7 @@ import { util } from '../_helpers';
 const state = {
     loading: {
         networks: false, network: false, deleting: false,
-        nearestRegions: false, startingNetwork: false, networkStatuses: false
+        nearestRegions: false, startingNetwork: false, networkStatuses: false, networkNodes: false
     },
     creating: null,
     error: null,
@@ -13,25 +13,26 @@ const state = {
     network: null,
     nearestRegions: null,
     newNodeNotification: null,
-    networkStatuses: {}
+    networkStatuses: {},
+    networkNodes: null
 };
 
 const actions = {
-    getAll({ commit }, {userId, messages, errors}) {
-        commit('getAllRequest');
-        networkService.getAll(userId, messages, errors)
+    getAllNetworks({ commit }, {userId, messages, errors}) {
+        commit('getAllNetworksRequest');
+        networkService.getAllNetworks(userId, messages, errors)
             .then(
-                networks => commit('getAllSuccess', networks),
-                error => commit('getAllFailure', error)
+                networks => commit('getAllNetworksSuccess', networks),
+                error => commit('getAllNetworksFailure', error)
             );
     },
 
-    getByUuid({ commit }, {userId, uuid, messages, errors}) {
-        commit('getByUuidRequest');
-        networkService.getById(userId, uuid, messages, errors)
+    getNetworkById({ commit }, {userId, networkId, messages, errors}) {
+        commit('getNetworkByIdRequest');
+        networkService.getNetworkById(userId, networkId, messages, errors)
             .then(
-                network => commit('getByUuidSuccess', network),
-                error => commit('getByUuidFailure', error)
+                network => commit('getNetworkByIdSuccess', network),
+                error => commit('getNetworkByIdFailure', error)
             );
     },
 
@@ -42,7 +43,7 @@ const actions = {
                 plan => {
                     networkService.startNetwork(userId, plan.name, cloud, region, messages, errors)
                         .then(
-                            network => commit('addPlanAndStartNetworkSuccess', network),
+                            newNodeNotification => commit('addPlanAndStartNetworkSuccess', newNodeNotification),
                             error => commit('addPlanSuccessStartNetworkFailure', error)
                         );
                 },
@@ -50,27 +51,36 @@ const actions = {
             );
     },
 
-    getNetworkStatuses({ commit }, {userId, network, messages, errors}) {
-        commit('getNetworkStatusRequest', network);
-        networkService.getNetworkStatuses(userId, network, messages, errors)
+    getStatusesByNetworkId({ commit }, {userId, networkId, messages, errors}) {
+        commit('getStatusesByNetworkIdRequest', networkId);
+        networkService.getStatusesByNetworkId(userId, networkId, messages, errors)
             .then(
-                statuses => commit('getNetworkStatusSuccess', { network, statuses }),
-                error => commit('getNetworkStatusFailure', { network, error })
+                statuses => commit('getStatusesByNetworkIdSuccess', { networkId, statuses }),
+                error => commit('getStatusesByNetworkIdFailure', { networkId, error })
             );
     },
 
-    delete({ commit }, {userId, id, messages, errors}) {
+    getNodesByNetworkId({ commit }, {userId, networkId, messages, errors}) {
+        commit('getNodesByNetworkIdRequest', networkId);
+        networkService.getNodesByNetworkId(userId, networkId, messages, errors)
+            .then(
+                nodes => commit('getNodesByNetworkIdSuccess', nodes),
+                error => commit('getNodesByNetworkIdFailure', error)
+            );
+    },
+
+    deleteNetwork({ commit }, {userId, networkId, messages, errors}) {
         commit('deleteRequest', id);
-        networkService.delete(userId, id, messages, errors)
+        networkService.deleteNetwork(userId, networkId, messages, errors)
             .then(
                 network => commit('deleteSuccess', network),
-                error => commit('deleteFailure', { id, error: error.toString() })
+                error => commit('deleteFailure', { networkId, error: error.toString() })
             );
     },
 
-    getNearestRegions({ commit }, {footprint, messages, errors}) {
+    getNearestRegions({ commit }, {footprintId, messages, errors}) {
         commit('getNearestRegionsRequest');
-        networkService.getNearestRegions(footprint, messages, errors)
+        networkService.getNearestRegions(footprintId, messages, errors)
             .then(
                 regions => commit('getNearestRegionsSuccess', regions),
                 error => commit('getNearestRegionsFailure', error)
@@ -79,25 +89,25 @@ const actions = {
 };
 
 const mutations = {
-    getAllRequest(state) {
+    getAllNetworksRequest(state) {
         state.loading.networks = true;
     },
-    getAllSuccess(state, networks) {
+    getAllNetworksSuccess(state, networks) {
         state.loading.networks = false;
         state.networks = networks;
     },
-    getAllFailure(state, error) {
+    getAllNetworksFailure(state, error) {
         state.loading.networks = false;
         state.error = { error };
     },
-    getByUuidRequest(state) {
+    getNetworkByIdRequest(state) {
         state.loading.network = true;
     },
-    getByUuidSuccess(state, network) {
+    getNetworkByIdSuccess(state, network) {
         state.loading.network = false;
         state.network = network;
     },
-    getByUuidFailure(state, error) {
+    getNetworkByIdFailure(state, error) {
         state.loading.network = false;
         state.error = { error };
     },
@@ -118,15 +128,27 @@ const mutations = {
         state.error = { error };
     },
 
-    getNetworkStatusRequest(state, network) {
+    getStatusesByNetworkIdRequest(state, networkId) {
         state.loading.networkStatuses = true;
     },
-    getNetworkStatusSuccess(state, {network, statuses}) {
+    getStatusesByNetworkIdSuccess(state, {networkId, statuses}) {
         state.loading.networkStatuses = false;
-        state.networkStatuses[network] = statuses;
+        state.networkStatuses[networkId] = statuses;
     },
-    getNetworkStatusFailure(state, {network, error}) {
+    getStatusesByNetworkIdFailure(state, {networkId, error}) {
         state.loading.networkStatuses = false;
+        state.error = { error };
+    },
+
+    getNodesByNetworkIdRequest(state, networkId) {
+        state.loading.networkNodes = true;
+    },
+    getNodesByNetworkIdSuccess(state, nodes) {
+        state.loading.networkNodes = false;
+        state.networkNodes = nodes;
+    },
+    getNodesByNetworkIdFailure(state, error) {
+        state.loading.networkNodes = false;
         state.error = { error };
     },
 
@@ -137,7 +159,7 @@ const mutations = {
         state.loading.deleting = false;
         // remove deleted network from state
         if (state.networks) {
-            state.networks = state.networks.filter(network => network.uuid !== id)
+            state.networks = state.networks.filter(network => (network.uuid !== id && network.name !== id))
         }
     },
     deleteFailure(state, { id, error }) {

@@ -19,20 +19,20 @@ const state = {
 };
 
 const actions = {
-    getAll({ commit }, {messages, errors}) {
-        commit('getAllRequest');
-        paymentMethodService.getAll(messages, errors)
+    getAllPaymentMethods({ commit }, {messages, errors}) {
+        commit('getAllPaymentMethodsRequest');
+        paymentMethodService.getAllPaymentMethods(messages, errors)
             .then(
-                paymentMethods => commit('getAllSuccess', paymentMethods),
-                error => commit('getAllFailure', error)
+                paymentMethods => commit('getAllPaymentMethodsSuccess', paymentMethods),
+                error => commit('getAllPaymentMethodsFailure', error)
             );
     },
-    getById({ commit }, {uuid, messages, errors}) {
-        commit('getByUuidRequest');
-        paymentMethodService.getById(uuid, messages, errors)
+    getPublicById({ commit }, {paymentMethodId, messages, errors}) {
+        commit('getPublicByIdRequest');
+        paymentMethodService.getPublicById(paymentMethodId, messages, errors)
             .then(
-                paymentMethod => commit('getByUuidSuccess', paymentMethod),
-                error => commit('getByUuidFailure', error)
+                paymentMethod => commit('getPublicByIdSuccess', paymentMethod),
+                error => commit('getPublicByIdFailure', error)
             );
     },
 
@@ -40,27 +40,27 @@ const actions = {
         commit("setPaymentMethodSuccess", pm);
     },
 
-    getAllByAccount({ commit }, {messages, errors}) {
+    getAllByAccount({ commit }, {userId, messages, errors}) {
         commit('getAllByAccountRequest');
-        paymentMethodService.getAllByAccount(messages, errors)
+        paymentMethodService.getAllByAccount(userId, messages, errors)
             .then(
                 paymentMethods => commit('getAllByAccountSuccess', paymentMethods),
                 error => commit('getAllByAccountFailure', error)
             );
     },
 
-    getByAccountAndId({ commit }, {uuid, messages, errors}) {
+    getByAccountAndId({ commit }, {userId, paymentMethodId, messages, errors}) {
         commit('getByAccountAndIdRequest');
-        paymentMethodService.getById(uuid, messages, errors)
+        paymentMethodService.getByAccountAndId(userId, paymentMethodId, messages, errors)
             .then(
                 paymentMethod => commit('getByAccountAndIdSuccess', paymentMethod),
                 error => commit('getByAccountAndIdFailure', error)
             );
     },
 
-    addAccountPaymentMethod({ commit }, {paymentMethod, messages, errors}) {
+    addAccountPaymentMethod({ commit }, {userId, paymentMethod, messages, errors}) {
         commit('addAccountPaymentMethodRequest');
-        paymentMethodService.addAccountPaymentMethod(paymentMethod, messages, errors)
+        paymentMethodService.addAccountPaymentMethod(userId, paymentMethod, messages, errors)
             .then(
                 pm => commit('addAccountPaymentMethodSuccess', {paymentMethod: pm, originalPaymentMethod: paymentMethod}),
                 errors => commit('addAccountPaymentMethodFailure', errors)
@@ -72,25 +72,25 @@ const actions = {
 };
 
 const mutations = {
-    getAllRequest(state) {
+    getAllPaymentMethodsRequest(state) {
         state.loading.paymentMethods = true;
     },
-    getAllSuccess(state, paymentMethods) {
+    getAllPaymentMethodsSuccess(state, paymentMethods) {
         state.loading.paymentMethods = false;
         state.paymentMethods = paymentMethods;
     },
-    getAllFailure(state, error) {
+    getAllPaymentMethodsFailure(state, error) {
         state.loading.paymentMethods = false;
         state.error = { error };
     },
-    getByUuidRequest(state) {
+    getPublicByIdRequest(state) {
         state.loading.paymentMethod = true;
     },
-    getByUuidSuccess(state, paymentMethod) {
+    getPublicByIdSuccess(state, paymentMethod) {
         state.loading.paymentMethod = false;
         state.paymentMethod = paymentMethod;
     },
-    getByUuidFailure(state, error) {
+    getPublicByIdFailure(state, error) {
         state.loading.paymentMethod = false;
         state.error = { error };
     },

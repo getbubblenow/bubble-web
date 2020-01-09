@@ -75,8 +75,10 @@ export default {
         },
         user (u) {
             if (typeof u === 'undefined' || u === null || typeof u.locale === 'undefined' || u.locale === null) {
-                this.logout();
-                this.$router.replace('/logout');
+                if (this.activated) {
+                    this.logout();
+                    this.$router.replace('/logout');
+                }
                 return;
             }
             this.selectedLocale = u.locale;

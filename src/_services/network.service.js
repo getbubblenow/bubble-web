@@ -2,18 +2,20 @@ import config from 'config';
 import { util } from '../_helpers';
 
 export const networkService = {
-    getAll,
-    getById,
+    getAllNetworks,
+    getNetworkById,
     getNearestRegions,
     startNetwork,
-    getNetworkStatuses
+    getStatusesByNetworkId,
+    getNodesByNetworkId,
+    deleteNetwork
 };
 
-function getAll(userId, messages, errors) {
+function getAllNetworks(userId, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/networks`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
-function getById(userId, networkId, messages, errors) {
+function getNetworkById(userId, networkId, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
@@ -27,6 +29,14 @@ function startNetwork(userId, planId, cloud, region, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/networks/${planId}/actions/start${cloudAndRegion}`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
-function getNetworkStatuses(userId, network, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/networks/${network}/actions/status`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+function getStatusesByNetworkId(userId, networkId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}/actions/status`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+}
+
+function getNodesByNetworkId(userId, networkId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}/nodes`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+}
+
+function deleteNetwork(userId, networkId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}/actions/stop`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
 }

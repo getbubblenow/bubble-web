@@ -15,10 +15,12 @@
 <script>
     import { mapState, mapActions } from 'vuex'
     import { paymentMethods } from "../../_store/paymentMethods.module";
+    import { util } from '../../_helpers'
 
     export default {
         data() {
             return {
+                user: util.currentUser(),
                 elements: null,
                 card: null,
                 submitted: false
@@ -52,6 +54,7 @@
                     } else {
                         comp.submitted = true;
                         comp.addAccountPaymentMethod({
+                            userId: this.user.uuid,
                             paymentMethod: {
                                 paymentMethodType: 'credit',
                                 paymentInfo: result.token.id

@@ -5,16 +5,16 @@ export const userService = {
     login,
     logout,
     register,
-    getAll,
+    getAllUsers,
     getMe,
-    getById,
-    getPolicyById,
-    updatePolicyById,
+    getUserById,
+    getPolicyByUserId,
+    updatePolicyByUserId,
     addPolicyContactById,
     removePolicyContactByUuid,
     setLocale,
-    update,
-    delete: _delete,
+    updateUser,
+    deleteUser,
     approveAction,
     denyAction,
     sendAuthenticatorCode,
@@ -57,7 +57,7 @@ function register(user, messages, errors) {
         .then(setSessionUser);
 }
 
-function getAll(messages, errors) {
+function getAllUsers(messages, errors) {
     return fetch(`${config.apiUrl}/users`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
@@ -65,35 +65,35 @@ function getMe(messages, errors) {
     return fetch(`${config.apiUrl}/me`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
-function getById(id, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${id}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+function getUserById(userId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
-function getPolicyById(id, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${id}/policy`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+function getPolicyByUserId(userId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/policy`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
-function updatePolicyById(id, policy, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${id}/policy`, util.postWithAuth(policy)).then(util.handleCrudResponse(messages, errors));
+function updatePolicyByUserId(userId, policy, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/policy`, util.postWithAuth(policy)).then(util.handleCrudResponse(messages, errors));
 }
 
-function addPolicyContactById(id, contact, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${id}/policy/contacts`, util.postWithAuth(contact)).then(util.handleCrudResponse(messages, errors));
+function addPolicyContactById(userId, contact, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/policy/contacts`, util.postWithAuth(contact)).then(util.handleCrudResponse(messages, errors));
 }
 
-function removePolicyContactByUuid(id, uuid, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${id}/policy/contacts/${uuid}`, util.deleteWithAuth()).then(util.handleCrudResponse(messages, errors));
+function removePolicyContactByUuid(userId, contactUuid, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/policy/contacts/${contactUuid}`, util.deleteWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
-function approveAction(id, code, messages, errors) {
-    return fetch(`${config.apiUrl}/auth/approve/${code}`, util.postWithAuth([{'name': 'account', 'value': id}]))
+function approveAction(userId, code, messages, errors) {
+    return fetch(`${config.apiUrl}/auth/approve/${code}`, util.postWithAuth([{'name': 'account', 'value': userId}]))
         .then(util.handleCrudResponse(messages, errors))
         .then(setSessionUser);
 }
 
-function sendAuthenticatorCode(id, code, verifyOnly, messages, errors) {
+function sendAuthenticatorCode(userId, code, verifyOnly, messages, errors) {
     return fetch(`${config.apiUrl}/auth/authenticator`, util.postWithAuth({
-        account: id,
+        account: userId,
         token: code,
         verify: verifyOnly
     }))
@@ -101,12 +101,12 @@ function sendAuthenticatorCode(id, code, verifyOnly, messages, errors) {
         .then(setSessionUser);
 }
 
-function resendVerificationCode(id, contact, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${id}/policy/contacts/verify`, util.postWithAuth(contact))
+function resendVerificationCode(userId, contact, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/policy/contacts/verify`, util.postWithAuth(contact))
         .then(util.handleCrudResponse(messages, errors));
 }
 
-function denyAction(id, code, messages, errors) {
+function denyAction(userId, code, messages, errors) {
     return fetch(`${config.apiUrl}/auth/deny/${code}`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
@@ -120,13 +120,12 @@ function setLocale(locale, messages, errors) {
     }
 }
 
-function update(user, messages, errors) {
+function updateUser(user, messages, errors) {
     return fetch(`${config.apiUrl}/users/${user.uuid}`, util.postWithAuth(user)).then(util.handleCrudResponse(messages, errors));
 }
 
-// prefixed function name with underscore because delete is a reserved word in javascript
-function _delete(id, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${id}`, util.deleteWithAuth()).then(util.handleCrudResponse(messages, errors));
+function deleteUser(userId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}`, util.deleteWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function handleAuthResponse(messages, errors) {

@@ -9,45 +9,45 @@ const state = {
 };
 
 const actions = {
-    getAll({ commit }, {messages, errors}) {
-        commit('getAllRequest');
-        footprintService.getAll(messages, errors)
+    getAllFootprints({ commit }, {userId, messages, errors}) {
+        commit('getAllFootprintsRequest');
+        footprintService.getAllFootprints(userId, messages, errors)
             .then(
-                footprints => commit('getAllSuccess', footprints),
-                error => commit('getAllFailure', error)
+                footprints => commit('getAllFootprintsSuccess', footprints),
+                error => commit('getAllFootprintsFailure', error)
             );
     },
 
-    getByUuid({ commit }, {uuid, messages, errors}) {
-        commit('getByUuidRequest');
-        footprintService.getById(uuid, messages, errors)
+    getFootprintById({ commit }, {userId, footprintId, messages, errors}) {
+        commit('getFootprintByIdRequest');
+        footprintService.getFootprintById(userId, footprintId, messages, errors)
             .then(
-                footprint => commit('getByUuidSuccess', footprint),
-                error => commit('getByUuidFailure', error)
+                footprint => commit('getFootprintByIdSuccess', footprint),
+                error => commit('getFootprintByIdFailure', error)
             );
     }
 };
 
 const mutations = {
-    getAllRequest(state) {
+    getAllFootprintsRequest(state) {
         state.loading.footprints = true;
     },
-    getAllSuccess(state, footprints) {
+    getAllFootprintsSuccess(state, footprints) {
         state.loading.footprints = false;
         state.footprints = footprints;
     },
-    getAllFailure(state, error) {
+    getAllFootprintsFailure(state, error) {
         state.loading.footprints = false;
         state.error = { error };
     },
-    getByUuidRequest(state) {
+    getFootprintByIdRequest(state) {
         state.loading.footprint = true;
     },
-    getByUuidSuccess(state, footprint) {
+    getFootprintByIdSuccess(state, footprint) {
         state.loading.footprint = false;
         state.footprint = footprint;
     },
-    getByUuidFailure(state, error) {
+    getFootprintByIdFailure(state, error) {
         state.loading.footprint = false;
         state.error = { error };
     }

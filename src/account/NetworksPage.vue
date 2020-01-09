@@ -6,13 +6,13 @@
             <table border="1">
                 <thead>
                 <tr>
-                    <th nowrap="nowrap">{{messages.table_head_networks_name}}</th>
-                    <th nowrap="nowrap">{{messages.table_head_networks_locale}}</th>
-                    <th nowrap="nowrap">{{messages.table_head_networks_timezone}}</th>
-                    <th nowrap="nowrap">{{messages.table_head_networks_object_state}}</th>
-                    <th nowrap="nowrap">{{messages.table_head_networks_action_view}}</th>
-                    <th nowrap="nowrap">{{messages.table_head_networks_action_start_stop}}</th>
-                    <th nowrap="nowrap">{{messages.table_head_networks_action_delete}}</th>
+                    <th nowrap="nowrap">{{messages.label_field_networks_name}}</th>
+                    <th nowrap="nowrap">{{messages.label_field_networks_locale}}</th>
+                    <th nowrap="nowrap">{{messages.label_field_networks_timezone}}</th>
+                    <th nowrap="nowrap">{{messages.label_field_networks_object_state}}</th>
+                    <th nowrap="nowrap">{{messages.label_field_networks_action_view}}</th>
+                    <th nowrap="nowrap">{{messages.label_field_networks_action_start_stop}}</th>
+                    <th nowrap="nowrap">{{messages.label_field_networks_action_delete}}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -20,16 +20,19 @@
                     <td>{{network.name}}.{{network.domainName}}</td>
                     <td nowrap="nowrap">{{messages['locale_'+network.locale] || network.locale}}</td>
                     <td nowrap="nowrap">{{messages['tz_name_'+network.timezone] || network.timezone}}</td>
-                    <td>{{network.state}}</td>
-                    <td><router-link :to="{ path: '/networks/'+ network.uuid }">{{messages.table_row_networks_action_view}}</router-link></td>
+                    <td>{{messages['msg_network_state_'+network.state]}}</td>
+                    <td><router-link :to="{ path: '/bubble/'+ network.name }">{{messages.table_row_networks_action_view}}</router-link></td>
+
                     <td v-if="network.state === 'running'">{{messages.table_row_networks_action_stop}}</td>
-                    <td v-if="network.state === 'created'">{{messages.table_row_networks_action_start}}</td>
+                    <td v-else-if="network.state === 'created'">{{messages.table_row_networks_action_start}}</td>
+                    <td v-else></td>
+
                     <td><a @click="deleteNetwork(network.uuid)" class="text-danger">{{messages.table_row_networks_action_delete}}</a></td>
                 </tr>
                 </tbody>
             </table>
             <hr/>
-            <router-link to="/networks/new">{{messages.button_label_new_network}}</router-link>
+            <router-link to="/bubble/new">{{messages.button_label_new_network}}</router-link>
         </div>
 
         <div v-if="!networks || networks.length === 0">
@@ -55,10 +58,7 @@
             this.getAllNetworks({userId: util.currentUser().uuid, messages: this.messages, errors: this.errors});
         },
         methods: {
-            ...mapActions('networks', {
-                getAllNetworks: 'getAll',
-                deleteNetwork: 'delete'
-            }),
+            ...mapActions('networks', ['getAllNetworks', 'deleteNetwork']),
             ...mapGetters('networks', ['loading'])
         }
     };

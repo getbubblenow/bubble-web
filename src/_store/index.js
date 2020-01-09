@@ -44,9 +44,10 @@ function evalInContext(vue, string) {
     }
 }
 
-String.prototype.parseMessage = function (vue) {
-    return this ? ''+this.replace(/{{.*?}}/g, match => {
+String.prototype.parseMessage = function (vue, ctx) {
+    const context = (typeof ctx !== 'undefined' && ctx !== null) ? Object.assign(vue, ctx) : vue;
+    return this ? ''+this.replace(/{{[\w\._]*?}}/g, match => {
         const expression = match.slice(2, -2);
-        return evalInContext(vue, expression)
+        return evalInContext(context, expression)
     }) : '';
 };

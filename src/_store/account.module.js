@@ -110,33 +110,33 @@ const actions = {
             );
     },
 
-    approveAction({ commit }, {uuid, code, messages, errors}) {
+    approveAction({ commit }, {userId, code, messages, errors}) {
         commit('approveActionRequest');
-        userService.approveAction(uuid, code, messages, errors)
+        userService.approveAction(userId, code, messages, errors)
             .then(
                 policy => commit('approveActionSuccess', policy),
                 error => commit('approveActionFailure', error)
             );
     },
-    denyAction({ commit }, {uuid, code, messages, errors}) {
+    denyAction({ commit }, {userId, code, messages, errors}) {
         commit('denyActionRequest');
-        userService.denyAction(uuid, code, messages, errors)
+        userService.denyAction(userId, code, messages, errors)
             .then(
                 policy => commit('denyActionSuccess', policy),
                 error => commit('denyActionFailure', error)
             );
     },
-    sendAuthenticatorCode({ commit }, {uuid, code, verifyOnly, messages, errors}) {
+    sendAuthenticatorCode({ commit }, {userId, code, verifyOnly, messages, errors}) {
         commit('sendAuthenticatorCodeRequest');
-        userService.sendAuthenticatorCode(uuid, code, verifyOnly, messages, errors)
+        userService.sendAuthenticatorCode(userId, code, verifyOnly, messages, errors)
             .then(
                 user => commit('sendAuthenticatorCodeSuccess', user),
                 error => commit('sendAuthenticatorCodeFailure', error)
             );
     },
-    resendVerificationCode({ dispatch, commit }, {uuid, contact, messages, errors}) {
+    resendVerificationCode({ dispatch, commit }, {userId, contact, messages, errors}) {
         commit('resendVerificationCodeRequest');
-        userService.resendVerificationCode(uuid, contact, messages, errors)
+        userService.resendVerificationCode(userId, contact, messages, errors)
             .then(
                 policy => {
                     commit('resendVerificationCodeSuccess', policy);

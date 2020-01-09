@@ -184,6 +184,7 @@
     export default {
         data() {
             return {
+                user: util.currentUser(),
                 accountPlan: {
                     name: '',
                     domain: '',
@@ -215,7 +216,6 @@
                     footprint: 'Worldwide',
                     region: ''
                 },
-                user: util.currentUser(),
                 submitted: false,
                 status: {
                     creating: false
@@ -286,34 +286,25 @@
             }
         },
         methods: {
-            ...mapActions('users', ['getPolicyByUuid']),
+            ...mapActions('users', ['getPolicyByUserId']),
             ...mapActions('account', ['approveAction', 'resendVerificationCode']),
             ...mapActions('system', ['detectTimezone', 'detectLocale']),
             ...mapActions('networks', ['getNearestRegions', 'addPlanAndStartNetwork']),
             ...mapGetters('networks', ['loading']),
-            ...mapActions('domains', {
-                loadDomains: 'getAll'
-            }),
-            ...mapActions('plans', {
-                loadPlans: 'getAll'
-            }),
-            ...mapActions('footprints', {
-                loadFootprints: 'getAll'
-            }),
-            ...mapActions('paymentMethods', {
-                loadPaymentMethods: 'getAll',
-                setPaymentMethod: 'setPaymentMethod'
-            }),
+            ...mapActions('domains', ['getAllDomains']),
+            ...mapActions('plans', ['getAllPlans']),
+            ...mapActions('footprints', ['getAllFootprints']),
+            ...mapActions('paymentMethods', ['getAllPaymentMethods', 'setPaymentMethod']),
             initDefaults() {
                 const currentUser = util.currentUser();
-                this.getPolicyByUuid({uuid: currentUser.uuid, messages: this.messages, errors: this.errors});
+                this.getPolicyByUserId({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
                 this.detectTimezone();
                 this.detectLocale();
-                this.loadDomains(currentUser.uuid, this.messages, this.errors);
-                this.loadPlans(this.messages, this.errors);
-                this.loadFootprints(this.messages, this.errors);
-                this.loadPaymentMethods(this.messages, this.errors);
-                this.getNearestRegions(null, this.messages, this.errors);
+                this.getAllDomains({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
+                this.getAllPlans(this.messages, this.errors);
+                this.getAllFootprints({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
+                this.getAllPaymentMethods(this.messages, this.errors);
+                this.getNearestRegions({footprintId: null, messages: this.messages, errors: this.errors});
             },
             isAuthenticator(val) { return window.isAuthenticator(val); },
             isNotAuthenticator(val) { return window.isNotAuthenticator(val); },
@@ -463,7 +454,7 @@
             },
             newNodeNotification (nn) {
                 if (nn && nn.uuid) {
-                    this.$router.push({path:'/networks', params: {uuid: nn.network}, query: {'status': nn.uuid}});
+                    this.$router.push({path:'/bubble', params: {id: nn.networkName}, query: {'status': nn.uuid}});
                 }
             }
         },

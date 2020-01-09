@@ -93,7 +93,7 @@
         },
         beforeRouteUpdate (to, from, next) {
             // react to route changes...
-            console.log('this.router.params.uuid='+this.router.params.uuid);
+            // console.log('this.router.params.id='+this.router.params.id);
             next();
         },
         methods: {

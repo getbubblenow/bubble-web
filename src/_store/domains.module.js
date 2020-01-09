@@ -11,45 +11,45 @@ const state = {
 };
 
 const actions = {
-    getAll({ commit }, {messages, errors}) {
-        commit('getAllRequest');
-        domainService.getAll(messages, errors)
+    getAllDomains({ commit }, {userId, messages, errors}) {
+        commit('getAllDomainsRequest');
+        domainService.getAllDomains(userId, messages, errors)
             .then(
-                domains => commit('getAllSuccess', domains),
-                error => commit('getAllFailure', error)
+                domains => commit('getAllDomainsSuccess', domains),
+                error => commit('getAllDomainsFailure', error)
             );
     },
 
-    getByUuid({ commit }, {uuid, messages, errors}) {
-        commit('getByUuidRequest');
-        domainService.getById(uuid, messages, errors)
+    getDomainById({ commit }, {userId, domainId, messages, errors}) {
+        commit('getDomainByIdRequest');
+        domainService.getDomainById(userId, domainId, messages, errors)
             .then(
-                domain => commit('getByUuidSuccess', domain),
-                error => commit('getByUuidFailure', error)
+                domain => commit('getDomainByIdSuccess', domain),
+                error => commit('getDomainByIdFailure', error)
             );
     }
 };
 
 const mutations = {
-    getAllRequest(state) {
+    getAllDomainsRequest(state) {
         state.loading.domains = true;
     },
-    getAllSuccess(state, domains) {
+    getAllDomainsSuccess(state, domains) {
         state.loading.domains = false;
         state.domains = domains;
     },
-    getAllFailure(state, error) {
+    getAllDomainsFailure(state, error) {
         state.loading.domains = false;
         state.error = { error };
     },
-    getByUuidRequest(state) {
+    getDomainByIdRequest(state) {
         state.loading.domain = true;
     },
-    getByUuidSuccess(state, domain) {
+    getDomainByIdSuccess(state, domain) {
         state.loading.domain = false;
         state.domain = domain;
     },
-    getByUuidFailure(state, error) {
+    getDomainByIdFailure(state, error) {
         state.loading.domain = false;
         state.error = { error };
     }

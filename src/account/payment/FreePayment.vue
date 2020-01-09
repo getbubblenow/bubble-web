@@ -15,10 +15,12 @@
 
 <script>
     import {mapActions, mapState} from 'vuex'
+    import { util } from '../../_helpers'
 
     export default {
         data() {
             return {
+                user: util.currentUser(),
                 submitted: false
             };
         },
@@ -32,6 +34,7 @@
                 this.submitted = true;
                 this.errors.clear();
                 this.addAccountPaymentMethod({
+                    userId: this.user.uuid,
                     paymentMethod: {
                         paymentMethodType: 'free',
                         paymentInfo: 'free'

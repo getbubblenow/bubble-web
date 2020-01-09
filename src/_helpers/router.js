@@ -51,7 +51,7 @@ export const router = new Router({
         { path: '/me/changePassword', component: ChangePasswordPage },
         { path: '/notifications', component: NotificationsPage },
         {
-          path: '/networks', component: NetworksPage ,
+          path: '/bubbles', component: NetworksPage ,
           children: [
             {
               path: '', component: NewNetworkPage,
@@ -59,10 +59,10 @@ export const router = new Router({
             },
           ]
         },
-        { path: '/networks/new', component: NewNetworkPage,
+        { path: '/bubble/new', component: NewNetworkPage,
           children: newNetworkChildren
         },
-        { path: '/networks/:uuid', component: NetworkPage }
+        { path: '/bubble/:id', component: NetworkPage }
       ]
     },
     { path: '/action', component: ActionPage },
@@ -74,7 +74,7 @@ export const router = new Router({
     { path: '/logout', component: LoginPage },
 
     { path: '/admin/accounts', component: AccountsPage },
-    { path: '/admin/accounts/:uuid', component: ProfilePage },
+    { path: '/admin/accounts/:id', component: ProfilePage },
     { path: '/admin/model', component: ModelSetupPage },
 
     // otherwise redirect to home

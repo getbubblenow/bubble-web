@@ -50,72 +50,72 @@ function setAuthenticator(policy) {
 }
 
 const actions = {
-    getAll({ commit }, {messages, errors}) {
-        commit('getAllRequest');
-        userService.getAll(messages, errors)
+    getAllUsers({ commit }, {messages, errors}) {
+        commit('getAllUsersRequest');
+        userService.getAllUsers(messages, errors)
             .then(
-                users => commit('getAllSuccess', users),
-                error => commit('getAllFailure', error)
+                users => commit('getAllUsersSuccess', users),
+                error => commit('getAllUsersFailure', error)
             );
     },
 
-    getByUuid({ commit }, {uuid, messages, errors}) {
-        commit('getByUuidRequest');
-        userService.getById(uuid, messages, errors)
+    getUserById({ commit }, {userId, messages, errors}) {
+        commit('getUserByIdRequest');
+        userService.getUserById(userId, messages, errors)
             .then(
-                users => commit('getByUuidSuccess', users),
-                error => commit('getByUuidFailure', error)
+                users => commit('getUserByIdSuccess', users),
+                error => commit('getUserByIdFailure', error)
             );
     },
 
-    update({ commit }, {user, messages, errors}) {
-        commit('updateRequest', user);
-        userService.update(user, messages, errors)
+    updateUser({ commit }, {user, messages, errors}) {
+        commit('updateUserRequest', user);
+        userService.updateUser(user, messages, errors)
             .then(
-                user => commit('updateSuccess', user),
-                error => commit('updateFailure', { user, error: error.toString() })
+                user => commit('updateUserSuccess', user),
+                error => commit('updateUserFailure', { user, error: error.toString() })
             );
     },
 
-    getPolicyByUuid({ commit }, {uuid, messages, errors}) {
-        commit('getPolicyByUuidRequest');
-        userService.getPolicyById(uuid, messages, errors)
+    getPolicyByUserId({ commit }, {userId, messages, errors}) {
+        commit('getPolicyByUserIdRequest');
+        userService.getPolicyByUserId(userId, messages, errors)
             .then(
-                policy => commit('getPolicyByUuidSuccess', policy),
-                error => commit('getPolicyByUuidFailure', error)
+                policy => commit('getPolicyByUserIdSuccess', policy),
+                error => commit('getPolicyByUserIdFailure', error)
             );
     },
 
-    updatePolicyByUuid({ commit }, {uuid, policy, messages, errors}) {
-        commit('updatePolicyByUuidRequest');
-        userService.updatePolicyById(uuid, policy, messages, errors)
+    updatePolicyByUserId({ commit }, {userId, policy, messages, errors}) {
+        commit('updatePolicyByUserIdRequest');
+        userService.updatePolicyByUserId(userId, policy, messages, errors)
             .then(
-                policy => commit('updatePolicyByUuidSuccess', policy),
-                error => commit('updatePolicyByUuidFailure', error)
+                policy => commit('updatePolicyByUserIdSuccess', policy),
+                error => commit('updatePolicyByUserIdFailure', error)
             );
     },
 
-    addPolicyContactByUuid({ commit }, {uuid, contact, messages, errors}) {
-        commit('addPolicyContactByUuidRequest');
-        userService.addPolicyContactById(uuid, contact, messages, errors)
+    addPolicyContactByUserId({ commit }, {userId, contact, messages, errors}) {
+        commit('addPolicyContactByUserIdRequest');
+        userService.addPolicyContactById(userId, contact, messages, errors)
             .then(
-                contact => commit('addPolicyContactByUuidSuccess', contact),
-                error => commit('addPolicyContactByUuidFailure', error)
+                contact => commit('addPolicyContactByUserIdSuccess', contact),
+                error => commit('addPolicyContactByUserIdFailure', error)
             );
     },
 
-    removePolicyContactByUuid({ commit }, {uuid, contactUuid, messages, errors}) {
-        commit('removePolicyContactByUuidRequest');
-        userService.removePolicyContactByUuid(uuid, contactUuid, messages, errors)
+    removePolicyContactByUserId({ commit }, {userId, contactUuid, messages, errors}) {
+        commit('removePolicyContactByUserIdRequest');
+        userService.removePolicyContactByUserId(userId, contactUuid, messages, errors)
             .then(
-                policy => commit('removePolicyContactByUuidSuccess', policy),
-                error => commit('removePolicyContactByUuidFailure', error)
+                policy => commit('removePolicyContactByUserIdSuccess', policy),
+                error => commit('removePolicyContactByUserIdFailure', error)
             );
     },
 
-    delete({ commit }, {id, messages, errors}) {
-        commit('deleteRequest', id);
-        userService.delete(id, messages, errors)
+    delete({ commit }, {userId, messages, errors}) {
+        commit('deleteRequest', userId);
+        userService.deleteUser(userId, messages, errors)
             .then(
                 id => commit('deleteSuccess', id),
                 error => commit('deleteFailure', { id, error: error.toString() })
@@ -124,61 +124,61 @@ const actions = {
 };
 
 const mutations = {
-    getAllRequest(state) {
+    getAllUsersRequest(state) {
         state.loading.users = true;
     },
-    getAllSuccess(state, users) {
+    getAllUsersSuccess(state, users) {
         state.loading.users = false;
         state.users = users;
     },
-    getAllFailure(state, error) {
+    getAllUsersFailure(state, error) {
         state.loading.users = false;
         state.errors.all = error;
     },
 
-    getByUuidRequest(state) {
+    getUserByIdRequest(state) {
         state.loading.user = true;
     },
-    getByUuidSuccess(state, user) {
+    getUserByIdSuccess(state, user) {
         state.loading.user = false;
         state.user = user;
     },
-    getByUuidFailure(state, error) {
+    getUserByIdFailure(state, error) {
         state.loading.user = false;
         state.errors.user = error;
     },
 
-    getPolicyByUuidRequest(state) {
+    getPolicyByUserIdRequest(state) {
         state.loading.policy = true;
         state.user = { loading: true };
     },
-    getPolicyByUuidSuccess(state, policy) {
+    getPolicyByUserIdSuccess(state, policy) {
         state.loading.policy = false;
         state.policy = policy;
         setAuthenticator(policy);
     },
-    getPolicyByUuidFailure(state, error) {
+    getPolicyByUserIdFailure(state, error) {
         state.loading.policy = false;
         state.errors.policy = error;
     },
 
-    updatePolicyByUuidRequest(state) {
+    updatePolicyByUserIdRequest(state) {
         state.loading.updatingPolicy = true;
     },
-    updatePolicyByUuidSuccess(state, policy) {
+    updatePolicyByUserIdSuccess(state, policy) {
         state.loading.updatingPolicy = false;
         state.policy = policy;
         setAuthenticator(policy);
     },
-    updatePolicyByUuidFailure(state, error) {
+    updatePolicyByUserIdFailure(state, error) {
         state.loading.updatingPolicy = false;
         state.policy = { error };
     },
 
-    addPolicyContactByUuidRequest(state) {
+    addPolicyContactByUserIdRequest(state) {
         state.loading.addPolicyContact = true;
     },
-    addPolicyContactByUuidSuccess(state, contact) {
+    addPolicyContactByUserIdSuccess(state, contact) {
         state.loading.addPolicyContact = false;
         state.contact = contact;
         if (isAuthenticator(contact)) {
@@ -186,33 +186,33 @@ const mutations = {
             localStorage.setItem(LOCALSTORAGE_AUTHENTICATOR, JSON.stringify(state.authenticator));
         }
     },
-    addPolicyContactByUuidFailure(state, error) {
+    addPolicyContactByUserIdFailure(state, error) {
         state.loading.addPolicyContact = false;
         state.errors.contact = error;
     },
 
-    removePolicyContactByUuidRequest(state) {
+    removePolicyContactByUserIdRequest(state) {
         state.loading.removePolicyContact = true;
     },
-    removePolicyContactByUuidSuccess(state, policy) {
+    removePolicyContactByUserIdSuccess(state, policy) {
         state.loading.removePolicyContact = false;
         state.policy = policy;
     },
-    removePolicyContactByUuidFailure(state, error) {
+    removePolicyContactByUserIdFailure(state, error) {
         state.loading.removePolicyContact = false;
         state.errors.policy = error;
     },
 
-    updateRequest(state, user) {
+    updateUserRequest(state, user) {
         state.loading.updating = true;
     },
-    updateSuccess(state, user) {
+    updateUserSuccess(state, user) {
         state.loading.updating = false;
         user.token = account.state.user.token;  // preserve token
         state.user = account.state.user = user;
         localStorage.setItem('user', JSON.stringify(user));
     },
-    updateFailure(state, { id, error }) {
+    updateUserFailure(state, { id, error }) {
         state.loading.updating = false;
         state.errors.update = error;
     },

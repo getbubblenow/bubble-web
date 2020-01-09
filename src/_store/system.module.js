@@ -159,7 +159,7 @@ const getters = {
         }];
         if (configs.sageLauncher) {
             menu.splice(3, 0, {
-                href: '/me/networks',
+                href: '/me/bubbles',
                 title: messages.label_menu_networks,
                 icon: messages.label_menu_networks_icon
             });
@@ -189,7 +189,7 @@ const getters = {
             menu.splice(1, 0, admin_menu);
             if (configs.sageLauncher)  {
                 admin_menu.child.push({
-                    href: '/admin/networks',
+                    href: '/admin/bubbles',
                     title: messages.label_menu_admin_networks,
                     icon: messages.label_menu_admin_networks_icon
                 });
