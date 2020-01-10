@@ -134,7 +134,7 @@
             <!-- footprint -->
             <div v-if="customize.footprint === true" class="form-group">
                 <label htmlFor="footprint">{{messages.field_label_footprint}}</label>
-                <select v-validate="'required'" v-if="footprintObjects" v-model="accountPlan.footprint" name="footprint" class="form-control" :class="{ 'is-invalid': submitted && errors.has('footprint') }">
+                <select v-validate="'required'" v-if="footprintObjects" v-model="accountPlan.footprint" name="footprint" @change="refreshCloudRegions()" class="form-control" :class="{ 'is-invalid': submitted && errors.has('footprint') }">
                     <option v-for="footprint in footprintObjects" :value="footprint.name">{{messages['footprint_name_'+footprint.name]}}</option>
                 </select>
                 <div v-if="submitted && errors.has('footprint')" class="invalid-feedback">{{ errors.first('footprint') }}</div>
@@ -430,6 +430,9 @@
                 console.log('findRegion: uuid not found: '+uuid);
                 return null;
             },
+            refreshCloudRegions() {
+                this.getNearestRegions({footprintId: this.accountPlan.footprint, messages: this.messages, errors: this.errors});
+            },
             handleSubmit(e) {
                 this.submitted = true;
                 this.$validator.validate().then(valid => {
@@ -474,9 +477,14 @@
             },
             nearestRegions (regions) {
                 if (regions) {
+                    console.log('nearestRegions: received: '+regions.length+' regions');
                     this.regions = regions;
-                    if (this.cloudRegionUuid === null) this.cloudRegionUuid = regions[0].uuid;
-                    if (this.defaults.region === '') this.defaults.region = regions[0];
+                    if (this.cloudRegionUuid === null || (typeof regions.find(r => r.uuid  === this.cloudRegionUuid) === 'undefined')) {
+                        this.cloudRegionUuid = regions[0].uuid;
+                    }
+                    if (this.defaults.region === '' || (typeof regions.find(r => r.uuid  === this.defaults.region.uuid) === 'undefined')) {
+                        this.defaults.region = regions[0];
+                    }
                 }
             },
             paymentMethod (pm) {
