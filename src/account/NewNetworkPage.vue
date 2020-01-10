@@ -37,10 +37,32 @@
                 <div v-if="submitted && errors.has('name')" class="invalid-feedback">{{ errors.first('name') }}</div>
             </div>
 
+            <!-- plan -->
+            <div v-if="customize.plan === true" class="form-group">
+                <label htmlFor="plan">{{messages.field_label_plan}}</label>
+                <select v-validate="'required'" v-if="planObjects" v-model="accountPlan.plan" name="plan" class="form-control" :class="{ 'is-invalid': submitted && errors.has('plan') }">
+                    <option v-for="plan in planObjects" :value="plan.name">{{messages['plan_name_'+plan.name]}}</option>
+                </select>
+                <div v-if="submitted && errors.has('plan')" class="invalid-feedback">{{ errors.first('plan') }}</div>
+                <button @click="customize.plan = false">{{messages.button_label_use_default}}</button>
+            </div>
+            <div v-if="customize.plan === false">
+                {{messages.field_label_plan}}:
+                <span v-if="defaults.plan">{{messages['plan_name_'+defaults.plan]}}</span>
+                <span v-else v-html="messages.message_auto_detecting"></span>
+                <button @click="customize.plan = true">{{messages.button_label_customize}}</button>
+            </div>
+            <div>
+                {{messages['plan_description_'+accountPlan.plan]}}
+            </div>
+            <hr/>
+
             <!-- domain -->
             <div v-if="customize.domain === true" class="form-group">
                 <label for="domain">{{messages.field_label_network_domain}}</label>
-                <v-select v-validate="'required'" v-if="domains" :options="domains" label="name" type="text" v-model="accountPlan.domain" name="domain" class="form-control" :class="{ 'is-invalid': submitted && errors.has('domain') }"></v-select>
+                <select v-validate="'required'" v-if="domains" v-model="accountPlan.domain" name="domain" class="form-control" :class="{ 'is-invalid': submitted && errors.has('domain') }">
+                    <option v-for="domain in domains" :value="domain.name">{{domain.name}}</option>
+                </select>
                 <div v-if="submitted && errors.has('domain')" class="invalid-feedback">{{ errors.first('domain') }}</div>
                 <button @click="customize.domain = false">{{messages.button_label_use_default}}</button>
             </div>
@@ -52,10 +74,37 @@
             </div>
             <hr/>
 
+            <div>
+                <label for="showAdvanced">{{messages.field_label_show_advanced_plan_options}}</label>
+                <input type="checkbox" name="showAdvanced" v-model="showAdvanced"/>
+            </div>
+            <hr/>
+
+            <div v-if="showAdvanced">
+
+            <!-- cloud+region -->
+            <div v-if="customize.region === true" class="form-group">
+                <label htmlFor="region">{{messages.field_label_region}}</label>
+                <select name="region" v-validate="'required'" v-model="cloudRegionUuid" v-if="regions" class="form-control" :class="{ 'is-invalid': submitted && errors.has('region') }">
+                    <option v-for="region in regions" :value="region.uuid">{{region.name}} (~{{parseInt(region.distance/1000)}} {{messages.msg_km_distance_away}})</option>
+                </select>
+                <div v-if="submitted && errors.has('region')" class="invalid-feedback">{{ errors.first('region') }}</div>
+                <button @click="customize.region = false">{{messages.button_label_use_default}}</button>
+            </div>
+            <div v-if="customize.region === false">
+                {{messages.field_label_region}}:
+                <span v-if="defaults.region">{{defaults.region.name}} (~{{parseInt(defaults.region.distance/1000)}} {{messages.msg_km_distance_away}})</span>
+                <span v-else v-html="messages.message_auto_detecting"></span>
+                <button @click="customize.region = true">{{messages.button_label_customize}}</button>
+            </div>
+            <hr/>
+
             <!-- locale -->
             <div v-if="customize.locale === true" class="form-group">
                 <label htmlFor="locale">{{messages.field_label_locale}}</label>
-                <v-select v-validate="'required'" v-if="locales" :options="locales" :reduce="locale => locale.localeCode" label="localeName" type="text" v-model="accountPlan.locale" name="locale" class="form-control" :class="{ 'is-invalid': submitted && errors.has('locale') }"></v-select>
+                <select v-validate="'required'" v-if="locales" v-model="accountPlan.locale" name="locale" class="form-control" :class="{ 'is-invalid': submitted && errors.has('locale') }">
+                    <option v-for="locale in locales" :value="locale.localeCode">{{messages['locale_'+locale.localeCode]}}</option>
+                </select>
                 <div v-if="submitted && errors.has('locale')" class="invalid-feedback">{{ errors.first('locale') }}</div>
                 <button @click="customize.locale = false">{{messages.button_label_use_default}}</button>
             </div>
@@ -82,45 +131,12 @@
             </div>
             <hr/>
 
-            <!-- plan -->
-            <div v-if="customize.plan === true" class="form-group">
-                <label htmlFor="plan">{{messages.field_label_plan}}</label>
-                <v-select v-validate="'required'" v-if="planObjects" :options="planObjects" :reduce="plan => plan.name" label="localName" type="text" v-model="accountPlan.plan" name="plan" class="form-control" :class="{ 'is-invalid': submitted && errors.has('plan') }"></v-select>
-                <div v-if="submitted && errors.has('plan')" class="invalid-feedback">{{ errors.first('plan') }}</div>
-                <button @click="customize.plan = false">{{messages.button_label_use_default}}</button>
-            </div>
-            <div v-if="customize.plan === false">
-                {{messages.field_label_plan}}:
-                <span v-if="defaults.plan">{{messages['plan_name_'+defaults.plan]}}</span>
-                <span v-else v-html="messages.message_auto_detecting"></span>
-                <button @click="customize.plan = true">{{messages.button_label_customize}}</button>
-            </div>
-            <div>
-                {{messages['plan_description_'+accountPlan.plan]}}
-            </div>
-            <hr/>
-
-            <!-- cloud+region -->
-            <div v-if="customize.region === true" class="form-group">
-                <label htmlFor="region">{{messages.field_label_region}}</label>
-                <select name="region" v-validate="'required'" v-model="cloudRegionUuid" v-if="regions" class="form-control" :class="{ 'is-invalid': submitted && errors.has('region') }">
-                    <option v-for="region in regions" :value="region.uuid">{{region.name}} (~{{parseInt(region.distance/1000)}} {{messages.msg_km_distance_away}})</option>
-                </select>
-                <div v-if="submitted && errors.has('region')" class="invalid-feedback">{{ errors.first('region') }}</div>
-                <button @click="customize.region = false">{{messages.button_label_use_default}}</button>
-            </div>
-            <div v-if="customize.region === false">
-                {{messages.field_label_region}}:
-                <span v-if="defaults.region">{{defaults.region.name}} (~{{parseInt(defaults.region.distance/1000)}} {{messages.msg_km_distance_away}})</span>
-                <span v-else v-html="messages.message_auto_detecting"></span>
-                <button @click="customize.region = true">{{messages.button_label_customize}}</button>
-            </div>
-            <hr/>
-
             <!-- footprint -->
             <div v-if="customize.footprint === true" class="form-group">
                 <label htmlFor="footprint">{{messages.field_label_footprint}}</label>
-                <v-select v-validate="'required'" v-if="footprintObjects" :options="footprintObjects" :reduce="footprint => footprint.name" label="name" :value="accountPlan.footprint" type="text" v-model="accountPlan.footprint" name="footprint" class="form-control" :class="{ 'is-invalid': submitted && errors.has('footprint') }"></v-select>
+                <select v-validate="'required'" v-if="footprintObjects" v-model="accountPlan.footprint" name="footprint" class="form-control" :class="{ 'is-invalid': submitted && errors.has('footprint') }">
+                    <option v-for="footprint in footprintObjects" :value="footprint.name">{{messages['footprint_name_'+footprint.name]}}</option>
+                </select>
                 <div v-if="submitted && errors.has('footprint')" class="invalid-feedback">{{ errors.first('footprint') }}</div>
                 <button @click="customize.footprint = false">{{messages.button_label_use_default}}</button>
             </div>
@@ -134,6 +150,29 @@
                 {{messages['footprint_description_'+accountPlan.footprint]}}
             </div>
             <hr/>
+
+            <!-- SSH key -->
+            <div v-if="customize.sshKey === true" class="form-group">
+                <label for="sshKey">{{messages.field_label_network_ssh_key}}</label>
+                <select v-validate="'required'" v-if="sshKeys" v-model="accountPlan.sshKey" name="sshKey" class="form-control" :class="{ 'is-invalid': submitted && errors.has('sshPublicKey') }">
+                    <option v-for="key in sshKeyObjects" :value="key.value">{{key.name}}</option>
+                </select>
+                <div v-if="submitted && errors.has('sshPublicKey')" class="invalid-feedback">{{ errors.first('sshPublicKey') }}</div>
+                <button @click="customize.sshKey = false">{{messages.button_label_use_default}}</button>
+                <router-link to="/me/keys">{{messages.link_label_account_ssh_keys}}</router-link>
+            </div>
+            <div v-if="customize.sshKey === false">
+                {{messages.field_label_network_ssh_key}}:
+                <span>{{messages.message_network_ssh_key_do_not_install}}</span>
+                <button @click="customize.sshKey = true">{{messages.button_label_customize}}</button>
+            </div>
+            <div>{{messages.field_description_network_ssh_key}}</div>
+            <hr/>
+
+            </div>  <!-- end showAdvanced -->
+            <div v-else>
+
+            </div>
 
             <!-- payment -->
             <div class="form-group">
@@ -185,6 +224,7 @@
         data() {
             return {
                 user: util.currentUser(),
+                showAdvanced: false,
                 accountPlan: {
                     name: '',
                     domain: '',
@@ -196,7 +236,8 @@
                         uuid: null,
                         paymentMethodType: null,
                         paymentInfo: null
-                    }
+                    },
+                    sshKey: ''
                 },
                 cloudRegionUuid: null,
                 regions: [],
@@ -206,7 +247,8 @@
                     timezone: false,
                     plan: false,
                     footprint: false,
-                    region: false
+                    region: false,
+                    sshKey: false
                 },
                 defaults: {
                     domain: '',
@@ -214,7 +256,8 @@
                     timezone: '',
                     plan: 'bubble',
                     footprint: 'Worldwide',
-                    region: ''
+                    region: '',
+                    sshKey: ''
                 },
                 submitted: false,
                 status: {
@@ -236,7 +279,7 @@
             ...mapState('networks', {
                 error: state => state.error
             }),
-            ...mapState('users', ['policy']),
+            ...mapState('users', ['policy', 'sshKeys']),
             ...mapState('account', ['actionStatus']),
             isComplete() {
                 return (this.accountPlan.name !== '')
@@ -283,10 +326,20 @@
                     }
                 }
                 return fp_array;
+            },
+            sshKeyObjects: function () {
+                if (this.sshKeys) {
+                    const keyObjects = [];
+                    keyObjects.push({name: this.messages.message_network_ssh_key_do_not_install, value: ''});
+                    for (let i=0; i<this.sshKeys.length; i++) {
+                        keyObjects.push({name: this.sshKeys[i].name, value: this.sshKeys[i].name});
+                    }
+                    return keyObjects;
+                }
             }
         },
         methods: {
-            ...mapActions('users', ['getPolicyByUserId']),
+            ...mapActions('users', ['getPolicyByUserId', 'listSshKeysByUserId']),
             ...mapActions('account', ['approveAction', 'resendVerificationCode']),
             ...mapActions('system', ['detectTimezone', 'detectLocale']),
             ...mapActions('networks', ['getNearestRegions', 'addPlanAndStartNetwork']),
@@ -304,6 +357,7 @@
                 this.getAllPlans(this.messages, this.errors);
                 this.getAllFootprints({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
                 this.getAllPaymentMethods(this.messages, this.errors);
+                this.listSshKeysByUserId({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
                 this.getNearestRegions({footprintId: null, messages: this.messages, errors: this.errors});
             },
             isAuthenticator(val) { return window.isAuthenticator(val); },
