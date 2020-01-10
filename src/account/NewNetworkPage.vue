@@ -444,6 +444,7 @@
                             } else {
                                 console.log('sending accountPlan: ' + JSON.stringify(this.accountPlan) + ' cloud/region=' + cloudRegion.cloud + '/' + cloudRegion.internalName);
                                 this.addPlanAndStartNetwork({
+                                    userId: this.user.uuid,
                                     accountPlan: this.accountPlan,
                                     cloud: cloudRegion.cloud,
                                     region: cloudRegion.internalName,
@@ -477,7 +478,6 @@
             },
             nearestRegions (regions) {
                 if (regions) {
-                    console.log('nearestRegions: received: '+regions.length+' regions');
                     this.regions = regions;
                     if (this.cloudRegionUuid === null || (typeof regions.find(r => r.uuid  === this.cloudRegionUuid) === 'undefined')) {
                         this.cloudRegionUuid = regions[0].uuid;
