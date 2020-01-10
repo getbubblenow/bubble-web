@@ -46,7 +46,23 @@ function evalInContext(vue, string) {
 
 String.prototype.parseMessage = function (vue, ctx) {
     const context = (typeof ctx !== 'undefined' && ctx !== null) ? Object.assign(vue, ctx) : vue;
-    return this ? ''+this.replace(/{{[\w\._]*?}}/g, match => {
+    return this ? ''+this.replace(/{{[\w][\w\._]*?}}/g, match => {
+        const expression = match.slice(2, -2);
+        return evalInContext(context, expression)
+    }) : '';
+};
+
+String.prototype.parseDateMessage = function (millis, messages) {
+    const date = new Date(millis);
+    const context = {
+        YYYY: date.getFullYear(),
+        MMM: messages['label_date_month_'+date.getMonth()],
+        M: messages['label_date_month_short_'+date.getMonth()],
+        EEE: messages['label_date_day_'+date.getDay()],
+        E: messages['label_date_day_short_'+date.getDay()],
+        d: date.getDate()
+    };
+    return this ? ''+this.replace(/{{[\w]+?}}/g, match => {
         const expression = match.slice(2, -2);
         return evalInContext(context, expression)
     }) : '';

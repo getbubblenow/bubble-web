@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VeeValidate from 'vee-validate';
 import VueSidebarMenu from 'vue-sidebar-menu'
 import vSelect from 'vue-select'
+import { Datetime } from 'vue-datetime';
 
 // not sure what the best way is to include these icons
 // import { library } from '@fortawesome/fontawesome-svg-core'
@@ -19,6 +20,7 @@ import App from './app/App';
 Vue.use(VeeValidate);
 Vue.use(VueSidebarMenu);
 Vue.component('v-select', vSelect);
+Vue.component('datetime', Datetime);
 Vue.config.productionTip = false;
 
 // not sure what the best way is to include these icons, we reference them programmatically via string resource/messages

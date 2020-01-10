@@ -12,6 +12,7 @@ import ActionPage from '../account/profile/ActionPage'
 import PolicyPage from '../account/profile/PolicyPage'
 import NotificationsPage from '../account/NotificationsPage'
 import ChangePasswordPage from '../account/profile/ChangePasswordPage'
+import SshKeysPage from '../account/profile/SshKeysPage'
 import NetworksPage from '../account/NetworksPage'
 import NewNetworkPage from '../account/NewNetworkPage'
 import NetworkPage from '../account/NetworkPage'
@@ -49,6 +50,7 @@ export const router = new Router({
         { path: '/me/policy', component: PolicyPage },
         { path: '/me/action', component: ActionPage },
         { path: '/me/changePassword', component: ChangePasswordPage },
+        { path: '/me/keys', component: SshKeysPage },
         { path: '/notifications', component: NotificationsPage },
         {
           path: '/bubbles', component: NetworksPage ,

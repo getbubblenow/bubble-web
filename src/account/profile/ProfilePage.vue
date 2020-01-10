@@ -7,6 +7,8 @@
         <hr/>
         <router-link to="/me/policy">{{messages.link_label_account_policy}}</router-link>
         <hr/>
+        <router-link to="/me/keys">{{messages.link_label_account_ssh_keys}}</router-link>
+        <hr/>
 
         <form @submit.prevent="handleSubmit">
             <div class="form-group">

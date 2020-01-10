@@ -161,5 +161,15 @@ export const util = {
             }
             return false;
         };
+    },
+
+    userHasLocale: function(user) {
+        return !(typeof user === 'undefined' || user === null || !user.hasOwnProperty('locale') || user.locale === null || user.locale === '' || user.locale === 'detect');
+    },
+
+    jsLocale: function (user, detectedLocale) {
+        const loc = util.userHasLocale(user) ? user.locale : detectedLocale;
+        return loc === null ? null : loc.replace('_', '-').toLowerCase();
     }
+
 };

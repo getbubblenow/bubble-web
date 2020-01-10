@@ -254,9 +254,9 @@
             </tbody>
         </table>
 
+        <hr/>
         <h4>{{messages.form_title_account_add_contact}}</h4>
         <form @submit.prevent="addContact">
-            <hr/>
             <div class="form-group">
                 <label htmlFor="contactType">{{messages.field_label_policy_contact_type}}</label>
                 <select v-model="newContact.type" name="contactType" class="form-control">

@@ -13,6 +13,9 @@ export const userService = {
     addPolicyContactById,
     removePolicyContactByUuid,
     setLocale,
+    addSshKeyByUserId,
+    removeSshKeyByUserId,
+    listSshKeysByUserId,
     updateUser,
     deleteUser,
     approveAction,
@@ -118,6 +121,18 @@ function setLocale(locale, messages, errors) {
         const loc = {locale: locale};
         return Promise.resolve(loc);
     }
+}
+
+function addSshKeyByUserId(userId, sshKey, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/keys`, util.putWithAuth(sshKey)).then(util.handleCrudResponse(messages, errors));
+}
+
+function removeSshKeyByUserId(userId, sshKeyId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/keys/${sshKeyId}`, util.deleteWithAuth()).then(util.handleCrudResponse(messages, errors));
+}
+
+function listSshKeysByUserId(userId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/keys`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function updateUser(user, messages, errors) {

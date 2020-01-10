@@ -5,14 +5,17 @@ import { util } from '../_helpers';
 const state = {
     loading: {
         users: false, user: false, updating: false, deleting: false,
-        policy: false, updatingPolicy: false, addPolicyContact: false, removePolicyContact: false
+        policy: false, updatingPolicy: false, addPolicyContact: false, removePolicyContact: false,
+        listSshKeys: false, addSshKey: false, removeSshKey: false
     },
     errors: {},
     users: null,
     user: null,
     policy: {},
     contact: null,
-    authenticator: {}
+    authenticator: {},
+    sshKey: null,
+    sshKeys: []
 };
 
 export const CONTACT_TYPE_AUTHENTICATOR = 'authenticator';
@@ -110,6 +113,33 @@ const actions = {
             .then(
                 policy => commit('removePolicyContactByUserIdSuccess', policy),
                 error => commit('removePolicyContactByUserIdFailure', error)
+            );
+    },
+
+    addSshKeyByUserId({ commit }, {userId, sshKey, messages, errors}) {
+        commit('addSshKeyByUserIdRequest');
+        userService.addSshKeyByUserId(userId, sshKey, messages, errors)
+            .then(
+                key => commit('addSshKeyByUserIdSuccess', key),
+                error => commit('addSshKeyByUserIdFailure', error)
+            );
+    },
+
+    removeSshKeyByUserId({ commit }, {userId, sshKeyId, messages, errors}) {
+        commit('removeSshKeyByUserIdRequest');
+        userService.removeSshKeyByUserId(userId, sshKeyId, messages, errors)
+            .then(
+                ok => commit('removeSshKeyByUserIdSuccess', sshKeyId),
+                error => commit('removeSshKeyByUserIdFailure', error)
+            );
+    },
+
+    listSshKeysByUserId({ commit }, {userId, messages, errors}) {
+        commit('listSshKeysByUserIdRequest');
+        userService.listSshKeysByUserId(userId, messages, errors)
+            .then(
+                sshKeys => commit('listSshKeysByUserIdSuccess', sshKeys),
+                error => commit('listSshKeysByUserIdFailure', error)
             );
     },
 
@@ -215,6 +245,44 @@ const mutations = {
     updateUserFailure(state, { id, error }) {
         state.loading.updating = false;
         state.errors.update = error;
+    },
+
+    addSshKeyByUserIdRequest(state) {
+        state.loading.addSshKey = true;
+    },
+    addSshKeyByUserIdSuccess(state, sshKey) {
+        state.loading.addSshKey = false;
+        state.sshKey = sshKey;
+        state.sshKeys.push(sshKey);
+    },
+    addSshKeyByUserIdFailure(state, error) {
+        state.loading.addSshKey = false;
+        state.errors.sshKey = error;
+    },
+
+    removeSshKeyByUserIdRequest(state) {
+        state.loading.removeSshKey = true;
+    },
+    removeSshKeyByUserIdSuccess(state, sshKeyId) {
+        state.loading.removeSshKey = false;
+        state.sshKey = null;
+        state.sshKeys = state.sshKeys.filter(function(k) { return k.uuid !== sshKeyId; })
+    },
+    removeSshKeyByUserIdFailure(state, error) {
+        state.loading.removeSshKey = false;
+        state.errors.sshKey = error;
+    },
+
+    listSshKeysByUserIdRequest(state) {
+        state.loading.listSshKeys = true;
+    },
+    listSshKeysByUserIdSuccess(state, sshKeys) {
+        state.loading.listSshKeys = false;
+        state.sshKeys = sshKeys;
+    },
+    listSshKeysByUserIdFailure(state, error) {
+        state.loading.listSshKeys = false;
+        state.errors.sshKey = error;
     },
 
     deleteRequest(state, id) {
