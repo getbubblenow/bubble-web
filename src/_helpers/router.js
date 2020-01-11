@@ -75,8 +75,8 @@ export const router = new Router({
     { path: '/login', component: LoginPage },
     { path: '/logout', component: LoginPage },
 
-    { path: '/admin/accounts', component: AccountsPage },
-    { path: '/admin/accounts/:id', component: ProfilePage },
+    { path: '/admin/users', component: AccountsPage },
+    { path: '/admin/users/:id', component: ProfilePage },
     { path: '/admin/model', component: ModelSetupPage },
 
     // otherwise redirect to home
