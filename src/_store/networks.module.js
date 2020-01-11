@@ -5,7 +5,8 @@ import { util } from '../_helpers';
 const state = {
     loading: {
         networks: false, network: false, deleting: false,
-        nearestRegions: false, startingNetwork: false, networkStatuses: false, networkNodes: false
+        nearestRegions: false, startingNetwork: false, networkStatuses: false, networkNodes: false,
+        requestNetworkKeys: false, retrieveNetworkKeys: false
     },
     creating: null,
     error: null,
@@ -14,7 +15,9 @@ const state = {
     nearestRegions: null,
     newNodeNotification: null,
     networkStatuses: {},
-    networkNodes: null
+    networkNodes: null,
+    networkKeysRequested: null,
+    networkKeys: null
 };
 
 const actions = {
@@ -70,7 +73,7 @@ const actions = {
     },
 
     stopNetwork({ commit }, {userId, networkId, messages, errors}) {
-        commit('stopNetworkRequest', id);
+        commit('stopNetworkRequest', networkId);
         networkService.stopNetwork(userId, networkId, messages, errors)
             .then(
                 network => commit('stopNetworkSuccess', network),
@@ -79,7 +82,7 @@ const actions = {
     },
 
     deleteNetwork({ commit }, {userId, networkId, messages, errors}) {
-        commit('deleteNetworkRequest', id);
+        commit('deleteNetworkRequest', networkId);
         networkService.deleteNetwork(userId, networkId, messages, errors)
             .then(
                 network => commit('deleteNetworkSuccess', network),
@@ -95,6 +98,24 @@ const actions = {
                 error => commit('getNearestRegionsFailure', error)
             );
     },
+
+    requestNetworkKeys({ commit }, {userId, networkId, messages, errors}) {
+        commit('requestNetworkKeysRequest');
+        networkService.requestNetworkKeys(userId, networkId, messages, errors)
+            .then(
+                ok => commit('requestNetworkKeysSuccess', networkId),
+                error => commit('requestNetworkKeysFailure', error)
+            );
+    },
+
+    retrieveNetworkKeys({ commit }, {userId, networkId, code, password, messages, errors}) {
+        commit('retrieveNetworkKeysRequest');
+        networkService.retrieveNetworkKeys(userId, networkId, code, password, messages, errors)
+            .then(
+                keys => commit('retrieveNetworkKeysSuccess', keys),
+                error => commit('retrieveNetworkKeysFailure', error)
+            );
+    }
 };
 
 const mutations = {
@@ -199,6 +220,30 @@ const mutations = {
     },
     getNearestRegionsFailure(state, error) {
         state.loading.nearestRegions = false;
+        state.error = { error };
+    },
+
+    requestNetworkKeysRequest(state) {
+        state.loading.requestNetworkKeys = true;
+    },
+    requestNetworkKeysSuccess(state, networkId) {
+        state.loading.requestNetworkKeys = false;
+        state.networkKeysRequested = networkId;
+    },
+    requestNetworkKeysFailure(state, error) {
+        state.loading.requestNetworkKeys = false;
+        state.error = { error };
+    },
+
+    retrieveNetworkKeysRequest(state) {
+        state.loading.retrieveNetworkKeys = true;
+    },
+    retrieveNetworkKeysSuccess(state, keys) {
+        state.loading.retrieveNetworkKeys = false;
+        state.networkKeys = keys;
+    },
+    retrieveNetworkKeysFailure(state, error) {
+        state.loading.retrieveNetworkKeys = false;
         state.error = { error };
     }
 };

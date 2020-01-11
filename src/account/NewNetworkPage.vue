@@ -228,7 +228,7 @@
                 accountPlan: {
                     name: '',
                     domain: '',
-                    locale: '',
+                    locale: util.currentUser().locale,
                     timezone: '',
                     plan: 'bubble',
                     footprint: 'Worldwide',

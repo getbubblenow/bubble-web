@@ -70,7 +70,7 @@
                     if (isAuthenticator(type)) {
                         console.log('submitVerification: sending authenticator code: '+code);
                         this.sendAuthenticatorCode({
-                            uuid: this.username,
+                            userId: this.username,
                             code: code,
                             verifyOnly: false,
                             messages: this.messages,

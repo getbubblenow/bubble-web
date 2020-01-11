@@ -42,7 +42,7 @@
                     errors: this.errors
                 });
             } else {
-                this.$router.push({path:'/me/profile', params: {'action': 'invalid'}});
+                this.$router.push({path:'/me/profile', params: {action: 'invalid'}});
             }
         },
         watch: {

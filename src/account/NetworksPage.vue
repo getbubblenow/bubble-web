@@ -10,27 +10,14 @@
                     <th nowrap="nowrap">{{messages.label_field_networks_locale}}</th>
                     <th nowrap="nowrap">{{messages.label_field_networks_timezone}}</th>
                     <th nowrap="nowrap">{{messages.label_field_networks_object_state}}</th>
-                    <th nowrap="nowrap">{{messages.label_field_networks_action_view}}</th>
-                    <th nowrap="nowrap">{{messages.label_field_networks_action_stop}}</th>
-                    <th nowrap="nowrap">{{messages.label_field_networks_action_delete}}</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr v-for="network in networks" :key="network.uuid">
-                    <td>{{network.name}}.{{network.domainName}}</td>
+                    <td><router-link :to="{ path: '/bubble/'+ network.name }">{{network.name}}.{{network.domainName}}</router-link></td>
                     <td nowrap="nowrap">{{messages['locale_'+network.locale] || network.locale}}</td>
                     <td nowrap="nowrap">{{messages['tz_name_'+network.timezone] || network.timezone}}</td>
                     <td>{{messages['msg_network_state_'+network.state]}}</td>
-                    <td><router-link :to="{ path: '/bubble/'+ network.name }">{{messages.table_row_networks_action_view}}</router-link></td>
-
-                    <td v-if="network.state === 'running'">
-                        <a @click="stopNetwork(network.uuid)" class="text-danger">{{messages.table_row_networks_action_stop}}</a>
-                    </td>
-                    <td v-else></td>
-
-                    <td>
-                        <a @click="deleteNetwork(network.uuid)" class="text-danger">{{messages.table_row_networks_action_delete}}</a>
-                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -52,9 +39,7 @@
 
     export default {
         computed: {
-            ...mapState({
-                networks: state => state.networks.networks
-            }),
+            ...mapState('networks', ['networks']),
             ...mapState('system', ['messages'])
         },
         created () {
@@ -63,6 +48,17 @@
         methods: {
             ...mapActions('networks', ['getAllNetworks', 'stopNetwork', 'deleteNetwork']),
             ...mapGetters('networks', ['loading'])
+        },
+        watch: {
+            networks (nets) {
+                if (nets && nets.length) {
+                    if (nets.length === 0) {
+                        this.$router.replace({path: '/bubble/new'});
+                    } else if (nets.length === 1 && util.currentUser().admin !== true) {
+                        this.$router.replace({path: '/bubble/' + nets[0].name});
+                    }
+                }
+            }
         }
     };
 </script>
