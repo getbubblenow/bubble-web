@@ -1,7 +1,7 @@
 <template>
     <div v-if="network">
         <h4>{{network.name}}.{{network.domainName}} - <i>{{messages['msg_network_state_'+network.state]}}</i></h4>
-        <div v-if="stats">
+        <div v-if="stats && network.state !== 'stopped'">
             <!-- adapted from: https://code-boxx.com/simple-vanilla-javascript-progress-bar/ -->
             <div class="progress-wrap">
                 <div class="progress-bar" :style="'width: '+stats.percent+'%'" :id="'progressBar_'+networkId"></div>
@@ -107,7 +107,8 @@
         },
         computed: {
             ...mapState('networks', [
-                'network', 'newNodeNotification', 'networkStatuses', 'networkNodes', 'networkKeysRequested', 'networkKeys'
+                'network', 'newNodeNotification', 'networkStatuses', 'networkNodes', 'networkKeysRequested',
+                'deletedNetwork', 'networkKeys'
             ]),
             ...mapState('system', ['messages'])
         },
@@ -134,6 +135,7 @@
                 });
             },
             startStatusRefresher (user) {
+                // todo: separate refresher for network -- after "stop" we should refresh the status to show it is stopped
                 this.refresher = setInterval(() => this.refreshStatus(user.uuid), 5000);
             },
             stopNet () {
@@ -198,6 +200,11 @@
                     if (this.stats.percent === 100) {
                         clearInterval(this.refresher);
                     }
+                }
+            },
+            deletedNetwork (netId) {
+                if (netId && netId === this.networkId) {
+                    this.$router.replace({path: '/bubbles'});
                 }
             }
         }

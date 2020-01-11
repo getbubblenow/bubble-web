@@ -16,6 +16,7 @@ const state = {
     newNodeNotification: null,
     networkStatuses: {},
     networkNodes: null,
+    deletedNetwork: null,
     networkKeysRequested: null,
     networkKeys: null
 };
@@ -204,6 +205,7 @@ const mutations = {
         if (state.networks) {
             state.networks = state.networks.filter(network => (network.uuid !== id && network.name !== id))
         }
+        state.deletedNetwork = id;
     },
     deleteNetworkFailure(state, { id, error }) {
         state.loading.deleting = false;
