@@ -1,12 +1,15 @@
 <template>
     <div v-if="network">
         <h4>{{network.name}}.{{network.domainName}} - <i>{{messages['msg_network_state_'+network.state]}}</i></h4>
-        <div v-if="networkStatuses && networkStatuses[network.uuid]">
+        <div v-if="stats">
             <div class="progress-wrap">
-                <div class="progress-bar" :id="'progressBar_'+network.uuid"></div>
-                <div class="progress-text" :id="'progressBar_text_'+network.uuid"></div>
-                <div :id="'progressBar_details_'+network.uuid"></div>
+                <div class="progress-bar" :style="'width: '+stats.percent+'%'" :id="'progressBar_'+networkId"></div>
+                <div class="progress-text">{{messages.label_percent.parseMessage(this, {percent: stats.percent})}}</div>
             </div>
+            <div :id="'progressBar_details_'+networkId">{{messages[stats.messageKey]}}</div>
+            <hr/>
+        </div>
+        <div>
             <div>
                 <div>{{messages.label_field_networks_locale}}: {{messages['locale_'+network.locale] || network.locale}}</div>
                 <div>{{messages.label_field_networks_timezone}}: {{messages['tz_name_'+network.timezone] || network.timezone}}</div>
@@ -46,6 +49,7 @@
         data() {
             return {
                 networkId: this.$route.params.id,
+                stats: null,
                 refresher: null
             };
         },
@@ -73,7 +77,7 @@
                 });
             },
             startStatusRefresher (user) {
-                // this.refresher = setInterval(() => this.refreshStatus(user.uuid), 5000);
+                this.refresher = setInterval(() => this.refreshStatus(user.uuid), 5000);
             }
         },
         created () {
@@ -86,26 +90,16 @@
         },
         watch: {
             networkNodes (nodes) {
-                console.log('watch.networkNodes: received: '+JSON.stringify(nodes));
+                // console.log('watch.networkNodes: received: '+JSON.stringify(nodes));
             },
             networkStatuses (stats) {
-                // console.log('received stats: '+JSON.stringify(stats));
+                console.log('received stats: '+JSON.stringify(stats));
                 if (stats) {
                     // adapted from: https://code-boxx.com/simple-vanilla-javascript-progress-bar/
-                    if (!stats.hasOwnProperty(network.uuid)) return;
-                    const percent =  stats[network.uuid].hasOwnProperty('percent') ? stats[network.uuid].percent : null;
-                    const messageKey =  stats[network.uuid].hasOwnProperty('messageKey') ? stats[network.uuid].messageKey : null;
-                    if (percent !== null) {
-                        const progressBar = document.getElementById("progressBar_");
-                        const progressBarText = document.getElementById("progressBar_text_");
-                        const progressBarDetails = document.getElementById("progressBar_details_");
-                        if (progressBar !== null && progressBarText !== null && progressBarDetails !== null) {
-                            progressBar.style.width = percent + "%";
-                            progressBarText.innerHTML = messages.label_percent.parseMessage(this, {percent: percent});
-                            if (messageKey != null) {
-                                progressBarDetails.innerHTML = this.messages[messageKey];
-                            }
-                        }
+                    if (!stats.hasOwnProperty(this.networkId)) return;
+                    this.stats = stats[this.networkId][0];  // todo: when we have multiple nodes, this will need to be changed
+                    if (this.stats.percent === 100) {
+                        clearInterval(this.refresher);
                     }
                 }
             }

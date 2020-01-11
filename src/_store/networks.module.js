@@ -133,7 +133,9 @@ const mutations = {
     },
     getStatusesByNetworkIdSuccess(state, {networkId, statuses}) {
         state.loading.networkStatuses = false;
-        state.networkStatuses[networkId] = statuses;
+        const newStatuses = {};
+        newStatuses[networkId] = statuses;
+        state.networkStatuses = Object.assign({}, state.networkStatuses, newStatuses);
     },
     getStatusesByNetworkIdFailure(state, {networkId, error}) {
         state.loading.networkStatuses = false;
