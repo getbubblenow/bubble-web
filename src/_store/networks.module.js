@@ -69,12 +69,21 @@ const actions = {
             );
     },
 
+    stopNetwork({ commit }, {userId, networkId, messages, errors}) {
+        commit('stopNetworkRequest', id);
+        networkService.stopNetwork(userId, networkId, messages, errors)
+            .then(
+                network => commit('stopNetworkSuccess', network),
+                error => commit('stopNetworkFailure', { networkId, error: error.toString() })
+            );
+    },
+
     deleteNetwork({ commit }, {userId, networkId, messages, errors}) {
-        commit('deleteRequest', id);
+        commit('deleteNetworkRequest', id);
         networkService.deleteNetwork(userId, networkId, messages, errors)
             .then(
-                network => commit('deleteSuccess', network),
-                error => commit('deleteFailure', { networkId, error: error.toString() })
+                network => commit('deleteNetworkSuccess', network),
+                error => commit('deleteNetworkFailure', { networkId, error: error.toString() })
             );
     },
 
@@ -154,21 +163,33 @@ const mutations = {
         state.error = { error };
     },
 
-    deleteRequest(state, id) {
+    stopNetworkRequest(state, id) {
+        state.loading.stopping = true;
+    },
+    stopNetworkSuccess(state, id) {
+        state.loading.stopping = false;
+    },
+    stopNetworkFailure(state, { id, error }) {
+        state.loading.stopping = false;
+        state.error = error;
+    },
+
+    deleteNetworkRequest(state, id) {
         state.loading.deleting = true;
     },
-    deleteSuccess(state, id) {
+    deleteNetworkSuccess(state, id) {
         state.loading.deleting = false;
         // remove deleted network from state
         if (state.networks) {
             state.networks = state.networks.filter(network => (network.uuid !== id && network.name !== id))
         }
     },
-    deleteFailure(state, { id, error }) {
+    deleteNetworkFailure(state, { id, error }) {
         state.loading.deleting = false;
-        // remove 'deleting:true' property and add 'deleteError:[error]' property to network
+        // remove 'deleting:true' property and add 'deleteNetworkError:[error]' property to network
         state.error = error;
     },
+
     getNearestRegionsRequest(state) {
         state.loading.nearestRegions = true;
     },

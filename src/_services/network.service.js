@@ -8,6 +8,7 @@ export const networkService = {
     startNetwork,
     getStatusesByNetworkId,
     getNodesByNetworkId,
+    stopNetwork,
     deleteNetwork
 };
 
@@ -37,6 +38,11 @@ function getNodesByNetworkId(userId, networkId, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}/nodes`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
-function deleteNetwork(userId, networkId, messages, errors) {
+function stopNetwork(userId, networkId, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}/actions/stop`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
+}
+
+// deleting network is not allowed via API, instead we delete the AccountPlan, which in turn deletes the network
+function deleteNetwork(userId, networkId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/plans/${networkId}`, util.deleteWithAuth()).then(util.handleCrudResponse(messages, errors));
 }

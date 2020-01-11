@@ -11,7 +11,7 @@
                     <th nowrap="nowrap">{{messages.label_field_networks_timezone}}</th>
                     <th nowrap="nowrap">{{messages.label_field_networks_object_state}}</th>
                     <th nowrap="nowrap">{{messages.label_field_networks_action_view}}</th>
-                    <th nowrap="nowrap">{{messages.label_field_networks_action_start_stop}}</th>
+                    <th nowrap="nowrap">{{messages.label_field_networks_action_stop}}</th>
                     <th nowrap="nowrap">{{messages.label_field_networks_action_delete}}</th>
                 </tr>
                 </thead>
@@ -23,11 +23,14 @@
                     <td>{{messages['msg_network_state_'+network.state]}}</td>
                     <td><router-link :to="{ path: '/bubble/'+ network.name }">{{messages.table_row_networks_action_view}}</router-link></td>
 
-                    <td v-if="network.state === 'running'">{{messages.table_row_networks_action_stop}}</td>
-                    <td v-else-if="network.state === 'created'">{{messages.table_row_networks_action_start}}</td>
+                    <td v-if="network.state === 'running'">
+                        <a @click="stopNetwork(network.uuid)" class="text-danger">{{messages.table_row_networks_action_stop}}</a>
+                    </td>
                     <td v-else></td>
 
-                    <td><a @click="deleteNetwork(network.uuid)" class="text-danger">{{messages.table_row_networks_action_delete}}</a></td>
+                    <td>
+                        <a @click="deleteNetwork(network.uuid)" class="text-danger">{{messages.table_row_networks_action_delete}}</a>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -58,7 +61,7 @@
             this.getAllNetworks({userId: util.currentUser().uuid, messages: this.messages, errors: this.errors});
         },
         methods: {
-            ...mapActions('networks', ['getAllNetworks', 'deleteNetwork']),
+            ...mapActions('networks', ['getAllNetworks', 'stopNetwork', 'deleteNetwork']),
             ...mapGetters('networks', ['loading'])
         }
     };
