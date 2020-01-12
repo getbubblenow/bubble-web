@@ -19,6 +19,7 @@ const state = {
     error: null,
     messages: {
         durationToMillis: function(count, units) {
+            if (typeof count === 'undefined' || count === null || count === '') return null;
             return parseInt(count) * parseInt(state.messages['time_duration_'+units+'_factor']);
         },
         millisToDuration: function (ms) {

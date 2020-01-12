@@ -126,11 +126,11 @@ const actions = {
                 error => commit('denyActionFailure', error)
             );
     },
-    sendAuthenticatorCode({ commit }, {userId, code, verifyOnly, messages, errors}) {
+    sendAuthenticatorCode({ commit }, {userId, code, authOnly, verifyOnly, messages, errors}) {
         commit('sendAuthenticatorCodeRequest');
-        userService.sendAuthenticatorCode(userId, code, verifyOnly, messages, errors)
+        userService.sendAuthenticatorCode(userId, code, authOnly, verifyOnly, messages, errors)
             .then(
-                user => commit('sendAuthenticatorCodeSuccess', user),
+                user => commit('sendAuthenticatorCodeSuccess', {user, messages}),
                 error => commit('sendAuthenticatorCodeFailure', error)
             );
     },
@@ -275,11 +275,16 @@ const mutations = {
         state.status.authenticating = true;
         state.actionStatus = { requesting: true, type: 'approve' };
     },
-    sendAuthenticatorCodeSuccess(state, user) {
+    sendAuthenticatorCodeSuccess(state, user, messages) {
         state.status.authenticating = false;
         state.actionStatus = { success: true, type: 'approve', result: user };
+        console.log('auth successful -- setting window.showTotpModal = false');
+        window.showTotpModal = false;
+
         if (user.token) {
             state.user = user;
+            localStorage.setItem(util.USER_KEY, JSON.stringify(user));
+
         } else if (user.multifactorAuth) {
             state.user.multifactorAuth = user.multifactorAuth;
             localStorage.setItem(util.USER_KEY, JSON.stringify(user));

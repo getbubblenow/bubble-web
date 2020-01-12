@@ -1,5 +1,6 @@
 <template>
     <div class="jumbotron">
+        <totp-modal/>
         <sidebar-menu :hide-toggle="true" :menu="menu" v-if="status.loggedIn"/>
         <div class="container">
             <div class="row">

@@ -202,7 +202,7 @@ const mutations = {
     },
     updatePolicyByUserIdFailure(state, error) {
         state.loading.updatingPolicy = false;
-        state.policy = { error };
+        state.errors.policy = { error };
     },
 
     addPolicyContactByUserIdRequest(state) {

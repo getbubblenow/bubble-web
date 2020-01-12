@@ -134,13 +134,17 @@ export const util = {
 
     setValidationErrors: function(data, messages, errors) {
         for (let i=0; i<data.length; i++) {
-            if (data[i].messageTemplate) {
-                const parts = data[i].messageTemplate.split(/[._]+/);
+            const messageTemplate = data[i].messageTemplate.replace(/\./g, '_');
+            if (messageTemplate) {
+                const parts = messageTemplate.split(/[_]+/);
                 if (parts.length === 3 && parts[0] === 'err') {
                     const field = parts[1];
-                    const messageTemplate = data[i].messageTemplate.replace(/\./g, '_');
                     const message = messages[messageTemplate];
                     errors.add({field: field, msg: message});
+                    if (messageTemplate === 'err_totpToken_invalid') {
+                        // console.log('received '+messageTemplate+' -- setting window.showTotpModal = true');
+                        window.showTotpModal = true;
+                    }
                 //     console.log('>>>>> field '+field+' added error: '+message+', errors='+JSON.stringify(errors));
                 // } else {
                 //     console.log('>>>>> data item did not contain a valid error: '+JSON.stringify(data[i]));

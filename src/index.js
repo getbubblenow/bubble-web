@@ -12,6 +12,7 @@ import { Datetime } from 'vue-datetime';
 
 import { store } from './_store';
 import { router } from './_helpers';
+import TotpModal from './_components/TotpModal';
 import App from './app/App';
 
 // why can't i import this?
@@ -21,6 +22,7 @@ Vue.use(VeeValidate);
 Vue.use(VueSidebarMenu);
 Vue.component('v-select', vSelect);
 Vue.component('datetime', Datetime);
+Vue.component('totp-modal', TotpModal);
 Vue.config.productionTip = false;
 
 // not sure what the best way is to include these icons, we reference them programmatically via string resource/messages

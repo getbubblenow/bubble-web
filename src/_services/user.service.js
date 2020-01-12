@@ -11,7 +11,7 @@ export const userService = {
     getPolicyByUserId,
     updatePolicyByUserId,
     addPolicyContactById,
-    removePolicyContactByUuid,
+    removePolicyContactByUserId,
     setLocale,
     addSshKeyByUserId,
     removeSshKeyByUserId,
@@ -84,7 +84,7 @@ function addPolicyContactById(userId, contact, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/policy/contacts`, util.postWithAuth(contact)).then(util.handleCrudResponse(messages, errors));
 }
 
-function removePolicyContactByUuid(userId, contactUuid, messages, errors) {
+function removePolicyContactByUserId(userId, contactUuid, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/policy/contacts/${contactUuid}`, util.deleteWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
@@ -94,12 +94,14 @@ function approveAction(userId, code, messages, errors) {
         .then(setSessionUser);
 }
 
-function sendAuthenticatorCode(userId, code, verifyOnly, messages, errors) {
-    return fetch(`${config.apiUrl}/auth/authenticator`, util.postWithAuth({
+function sendAuthenticatorCode(userId, code, authOnly, verifyOnly, messages, errors) {
+    const auth = {
         account: userId,
-        token: code,
-        verify: verifyOnly
-    }))
+        token: code
+    };
+    if (typeof authOnly !== 'undefined' && authOnly !== null) auth.authenticate = authOnly;
+    if (typeof verifyOnly !== 'undefined' && verifyOnly !== null) auth.verify = verifyOnly;
+    return fetch(`${config.apiUrl}/auth/authenticator`, util.postWithAuth(auth))
         .then(util.handleCrudResponse(messages, errors))
         .then(setSessionUser);
 }

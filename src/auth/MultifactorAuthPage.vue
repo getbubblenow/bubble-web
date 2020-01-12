@@ -72,6 +72,7 @@
                         this.sendAuthenticatorCode({
                             userId: this.username,
                             code: code,
+                            authOnly: null,
                             verifyOnly: false,
                             messages: this.messages,
                             errors: this.errors

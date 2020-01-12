@@ -20,6 +20,7 @@
             </div>
 
             <hr/>
+
             <div class="form-group">
                 <label htmlFor="accountOperationTimeout">{{messages.field_label_policy_account_operation_timeout}}</label>
                 <input type="number" v-model="accountOperationTimeout" name="accountOperationTimeout" class="form-control"/>
@@ -30,7 +31,6 @@
                 <span>{{messages.field_label_policy_account_operation_timeout_description}}</span>
             </div>
 
-            <hr/>
             <div class="form-group">
                 <label htmlFor="nodeOperationTimeout">{{messages.field_label_policy_node_operation_timeout}}</label>
                 <input type="number" v-model="nodeOperationTimeout" name="nodeOperationTimeout" class="form-control"/>
@@ -39,6 +39,16 @@
                 </select>
                 <div v-if="submitted && errors.has('nodeOperationTimeout')" class="invalid-feedback d-block">{{ errors.first('nodeOperationTimeout') }}</div>
                 <span>{{messages.field_label_policy_node_operation_timeout_description}}</span>
+            </div>
+
+            <div class="form-group" v-if="hasAuthenticator">
+                <label htmlFor="authenticatorTimeout">{{messages.field_label_policy_authenticator_timeout}}</label>
+                <input type="number" v-model="authenticatorTimeout" name="authenticatorTimeout" class="form-control"/>
+                <select v-model="authenticatorTimeoutUnits" name="authenticatorTimeoutUnits" class="form-control">
+                    <option v-for="opt in timeDurationOptions" v-bind:value="opt">{{messages['time_duration_'+opt]}}</option>
+                </select>
+                <div v-if="submitted && errors.has('authenticatorTimeout')" class="invalid-feedback d-block">{{ errors.first('authenticatorTimeout') }}</div>
+                <span>{{messages.field_label_policy_authenticator_timeout_description}}</span>
             </div>
 
             <hr/>
@@ -51,6 +61,7 @@
 
         <hr/>
         <h2>{{messages.form_title_account_contacts}}</h2>
+        <div v-if="errors.has('contact')" class="invalid-feedback d-block">{{ errors.first('contact') }}</div>
         <table v-if="contacts && contacts.length > 0" border="1">
             <thead>
             <tr>
@@ -65,12 +76,8 @@
                 </td>
 
                 <td>
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_requiredForNetworkUnlock_icon" :title="messages.field_label_policy_contact_requiredForNetworkUnlock"></i>
-                    <span class="sr-only">{{messages.field_label_policy_contact_requiredForNetworkUnlock}}</span>
-                </td>
-                <td>
-                    <i aria-hidden="true" :class="messages.field_label_policy_contact_requiredForNodeOperations_icon" :title="messages.field_label_policy_contact_requiredForNodeOperations"></i>
-                    <span class="sr-only">{{messages.field_label_policy_contact_requiredForNodeOperations}}</span>
+                    <i aria-hidden="true" :class="messages.field_label_policy_contact_requiredForNetworkOperations_icon" :title="messages.field_label_policy_contact_requiredForNetworkOperations"></i>
+                    <span class="sr-only">{{messages.field_label_policy_contact_requiredForNetworkOperations}}</span>
                 </td>
                 <td>
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_requiredForAccountOperations_icon" :title="messages.field_label_policy_contact_requiredForAccountOperations"></i>
@@ -101,10 +108,16 @@
             </thead>
             <tbody>
             <tr v-for="contact in contacts">
+                <!-- nickname -->
                 <td>{{contact.nick}}</td>
+
+                <!-- contact type -->
                 <td>{{messages['field_label_policy_contact_type_'+contact.type]}}</td>
+
+                <!-- masked contact info -->
                 <td><span v-if="isNotAuthenticator(contact)">{{contact.info}}</span></td>
 
+                <!-- verified, or show verification form -->
                 <td v-if="contact.verified">
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
                     <span class="sr-only">{{messages.message_true}}</span>
@@ -137,6 +150,7 @@
                     <button v-if="verifyingContact !== contact.uuid && isNotAuthenticator(contact)" @click="startVerifyContact(contact)" class="btn btn-primary">{{messages.button_label_submit_verify_code}}</button>
                 </td>
 
+                <!-- auth factor: required, sufficient, or not_required -->
                 <td v-if="contact.authFactor === 'required'">
                     <i @click="toggleAuthFactor(contact)" aria-hidden="true" :class="messages.field_label_policy_contact_authFactor_name_required_icon" :title="messages.field_label_policy_contact_authFactor_name_required"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_authFactor_name_required}}</span>
@@ -154,24 +168,7 @@
                     <span class="sr-only">{{messages.field_label_policy_contact_value_not_applicable_name}}</span>
                 </td>
 
-                <td v-if="contact.requiredForNetworkUnlock">
-                    <i @click="contactFlag(contact, 'requiredForNetworkUnlock', false)" aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
-                    <span class="sr-only">{{messages.message_true}}</span>
-                </td>
-                <td v-else>
-                    <i @click="contactFlag(contact, 'requiredForNetworkUnlock', true)" aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
-                    <span class="sr-only">{{messages.message_false}}</span>
-                </td>
-
-                <td v-if="contact.requiredForNodeOperations">
-                    <i @click="contactFlag(contact, 'requiredForNodeOperations', false)" aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
-                    <span class="sr-only">{{messages.message_true}}</span>
-                </td>
-                <td v-else>
-                    <i @click="contactFlag(contact, 'requiredForNodeOperations', true)" aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
-                    <span class="sr-only">{{messages.message_false}}</span>
-                </td>
-
+                <!-- required for account operations? -->
                 <td v-if="contact.requiredForAccountOperations">
                     <i @click="contactFlag(contact, 'requiredForAccountOperations', false)" aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
                     <span class="sr-only">{{messages.message_true}}</span>
@@ -181,6 +178,17 @@
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
+                <!-- required for network operations? -->
+                <td v-if="contact.requiredForNetworkOperations">
+                    <i @click="contactFlag(contact, 'requiredForNetworkOperations', false)" aria-hidden="true" :class="messages.field_label_policy_contact_value_enabled_icon" :title="messages.message_true"></i>
+                    <span class="sr-only">{{messages.message_true}}</span>
+                </td>
+                <td v-else>
+                    <i @click="contactFlag(contact, 'requiredForNetworkOperations', true)" aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
+                    <span class="sr-only">{{messages.message_false}}</span>
+                </td>
+
+                <!-- receive verify notifications? -->
                 <td v-if="isAuthenticator(contact)">
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_value_not_applicable_icon" :title="messages.field_label_policy_contact_value_not_applicable_name"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_value_not_applicable_name}}</span>
@@ -194,6 +202,7 @@
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
+                <!-- receive login notifications? -->
                 <td v-if="isAuthenticator(contact)">
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_value_not_applicable_icon" :title="messages.field_label_policy_contact_value_not_applicable_name"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_value_not_applicable_name}}</span>
@@ -207,6 +216,7 @@
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
+                <!-- receive change password notifications? -->
                 <td v-if="isAuthenticator(contact)">
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_value_not_applicable_icon" :title="messages.field_label_policy_contact_value_not_applicable_name"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_value_not_applicable_name}}</span>
@@ -220,6 +230,7 @@
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
+                <!-- receive informational messages? -->
                 <td v-if="isAuthenticator(contact)">
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_value_not_applicable_icon" :title="messages.field_label_policy_contact_value_not_applicable_name"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_value_not_applicable_name}}</span>
@@ -233,6 +244,7 @@
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
+                <!-- receive promotional messages? -->
                 <td v-if="isAuthenticator(contact)">
                     <i aria-hidden="true" :class="messages.field_label_policy_contact_value_not_applicable_icon" :title="messages.field_label_policy_contact_value_not_applicable_name"></i>
                     <span class="sr-only">{{messages.field_label_policy_contact_value_not_applicable_name}}</span>
@@ -246,6 +258,7 @@
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
+                <!-- remove contact -->
                 <td>
                     <i @click="removeContact(contact.uuid)" aria-hidden="true" :class="messages.button_label_remove_contact_icon" :title="messages.button_label_remove_contact"></i>
                     <span class="sr-only">{{messages.button_label_remove_contact}}</span>
@@ -276,17 +289,13 @@
 
             <hr/>
             <div class="form-group">
-                <label for="requiredForNetworkUnlock">{{messages.field_label_policy_contact_requiredForNetworkUnlock}}</label>
-                <input type="checkbox" id="requiredForNetworkUnlock" v-model="newContact.requiredForNetworkUnlock">
-                <div v-if="contactSubmitted && errors.has('requiredForNetworkUnlock')" class="invalid-feedback d-block">{{ errors.first('requiredForNetworkUnlock') }}</div>
-            </div>
-            <div class="form-group">
-                <label for="requiredForNodeOperations">{{messages.field_label_policy_contact_requiredForNodeOperations}}</label>
-                <input type="checkbox" id="requiredForNodeOperations" v-model="newContact.requiredForNodeOperations">
-            </div>
-            <div class="form-group">
                 <label for="requiredForAccountOperations">{{messages.field_label_policy_contact_requiredForAccountOperations}}</label>
                 <input type="checkbox" id="requiredForAccountOperations" v-model="newContact.requiredForAccountOperations">
+            </div>
+            <div class="form-group">
+                <label for="requiredForNetworkOperations">{{messages.field_label_policy_contact_requiredForNetworkOperations}}</label>
+                <input type="checkbox" id="requiredForNetworkOperations" v-model="newContact.requiredForNetworkOperations">
+                <div v-if="contactSubmitted && errors.has('requiredForNetworkOperations')" class="invalid-feedback d-block">{{ errors.first('requiredForNetworkOperations') }}</div>
             </div>
             <div v-if="newContact.type !== '' && isNotAuthenticator(newContact)" class="form-group">
                 <label for="receiveVerifyNotifications">{{messages.field_label_policy_contact_receiveVerifyNotifications}}</label>
@@ -339,8 +348,7 @@
     function initNewContact () {
         return {
             uuid: '', type: '', info: '',
-            requiredForNetworkUnlock: true,
-            requiredForNodeOperations: true,
+            requiredForNetworkOperations: true,
             requiredForAccountOperations: true,
             receiveVerifyNotifications: true,
             receiveLoginNotifications: true,
@@ -364,12 +372,15 @@
                 accountOperationTimeoutUnits: '',
                 nodeOperationTimeout: '',
                 nodeOperationTimeoutUnits: '',
+                authenticatorTimeout: '',
+                authenticatorTimeoutUnits: '',
                 contacts: [],
                 contactSubmitted: false,
                 newContactSmsCountry: '',
                 newContact: initNewContact(),
                 verifyingContact: null,
-                inboundAction: null
+                inboundAction: null,
+                watchedPolicy: null
             }
         },
         computed: {
@@ -413,19 +424,21 @@
         methods: {
             ...mapActions('account', ['approveAction', 'denyAction', 'sendAuthenticatorCode', 'resendVerificationCode']),
             ...mapActions('users', [
-                'getPolicyByUserId', 'updatePolicyByUserId', 'addPolicyContactByUserId', 'removePolicyContactByUuid',
+                'getPolicyByUserId', 'updatePolicyByUserId', 'addPolicyContactByUserId', 'removePolicyContactByUserId',
             ]),
             ...mapGetters('users', ['loading']),
             isAuthenticator(val) { return window.isAuthenticator(val); },
             isNotAuthenticator(val) { return window.isNotAuthenticator(val); },
             updatePolicy(e) {
+                this.errors.clear();
                 this.submitted = true;
                 this.updatePolicyByUserId({
                     userId: this.currentUser.uuid,
                     policy: {
                         deletionPolicy: this.deletionPolicy,
                         accountOperationTimeout: this.messages.durationToMillis(this.accountOperationTimeout, this.accountOperationTimeoutUnits),
-                        nodeOperationTimeout: this.messages.durationToMillis(this.nodeOperationTimeout, this.nodeOperationTimeoutUnits)
+                        nodeOperationTimeout: this.messages.durationToMillis(this.nodeOperationTimeout, this.nodeOperationTimeoutUnits),
+                        authenticatorTimeout: this.messages.durationToMillis(this.authenticatorTimeout, this.authenticatorTimeoutUnits),
                     },
                     messages: this.messages,
                     errors: this.errors
@@ -438,7 +451,7 @@
                 }
                 this.contactSubmitted = true;
                 this.errors.clear();
-                console.log('addContact: adding: '+JSON.stringify(contactToAdd));
+                // console.log('addContact: adding: '+JSON.stringify(contactToAdd));
                 this.addPolicyContactByUserId({
                     userId: this.currentUser.uuid,
                     contact: contactToAdd,
@@ -447,25 +460,45 @@
                 });
             },
             removeContact(uuid) {
-                this.removePolicyContactByUuid({
+                this.errors.clear();
+                this.removePolicyContactByUserId({
                     userId: this.currentUser.uuid,
                     contactUuid: uuid,
                     messages: this.messages,
                     errors: this.errors
                 });
             },
+            prepContact(contact) {
+                // remove 'info' property before sending to API
+                const c = Object.assign({}, contact);
+                if (c.hasOwnProperty('info')) delete c['info'];
+                return c;
+            },
             contactFlag(contact, flag, val) {
+                this.errors.clear();
+                if (!contact.verified) {
+                    this.errors.add({field: 'contact', msg: this.messages['err_contact_unverified']});
+                    return;
+                }
                 contact[flag] = val;
-                console.log('contactFlag: update: '+JSON.stringify(contact));
+                const c = this.prepContact(contact);
+                // console.log('contactFlag: update: '+JSON.stringify(c));
                 this.addPolicyContactByUserId({
                     userId: this.currentUser.uuid,
-                    contact: contact,
+                    contact: c,
                     messages: this.messages,
                     errors: this.errors
                 });
             },
             toggleAuthFactor(contact) {
-                if (isAuthenticator(contact)) return;
+                if (!contact.verified) {
+                    this.errors.add({field: 'contact', msg: this.messages['err_contact_unverified']});
+                    return;
+                }
+                if (isAuthenticator(contact)) {
+                    this.errors.add({field: 'contact', msg: this.messages['err_contact_authenticatorAuthFactorCannotBeChanged']});
+                    return;
+                }
                 switch (contact.authFactor) {
                     case 'required': this.setAuthFactor(contact, 'sufficient'); break;
                     case 'sufficient': this.setAuthFactor(contact, 'not_required'); break;
@@ -473,10 +506,12 @@
                 }
             },
             setAuthFactor(contact, factor) {
-                contact.authFactor = factor;
+                this.errors.clear();
+                const c = this.prepContact(contact);
+                c.authFactor = factor;
                 this.addPolicyContactByUserId({
                     userId: this.currentUser.uuid,
-                    contact: contact,
+                    contact: c,
                     messages: this.messages,
                     errors: this.errors
                 });
@@ -487,6 +522,7 @@
                 return false; // do not follow the click
             },
             resendVerification(contact) {
+                this.errors.clear();
                 this.resendVerificationCode({
                     userId: this.currentUser.uuid,
                     contact: contact,
@@ -499,6 +535,23 @@
                 this.verifyingContact = null;
                 this.errors.clear();
                 return false; // do not follow the click
+            },
+            updatePolicyTimeouts(p) {
+                if (typeof p.accountOperationTimeout !== 'undefined' && p.accountOperationTimeout !== null) {
+                    const parts = this.messages.millisToDuration(p.accountOperationTimeout);
+                    this.accountOperationTimeout = parts.count;
+                    this.accountOperationTimeoutUnits = parts.units;
+                }
+                if (typeof p.nodeOperationTimeout !== 'undefined' && p.nodeOperationTimeout !== null) {
+                    const parts = this.messages.millisToDuration(p.nodeOperationTimeout);
+                    this.nodeOperationTimeout = parts.count;
+                    this.nodeOperationTimeoutUnits = parts.units;
+                }
+                if (typeof p.authenticatorTimeout !== 'undefined' && p.authenticatorTimeout !== null) {
+                    const parts = this.messages.millisToDuration(p.authenticatorTimeout);
+                    this.authenticatorTimeout = parts.count;
+                    this.authenticatorTimeoutUnits = parts.units;
+                }
             },
             submitVerification(contact) {
                 const uuid = contact.uuid;
@@ -514,6 +567,7 @@
                         this.sendAuthenticatorCode({
                             userId: this.currentUser.uuid,
                             code: code,
+                            authOnly: null,
                             verifyOnly: true,
                             messages: this.messages,
                             errors: this.errors
@@ -532,21 +586,18 @@
             }
         },
         watch: {
+            messages (msgs) {
+                if (this.accountOperationTimeoutUnits === '' && this.watchedPolicy) {
+                    this.updatePolicyTimeouts(this.watchedPolicy);
+                }
+            },
             policy (p) {
                 // console.log('watch.policy: received: '+JSON.stringify(p));
+                if (p) this.watchedPolicy = p;
                 if (typeof p.deletionPolicy !== 'undefined' && p.deletionPolicy !== null) {
                     this.deletionPolicy = p.deletionPolicy;
                 }
-                if (typeof p.accountOperationTimeout !== 'undefined' && p.accountOperationTimeout !== null) {
-                    const parts = this.messages.millisToDuration(p.accountOperationTimeout);
-                    this.accountOperationTimeout = parts.count;
-                    this.accountOperationTimeoutUnits = parts.units;
-                }
-                if (typeof p.nodeOperationTimeout !== 'undefined' && p.nodeOperationTimeout !== null) {
-                    const parts = this.messages.millisToDuration(p.nodeOperationTimeout);
-                    this.nodeOperationTimeout = parts.count;
-                    this.nodeOperationTimeoutUnits = parts.units;
-                }
+                this.updatePolicyTimeouts(p);
                 if (typeof p.accountContacts !== 'undefined' && p.accountContacts !== null && p.accountContacts.length > 0) {
                     this.contacts = p.accountContacts;
                 } else {
