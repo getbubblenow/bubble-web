@@ -1,5 +1,5 @@
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var CopyWebpackPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     mode: 'development',
@@ -37,4 +37,4 @@ module.exports = {
             apiUrl: '/api'
         })
     }
-}
+};
