@@ -516,7 +516,7 @@
             },
             newNodeNotification (nn) {
                 if (nn && nn.uuid) {
-                    this.$router.push({path:'/bubble', params: {id: nn.networkName}, query: {'status': nn.uuid}});
+                    this.$router.push({path:'/bubble/'+nn.networkName});
                 }
             }
         },

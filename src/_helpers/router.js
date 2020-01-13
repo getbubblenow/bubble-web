@@ -61,7 +61,7 @@ export const router = new Router({
             },
           ]
         },
-        { path: '/bubble/new', component: NewNetworkPage,
+        { path: '/new_bubble', component: NewNetworkPage,
           children: newNetworkChildren
         },
         { path: '/bubble/:id', component: NetworkPage }

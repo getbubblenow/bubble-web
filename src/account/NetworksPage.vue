@@ -22,7 +22,7 @@
                 </tbody>
             </table>
             <hr/>
-            <router-link to="/bubble/new">{{messages.button_label_new_network}}</router-link>
+            <router-link to="/new_bubble">{{messages.button_label_new_network}}</router-link>
         </div>
 
         <div v-if="!networks || networks.length === 0">
@@ -53,7 +53,7 @@
             networks (nets) {
                 if (nets && nets.length) {
                     if (nets.length === 0) {
-                        this.$router.replace({path: '/bubble/new'});
+                        this.$router.replace({path: '/new_bubble'});
                     } else if (nets.length === 1 && util.currentUser().admin !== true) {
                         this.$router.replace({path: '/bubble/' + nets[0].name});
                     }
