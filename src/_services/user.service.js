@@ -33,13 +33,14 @@ function setSessionUser (user) {
     return user;
 }
 
-function login(name, password, messages, errors) {
+function login(name, password, unlockKey, messages, errors) {
+    const unlockParam = (typeof unlockKey !== 'undefined' && unlockKey !== null) ? `?k=${unlockKey}` : '';
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 'name': name, 'password': password })
     };
-    return fetch(`${config.apiUrl}/auth/login`, requestOptions)
+    return fetch(`${config.apiUrl}/auth/login${unlockParam}`, requestOptions)
         .then(handleAuthResponse(messages, errors))
         .then(setSessionUser);
 }

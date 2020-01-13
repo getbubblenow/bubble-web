@@ -38,11 +38,15 @@ const actions = {
     },
     login({ dispatch, commit }, { user, messages, errors }) {
         commit('loginRequest', { name: user.name });
-        userService.login(user.name, user.password, messages, errors)
+        userService.login(user.name, user.password, user.unlockKey, messages, errors)
             .then(
                 user => {
                     commit('loginSuccess', user);
                     if (user.token) {
+                        if (user.unlockKey) {
+                            console.log('account.login: reloading system configs after unlock');
+                            dispatch('system/loadSystemConfigs');
+                        }
                         const landing = util.getLandingPage();
                         if (landing === null) {
                             router.replace('/');

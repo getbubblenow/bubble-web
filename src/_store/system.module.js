@@ -16,6 +16,7 @@ const state = {
     searchResults: [],
     status: { activating: false, searching: false, creatingEntity: false, modelSetupInProgress: false },
     activated: null,
+    locked: null,
     error: null,
     messages: {
         durationToMillis: function(count, units) {

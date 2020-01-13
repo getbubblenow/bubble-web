@@ -74,6 +74,7 @@
             <hr/>
             <div class="text-danger"><h4>{{messages.title_network_danger_zone}}</h4></div>
             <div v-if="errors.has('node')" class="invalid-feedback d-block">{{ errors.first('node') }}</div>
+            <div v-if="errors.has('accountPlan')" class="invalid-feedback d-block">{{ errors.first('accountPlan') }}</div>
             <div v-if="network.state === 'running'" style="border: 2px solid #000;">
                 <hr/>
                 <button @click="stopNet()" class="text-danger">{{messages.link_network_action_stop}}</button>
