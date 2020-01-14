@@ -17,6 +17,12 @@ module.exports = {
                 test: /\.js?$/,
                 exclude: /(node_modules)/,
                 use: 'babel-loader'
+            },
+            {
+                test: /\.(css|less)$/,
+                use: [{
+                    loader: "css-loader" // translates CSS into CommonJS
+                }]
             }
         ]
     },
