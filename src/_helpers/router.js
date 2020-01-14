@@ -10,6 +10,7 @@ import MultifactorAuthPage from '../auth/MultifactorAuthPage'
 import ProfilePage from '../account/profile/ProfilePage'
 import ActionPage from '../account/profile/ActionPage'
 import PolicyPage from '../account/profile/PolicyPage'
+import DevicesPage from '../account/DevicesPage'
 import NotificationsPage from '../account/NotificationsPage'
 import ChangePasswordPage from '../account/profile/ChangePasswordPage'
 import SshKeysPage from '../account/profile/SshKeysPage'
@@ -51,6 +52,7 @@ export const router = new Router({
         { path: '/me/action', component: ActionPage },
         { path: '/me/changePassword', component: ChangePasswordPage },
         { path: '/me/keys', component: SshKeysPage },
+        { path: '/devices', component: DevicesPage },
         { path: '/notifications', component: NotificationsPage },
         {
           path: '/bubbles', component: NetworksPage ,

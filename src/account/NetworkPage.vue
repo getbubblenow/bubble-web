@@ -1,6 +1,10 @@
 <template>
     <div v-if="network">
-        <h4>{{network.name}}.{{network.domainName}} - <i>{{messages['msg_network_state_'+network.state]}}</i></h4>
+        <h4 v-if="network.state === 'running' && configs.networkUuid && network.uuid !== configs.networkUuid">
+            <a :href="'https://'+network.name+'.'+network.domainName+':1443/'">{{network.name}}.{{network.domainName}}</a> - <i>{{messages['msg_network_state_'+network.state]}}</i>
+        </h4>
+        <h4 v-else>{{network.name}}.{{network.domainName}} - <i>{{messages['msg_network_state_'+network.state]}}</i></h4>
+
         <div v-if="stats && network.state !== 'stopped'">
             <!-- adapted from: https://code-boxx.com/simple-vanilla-javascript-progress-bar/ -->
             <div class="progress-wrap">
@@ -20,7 +24,7 @@
             <table border="1">
                 <thead>
                 <tr>
-                    <th nowrap="nowrap">{{messages.label_field_nodes_fqdn}}</th>
+                    <th nowrap="nowrap">{{messages.label_field_nodes_name}}</th>
                     <th nowrap="nowrap">{{messages.label_field_nodes_region}}</th>
                     <th nowrap="nowrap">{{messages.label_field_nodes_ip4}}</th>
                     <th nowrap="nowrap">{{messages.label_field_nodes_ip6}}</th>
@@ -29,7 +33,7 @@
                 </thead>
                 <tbody>
                 <tr v-for="node in networkNodes">
-                    <td>{{node.fqdn}}</td>
+                    <td>{{node.name}}</td>
                     <td nowrap="nowrap">{{node.region}}</td>
                     <td>{{node.ip4}}</td>
                     <td>{{node.ip6}}</td>
@@ -39,7 +43,7 @@
             </table>
         </div>
 
-        <div v-if="network.state === 'running'">
+        <div v-if="network.state === 'running' && configs.networkUuid && network.uuid === configs.networkUuid">
             <button @click="requestRestoreKey()">{{messages.link_network_action_request_keys}}</button>
             <div v-if="errors.has('networkKeys')" class="invalid-feedback d-block">{{ errors.first('networkKeys') }}</div>
             <div v-if="networkKeysRequested && networkKeysRequested === networkId">{{messages.message_network_action_keys_requested}}</div>
@@ -66,12 +70,13 @@
             </form>
         </div>
 
+        <hr/>
+
         <div v-if="network.state === 'stopped'">
             <!-- todo: add button to restart network in restore mode -->
         </div>
 
         <div>
-            <hr/>
             <div class="text-danger"><h4>{{messages.title_network_danger_zone}}</h4></div>
             <div v-if="errors.has('node')" class="invalid-feedback d-block">{{ errors.first('node') }}</div>
             <div v-if="errors.has('accountPlan')" class="invalid-feedback d-block">{{ errors.first('accountPlan') }}</div>
@@ -111,7 +116,7 @@
                 'network', 'newNodeNotification', 'networkStatuses', 'networkNodes', 'networkKeysRequested',
                 'deletedNetwork', 'networkKeys'
             ]),
-            ...mapState('system', ['messages'])
+            ...mapState('system', ['messages', 'configs'])
         },
         methods: {
             ...mapActions('networks', [

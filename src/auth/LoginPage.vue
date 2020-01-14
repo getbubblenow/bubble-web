@@ -36,7 +36,7 @@ export default {
         return {
             name: '',
             password: '',
-            unlockKey: null,
+            unlockKey: (this.$route.params && this.$route.params.k) ? this.$route.params.k : null,
             submitted: false
         }
     },

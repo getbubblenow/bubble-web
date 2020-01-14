@@ -1,9 +1,10 @@
-import { systemService, userService } from '../_services';
+import { systemService } from '../_services';
 import { account } from "./account.module";
 import { router } from "../_helpers";
 
 const state = {
     configs: {
+        networkUuid: null,
         allowRegistration: false,
         paymentsEnabled: false,
         sageLauncher: false,
@@ -150,6 +151,10 @@ const getters = {
             href: '/me',
             title: messages.label_menu_account,
             icon: messages.label_menu_account_icon
+        }, {
+            href: '/devices',
+            title: messages.label_menu_devices,
+            icon: messages.label_menu_devices_icon
         }, {
             href: '/notifications',
             title: messages.label_menu_notifications,

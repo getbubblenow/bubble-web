@@ -11,6 +11,7 @@ import { domains } from './domains.module';
 import { paymentMethods } from './paymentMethods.module';
 import { accountPlans } from './accountPlans.module';
 import { networks } from './networks.module';
+import { devices } from './devices.module';
 
 Vue.use(Vuex);
 
@@ -25,7 +26,8 @@ export const store = new Vuex.Store({
         domains,
         paymentMethods,
         accountPlans,
-        networks
+        networks,
+        devices
     }
 });
 
@@ -53,6 +55,7 @@ String.prototype.parseMessage = function (vue, ctx) {
 };
 
 String.prototype.parseDateMessage = function (millis, messages) {
+    if (typeof millis === 'undefined' || millis === null || millis === 0) return messages.label_date_undefined;
     const date = new Date(millis);
     const context = {
         YYYY: date.getFullYear(),
@@ -60,7 +63,12 @@ String.prototype.parseDateMessage = function (millis, messages) {
         M: messages['label_date_month_short_'+date.getMonth()],
         EEE: messages['label_date_day_'+date.getDay()],
         E: messages['label_date_day_short_'+date.getDay()],
-        d: date.getDate()
+        d: date.getDate(),
+        H: date.getHours(),
+        h: (date.getHours() > 12 ? date.getHours() - 12 : date.getHours()+1),
+        a: (date.getHours() > 12 ? messages['label_date_day_half_pm'] : messages['label_date_day_half_am']),
+        m: date.getMinutes(),
+        s: date.getSeconds()
     };
     return this ? ''+this.replace(/{{[\w]+?}}/g, match => {
         const expression = match.slice(2, -2);

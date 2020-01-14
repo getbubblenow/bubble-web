@@ -34,8 +34,8 @@
 </template>
 
 <script>
-    import { mapState, mapActions, mapGetters } from 'vuex'
-    import { util } from '../_helpers'
+    import { mapState, mapActions, mapGetters } from 'vuex';
+    import { util } from '../_helpers';
 
     export default {
         computed: {
