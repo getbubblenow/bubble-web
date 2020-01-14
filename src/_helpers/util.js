@@ -132,6 +132,29 @@ export const util = {
         }
     },
 
+    handlePlaintextResponse: function(messages, errors) {
+        return function (response) {
+            return response.text().then(text => {
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        // todo: show nicer error message
+                        const errData = JSON.parse(''+text);
+                        console.log('handleCrudResponse: received 404: ' + text);
+
+                    } else if (response.status === 422) {
+                        const errData = JSON.parse(''+text);
+                        console.log('handleCrudResponse: received 422, error: ' + text);
+                        util.setValidationErrors(errData, messages, errors);
+                    }
+
+                    const error = (data && data.message) || response.statusText;
+                    return Promise.reject(error);
+                }
+                return text;
+            });
+        }
+    },
+
     setValidationErrors: function(data, messages, errors) {
         for (let i=0; i<data.length; i++) {
             const messageTemplate = data[i].messageTemplate.replace(/\./g, '_');

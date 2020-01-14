@@ -8,6 +8,7 @@
                 <tr>
                     <th nowrap="nowrap">{{messages.label_field_device_name}}</th>
 <!--                    <th nowrap="nowrap">{{messages.label_field_device_enabled}}</th>-->
+                    <th>{{messages.label_field_device_vpn_config}}</th>
                     <th>{{messages.label_field_device_ctime}}</th>
                     <th><!-- delete --></th>
                 </tr>
@@ -17,6 +18,28 @@
                     <td nowrap="nowrap">{{device.name}}</td>
 <!--                    <td>{{messages['message_'+device.enabled]}}</td>-->
                     <td nowrap="nowrap">{{messages.label_device_ctime_format.parseDateMessage(device.ctime, messages)}}</td>
+                    <td>
+                        <div v-if="displayVpnConfig[device.uuid] === true" class="device-vpn-config-div">
+                            <h3>{{device.name}}</h3>
+                            <hr/>
+
+                            <div v-if="qrCodeImageBase64">
+                                <img :src="'data:image/png;base64,'+qrCodeImageBase64"/>
+                            </div>
+                            <div v-if="errors.has('deviceQRcode')" class="invalid-feedback d-block">{{ errors.first('deviceQRcode') }}</div>
+
+                            <hr/>
+
+                            <button v-if="vpnConfBase64" @click="downloadURI('data:text/plain;base64,'+vpnConfBase64, 'vpn.conf')">{{messages.message_device_vpn_download_conf}}</button>
+                            <div v-if="errors.has('deviceVpnConf')" class="invalid-feedback d-block">{{ errors.first('deviceVpnConf') }}</div>
+
+                            <hr/>
+                            <button @click="hideVpnConfig()" class="btn btn-primary">{{messages.button_label_close_device_vpn_config}}</button>
+                        </div>
+                        <div v-else>
+                            <button @click="showVpnConfig(device.uuid)">{{messages.message_device_vpn_show_config}}</button>
+                        </div>
+                    </td>
                     <td>
                         <i @click="removeDevice(device.uuid)" aria-hidden="true" :class="messages.button_label_remove_device_icon" :title="messages.button_label_remove_device"></i>
                         <span class="sr-only">{{messages.button_label_remove_device}}</span>
@@ -57,17 +80,20 @@
 <script>
     import { mapState, mapActions, mapGetters } from 'vuex';
     import { util } from '../_helpers';
+    import config from 'config';
 
     export default {
         data () {
             return {
                 userId: util.currentUser().uuid,
                 submitted: false,
-                deviceName: null
+                deviceName: null,
+                displayVpnConfig: {},
+                config: config
             };
         },
         computed: {
-            ...mapState('devices', ['devices', 'device']),
+            ...mapState('devices', ['devices', 'device', 'qrCodeImageBase64', 'vpnConfBase64']),
             ...mapState('system', ['messages'])
         },
         created () {
@@ -78,7 +104,10 @@
             });
         },
         methods: {
-            ...mapActions('devices', ['getDevicesByUserId', 'addDeviceByUserId', 'removeDeviceByUserId']),
+            ...mapActions('devices', [
+                'getDevicesByUserId', 'addDeviceByUserId', 'removeDeviceByUserId',
+                'getDeviceQRcodeById', 'getDeviceVPNconfById'
+            ]),
             ...mapGetters('devices', ['loading']),
             addDevice () {
                 this.errors.clear();
@@ -101,6 +130,34 @@
                     messages: this.messages,
                     errors: this.errors
                 });
+            },
+            showVpnConfig (id) {
+                const show = {};
+                show[id] = true;
+                this.errors.clear();
+                this.getDeviceQRcodeById({
+                    userId: this.userId,
+                    deviceId: id,
+                    messages: this.messages,
+                    errors: this.errors
+                });
+                this.getDeviceVPNconfById({
+                    userId: this.userId,
+                    deviceId: id,
+                    messages: this.messages,
+                    errors: this.errors
+                });
+                this.displayVpnConfig = Object.assign({}, show);
+            },
+            hideVpnConfig () { this.displayVpnConfig = {}; },
+
+            downloadURI(uri, name) {  // adapted from https://stackoverflow.com/a/15832662/1251543
+                let link = document.createElement("a");
+                link.download = name;
+                link.href = uri;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
         },
         watch: {

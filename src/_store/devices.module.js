@@ -3,11 +3,14 @@ import { util } from '../_helpers';
 
 const state = {
     loading: {
-        devices: false, addDevice: false, removeDevice: false
+        devices: false, addDevice: false, removeDevice: false,
+        qrCode: false, vpnConf: false
     },
     error: null,
     devices: [],
-    device: null
+    device: null,
+    qrCodeImageBase64: null,
+    vpnConfBase64: null
 };
 
 const actions = {
@@ -17,6 +20,24 @@ const actions = {
             .then(
                 devices => commit('getDevicesByUserIdSuccess', devices),
                 error => commit('getDevicesByUserIdFailure', error)
+            );
+    },
+
+    getDeviceQRcodeById({ commit }, {userId, deviceId, messages, errors}) {
+        commit('getDeviceQRcodeByIdRequest');
+        deviceService.getDeviceQRcodeById(userId, deviceId, messages, errors)
+            .then(
+                qrData => commit('getDeviceQRcodeByIdSuccess', qrData),
+                error => commit('getDeviceQRcodeByIdFailure', error)
+            );
+    },
+
+    getDeviceVPNconfById({ commit }, {userId, deviceId, messages, errors}) {
+        commit('getDeviceVPNconfByIdRequest');
+        deviceService.getDeviceVPNconfById(userId, deviceId, messages, errors)
+            .then(
+                conf => commit('getDeviceVPNconfByIdSuccess', conf),
+                error => commit('getDeviceVPNconfByIdFailure', error)
             );
     },
 
@@ -48,7 +69,33 @@ const mutations = {
         state.devices = devices;
     },
     getDevicesByUserIdFailure(state, error) {
-        state.loading.users = false;
+        state.loading.devices = false;
+        state.error = error;
+    },
+
+    getDeviceQRcodeByIdRequest(state) {
+        state.loading.qrCode = true;
+        state.qrCodeImageBase64 = null;
+    },
+    getDeviceQRcodeByIdSuccess(state, qrCodeImageBase64) {
+        state.loading.qrCode = false;
+        state.qrCodeImageBase64 = qrCodeImageBase64;
+    },
+    getDeviceQRcodeByIdFailure(state, error) {
+        state.loading.qrCode = false;
+        state.error = error;
+    },
+
+    getDeviceVPNconfByIdRequest(state) {
+        state.loading.vpnConf = true;
+        state.vpnConfBase64 = null;
+    },
+    getDeviceVPNconfByIdSuccess(state, confData) {
+        state.loading.vpnConf = false;
+        state.vpnConfBase64 = confData;
+    },
+    getDeviceVPNconfByIdFailure(state, error) {
+        state.loading.vpnConf = false;
         state.error = error;
     },
 
