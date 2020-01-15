@@ -44,22 +44,22 @@
                 <div v-if="networkType === 'fork'" class="form-group">
                     <label for="forkHost">{{messages.field_label_network_fork_host}}</label>
                     <input type="text" v-model="accountPlan.forkHost" name="forkHost" class="form-control" :class="{ 'is-invalid': submitted && errors.has('forkHost') }" />
-                    <div v-if="submitted && errors.has('forkHost')" class="invalid-feedback">{{ errors.first('forkHost') }}</div>
-                    <div v-if="submitted && errors.has('fqdn')" class="invalid-feedback">{{ errors.first('fqdn') }}</div>
+                    <div v-if="submitted && errors.has('forkHost')" class="invalid-feedback d-block">{{ errors.first('forkHost') }}</div>
+                    <div v-if="submitted && errors.has('fqdn')" class="invalid-feedback d-block">{{ errors.first('fqdn') }}</div>
                     {{messages.field_description_network_fork_host}}
                 </div>
                 <!-- OR, name -->
                 <div v-else class="form-group">
                     <label for="name">{{messages.field_label_network_name}}</label>
                     <input type="text" v-model="accountPlan.name" v-validate="'required'" name="name" class="form-control" :class="{ 'is-invalid': submitted && errors.has('name') }" />
-                    <div v-if="submitted && errors.has('name')" class="invalid-feedback">{{ errors.first('name') }}</div>
+                    <div v-if="submitted && errors.has('name')" class="invalid-feedback d-block">{{ errors.first('name') }}</div>
                 </div>
             </div>
             <!-- name -->
             <div v-else class="form-group">
                 <label for="name">{{messages.field_label_network_name}}</label>
                 <input type="text" v-model="accountPlan.name" v-validate="'required'" name="name" class="form-control" :class="{ 'is-invalid': submitted && errors.has('name') }" />
-                <div v-if="submitted && errors.has('name')" class="invalid-feedback">{{ errors.first('name') }}</div>
+                <div v-if="submitted && errors.has('name')" class="invalid-feedback d-block">{{ errors.first('name') }}</div>
             </div>
 
             <!-- plan -->
@@ -68,7 +68,7 @@
                 <select v-validate="'required'" v-if="planObjects" v-model="accountPlan.plan" name="plan" class="form-control" :class="{ 'is-invalid': submitted && errors.has('plan') }">
                     <option v-for="plan in planObjects" :value="plan.name">{{messages['plan_name_'+plan.name]}}</option>
                 </select>
-                <div v-if="submitted && errors.has('plan')" class="invalid-feedback">{{ errors.first('plan') }}</div>
+                <div v-if="submitted && errors.has('plan')" class="invalid-feedback d-block">{{ errors.first('plan') }}</div>
                 <button @click="customize.plan = false">{{messages.button_label_use_default}}</button>
             </div>
             <div v-if="customize.plan === false">
@@ -88,7 +88,7 @@
                 <select v-validate="'required'" v-if="domains" v-model="accountPlan.domain" name="domain" class="form-control" :class="{ 'is-invalid': submitted && errors.has('domain') }">
                     <option v-for="domain in domains" :value="domain.name">{{domain.name}}</option>
                 </select>
-                <div v-if="submitted && errors.has('domain')" class="invalid-feedback">{{ errors.first('domain') }}</div>
+                <div v-if="submitted && errors.has('domain')" class="invalid-feedback d-block">{{ errors.first('domain') }}</div>
                 <button @click="customize.domain = false">{{messages.button_label_use_default}}</button>
             </div>
             <div v-if="customize.domain === false">
@@ -113,7 +113,7 @@
                 <select name="region" v-validate="'required'" v-model="cloudRegionUuid" v-if="regions" class="form-control" :class="{ 'is-invalid': submitted && errors.has('region') }">
                     <option v-for="region in regions" :value="region.uuid">{{region.name}} (~{{parseInt(region.distance/1000)}} {{messages.msg_km_distance_away}})</option>
                 </select>
-                <div v-if="submitted && errors.has('region')" class="invalid-feedback">{{ errors.first('region') }}</div>
+                <div v-if="submitted && errors.has('region')" class="invalid-feedback d-block">{{ errors.first('region') }}</div>
                 <button @click="customize.region = false">{{messages.button_label_use_default}}</button>
             </div>
             <div v-if="customize.region === false">
@@ -130,7 +130,7 @@
                 <select v-validate="'required'" v-if="locales" v-model="accountPlan.locale" name="locale" class="form-control" :class="{ 'is-invalid': submitted && errors.has('locale') }">
                     <option v-for="locale in locales" :value="locale.localeCode">{{messages['locale_'+locale.localeCode]}}</option>
                 </select>
-                <div v-if="submitted && errors.has('locale')" class="invalid-feedback">{{ errors.first('locale') }}</div>
+                <div v-if="submitted && errors.has('locale')" class="invalid-feedback d-block">{{ errors.first('locale') }}</div>
                 <button @click="customize.locale = false">{{messages.button_label_use_default}}</button>
             </div>
             <div v-if="customize.locale === false">
@@ -145,7 +145,7 @@
             <div v-if="customize.timezone === true" class="form-group">
                 <label htmlFor="timezone">{{messages.field_label_timezone}}</label>
                 <v-select v-validate="'required'" :options="timezoneObjects" :reduce="tz => tz.timezoneId" label="timezoneDescription" type="text" v-model="accountPlan.timezone" name="timezone" class="form-control" :class="{ 'is-invalid': submitted && errors.has('timezone') }"></v-select>
-                <div v-if="submitted && errors.has('timezone')" class="invalid-feedback">{{ errors.first('timezone') }}</div>
+                <div v-if="submitted && errors.has('timezone')" class="invalid-feedback d-block">{{ errors.first('timezone') }}</div>
                 <button @click="customize.timezone = false">{{messages.button_label_use_default}}</button>
             </div>
             <div v-if="customize.timezone === false">
@@ -162,7 +162,7 @@
                 <select v-validate="'required'" v-if="footprintObjects" v-model="accountPlan.footprint" name="footprint" @change="refreshCloudRegions()" class="form-control" :class="{ 'is-invalid': submitted && errors.has('footprint') }">
                     <option v-for="footprint in footprintObjects" :value="footprint.name">{{messages['footprint_name_'+footprint.name]}}</option>
                 </select>
-                <div v-if="submitted && errors.has('footprint')" class="invalid-feedback">{{ errors.first('footprint') }}</div>
+                <div v-if="submitted && errors.has('footprint')" class="invalid-feedback d-block">{{ errors.first('footprint') }}</div>
                 <button @click="customize.footprint = false">{{messages.button_label_use_default}}</button>
             </div>
             <div v-if="customize.footprint === false">
@@ -182,7 +182,7 @@
                 <select v-validate="'required'" v-if="sshKeys" v-model="accountPlan.sshKey" name="sshKey" class="form-control" :class="{ 'is-invalid': submitted && errors.has('sshPublicKey') }">
                     <option v-for="key in sshKeyObjects" :value="key.value">{{key.name}}</option>
                 </select>
-                <div v-if="submitted && errors.has('sshPublicKey')" class="invalid-feedback">{{ errors.first('sshPublicKey') }}</div>
+                <div v-if="submitted && errors.has('sshPublicKey')" class="invalid-feedback d-block">{{ errors.first('sshPublicKey') }}</div>
                 <button @click="customize.sshKey = false">{{messages.button_label_use_default}}</button>
                 <router-link to="/me/keys">{{messages.link_label_account_ssh_keys}}</router-link>
             </div>
