@@ -6,6 +6,7 @@ export const networkService = {
     getNetworkById,
     getNearestRegions,
     startNetwork,
+    forkNetwork,
     getStatusesByNetworkId,
     getNodesByNetworkId,
     stopNetwork,
@@ -27,9 +28,18 @@ function getNearestRegions(footprint, messages, errors) {
     return fetch(`${config.apiUrl}/me/regions/closest${footprintParam}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
+function getCloudAndRegion(cloud, region) {
+    return (typeof cloud === 'undefined' || typeof region === 'undefined' || cloud === null || region === null) ? "" : `?cloud=${cloud}&region=${region}`;
+}
+
 function startNetwork(userId, planId, cloud, region, messages, errors) {
-    const cloudAndRegion = (typeof cloud === 'undefined' || typeof region === 'undefined' || cloud === null || region === null) ? "" : `?cloud=${cloud}&region=${region}`;
+    const cloudAndRegion = getCloudAndRegion(cloud, region);
     return fetch(`${config.apiUrl}/users/${userId}/networks/${planId}/actions/start${cloudAndRegion}`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
+}
+
+function forkNetwork(userId, planId, forkHost, cloud, region, messages, errors) {
+    const cloudAndRegion = getCloudAndRegion(cloud, region);
+    return fetch(`${config.apiUrl}/users/${userId}/networks/${planId}/actions/fork/${forkHost}${cloudAndRegion}`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function getStatusesByNetworkId(userId, networkId, messages, errors) {

@@ -45,11 +45,20 @@ const actions = {
         accountPlanService.newAccountPlan(userId, accountPlan, messages, errors)
             .then(
                 plan => {
-                    networkService.startNetwork(userId, plan.name, cloud, region, messages, errors)
-                        .then(
-                            newNodeNotification => commit('addPlanAndStartNetworkSuccess', newNodeNotification),
-                            error => commit('addPlanSuccessStartNetworkFailure', error)
-                        );
+                    if (accountPlan.forkHost && accountPlan.forkHost !== '') {
+                        networkService.forkNetwork(userId, plan.name, accountPlan.forkHost, cloud, region, messages, errors)
+                            .then(
+                                newNodeNotification => commit('addPlanAndStartNetworkSuccess', newNodeNotification),
+                                error => commit('addPlanSuccessStartNetworkFailure', error)
+                            );
+
+                    } else {
+                        networkService.startNetwork(userId, plan.name, cloud, region, messages, errors)
+                            .then(
+                                newNodeNotification => commit('addPlanAndStartNetworkSuccess', newNodeNotification),
+                                error => commit('addPlanSuccessStartNetworkFailure', error)
+                            );
+                    }
                 },
                 error => commit('addPlanFailure', error)
             );

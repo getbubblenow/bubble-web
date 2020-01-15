@@ -30,8 +30,32 @@
         </div>
         <div v-else>
         <form @submit.prevent="handleSubmit">
+
+            <div v-if="configs && configs.sageLauncher && configs.sageLauncher === true && user && user.admin === true">
+                <!-- network type -->
+                <div class="form-group">
+                    <label for="networkType">{{messages.field_label_network_type}}</label>
+                    <select v-model="networkType" name="networkType" class="form-control">
+                        <option value="bubble">{{messages.field_label_network_type_regular}}</option>
+                        <option value="fork">{{messages.field_label_network_type_fork}}</option>
+                    </select>
+                </div>
+                <!-- fork host -->
+                <div v-if="networkType === 'fork'" class="form-group">
+                    <label for="forkHost">{{messages.field_label_network_fork_host}}</label>
+                    <input type="text" v-model="accountPlan.forkHost" name="forkHost" class="form-control" :class="{ 'is-invalid': submitted && errors.has('forkHost') }" />
+                    <div v-if="submitted && errors.has('forkHost')" class="invalid-feedback">{{ errors.first('forkHost') }}</div>
+                    {{messages.field_description_network_fork_host}}
+                </div>
+                <!-- OR, name -->
+                <div v-else class="form-group">
+                    <label for="name">{{messages.field_label_network_name}}</label>
+                    <input type="text" v-model="accountPlan.name" v-validate="'required'" name="name" class="form-control" :class="{ 'is-invalid': submitted && errors.has('name') }" />
+                    <div v-if="submitted && errors.has('name')" class="invalid-feedback">{{ errors.first('name') }}</div>
+                </div>
+            </div>
             <!-- name -->
-            <div class="form-group">
+            <div v-else class="form-group">
                 <label for="name">{{messages.field_label_network_name}}</label>
                 <input type="text" v-model="accountPlan.name" v-validate="'required'" name="name" class="form-control" :class="{ 'is-invalid': submitted && errors.has('name') }" />
                 <div v-if="submitted && errors.has('name')" class="invalid-feedback">{{ errors.first('name') }}</div>
@@ -237,8 +261,10 @@
                         paymentMethodType: null,
                         paymentInfo: null
                     },
-                    sshKey: ''
+                    sshKey: '',
+                    forkHost: ''
                 },
+                networkType: 'bubble',
                 cloudRegionUuid: null,
                 regions: [],
                 customize: {
@@ -270,7 +296,7 @@
             };
         },
         computed: {
-            ...mapState('system', ['messages', 'locales', 'timezones', 'detectedTimezone', 'detectedLocale']),
+            ...mapState('system', ['messages', 'locales', 'timezones', 'detectedTimezone', 'detectedLocale', 'configs']),
             ...mapState('domains', ['domains']),
             ...mapState('plans', ['plans']),
             ...mapState('footprints', ['footprints']),

@@ -152,10 +152,6 @@ const getters = {
             title: messages.label_menu_account,
             icon: messages.label_menu_account_icon
         }, {
-            href: '/devices',
-            title: messages.label_menu_devices,
-            icon: messages.label_menu_devices_icon
-        }, {
             href: '/notifications',
             title: messages.label_menu_notifications,
             icon: messages.label_menu_notifications_icon
@@ -169,6 +165,12 @@ const getters = {
                 href: '/me/bubbles',
                 title: messages.label_menu_networks,
                 icon: messages.label_menu_networks_icon
+            });
+        } else {
+            menu.splice(3, 0, {
+                href: '/devices',
+                title: messages.label_menu_devices,
+                icon: messages.label_menu_devices_icon
             });
         }
         if (configs.paymentsEnabled) {
