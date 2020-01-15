@@ -76,7 +76,7 @@
             <!-- todo: add button to restart network in restore mode -->
         </div>
 
-        <div>
+        <div v-if="network.state === 'running' || network.state === 'stopped'">
             <div class="text-danger"><h4>{{messages.title_network_danger_zone}}</h4></div>
             <div v-if="errors.has('node')" class="invalid-feedback d-block">{{ errors.first('node') }}</div>
             <div v-if="errors.has('accountPlan')" class="invalid-feedback d-block">{{ errors.first('accountPlan') }}</div>
@@ -87,7 +87,7 @@
             </div>
             <div v-else></div>
             <hr/>
-            <div style="border: 2px solid #000;">
+            <div v-if="network.state === 'stopped'" style="border: 2px solid #000;">
                 <button @click="deleteNet()" class="text-danger">{{messages.link_network_action_delete}}</button>
                 {{messages.link_network_action_delete_description}}
             </div>
