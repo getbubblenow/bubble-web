@@ -33,7 +33,7 @@
                 </thead>
                 <tbody>
                 <tr v-for="node in networkNodes">
-                    <td>{{node.name}}</td>
+                    <td>{{node.fqdn}}</td>
                     <td nowrap="nowrap">{{node.region}}</td>
                     <td>{{node.ip4}}</td>
                     <td>{{node.ip6}}</td>
