@@ -308,7 +308,7 @@
             ...mapState('users', ['policy', 'sshKeys']),
             ...mapState('account', ['actionStatus']),
             isComplete() {
-                return (this.accountPlan.name !== '')
+                return (this.accountPlan.name !== '' || this.accountPlan.forkHost !== '')
                     && (this.customize.domain === false || this.accountPlan.domain !== '')
                     && (this.customize.locale === false || this.accountPlan.locale !== '')
                     && (this.customize.timezone === false || this.accountPlan.timezone !== '')

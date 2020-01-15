@@ -39,7 +39,7 @@ function startNetwork(userId, planId, cloud, region, messages, errors) {
 
 function forkNetwork(userId, planId, forkHost, cloud, region, messages, errors) {
     const cloudAndRegion = getCloudAndRegion(cloud, region);
-    return fetch(`${config.apiUrl}/users/${userId}/networks/${planId}/actions/fork/${forkHost}${cloudAndRegion}`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/users/${userId}/networks/${planId}/actions/fork/${forkHost}${cloudAndRegion}`, util.putWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function getStatusesByNetworkId(userId, networkId, messages, errors) {
