@@ -1,11 +1,11 @@
 {
-  "name": "vue-vuex-registration-login-example",
+  "name": "bubble-web",
   "version": "1.0.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cornflourblue/vue-vuex-registration-login-example.git"
+    "url": "https://git.bubblev.org/bubblev/bubble-web.git"
   },
-  "license": "MIT",
+  "license": "GNU Affero General Public License",
   "scripts": {
     "start": "webpack-dev-server --open"
   },
