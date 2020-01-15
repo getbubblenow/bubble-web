@@ -45,6 +45,7 @@
                     <label for="forkHost">{{messages.field_label_network_fork_host}}</label>
                     <input type="text" v-model="accountPlan.forkHost" name="forkHost" class="form-control" :class="{ 'is-invalid': submitted && errors.has('forkHost') }" />
                     <div v-if="submitted && errors.has('forkHost')" class="invalid-feedback">{{ errors.first('forkHost') }}</div>
+                    <div v-if="submitted && errors.has('fqdn')" class="invalid-feedback">{{ errors.first('fqdn') }}</div>
                     {{messages.field_description_network_fork_host}}
                 </div>
                 <!-- OR, name -->
