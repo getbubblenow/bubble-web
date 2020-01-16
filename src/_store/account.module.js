@@ -1,4 +1,4 @@
-import { userService, systemService } from '../_services';
+import { userService } from '../_services';
 import { router, util } from '../_helpers';
 
 const user = util.currentUser();
@@ -154,7 +154,7 @@ const actions = {
 
 const mutations = {
     refreshUser(state, user) {
-        state.status.loggedIn = (user !== null);
+        state.status = Object.assign({}, state.status, {loggedIn: (user !== null)});
         state.user = user;
     },
     checkSessionRequest(state) {},
@@ -167,16 +167,15 @@ const mutations = {
     },
     checkSessionFailure(state, error) {
         state.user = null;
-        state.status.loggedIn = false;
+        state.status = Object.assign({}, state.status, {loggedIn: false});
     },
     loginRequest(state, user) {
-        state.status.loggingIn = true;
+        state.status = Object.assign({}, state.status, {loggingIn: true});
         state.user = user;
     },
     loginSuccess(state, user) {
         if (user.token) {
-            state.status.loggingIn = false;
-            state.status.loggedIn = true;
+            state.status = Object.assign({}, state.status, {loggingIn: false, loggedIn: true});
         } else if (user.multifactorAuth) {
             state.status = { multifactorAuth: true };
         } else {
@@ -187,7 +186,7 @@ const mutations = {
         state.locale = (typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : state.locale);
     },
     loginFailure(state) {
-        state.status.loggingIn = false;
+        state.status = Object.assign({}, state.status, {loggingIn: false, loggedIn: false});
         state.user = null;
     },
 
@@ -197,24 +196,24 @@ const mutations = {
     },
 
     registerRequest(state, user) {
-        state.status.registering = true;
+        state.status = Object.assign({}, state.status, {registering: true});
         state.user = user;
     },
     registerSuccess(state, user) {
         state.user = user;
-        state.status.registering = false;
+        state.status = Object.assign({}, state.status, {registering: false});
         localStorage.setItem(util.USER_KEY, JSON.stringify(user));
         state.locale = (typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : state.locale);
         state.registrationError = null;
     },
     registerFailure(state, error) {
-        state.status.registering = false;
+        state.status = Object.assign({}, state.status, {registering: false});
         state.status = {};
         state.registrationError = error;
     },
 
     setLocaleRequest(state, locale) {
-        state.status.settingLocale = true;
+        state.status = Object.assign({}, state.status, {settingLocale: true});
         state.locale = locale;
         const user = util.currentUser();
         if (user === null) {
@@ -227,60 +226,60 @@ const mutations = {
     },
     setLocaleSuccess(state, user) {
         state.locale = ''+state.locale;
-        state.status.settingLocale = false;
+        state.status = Object.assign({}, state.status, {settingLocale: false});
     },
     setLocaleFailure(state) {
-        state.status.settingLocale = false;
+        state.status = Object.assign({}, state.status, {settingLocale: false});
         state.status = {};
     },
 
     updateRequest(state, user) {
-        state.status.updating = true;
+        state.status = Object.assign({}, state.status, {updating: true});
         state.user = user;
     },
     updateSuccess(state, user) {
-        state.status.updating = false;
+        state.status = Object.assign({}, state.status, {updating: false});
         localStorage.setItem(util.USER_KEY, JSON.stringify(user));
         state.user = user;
         state.locale = (typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : state.locale);
     },
     updateFailure(state) {
-        state.status.updating = false;
+        state.status = Object.assign({}, state.status, {updating: false});
         state.status = {};
     },
 
     approveActionRequest(state) {
-        state.status.approving = true;
+        state.status = Object.assign({}, state.status, {approving: true});
         state.actionStatus = { requesting: true, type: 'approve' };
     },
     approveActionSuccess(state, user) {
-        state.status.approving = false;
+        state.status = Object.assign({}, state.status, {approving: false});
         state.actionStatus = { success: true, type: 'approve', result: user };
         if (user.token) state.user = user;
     },
     approveActionFailure(state, error) {
-        state.status.approving = false;
+        state.status = Object.assign({}, state.status, {approving: false});
         state.actionStatus = { error: error, type: 'approve' };
     },
     denyActionRequest(state) {
-        state.status.denying = true;
+        state.status = Object.assign({}, state.status, {denying: true});
         state.actionStatus = { requesting: true, type: 'deny' };
     },
     denyActionSuccess(state, denial) {
-        state.status.denying = false;
+        state.status = Object.assign({}, state.status, {denying: false});
         state.actionStatus = { success: true, type: 'deny', result: denial };
         state.denial = denial;
     },
     denyActionFailure(state, error) {
-        state.status.denying = false;
+        state.status = Object.assign({}, state.status, {denying: false});
         state.actionStatus = { error: error, type: 'deny' };
     },
     sendAuthenticatorCodeRequest(state) {
-        state.status.authenticating = true;
+        state.status = Object.assign({}, state.status, {authenticating: true});
         state.actionStatus = { requesting: true, type: 'approve' };
     },
     sendAuthenticatorCodeSuccess(state, user, messages) {
-        state.status.authenticating = false;
+        state.status = Object.assign({}, state.status, {authenticating: false});
         state.actionStatus = { success: true, type: 'approve', result: user };
         console.log('auth successful -- setting window.showTotpModal = false');
         window.showTotpModal = false;
@@ -295,20 +294,20 @@ const mutations = {
         }
     },
     sendAuthenticatorCodeFailure(state, error) {
-        state.status.authenticating = false;
+        state.status = Object.assign({}, state.status, {authenticating: false});
         state.actionStatus = { error: error, type: 'approve' };
     },
 
     resendVerificationCodeRequest(state) {
-        state.status.sendingVerification = true;
+        state.status = Object.assign({}, state.status, {sendingVerification: true});
         state.actionStatus = { requesting: true, type: 'verify' };
     },
     resendVerificationCodeSuccess(state, policy) {
-        state.status.sendingVerification = false;
+        state.status = Object.assign({}, state.status, {sendingVerification: false});
         state.actionStatus = { success: true, type: 'verify', result: policy };
     },
     resendVerificationCodeFailure(state, error) {
-        state.status.sendingVerification = false;
+        state.status = Object.assign({}, state.status, {sendingVerification: false});
         state.actionStatus = { error: error, type: 'verify' };
     }
 };

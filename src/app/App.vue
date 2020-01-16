@@ -76,7 +76,7 @@ export default {
         },
         user (u) {
             if (typeof u === 'undefined' || u === null || typeof u.locale === 'undefined' || u.locale === null) {
-                if (this.activated && status.registrationError === null) {
+                if (this.activated && (typeof status.registrationError === 'undefined' || status.registrationError === null)) {
                     this.logout();
                     this.$router.replace('/logout');
                 }
