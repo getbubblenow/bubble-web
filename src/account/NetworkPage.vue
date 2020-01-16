@@ -1,7 +1,7 @@
 <template>
     <div v-if="network">
-        <h4 v-if="network.state === 'running' && configs.networkUuid && network.uuid !== configs.networkUuid">
-            <a :href="'https://'+network.name+'.'+network.domainName+':1443/'">{{network.name}}.{{network.domainName}}</a> - <i>{{messages['msg_network_state_'+network.state]}}</i>
+        <h4 v-if="network.state === 'running' && configs && configs.networkUuid && network.uuid !== configs.networkUuid">
+            <a :href="'https://'+network.name+'.'+network.domainName+(network.installType !== 'sage' && configs.nginxPort ? ':'+configs.nginxPort : '')+'/'">{{network.name}}.{{network.domainName}}</a> - <i>{{messages['msg_network_state_'+network.state]}}</i>
         </h4>
         <h4 v-else>{{network.name}}.{{network.domainName}} - <i>{{messages['msg_network_state_'+network.state]}}</i></h4>
 

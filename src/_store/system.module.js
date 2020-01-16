@@ -11,7 +11,8 @@ const state = {
         cloudDrivers: [],
         entityClasses: [],
         locales: ['en_US'],
-        cloudConfigs: {}
+        cloudConfigs: {},
+        nginxPort: null
     },
     entityConfigs: {},
     searchResults: [],
