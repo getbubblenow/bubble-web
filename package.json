@@ -5,7 +5,7 @@
     "type": "git",
     "url": "https://git.bubblev.org/bubblev/bubble-web.git"
   },
-  "license": "AGPL-3.0-only",
+  "license": "LicenseRef-LICENSE.md",
   "scripts": {
     "start": "webpack-dev-server --open"
   },
