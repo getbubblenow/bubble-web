@@ -13,7 +13,8 @@ const defaultStatus = {
     approving: false,
     denying: false,
     authenticating: false,
-    sendingVerification: false
+    sendingVerification: false,
+    registrationError: null
 };
 
 const state = {
@@ -80,10 +81,7 @@ const actions = {
                         dispatch('alert/success', messages.alert_registration_success, { root: true });
                     })
                 },
-                error => {
-                    commit('registerFailure');
-                    dispatch('alert/error', error, { root: true });
-                }
+                error => commit('registerFailure', error)
             );
     },
     setLocale({ commit }, {locale, messages, errors}) {
@@ -203,14 +201,16 @@ const mutations = {
         state.user = user;
     },
     registerSuccess(state, user) {
+        state.user = user;
         state.status.registering = false;
         localStorage.setItem(util.USER_KEY, JSON.stringify(user));
-        state.user = user;
         state.locale = (typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : state.locale);
+        state.registrationError = null;
     },
-    registerFailure(state) {
+    registerFailure(state, error) {
         state.status.registering = false;
         state.status = {};
+        state.registrationError = error;
     },
 
     setLocaleRequest(state, locale) {
