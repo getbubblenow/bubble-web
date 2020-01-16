@@ -467,9 +467,8 @@
                         if (this.paymentInfo) {
                             const cloudRegion = this.findRegion(this.cloudRegionUuid);
                             if (cloudRegion === null) {
-                                console.log('no region selected'); // todo: set error
+                                this.errors.add({field: 'region', msg: this.messages['err_region_notFound']});
                             } else {
-                                console.log('sending accountPlan: ' + JSON.stringify(this.accountPlan) + ' cloud/region=' + cloudRegion.cloud + '/' + cloudRegion.internalName);
                                 this.addPlanAndStartNetwork({
                                     userId: this.user.uuid,
                                     accountPlan: this.accountPlan,
