@@ -12,7 +12,7 @@ const state = {
         entityClasses: [],
         locales: ['en_US'],
         cloudConfigs: {},
-        nginxPort: null
+        sslPort: null
     },
     entityConfigs: {},
     searchResults: [],
