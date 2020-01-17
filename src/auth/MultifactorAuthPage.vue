@@ -79,7 +79,7 @@
                         });
                     } else {
                         this.approveAction({
-                            uuid: this.username,
+                            userId: this.username,
                             code: code,
                             messages: this.messages,
                             errors: this.errors

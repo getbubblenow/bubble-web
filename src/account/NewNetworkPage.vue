@@ -427,7 +427,7 @@
                     if (code === null || code === '') return;
                     this.errors.clear();
                     this.approveAction({
-                        uuid: util.currentUser().uuid,
+                        userId: util.currentUser().uuid,
                         code: code,
                         messages: this.messages,
                         errors: this.errors
@@ -438,7 +438,7 @@
             },
             resendVerification(contact) {
                 this.resendVerificationCode({
-                    uuid: util.currentUser().uuid,
+                    userId: util.currentUser().uuid,
                     contact: contact,
                     messages: this.messages,
                     errors: this.errors
