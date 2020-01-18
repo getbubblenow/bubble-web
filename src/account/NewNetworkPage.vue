@@ -20,7 +20,7 @@
                         <form @submit.prevent="submitVerification()">
         <label htmlFor="verifyCode">{{messages.field_label_policy_contact_verify_code}}</label>
         <input :disabled="actionStatus.requesting" :id="'verifyContactCode'" v-validate="'required'" name="verifyCode" type="text" size="8"/>
-        <div v-if="errors.has('token')" class="invalid-feedback d-block">{{ errors.first('token') }}</div>
+        <div v-if="errors.has('approvalToken')" class="invalid-feedback d-block">{{ errors.first('approvalToken') }}</div>
         <button class="btn btn-primary" :disabled="actionStatus.requesting">{{messages.button_label_submit_verify_code}}</button>
         <button class="btn btn-primary" :disabled="actionStatus.requesting" @click="resendVerification(firstContact)">{{messages.button_label_resend_verify_code}}</button>
                         </form>
