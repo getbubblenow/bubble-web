@@ -200,31 +200,34 @@
             </div>
 
             <!-- payment -->
-            <div class="form-group">
-                <label htmlFor="paymentMethod">{{messages.field_label_paymentMethod}}</label>
-                <div v-if="typeof paymentMethods === 'undefined' || paymentMethods === null || paymentMethods.length === 0" class="invalid-feedback d-block">
-                    <h5>{{messages.err_noPaymentMethods}}</h5>
-                </div>
-                <span v-for="pm in paymentMethods">
+            <div v-if="configs && configs.paymentsEnabled">
+                <div class="form-group">
+                    <label htmlFor="paymentMethod">{{messages.field_label_paymentMethod}}</label>
+                    <div v-if="typeof paymentMethods === 'undefined' || paymentMethods === null || paymentMethods.length === 0" class="invalid-feedback d-block">
+                        <h5>{{messages.err_noPaymentMethods}}</h5>
+                    </div>
+                    <span v-for="pm in paymentMethods">
                     <button class="btn btn-primary" :disabled="loading()" @click="setPaymentMethod(pm)">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
                 </span>
+                </div>
+
+                <div v-if="selectedPaymentMethod !== null && selectedPaymentMethod.paymentMethodType === 'credit'">
+                    <router-view name="pay_stripe" v-if="selectedPaymentMethod.driverClass.endsWith('StripePaymentDriver')"></router-view>
+                    <router-view name="pay_unknown" v-else></router-view>
+                </div>
+                <div v-else-if="selectedPaymentMethod !== null && selectedPaymentMethod.paymentMethodType === 'code'">
+                    <router-view name="pay_invite" v-if="selectedPaymentMethod.driverClass.endsWith('CodePaymentDriver')"></router-view>
+                    <router-view name="pay_unknown" v-else></router-view>
+                </div>
+                <div v-else-if="selectedPaymentMethod !== null && selectedPaymentMethod.paymentMethodType === 'free'">
+                    <router-view name="pay_free" v-if="selectedPaymentMethod.driverClass.endsWith('FreePaymentDriver')"></router-view>
+                    <router-view name="pay_unknown" v-else></router-view>
+                </div>
+                <div v-else-if="selectedPaymentMethod !== null">
+                    <router-view name="pay_unknown"></router-view>
+                </div>
             </div>
 
-            <div v-if="selectedPaymentMethod !== null && selectedPaymentMethod.paymentMethodType === 'credit'">
-                <router-view name="pay_stripe" v-if="selectedPaymentMethod.driverClass.endsWith('StripePaymentDriver')"></router-view>
-                <router-view name="pay_unknown" v-else></router-view>
-            </div>
-            <div v-else-if="selectedPaymentMethod !== null && selectedPaymentMethod.paymentMethodType === 'code'">
-                <router-view name="pay_invite" v-if="selectedPaymentMethod.driverClass.endsWith('CodePaymentDriver')"></router-view>
-                <router-view name="pay_unknown" v-else></router-view>
-            </div>
-            <div v-else-if="selectedPaymentMethod !== null && selectedPaymentMethod.paymentMethodType === 'free'">
-                <router-view name="pay_free" v-if="selectedPaymentMethod.driverClass.endsWith('FreePaymentDriver')"></router-view>
-                <router-view name="pay_unknown" v-else></router-view>
-            </div>
-            <div v-else-if="selectedPaymentMethod !== null">
-                <router-view name="pay_unknown"></router-view>
-            </div>
             <hr/>
 
             <div class="form-group">
