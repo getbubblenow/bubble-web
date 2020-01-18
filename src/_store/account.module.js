@@ -34,7 +34,15 @@ const actions = {
         userService.getMe(messages, errors)
             .then(
                 user => commit('checkSessionSuccess', user),
-                error => commit('checkSessionFailure', error)
+                error => {
+                    commit('checkSessionFailure', error);
+                    if (error === 'Not Found' || error === 'Forbidden') {
+                        userService.logout(messages, errors).then(
+                            ok => router.replace('/login'),
+                            error => router.replace('/login')
+                        );
+                    }
+                }
             );
     },
     login({ dispatch, commit }, { user, messages, errors }) {
