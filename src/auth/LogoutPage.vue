@@ -15,7 +15,6 @@
         },
         created () {
             if (util.currentUser() !== null) {
-                console.log('LogoutPage.created: calling logout');
                 this.logout({messages: this.messages, errors: this.errors});
             }
             this.$router.replace('/login');

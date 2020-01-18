@@ -202,7 +202,6 @@ const mutations = {
     logoutRequest(state) {},
     logoutSuccess(state) {
         state.status = Object.assign({}, defaultStatus);
-        console.log('accountModule.logoutSuccess: removing key: '+util.USER_KEY);
         localStorage.removeItem(util.USER_KEY);
         state.user = null;
     },
