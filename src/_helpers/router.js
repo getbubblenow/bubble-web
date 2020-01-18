@@ -6,6 +6,7 @@ import ActivationPage from '../auth/ActivationPage'
 import ModelSetupPage from '../admin/ModelSetupPage'
 import RegisterPage from '../auth/RegisterPage'
 import LoginPage from '../auth/LoginPage'
+import LogoutPage from '../auth/LogoutPage'
 import MultifactorAuthPage from '../auth/MultifactorAuthPage'
 import ProfilePage from '../account/profile/ProfilePage'
 import ActionPage from '../account/profile/ActionPage'
@@ -80,7 +81,7 @@ export const router = new Router({
     { path: '/register', component: RegisterPage },
     { path: '/auth', component: MultifactorAuthPage },
     { path: '/login', component: LoginPage },
-    { path: '/logout', component: LoginPage },
+    { path: '/logout', component: LogoutPage },
 
     { path: '/admin/users', component: AccountsPage },
     { path: '/admin/users/:id', component: ProfilePage },

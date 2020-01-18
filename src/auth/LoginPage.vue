@@ -30,6 +30,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
+import { util } from '../_helpers'
 
 export default {
     data () {
@@ -43,9 +44,6 @@ export default {
     computed: {
         ...mapState('account', ['status']),
         ...mapState('system', ['configs', 'messages'])
-    },
-    created () {
-        this.logout();  // reset login status
     },
     methods: {
         ...mapActions('account', ['login', 'logout']),

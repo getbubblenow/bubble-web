@@ -240,7 +240,7 @@ const mutations = {
         state.loading.updating = false;
         user.token = account.state.user.token;  // preserve token
         state.user = account.state.user = user;
-        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem(util.USER_KEY, JSON.stringify(user));
     },
     updateUserFailure(state, { id, error }) {
         state.loading.updating = false;

@@ -7,7 +7,7 @@ export const util = {
     resetLandingPage: function () { landingPage = null; },
 
     currentUser: function() {
-        let userJson = localStorage.getItem('user');
+        const userJson = localStorage.getItem(util.USER_KEY);
         return userJson ? JSON.parse(userJson) : null;
     },
 

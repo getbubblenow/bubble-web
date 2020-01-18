@@ -245,7 +245,7 @@ const mutations = {
         state.activated = true;
         state.user = admin;
         state.status = { loggedIn: (admin !== null) };
-        localStorage.setItem('user', JSON.stringify(admin));
+        localStorage.setItem(util.USER_KEY, JSON.stringify(admin));
     },
     activateFailure(state, error) {
         state.status.activating = false;

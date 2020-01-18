@@ -65,9 +65,13 @@ const actions = {
                 }
             );
     },
-    logout({ commit }) {
-        userService.logout();
-        commit('logout');
+    logout({ commit }, {messages, errors}) {
+        commit('logoutRequest');
+        userService.logout(messages, errors)
+            .then(
+                ok => commit('logoutSuccess'),
+                error => commit('logoutFailure', error)
+            );
     },
     register({ dispatch, commit }, {user, messages, errors}) {
         commit('registerRequest', user);
@@ -160,8 +164,13 @@ const mutations = {
     checkSessionRequest(state) {},
     checkSessionSuccess(state, user) {
         if (user.token) {
-            localStorage.setItem(util.USER_KEY, JSON.stringify(user));
-            state.user = user;
+            if (util.currentUser() === null) {
+                // we must have logged out while this request was in flight... do nothing
+                state.user = null;
+            } else {
+                localStorage.setItem(util.USER_KEY, JSON.stringify(user));
+                state.user = user;
+            }
         }
         state.locale = (typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : state.locale);
     },
@@ -190,9 +199,15 @@ const mutations = {
         state.user = null;
     },
 
-    logout(state) {
+    logoutRequest(state) {},
+    logoutSuccess(state) {
         state.status = Object.assign({}, defaultStatus);
+        console.log('accountModule.logoutSuccess: removing key: '+util.USER_KEY);
+        localStorage.removeItem(util.USER_KEY);
         state.user = null;
+    },
+    logoutFailure(state, error) {
+        console.log('logout failed: '+JSON.stringify(error));
     },
 
     registerRequest(state, user) {

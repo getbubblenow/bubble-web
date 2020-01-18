@@ -28,7 +28,7 @@ function setSessionUser (user) {
     // login successful if there's a session token in the response
     if (user.token) {
         // store user details and session token in local storage to keep user logged in between page refreshes
-        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem(util.USER_KEY, JSON.stringify(user));
     }
     return user;
 }
@@ -45,9 +45,13 @@ function login(name, password, unlockKey, messages, errors) {
         .then(setSessionUser);
 }
 
-function logout() {
-    // remove user from local storage to log user out
-    localStorage.removeItem('user');
+function logout(messages, errors) {
+    if (util.currentUser() === null) {
+        console.log('userService.logout: already logged out');
+        return Promise.resolve();
+    }
+    return fetch(`${config.apiUrl}/auth/logout`, util.getWithAuth())
+        .then(util.handleCrudResponse(messages, errors));
 }
 
 function register(user, messages, errors) {

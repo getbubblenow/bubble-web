@@ -75,15 +75,10 @@ export default {
             if (!active) this.$router.replace('/activate');
         },
         user (u) {
-            if (typeof u === 'undefined' || u === null || typeof u.locale === 'undefined' || u.locale === null) {
-                if (this.activated && (typeof status.registrationError === 'undefined' || status.registrationError === null)) {
-                    this.logout();
-                    this.$router.replace('/logout');
-                }
-                return;
+            if (typeof u !== 'undefined' && u !== null) {
+                this.selectedLocale = u.locale;
+                this.reloadMessages();
             }
-            this.selectedLocale = u.locale;
-            this.reloadMessages();
         },
         locale (loc) {
             this.selectedLocale = loc;
