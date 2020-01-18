@@ -43,9 +43,8 @@
             ...mapActions('paymentMethods', ['addAccountPaymentMethod']),
             authorizeCard(e) {
                 const comp = this;
-                console.log('this.errors='+JSON.stringify(this.errors));
+                this.errors.clear();
                 window.stripe.createToken(this.card).then(function(result) {
-                    console.log('authorizedCard: created token='+JSON.stringify(result.token));
                     if (result.error) {
                         console.log('authorizedCard: had errors: '+JSON.stringify(result.error));
                         self.hasCardErrors = true;
@@ -54,7 +53,7 @@
                     } else {
                         comp.submitted = true;
                         comp.addAccountPaymentMethod({
-                            userId: this.user.uuid,
+                            userId: comp.user.uuid,
                             paymentMethod: {
                                 paymentMethodType: 'credit',
                                 paymentInfo: result.token.id

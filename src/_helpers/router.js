@@ -45,7 +45,12 @@ export const router = new Router({
       children: [
         {
           path: '', component: NetworksPage,
-          children: newNetworkChildren
+          children: [
+            {
+              path: '', component: NewNetworkPage,
+              children: newNetworkChildren
+            },
+          ]
         },
         { path: '/me', component: ProfilePage },
         { path: '/me/policy', component: PolicyPage },
