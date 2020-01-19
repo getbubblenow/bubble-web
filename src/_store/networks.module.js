@@ -150,6 +150,9 @@ const mutations = {
     getNetworkByIdFailure(state, error) {
         state.loading.network = false;
         state.error = { error };
+        if (error === 'Not Found') {
+            state.network = { uuid: 'Not Found' };
+        }
     },
 
     addPlanAndStartNetworkRequest(state) {
@@ -208,15 +211,15 @@ const mutations = {
     deleteNetworkRequest(state, id) {
         state.loading.deleting = true;
     },
-    deleteNetworkSuccess(state, id) {
+    deleteNetworkSuccess(state, deletedNet) {
         state.loading.deleting = false;
         // remove deleted network from state
         if (state.networks) {
-            state.networks = state.networks.filter(network => (network.uuid !== id && network.name !== id))
+            state.networks = state.networks.filter(network => (network.uuid !== deletedNet.uuid && network.name !== deletedNet.name))
         }
-        state.deletedNetwork = id;
+        state.deletedNetwork = deletedNet;
     },
-    deleteNetworkFailure(state, { id, error }) {
+    deleteNetworkFailure(state, { net, error }) {
         state.loading.deleting = false;
         // remove 'deleting:true' property and add 'deleteNetworkError:[error]' property to network
         state.error = error;

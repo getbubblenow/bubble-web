@@ -76,7 +76,7 @@
             <!-- todo: add button to restart network in restore mode -->
         </div>
 
-        <div v-if="network.state === 'running' || network.state === 'stopped'">
+        <div v-if="network.state === 'running' || network.state === 'stopped' || network.state === 'error_stopping'">
             <div class="text-danger"><h4>{{messages.title_network_danger_zone}}</h4></div>
             <div v-if="errors.has('node')" class="invalid-feedback d-block">{{ errors.first('node') }}</div>
             <div v-if="errors.has('accountPlan')" class="invalid-feedback d-block">{{ errors.first('accountPlan') }}</div>
@@ -87,7 +87,7 @@
             </div>
             <div v-else></div>
             <hr/>
-            <div v-if="network.state === 'stopped'" style="border: 2px solid #000;">
+            <div v-if="network.state === 'stopped' || network.state === 'error_stopping'" style="border: 2px solid #000;">
                 <button @click="deleteNet()" class="text-danger">{{messages.link_network_action_delete}}</button>
                 {{messages.link_network_action_delete_description}}
             </div>
@@ -192,6 +192,16 @@
             clearInterval(this.refresher);
         },
         watch: {
+            network (net) {
+                if (net) {
+                    if (net.state === 'running' || net.state === 'stopped' || net.state === 'error_stopping' || net.uuid === 'Not Found') {
+                        clearInterval(this.refresher);
+                    }
+                    if (net.uuid === 'Not Found') {
+                        this.$router.replace({path: '/bubbles'});
+                    }
+                }
+            },
             networkNodes (nodes) {
                 // console.log('watch.networkNodes: received: '+JSON.stringify(nodes));
             },
@@ -208,8 +218,8 @@
                     }
                 }
             },
-            deletedNetwork (netId) {
-                if (netId && netId === this.networkId) {
+            deletedNetwork (network) {
+                if (network && network.uuid === this.networkId) {
                     this.$router.replace({path: '/bubbles'});
                 }
             }
