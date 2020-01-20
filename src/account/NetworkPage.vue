@@ -219,7 +219,8 @@
                 }
             },
             deletedNetwork (network) {
-                if (network && network.uuid === this.networkId) {
+                console.log('watch.deletedNetwork: '+JSON.stringify(network));
+                if (network && (network.name === this.networkId || network.uuid === this.networkId)) {
                     this.$router.replace({path: '/bubbles'});
                 }
             }

@@ -72,7 +72,14 @@ export default {
             this.clearAlert();
         },
         activated (active) {
-            if (!active) this.$router.replace('/activate');
+            if (!active) {
+                this.$router.replace('/activate');
+            } else {
+                const user = util.currentUser();
+                if (user !== null && (typeof user.token !== 'undefined' && user.token !== null)) {
+                    this.checkSession({messages: this.messages, errors: this.errors});
+                }
+            }
         },
         user (u) {
             if (typeof u !== 'undefined' && u !== null) {
@@ -87,9 +94,6 @@ export default {
     },
     created() {
         const user = util.currentUser();
-        if (user !== null && (typeof user.token !== 'undefined' && user.token !== null)) {
-            this.checkSession({messages: this.messages, errors: this.errors});
-        }
         this.selectedLocale = (user !== null && typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : 'detect');
         this.loadIsActivated();
         this.loadSystemConfigs();  // determine if we can show the registration link

@@ -152,6 +152,8 @@ const mutations = {
         state.error = { error };
         if (error === 'Not Found') {
             state.network = { uuid: 'Not Found' };
+        } else {
+            console.log('getNetworkByIdFailure: error='+JSON.stringify(error));
         }
     },
 
