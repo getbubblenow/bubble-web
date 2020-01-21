@@ -61,7 +61,7 @@
             };
         },
         computed: {
-            ...mapState('apps', ['mitmEnabled', 'apps']),
+            ...mapState('apps', ['mitmEnabled', 'apps', 'app']),
             ...mapState('system', ['messages'])
         },
         created () {
@@ -112,6 +112,15 @@
                 this.disableAppByUserId({
                     userId: this.user.uuid,
                     appId: appId,
+                    messages: this.messages,
+                    errors: this.errors
+                });
+            }
+        },
+        watch: {
+            app (a) {
+                this.getAppsByUserId({
+                    userId: this.user.uuid,
                     messages: this.messages,
                     errors: this.errors
                 });
