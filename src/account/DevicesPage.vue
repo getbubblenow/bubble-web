@@ -47,8 +47,6 @@
                 </tr>
                 </tbody>
             </table>
-            <hr/>
-            <router-link to="/new_bubble">{{messages.button_label_new_network}}</router-link>
         </div>
 
         <div v-if="!devices || devices.length === 0">

@@ -12,6 +12,7 @@ import { paymentMethods } from './paymentMethods.module';
 import { accountPlans } from './accountPlans.module';
 import { networks } from './networks.module';
 import { devices } from './devices.module';
+import { apps } from './apps.module';
 
 Vue.use(Vuex);
 
@@ -27,7 +28,8 @@ export const store = new Vuex.Store({
         paymentMethods,
         accountPlans,
         networks,
-        devices
+        devices,
+        apps
     }
 });
 

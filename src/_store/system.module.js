@@ -173,6 +173,11 @@ const getters = {
                 title: messages.label_menu_devices,
                 icon: messages.label_menu_devices_icon
             });
+            menu.splice(4, 0, {
+                href: '/apps',
+                title: messages.label_menu_apps,
+                icon: messages.label_menu_apps_icon
+            });
         }
         if (configs.paymentsEnabled) {
             menu.splice(4, 0,{

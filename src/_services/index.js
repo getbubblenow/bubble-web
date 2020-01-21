@@ -7,3 +7,4 @@ export * from './paymentMethod.service';
 export * from './accountPlan.service';
 export * from './network.service';
 export * from './device.service';
+export * from './app.service';
