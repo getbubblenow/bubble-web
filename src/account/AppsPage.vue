@@ -5,9 +5,10 @@
             <button v-if="mitmEnabled" :disabled="loading()" @click="mitmOff()">{{messages.button_label_mitm_disable}}</button>
             <button v-else :disabled="loading()" @click="mitmOn()">{{messages.button_label_mitm_enable}}</button>
             <div v-if="errors.has('mitm')" class="invalid-feedback d-block">{{ errors.first('mitm') }}</div>
+            <hr/>
         </div>
 
-        <div v-if="mitmEnabled">
+        <div>
             <h4>{{messages.message_download_ca_cert}}</h4>
             <a href="/api/auth/cacert?type=pem">{{messages.message_os_apple}}</a> |
             <a href="/api/auth/cacert?type=p12">{{messages.message_os_windows}}</a> |
