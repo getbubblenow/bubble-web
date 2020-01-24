@@ -197,6 +197,12 @@ export const util = {
     jsLocale: function (user, detectedLocale) {
         const loc = util.userHasLocale(user) ? user.locale : detectedLocale;
         return loc === null ? null : loc.replace('_', '-').toLowerCase();
+    },
+
+    stripProtocolFromUrl: function (url) {
+        if (url.startsWith('http://')) return url.substring('http://'.length);
+        if (url.startsWith('https://')) return url.substring('https://'.length);
+        return url;
     }
 
 };

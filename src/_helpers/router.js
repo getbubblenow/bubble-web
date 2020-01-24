@@ -13,6 +13,8 @@ import ActionPage from '../account/profile/ActionPage'
 import PolicyPage from '../account/profile/PolicyPage'
 import DevicesPage from '../account/DevicesPage'
 import AppsPage from '../account/AppsPage'
+import AppPage from '../account/AppPage'
+import AppSitePage from '../account/AppSitePage'
 import NotificationsPage from '../account/NotificationsPage'
 import ChangePasswordPage from '../account/profile/ChangePasswordPage'
 import SshKeysPage from '../account/profile/SshKeysPage'
@@ -61,6 +63,8 @@ export const router = new Router({
         { path: '/me/keys', component: SshKeysPage },
         { path: '/devices', component: DevicesPage },
         { path: '/apps', component: AppsPage },
+        { path: '/app/:app', component: AppPage },
+        { path: '/app/:app/site/:site', component: AppSitePage },
         { path: '/notifications', component: NotificationsPage },
         {
           path: '/bubbles', component: NetworksPage ,

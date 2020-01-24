@@ -31,7 +31,7 @@
                 </thead>
                 <tbody>
                 <tr v-for="app in apps">
-                    <td nowrap="nowrap">{{app.name}}</td>
+                    <td nowrap="nowrap"><router-link :to="{ path: '/app/'+ app.name }">{{app.name}}</router-link></td>
                     <td>{{app.description}}</td>
                     <td>{{messages['message_'+app.enabled]}}</td>
                     <td v-if="app.enabled">
