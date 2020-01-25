@@ -20,7 +20,7 @@
                         <tbody>
                         <tr v-for="datum in appData">
                             <td nowrap="nowrap">{{datum.key}}</td>
-                            <td>{{datum.value}}</td>
+                            <td>{{datum.data}}</td>
                             <td>{{messages['message_'+datum.enabled]}}</td>
                             <td v-if="datum.enabled">
                                 <button @click="disableAppData(datum.key)">{{messages.button_label_app_site_data_enable}}</button>
