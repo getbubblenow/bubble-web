@@ -63,10 +63,10 @@
                         <td>{{datum.data}}</td>
                         <td>{{messages['message_'+datum.enabled]}}</td>
                         <td v-if="datum.enabled">
-                            <button @click="disableAppData(datum.key)">{{messages.button_label_app_data_enable}}</button>
+                            <button @click="disableAppData(datum.key)">{{messages.button_label_app_data_disable}}</button>
                         </td>
                         <td v-else>
-                            <button @click="enableAppData(datum.key)">{{messages.button_label_app_data_disable}}</button>
+                            <button @click="enableAppData(datum.key)">{{messages.button_label_app_data_enable}}</button>
                         </td>
                         <td nowrap="nowrap">
                             <span v-if="datum.expiration">{{messages.date_format_app_data_expiration.parseDateMessage(datum.expiration, messages)}}</span>
