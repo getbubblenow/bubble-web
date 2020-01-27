@@ -17,7 +17,7 @@
                 </thead>
                 <tbody>
                 <tr v-for="site in sites">
-                    <td nowrap="nowrap" v-if="app.dataPresentation === 'site' || app.dataPresentation === 'app_and_site'">
+                    <td nowrap="nowrap" v-if="app.dataConfig.presentation === 'site' || app.dataConfig.presentation === 'app_and_site'">
                         <router-link :to="{ path: '/app/'+ appId + '/site/' + site.name }">{{site.name}}</router-link>
                     </td>
                     <td v-else>{{site.name}}</td>
@@ -43,7 +43,7 @@
             {{messages.message_no_sites}}
         </div>
 
-        <div v-if="app.dataPresentation === 'app' || app.dataPresentation === 'app_and_site'">
+        <div v-if="app.dataConfig.presentation === 'app' || app.dataConfig.presentation === 'app_and_site'">
             <h2>{{app.name}} {{messages.table_title_app_data}}</h2>
             <div v-if="appData && appData.length > 0">
                 <table border="1">

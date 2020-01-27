@@ -3,7 +3,7 @@
         <em v-if="loading()">{{messages.loading_app_site}}</em>
 
         <div v-if="app && site">
-            <div v-if="app && site && app.dataPresentation === 'site' || app.dataPresentation === 'app_and_site'">
+            <div v-if="app && site && app.dataConfig.presentation === 'site' || app.dataConfig.presentation === 'app_and_site'">
                 <h2 v-if="app && site">{{app.name}} - {{site.name}} {{messages.table_title_app_site_data}}</h2>
                 <div v-if="appData && appData.length > 0">
                     <table border="1">
@@ -133,7 +133,7 @@
                 if (d !== null) this.dataLoaded = true;
             },
             app (a) {
-                if (!this.dataLoaded && (a.dataPresentation === 'site' || a.dataPresentation === 'app_and_site')) {
+                if (!this.dataLoaded && a.dataConfig && (a.dataConfig.presentation === 'site' || a.dataConfig.presentation === 'app_and_site')) {
                     console.log('watch.app: loading AppSiteData...');
                     this.getAppSiteDataByUserId({
                         userId: this.user.uuid,
@@ -145,7 +145,7 @@
                 }
             },
             site (s) {
-                if (!this.dataLoaded && this.app && (this.app.dataPresentation === 'site' || this.app.dataPresentation === 'app_and_site')) {
+                if (!this.dataLoaded && this.app && this.app.dataConfig && (this.app.dataConfig.presentation === 'site' || this.app.dataConfig.presentation === 'app_and_site')) {
                     console.log('watch.site: loading AppSiteData...');
                     this.getAppSiteDataByUserId({
                         userId: this.user.uuid,
