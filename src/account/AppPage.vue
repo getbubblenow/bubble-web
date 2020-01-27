@@ -3,7 +3,7 @@
         <em v-if="loading()">{{messages.loading_app}}</em>
 
         <div v-if="app">
-        <h2>{{app.name}} {{messages.table_title_app_sites}}</h2>
+        <h2>{{messages['app_'+app.name+'_name']}} {{messages.table_title_app_sites}}</h2>
         <div v-if="sites && sites.length > 0">
             <table border="1">
                 <thead>
@@ -43,46 +43,18 @@
             {{messages.message_no_sites}}
         </div>
 
-        <div v-if="app.dataConfig.presentation === 'app' || app.dataConfig.presentation === 'app_and_site'">
-            <h2>{{app.name}} {{messages.table_title_app_data}}</h2>
-            <div v-if="appData && appData.length > 0">
+        <div v-if="appViews && appViews.length > 0">
+            <h2>{{messages['app_'+app.name+'_name']}} {{messages.table_title_app_views}}</h2>
+            <div>
                 <table border="1">
-                    <thead>
-                    <tr>
-                        <th nowrap="nowrap">{{messages.label_field_app_data_key}}</th>
-                        <th nowrap="nowrap">{{messages.label_field_app_data_value}}</th>
-                        <th nowrap="nowrap">{{messages.label_field_app_data_enabled}}</th>
-                        <th><!-- enable/disable button --></th>
-                        <th nowrap="nowrap">{{messages.label_field_app_data_expiration}}</th>
-                        <th><!-- delete button --></th>
-                    </tr>
-                    </thead>
                     <tbody>
-                    <tr v-for="datum in appData">
-                        <td nowrap="nowrap">{{datum.key}}</td>
-                        <td>{{datum.data}}</td>
-                        <td>{{messages['message_'+datum.enabled]}}</td>
-                        <td v-if="datum.enabled">
-                            <button @click="disableAppData(datum.key)">{{messages.button_label_app_data_disable}}</button>
-                        </td>
-                        <td v-else>
-                            <button @click="enableAppData(datum.key)">{{messages.button_label_app_data_enable}}</button>
-                        </td>
+                    <tr v-for="view in appViews">
                         <td nowrap="nowrap">
-                            <span v-if="datum.expiration">{{messages.date_format_app_data_expiration.parseDateMessage(datum.expiration, messages)}}</span>
-                            <span v-else>{{messages.message_app_data_no_expiration}}</span>
-                        </td>
-                        <td>
-                            <i @click="deleteAppData(datum.key)" aria-hidden="true" :class="messages.button_label_app_data_delete_icon" :title="messages.button_label_app_data_delete"></i>
-                            <span class="sr-only">{{messages.button_label_app_data_delete}}</span>
+                            <router-link :to="{ path: '/app/'+ app.name + '/view/' + view.name }">{{messages['app_'+app.name+'_view_'+view.name]}}</router-link>
                         </td>
                     </tr>
                     </tbody>
                 </table>
-            </div>
-
-            <div v-if="(!appData || appData.length === 0) && !loading()">
-                {{messages.message_no_data}}
             </div>
         </div>
     </div>
@@ -97,16 +69,16 @@
         data () {
             return {
                 user: util.currentUser(),
-                appId: null
+                appId: null,
+                appViews: null
             };
         },
         computed: {
-            ...mapState('apps', ['app', 'sites', 'site', 'appData']),
+            ...mapState('apps', ['app', 'sites', 'site']),
             ...mapState('system', ['messages'])
         },
         created () {
             this.appId = this.$route.params.app;
-            this.resetAppData();
             this.getAppByUserId({
                 userId: this.user.uuid,
                 appId: this.appId,
@@ -122,8 +94,7 @@
         },
         methods: {
             ...mapActions('apps', [
-                'resetAppData', 'getAppByUserId', 'getAppSitesByUserId', 'enableAppSiteByUserId', 'disableAppSiteByUserId',
-                'getAppDataByUserId', 'enableAppDataByUserId', 'disableAppDataByUserId', 'deleteAppDataByUserId'
+                'getAppByUserId', 'getAppSitesByUserId', 'enableAppSiteByUserId', 'disableAppSiteByUserId'
             ]),
             ...mapGetters('apps', ['loading']),
             formatUrl (url) {
@@ -150,49 +121,21 @@
                     messages: this.messages,
                     errors: this.errors
                 });
-            },
-            enableAppData (datumId) {
-                this.errors.clear();
-                this.enableAppDataByUserId({
-                    userId: this.user.uuid,
-                    appId: this.appId,
-                    datumId: datumId,
-                    messages: this.messages,
-                    errors: this.errors
-                });
-            },
-            disableAppData (datumId) {
-                this.errors.clear();
-                this.disableAppDataByUserId({
-                    userId: this.user.uuid,
-                    appId: this.appId,
-                    datumId: datumId,
-                    messages: this.messages,
-                    errors: this.errors
-                });
-            },
-            deleteAppData (datumId) {
-                this.errors.clear();
-                this.deleteAppDataByUserId({
-                    userId: this.user.uuid,
-                    appId: this.appId,
-                    datumId: datumId,
-                    messages: this.messages,
-                    errors: this.errors
-                });
             }
         },
         watch: {
             app (a) {
-                if (a) {
-                    if (a.dataPresentation === 'app' || a.dataPresentation === 'app_and_site') {
-                        this.getAppDataByUserId({
-                            userId: this.user.uuid,
-                            appId: this.appId,
-                            messages: this.messages,
-                            errors: this.errors
-                        });
+                if (a && a.dataConfig && a.dataConfig.presentation
+                        && (a.dataConfig.presentation === 'app' || a.dataConfig.presentation === 'app_and_site')
+                        && a.dataConfig.views && a.dataConfig.views.length && a.dataConfig.views.length > 0) {
+                    const allViews = a.dataConfig.views;
+                    const appViews = [];
+                    for (let i=0; i<allViews.length; i++) {
+                        if (allViews[i].presentation && allViews[i].presentation === 'app') {
+                            appViews.push(allViews[i]);
+                        }
                     }
+                    this.appViews = appViews;
                 }
             },
             site (s) {
