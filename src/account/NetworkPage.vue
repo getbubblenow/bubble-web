@@ -206,16 +206,18 @@
                 // console.log('watch.networkNodes: received: '+JSON.stringify(nodes));
             },
             networkStatuses (stats) {
-                if (stats) {
-                    if (!stats.hasOwnProperty(this.networkId)) return;
-                    if (stats[this.networkId].length === 0) {
-                        clearInterval(this.refresher);
-                        return;
+                if (stats && stats.length && stats.length > 0) {
+                    for (let i=0; i<stats.length; i++) {
+                        if (stats[i].network === this.networkId) {
+                            this.stats = stats[i];
+                            if (this.stats.percent === 100) {
+                                clearInterval(this.refresher);
+                            }
+                            return;
+                        }
                     }
-                    this.stats = stats[this.networkId][0];  // todo: when we have multiple nodes, this will need to be changed
-                    if (this.stats.percent === 100) {
-                        clearInterval(this.refresher);
-                    }
+                    // status not found for our network
+                    clearInterval(this.refresher);
                 }
             },
             deletedNetwork (network) {
