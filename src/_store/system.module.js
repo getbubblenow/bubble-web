@@ -221,18 +221,6 @@ const getters = {
     }
 };
 
-const messageNotFoundHandler = {
-    get: function (target, name) {
-        if (typeof name === 'undefined') return '???undefined';
-        if (name === null) return '???null';
-        if (name === '') return '???empty';
-        if (target.hasOwnProperty(name)) return target[name];
-        const altName = name.toString().replace(/\./g, '_');
-        if (target.hasOwnProperty(altName)) return target[altName];
-        return '???'+name.toString();
-    }
-};
-
 const mutations = {
     loadIsActivatedRequest(state) {},
     loadIsActivatedSuccess(state, activated) {
@@ -312,7 +300,7 @@ const mutations = {
     loadMessagesRequest(state) {},
     loadMessagesSuccess(state, {group, messages}) {
         if (state.messageGroupsLoaded.indexOf(group) === -1) state.messageGroupsLoaded.push(group);
-        state.messages = new Proxy(Object.assign({}, state.messages, messages), messageNotFoundHandler);
+        state.messages = util.addMessages(state.messages, messages);
         if (messages.country_codes) {
             const countries = [];
             const codes = messages.country_codes.split(',');

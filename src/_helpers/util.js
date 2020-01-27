@@ -203,6 +203,22 @@ export const util = {
         if (url.startsWith('http://')) return url.substring('http://'.length);
         if (url.startsWith('https://')) return url.substring('https://'.length);
         return url;
+    },
+
+    messageNotFoundHandler: {
+        get: function (target, name) {
+            if (typeof name === 'undefined') return '???undefined';
+            if (name === null) return '???null';
+            if (name === '') return '???empty';
+            if (target.hasOwnProperty(name)) return target[name];
+            const altName = name.toString().replace(/\./g, '_');
+            if (target.hasOwnProperty(altName)) return target[altName];
+            return '???'+name.toString();
+        }
+    },
+
+    addMessages: function(existing, updates) {
+        return new Proxy(Object.assign({}, existing, updates), util.messageNotFoundHandler);
     }
 
 };

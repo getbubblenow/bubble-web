@@ -184,13 +184,15 @@
         },
         watch: {
             app (a) {
-                if (a.dataPresentation === 'app' || a.dataPresentation === 'app_and_site') {
-                    this.getAppDataByUserId({
-                        userId: this.user.uuid,
-                        appId: this.appId,
-                        messages: this.messages,
-                        errors: this.errors
-                    });
+                if (a) {
+                    if (a.dataPresentation === 'app' || a.dataPresentation === 'app_and_site') {
+                        this.getAppDataByUserId({
+                            userId: this.user.uuid,
+                            appId: this.appId,
+                            messages: this.messages,
+                            errors: this.errors
+                        });
+                    }
                 }
             },
             site (s) {

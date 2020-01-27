@@ -27,6 +27,7 @@ export default {
     },
     created () {
         this.loadMessages('post_auth', this.locale);
+        this.loadMessages('apps', this.locale);
         this.detectLocale();
         this.detectTimezone();
     }
