@@ -17,14 +17,7 @@ export const appService = {
     disableAppSiteByUserId,
 
     getAppDataByUserId,
-    enableAppDataByUserId,
-    disableAppDataByUserId,
-    deleteAppDataByUserId,
-
-    getAppSiteDataByUserId,
-    enableAppSiteDataByUserId,
-    disableAppSiteDataByUserId,
-    deleteAppSiteDataByUserId
+    getAppSiteDataByUserId
 };
 
 // MITM
@@ -75,35 +68,11 @@ function disableAppSiteByUserId(userId, appId, siteId, messages, errors) {
 }
 
 // Data by App
-function getAppDataByUserId(userId, appId, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/data`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
-}
-
-function enableAppDataByUserId(userId, appId, datumId, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/data/${datumId}/enable`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
-}
-
-function disableAppDataByUserId(userId, appId, datumId, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/data/${datumId}/disable`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
-}
-
-function deleteAppDataByUserId(userId, appId, datumId, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/data/${datumId}`, util.deleteWithAuth()).then(util.handleCrudResponse(messages, errors));
+function getAppDataByUserId(userId, appId, viewId, query, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/view/${viewId}`, util.postWithAuth(query)).then(util.handleCrudResponse(messages, errors));
 }
 
 // Data by App + Site
-function getAppSiteDataByUserId(userId, appId, siteId, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/sites/${siteId}/data`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
-}
-
-function enableAppSiteDataByUserId(userId, appId, siteId, datumId, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/sites/${siteId}/data/${datumId}/enable`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
-}
-
-function disableAppSiteDataByUserId(userId, appId, siteId, datumId, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/sites/${siteId}/data/${datumId}/disable`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
-}
-
-function deleteAppSiteDataByUserId(userId, appId, siteId, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/sites/${siteId}/data/${datumId}`, util.deleteWithAuth()).then(util.handleCrudResponse(messages, errors));
+function getAppSiteDataByUserId(userId, appId, siteId, viewId, query, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/sites/${siteId}/view/${viewId}`, util.postWithAuth(query)).then(util.handleCrudResponse(messages, errors));
 }

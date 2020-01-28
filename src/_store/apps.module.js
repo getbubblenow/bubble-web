@@ -6,7 +6,7 @@ const state = {
         enableMitm: false, disableMitm: false,
         apps: false, app: false, enableApp: false, disableApp: false,
         sites: false, site: false, enableSite: false, disableSite: false,
-        data: false, enableData: false, disableData: false, deleteData: false
+        appData: false
     },
     mitmEnabled: null,
     error: null,
@@ -125,76 +125,21 @@ const actions = {
         commit('resetAppDataSuccess');
     },
 
-    getAppDataByUserId({ commit }, {userId, appId, messages, errors}) {
+    getAppDataByUserId({ commit }, {userId, appId, viewId, query, messages, errors}) {
         commit('getAppDataByUserIdRequest');
-        appService.getAppDataByUserId(userId, appId, messages, errors)
+        appService.getAppDataByUserId(userId, appId, viewId, query, messages, errors)
             .then(
                 appData => commit('getAppDataByUserIdSuccess', appData),
                 error => commit('getAppDataByUserIdFailure', error)
             );
     },
 
-    enableAppDataByUserId({ commit }, {userId, appId, datumId, messages, errors}) {
-        commit('enableAppDataByUserIdRequest');
-        appService.enableAppDataByUserId(userId, appId, datumId, messages, errors)
-            .then(
-                appData => commit('enableAppDataByUserIdSuccess', appData),
-                error => commit('enableAppDataByUserIdFailure', error)
-            );
-    },
-
-    disableAppDataByUserId({ commit }, {userId, appId, datumId, messages, errors}) {
-        commit('disableAppDataByUserIdRequest');
-        appService.disableAppDataByUserId(userId, appId, datumId, messages, errors)
-            .then(
-                appData => commit('disableAppDataByUserIdSuccess', appData),
-                error => commit('disableAppDataByUserIdFailure', error)
-            );
-    },
-
-    deleteAppDataByUserId({ commit }, {userId, appId, datumId, messages, errors}) {
-        commit('deleteAppDataByUserIdRequest');
-        appService.deleteAppDataByUserId(userId, appId, datumId, messages, errors)
-            .then(
-                appData => commit('deleteAppDataByUserIdSuccess', appData),
-                error => commit('deleteAppDataByUserIdFailure', error)
-            );
-    },
-
-    // App Site Data
-    getAppSiteDataByUserId({ commit }, {userId, appId, siteId, messages, errors}) {
+    getAppSiteDataByUserId({ commit }, {userId, appId, siteId, viewId, query, messages, errors}) {
         commit('getAppSiteDataByUserIdRequest');
-        appService.getAppSiteDataByUserId(userId, appId, siteId, messages, errors)
+        appService.getAppSiteDataByUserId(userId, appId, siteId, viewId, query, messages, errors)
             .then(
                 appData => commit('getAppSiteDataByUserIdSuccess', appData),
                 error => commit('getAppSiteDataByUserIdFailure', error)
-            );
-    },
-
-    enableAppSiteDataByUserId({ commit }, {userId, appId, siteId, datumId, messages, errors}) {
-        commit('enableAppSiteDataByUserIdRequest');
-        appService.enableAppSiteDataByUserId(userId, appId, siteId, datumId, messages, errors)
-            .then(
-                appData => commit('enableAppSiteDataByUserIdSuccess', appData),
-                error => commit('enableAppSiteDataByUserIdFailure', error)
-            );
-    },
-
-    disableAppSiteDataByUserId({ commit }, {userId, appId, siteId, datumId, messages, errors}) {
-        commit('disableAppSiteDataByUserIdRequest');
-        appService.disableAppSiteDataByUserId(userId, appId, siteId, datumId, messages, errors)
-            .then(
-                appData => commit('disableAppSiteDataByUserIdSuccess', appData),
-                error => commit('disableAppSiteDataByUserIdFailure', error)
-            );
-    },
-
-    deleteAppSiteDataByUserId({ commit }, {userId, appId, siteId, datumId, messages, errors}) {
-        commit('deleteAppSiteDataByUserIdRequest');
-        appService.deleteAppSiteDataByUserId(userId, appId, siteId, datumId, messages, errors)
-            .then(
-                appData => commit('deleteAppSiteDataByUserIdSuccess', appData),
-                error => commit('deleteAppSiteDataByUserIdFailure', error)
             );
     }
 
@@ -337,106 +282,35 @@ const mutations = {
     },
 
     resetAppDataSuccess(state) {
-        state.loading.data = false;
+        state.loading.appData = false;
         state.appData = null;
     },
 
     // App Data
     getAppDataByUserIdRequest(state) {
-        state.loading.data = true;
+        state.loading.appData = true;
     },
     getAppDataByUserIdSuccess(state, appData) {
-        state.loading.data = false;
+        state.loading.appData = false;
         state.appData = appData;
     },
     getAppDataByUserIdFailure(state, error) {
-        state.loading.data = false;
-        state.error = error;
-    },
-
-    enableAppDataByUserIdRequest(state) {
-        state.loading.enableData = true;
-    },
-    enableAppDataByUserIdSuccess(state, appData) {
-        state.loading.enableData = false;
-        state.appData = appData;
-    },
-    enableAppDataByUserIdFailure(state, error) {
-        state.loading.enableData = false;
-        state.error = error;
-    },
-
-    disableAppDataByUserIdRequest(state) {
-        state.loading.disableData = true;
-    },
-    disableAppDataByUserIdSuccess(state, appData) {
-        state.loading.disableData = false;
-        state.appData = appData;
-    },
-    disableAppDataByUserIdFailure(state, error) {
-        state.loading.disableData = false;
-        state.error = error;
-    },
-
-    deleteAppDataByUserIdRequest(state) {
-        state.loading.deleteData = true;
-    },
-    deleteAppDataByUserIdSuccess(state, appData) {
-        state.loading.deleteData = false;
-    },
-    deleteAppDataByUserIdFailure(state, error) {
-        state.loading.deleteData = false;
+        state.loading.appData = false;
         state.error = error;
     },
 
     // App Site Data
     getAppSiteDataByUserIdRequest(state) {
-        state.loading.data = true;
+        state.loading.appData = true;
     },
     getAppSiteDataByUserIdSuccess(state, appData) {
-        state.loading.data = false;
+        state.loading.appData = false;
         state.appData = appData;
     },
     getAppSiteDataByUserIdFailure(state, error) {
-        state.loading.data = false;
-        state.error = error;
-    },
-
-    enableAppSiteDataByUserIdRequest(state) {
-        state.loading.enableData = true;
-    },
-    enableAppSiteDataByUserIdSuccess(state, appData) {
-        state.loading.enableData = false;
-        state.appData = appData;
-    },
-    enableAppSiteDataByUserIdFailure(state, error) {
-        state.loading.enableData = false;
-        state.error = error;
-    },
-
-    disableAppSiteDataByUserIdRequest(state) {
-        state.loading.disableData = true;
-    },
-    disableAppSiteDataByUserIdSuccess(state, appData) {
-        state.loading.disableData = false;
-        state.appData = appData;
-    },
-    disableAppSiteDataByUserIdFailure(state, error) {
-        state.loading.disableData = false;
-        state.error = error;
-    },
-
-    deleteAppSiteDataByUserIdRequest(state) {
-        state.loading.deleteData = true;
-    },
-    deleteAppSiteDataByUserIdSuccess(state, appData) {
-        state.loading.deleteData = false;
-    },
-    deleteAppSiteDataByUserIdFailure(state, error) {
-        state.loading.deleteData = false;
+        state.loading.appData = false;
         state.error = error;
     }
-
 };
 
 const getters = {

@@ -206,9 +206,9 @@
                 // console.log('watch.networkNodes: received: '+JSON.stringify(nodes));
             },
             networkStatuses (stats) {
-                if (stats && stats.length && stats.length > 0) {
+                if (this.network && stats && stats.length && stats.length > 0) {
                     for (let i=0; i<stats.length; i++) {
-                        if (stats[i].network === this.networkId) {
+                        if (stats[i].network === this.network.uuid) {
                             this.stats = stats[i];
                             if (this.stats.percent === 100) {
                                 clearInterval(this.refresher);
@@ -221,7 +221,6 @@
                 }
             },
             deletedNetwork (network) {
-                console.log('watch.deletedNetwork: '+JSON.stringify(network));
                 if (network && (network.name === this.networkId || network.uuid === this.networkId)) {
                     this.$router.replace({path: '/bubbles'});
                 }

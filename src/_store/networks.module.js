@@ -14,7 +14,7 @@ const state = {
     network: null,
     nearestRegions: null,
     newNodeNotification: null,
-    networkStatuses: {},
+    networkStatuses: [],
     networkNodes: null,
     deletedNetwork: null,
     networkKeysRequested: null,
@@ -178,9 +178,7 @@ const mutations = {
     },
     getStatusesByNetworkIdSuccess(state, {networkId, statuses}) {
         state.loading.networkStatuses = false;
-        const newStatuses = {};
-        newStatuses[networkId] = statuses;
-        state.networkStatuses = Object.assign({}, state.networkStatuses, newStatuses);
+        state.networkStatuses = statuses;
     },
     getStatusesByNetworkIdFailure(state, {networkId, error}) {
         state.loading.networkStatuses = false;
