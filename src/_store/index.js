@@ -33,7 +33,7 @@ export const store = new Vuex.Store({
     }
 });
 
-const safeEval = require('safe-eval');
+export const safeEval = require('safe-eval');
 
 function evalInContext(vue, string) {
     try {

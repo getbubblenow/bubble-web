@@ -6,7 +6,7 @@ const state = {
         enableMitm: false, disableMitm: false,
         apps: false, app: false, enableApp: false, disableApp: false,
         sites: false, site: false, enableSite: false, disableSite: false,
-        appData: false
+        appData: false, action: false
     },
     mitmEnabled: null,
     error: null,
@@ -14,7 +14,8 @@ const state = {
     app: null,
     sites: [],
     site: null,
-    appData: null
+    appData: null,
+    actionResult: null
 };
 
 const actions = {
@@ -141,8 +142,16 @@ const actions = {
                 appData => commit('getAppSiteDataByUserIdSuccess', appData),
                 error => commit('getAppSiteDataByUserIdFailure', error)
             );
-    }
+    },
 
+    takeDataAction({ commit }, {userId, appId, dataId, action, messages, errors}) {
+        commit('takeDataActionRequest');
+        appService.takeDataAction(userId, appId, dataId, action, messages, errors)
+            .then(
+                appData => commit('takeDataActionSuccess', appData),
+                error => commit('takeDataActionFailure', error)
+            );
+    }
 };
 
 const mutations = {
@@ -309,6 +318,18 @@ const mutations = {
     },
     getAppSiteDataByUserIdFailure(state, error) {
         state.loading.appData = false;
+        state.error = error;
+    },
+
+    takeDataActionRequest(state) {
+        state.loading.action = true;
+    },
+    takeDataActionSuccess(state, result) {
+        state.loading.action = false;
+        state.actionResult = result;
+    },
+    takeDataActionFailure(state, error) {
+        state.loading.action = false;
         state.error = error;
     }
 };

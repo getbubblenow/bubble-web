@@ -5,6 +5,7 @@
             <thead>
             <tr>
                 <th v-for="field in app.dataConfig.fields">{{messages['app_'+app.name+'_field_'+field.name]}}</th>
+                <th v-if="app.dataConfig.actions && app.dataConfig.actions.length && app.dataConfig.actions.length > 0">{{messages.message_data_actions}}</th>
             </tr>
             </thead>
             <tbody v-if="appData && appData.results && appData.results.length && appData.results.length > 0">
@@ -19,22 +20,29 @@
                     </span>
                     <span v-else>{{row[field.name]}}</span>
                 </td>
+                <td>
+                    <div v-for="action in app.dataConfig.actions">
+                        <button v-if="actionIsAvailable(action, row)" @click="dataAction(action, row.uuid)">{{messages['app_'+app.name+'_action_'+action.name]}}</button>
+                    </div>
+
+                </td>
             </tr>
             <tr>
                 <td>{{messages.message_data_results.parseMessage(this)}}</td>
             </tr>
             <tr v-if="hasPrevPage() || hasNextPage()">
-                <td align="left" v-if="hasPrevPage()">
+                <td align="left" v-if="hasPrevPage()" nowrap="nowrap">
                     <button @click="prevPage()">{{messages.message_app_data_previous_page}}</button>
                 </td>
-                <td align="right" v-if="hasNextPage()">
+                <td align="right" v-if="hasNextPage()" nowrap="nowrap">
                     <button @click="nextPage()">{{messages.message_app_data_next_page}}</button>
                 </td>
             </tr>
             </tbody>
             <tbody v-else>
             <tr>
-                <td :colspan="getTotalColumns()">{{messages.message_no_data}}</td>
+                <td :colspan="totalColumns" v-if="!loading()">{{messages.message_no_data}}</td>
+                <td :colspan="totalColumns" v-if="loading()">{{messages.loading_app_data}}</td>
             </tr>
             </tbody>
         </table>
@@ -45,6 +53,7 @@
 <script>
     import { mapState, mapActions, mapGetters } from 'vuex'
     import { util } from '../_helpers';
+    import { safeEval } from '../_store';
 
     export default {
         data () {
@@ -61,10 +70,15 @@
             };
         },
         computed: {
-            ...mapState('apps', ['app', 'site', 'appData']),
+            ...mapState('apps', ['app', 'site', 'appData', 'actionResult']),
             ...mapState('system', ['messages']),
             numPages () {
-                return 1 + parseInt(this.appData.totalCount / this.query.pageSize);
+                return Math.ceil(parseFloat(this.appData.totalCount) / parseFloat(this.query.pageSize));
+            },
+            totalColumns () {
+                let cols = this.app.dataConfig.fields.length;
+                if (this.app.dataConfig.actions && this.app.dataConfig.actions.length) cols += this.app.dataConfig.actions.length;
+                return cols;
             }
         },
         created () {
@@ -89,7 +103,7 @@
         },
         methods: {
             ...mapActions('apps', [
-                'getAppByUserId', 'getAppSiteByUserId', 'getAppDataByUserId', 'getAppSiteDataByUserId'
+                'getAppByUserId', 'getAppSiteByUserId', 'getAppDataByUserId', 'getAppSiteDataByUserId', 'takeDataAction'
             ]),
             ...mapGetters('apps', ['loading']),
             hasPrevPage () { return this.query.pageNumber > 1; },
@@ -127,10 +141,19 @@
                     });
                 }
             },
-            getTotalColumns () {
-                let cols = this.app.dataConfig.fields.length;
-                if (this.app.dataConfig.actions && this.app.dataConfig.actions.length) cols += this.app.dataConfig.actions.length;
-                return cols;
+            actionIsAvailable(action, row) {
+                if (typeof action.when === 'undefined' || action.when === null) return true;
+                return safeEval(action.when, {'data': row}) === true;
+            },
+            dataAction(action, dataId) {
+                this.takeDataAction({
+                    userId: this.user.name,
+                    appId: this.appId,
+                    dataId: dataId,
+                    action: action.name,
+                    messages: this.messages,
+                    errors: this.errors
+                });
             }
         },
         watch: {
@@ -146,6 +169,9 @@
                     }
                     console.warn('watch.app: view not found: '+this.viewId);
                 }
+            },
+            actionResult (r) {
+                if (r) this.refreshData();
             }
         }
     };

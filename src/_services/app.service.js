@@ -17,7 +17,8 @@ export const appService = {
     disableAppSiteByUserId,
 
     getAppDataByUserId,
-    getAppSiteDataByUserId
+    getAppSiteDataByUserId,
+    takeDataAction
 };
 
 // MITM
@@ -67,12 +68,15 @@ function disableAppSiteByUserId(userId, appId, siteId, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/sites/${siteId}/disable`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
-// Data by App
+// Data
 function getAppDataByUserId(userId, appId, viewId, query, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/view/${viewId}`, util.postWithAuth(query)).then(util.handleCrudResponse(messages, errors));
 }
 
-// Data by App + Site
 function getAppSiteDataByUserId(userId, appId, siteId, viewId, query, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/sites/${siteId}/view/${viewId}`, util.postWithAuth(query)).then(util.handleCrudResponse(messages, errors));
+}
+
+function takeDataAction(userId, appId, dataId, action, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/data/${dataId}/actions/${action}`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
