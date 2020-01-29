@@ -71,8 +71,8 @@ String.prototype.parseDateMessage = function (millis, messages) {
         h: (date.getHours() > 12 ? date.getHours() - 12 : date.getHours()+1),
         A: (date.getHours() > 12 ? messages['label_date_day_half_pm'] : messages['label_date_day_half_am']),
         a: (date.getHours() > 12 ? messages['label_date_day_half_pm'] : messages['label_date_day_half_am']).toLowerCase(),
-        m: date.getMinutes(),
-        s: date.getSeconds()
+        m: date.getMinutes() < 10 ? '0'+date.getMinutes() : date.getMinutes(),
+        s: date.getSeconds() < 10 ? '0'+date.getSeconds() : date.getSeconds()
     };
     return this ? ''+this.replace(/{{[\w]+?}}/g, match => {
         const expression = match.slice(2, -2);

@@ -1,8 +1,8 @@
 <template>
     <div>
 
-        <table v-if="app && app.dataConfig && app.dataConfig.params && app.dataConfig.params.length && app.dataConfig.params.length > 0">
-            <tr v-for="param in app.dataConfig.params">
+        <table v-if="app && viewParams && viewParams.length > 0">
+            <tr v-for="param in viewParams">
                 <td>{{messages['app_'+app.name+'_param_'+param.name]}}: </td>
                 <td v-if="param.name === 'device'">
                     <select v-model="paramValues[param.name]" v-if="devices">
@@ -19,16 +19,16 @@
             </tr>
         </table>
 
-        <table v-if="app && app.dataConfig && app.dataConfig.fields && app.dataConfig.fields.length && app.dataConfig.fields.length > 0" border="1">
+        <table v-if="app && viewFields && viewFields.length > 0" border="1">
             <thead>
             <tr>
-                <th v-for="field in app.dataConfig.fields">{{messages['app_'+app.name+'_field_'+field.name]}}</th>
+                <th v-for="field in viewFields">{{messages['app_'+app.name+'_field_'+field.name]}}</th>
                 <th v-if="app.dataConfig.actions && app.dataConfig.actions.length && app.dataConfig.actions.length > 0">{{messages.message_data_actions}}</th>
             </tr>
             </thead>
             <tbody v-if="appData && appData.results && appData.results.length && appData.results.length > 0">
             <tr v-for="row in appData.results">
-                <td v-for="field in app.dataConfig.fields" nowrap="nowrap">
+                <td v-for="field in viewFields" nowrap="nowrap">
                     <span v-if="field.name === 'expiration'">
                         <span v-if="row[field.name] !== null && row[field.name] > 0">{{messages.date_format_app_data_expiration.parseDateMessage(row[field.name], messages)}}</span>
                         <span v-else>{{messages.message_app_data_no_expiration}}</span>
@@ -39,7 +39,11 @@
                     <span v-else-if="field.name === 'ctime' || field.name === 'mtime'">
                         {{messages.date_format_app_data_epoch_time.parseDateMessage(row[field.name], messages)}}
                     </span>
-                    <span v-else>{{row[field.name]}}</span>
+                    <span v-else-if="(''+row[field.name]).length < 30">{{row[field.name]}}</span>
+                    <span v-else>
+                        <span v-if="isExpanded(row)" @click="toggleExpanded(row)">{{row[field.name]}}</span>
+                        <span v-else @click="toggleExpanded(row)">{{(''+row[field.name]).substring(0, 30)}}...</span>
+                    </span>
                 </td>
                 <td v-if="app.dataConfig.actions && app.dataConfig.actions.length && app.dataConfig.actions.length > 0">
                     <div v-for="action in app.dataConfig.actions">
@@ -87,8 +91,10 @@
                     pageNumber: 1,
                     pageSize: 20
                 },
+                viewParams: null,
                 paramValues: {},
-                paramOperators: {}
+                paramOperators: {},
+                expanded: {}
             };
         },
         computed: {
@@ -99,9 +105,19 @@
                 return Math.ceil(parseFloat(this.appData.totalCount) / parseFloat(this.query.pageSize));
             },
             totalColumns () {
-                let cols = this.app.dataConfig.fields.length;
+                let cols = this.viewFields.length;
                 if (this.app.dataConfig.actions && this.app.dataConfig.actions.length) cols += this.app.dataConfig.actions.length;
                 return cols;
+            },
+            viewFields () {
+                const fields = [];
+                for (let i=0; i<this.app.dataConfig.fields.length; i++) {
+                    const field = this.app.dataConfig.fields[i];
+                    if (typeof field.when === 'undefined' || field.when === null || safeEval(field.when, {'view': this.viewId}) === true) {
+                        fields.push(field);
+                    }
+                }
+                return fields;
             }
         },
         created () {
@@ -135,6 +151,28 @@
             ]),
             ...mapActions('devices', ['getAllDevicesByUserId']),
             ...mapGetters('apps', ['loading']),
+            toggleExpanded (row) {
+                console.log('toggleExpanded('+row.uuid+') called...');
+                if (this.expanded.hasOwnProperty(row.uuid)) {
+                    if (this.expanded[row.uuid] === true) {
+                        console.log('toggleExpanded('+row.uuid+') UNsetting expanded');
+                        this.expanded = {};
+                    } else {
+                        console.log('toggleExpanded('+row.uuid+') setting expanded');
+                        const exp = {};
+                        exp[row.uuid] = true;
+                        this.expanded = exp;
+                    }
+                } else {
+                    console.log('toggleExpanded('+row.uuid+') setting expanded');
+                    const exp = {};
+                    exp[row.uuid] = true;
+                    this.expanded = exp;
+                }
+            },
+            isExpanded (row) {
+                return this.expanded.hasOwnProperty(row.uuid) && this.expanded[row.uuid] === true;
+            },
             hasPrevPage () { return this.query.pageNumber > 1; },
             hasNextPage () {
                 return this.appData.totalCount && (this.appData.totalCount > (this.query.pageNumber * this.query.pageSize));
@@ -207,13 +245,18 @@
                     for (let i=0; i<allViews.length; i++) {
                         if (allViews[i].name === this.viewId) {
                             this.viewDetails = allViews[i];
+                            const viewParams = [];
                             if (typeof a.dataConfig.params !== 'undefined' && a.dataConfig.params !== null && a.dataConfig.params.length && a.dataConfig.params.length > 0) {
                                 for (let j=0; j<a.dataConfig.params.length; j++) {
                                     const param = a.dataConfig.params[j];
-                                    this.paramValues[param.name] = '';
-                                    this.paramOperators[param.name] = param.operator;
+                                    if (typeof param.when === 'undefined' || param.when === null || safeEval(param.when, {'view': this.viewId}) === true) {
+                                        viewParams.push(param);
+                                        this.paramValues[param.name] = '';
+                                        this.paramOperators[param.name] = param.operator;
+                                    }
                                 }
-                                a.dataConfig.params.sort(function (p1, p2) {return p1.index - p2.index;});
+                                viewParams.sort(function (p1, p2) {return p1.index - p2.index;});
+                                this.viewParams = viewParams;
                             }
                             this.refreshData();
                             return;
