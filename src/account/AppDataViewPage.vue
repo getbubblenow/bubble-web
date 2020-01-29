@@ -1,15 +1,15 @@
 <template>
     <div>
 
-        <table v-if="app && viewDetails && viewDetails.fields && viewDetails.fields.length && viewDetails.fields.length > 0" border="1">
+        <table v-if="app && app.dataConfig && app.dataConfig.fields && app.dataConfig.fields.length && app.dataConfig.fields.length > 0" border="1">
             <thead>
             <tr>
-                <th v-for="field in viewDetails.fields">{{messages['app_'+app.name+'_field_'+field]}}</th>
+                <th v-for="field in app.dataConfig.fields">{{messages['app_'+app.name+'_field_'+field.name]}}</th>
             </tr>
             </thead>
             <tbody v-if="appData && appData.results && appData.results.length && appData.results.length > 0">
             <tr v-for="row in appData.results">
-                <td v-for="field in viewDetails.fields">
+                <td v-for="field in app.dataConfig.fields">
                     <span v-if="field === 'expiration'">
                         <span v-if="row[field.name] !== null && row[field.name] > 0">{{messages.date_format_app_data_expiration.parseDateMessage(row[field.name], messages)}}</span>
                         <span v-else>{{messages.message_app_data_no_expiration}}</span>
@@ -90,8 +90,8 @@
                 return this.appData.totalCount && (this.appData.totalCount > (this.pageNumber * this.pageSize));
             },
             getTotalColumns () {
-                let cols = this.viewDetails.fields.length;
-                if (this.viewDetails.actions && this.viewDetails.actions.length) cols += this.viewDetails.actions.length;
+                let cols = this.app.dataConfig.fields.length;
+                if (this.app.dataConfig.actions && this.app.dataConfig.actions.length) cols += this.app.dataConfig.actions.length;
                 return cols;
             }
         },
