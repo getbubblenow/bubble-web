@@ -85,7 +85,7 @@
                 viewDetails: null,
                 query: {
                     pageNumber: 1,
-                    pageSize: 5
+                    pageSize: 20
                 },
                 paramValues: {},
                 paramOperators: {}
