@@ -10,25 +10,27 @@
             </thead>
             <tbody v-if="appData && appData.results && appData.results.length && appData.results.length > 0">
             <tr v-for="row in appData.results">
-                <td v-for="field in app.dataConfig.fields">
+                <td v-for="field in app.dataConfig.fields" nowrap="nowrap">
                     <span v-if="field.name === 'expiration'">
                         <span v-if="row[field.name] !== null && row[field.name] > 0">{{messages.date_format_app_data_expiration.parseDateMessage(row[field.name], messages)}}</span>
                         <span v-else>{{messages.message_app_data_no_expiration}}</span>
+                    </span>
+                    <span v-else-if="typeof field.customFormat !== 'undefined' && field.customFormat === true">
+                        {{messages['app_'+app.name+'_view_'+viewId+'_'+field.name+'_format'].parseDateMessage(row[field.name], messages)}}
                     </span>
                     <span v-else-if="field.name === 'ctime' || field.name === 'mtime'">
                         {{messages.date_format_app_data_epoch_time.parseDateMessage(row[field.name], messages)}}
                     </span>
                     <span v-else>{{row[field.name]}}</span>
                 </td>
-                <td>
+                <td v-if="app.dataConfig.actions && app.dataConfig.actions.length && app.dataConfig.actions.length > 0">
                     <div v-for="action in app.dataConfig.actions">
                         <button v-if="actionIsAvailable(action, row)" @click="dataAction(action, row.uuid)">{{messages['app_'+app.name+'_action_'+action.name]}}</button>
                     </div>
-
                 </td>
             </tr>
             <tr>
-                <td>{{messages.message_data_results.parseMessage(this)}}</td>
+                <td :colspan="totalColumns">{{messages.message_data_results.parseMessage(this)}}</td>
             </tr>
             <tr v-if="hasPrevPage() || hasNextPage()">
                 <td align="left" v-if="hasPrevPage()" nowrap="nowrap">
