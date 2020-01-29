@@ -1,6 +1,24 @@
 <template>
     <div>
 
+        <table v-if="app && app.dataConfig && app.dataConfig.params && app.dataConfig.params.length && app.dataConfig.params.length > 0">
+            <tr v-for="param in app.dataConfig.params">
+                <td>{{messages['app_'+app.name+'_param_'+param.name]}}: </td>
+                <td v-if="param.name === 'device'">
+                    <select v-model="paramValues[param.name]" v-if="devices">
+                        <option value="">{{messages.option_all_devices}}</option>
+                        <option v-for="device in devices" :value="device.uuid">{{device.name}}</option>
+                    </select>
+                </td>
+                <td v-else>
+                    <input type="text" v-model="paramValues[param.name]" width="40"/>
+                </td>
+            </tr>
+            <tr>
+                <button @click="refreshData()">{{messages.button_label_app_data_refresh}}</button>
+            </tr>
+        </table>
+
         <table v-if="app && app.dataConfig && app.dataConfig.fields && app.dataConfig.fields.length && app.dataConfig.fields.length > 0" border="1">
             <thead>
             <tr>
@@ -68,11 +86,14 @@
                 query: {
                     pageNumber: 1,
                     pageSize: 5
-                }
+                },
+                paramValues: {},
+                paramOperators: {}
             };
         },
         computed: {
             ...mapState('apps', ['app', 'site', 'appData', 'actionResult']),
+            ...mapState('devices', ['devices']),
             ...mapState('system', ['messages']),
             numPages () {
                 return Math.ceil(parseFloat(this.appData.totalCount) / parseFloat(this.query.pageSize));
@@ -102,11 +123,17 @@
                     errors: this.errors
                 });
             }
+            this.getAllDevicesByUserId({
+                userId: this.user.uuid,
+                messages: this.messages,
+                errors: this.errors
+            });
         },
         methods: {
             ...mapActions('apps', [
                 'getAppByUserId', 'getAppSiteByUserId', 'getAppDataByUserId', 'getAppSiteDataByUserId', 'takeDataAction'
             ]),
+            ...mapActions('devices', ['getAllDevicesByUserId']),
             ...mapGetters('apps', ['loading']),
             hasPrevPage () { return this.query.pageNumber > 1; },
             hasNextPage () {
@@ -120,6 +147,21 @@
                 this.query.pageNumber--;
                 this.refreshData();
             },
+            addBounds(q) {
+                const query = Object.assign({}, q);
+                for (let name in this.paramValues) {
+                    if (this.paramValues.hasOwnProperty(name)) {
+                        if (typeof query.bounds === 'undefined') {
+                            query.bounds = [];
+                        }
+                        const val = this.paramValues[name];
+                        if (val !== null && val !== '') {
+                            query.bounds.push({name: name, value: this.paramOperators[name]+':'+val});
+                        }
+                    }
+                }
+                return query;
+            },
             refreshData () {
                 if (this.siteId) {
                     this.getAppSiteDataByUserId({
@@ -127,7 +169,7 @@
                         appId: this.appId,
                         siteId: this.siteId,
                         viewId: this.viewId,
-                        query: this.query,
+                        query: this.addBounds(this.query),
                         messages: this.messages,
                         errors: this.errors
                     });
@@ -137,7 +179,7 @@
                         appId: this.appId,
                         siteId: this.siteId,
                         viewId: this.viewId,
-                        query: this.query,
+                        query: this.addBounds(this.query),
                         messages: this.messages,
                         errors: this.errors
                     });
@@ -165,6 +207,14 @@
                     for (let i=0; i<allViews.length; i++) {
                         if (allViews[i].name === this.viewId) {
                             this.viewDetails = allViews[i];
+                            if (typeof a.dataConfig.params !== 'undefined' && a.dataConfig.params !== null && a.dataConfig.params.length && a.dataConfig.params.length > 0) {
+                                for (let j=0; j<a.dataConfig.params.length; j++) {
+                                    const param = a.dataConfig.params[j];
+                                    this.paramValues[param.name] = '';
+                                    this.paramOperators[param.name] = param.operator;
+                                }
+                                a.dataConfig.params.sort(function (p1, p2) {return p1.index - p2.index;});
+                            }
                             this.refreshData();
                             return;
                         }

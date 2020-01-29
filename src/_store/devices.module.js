@@ -23,6 +23,15 @@ const actions = {
             );
     },
 
+    getAllDevicesByUserId({ commit }, {userId, messages, errors}) {
+        commit('getDevicesByUserIdRequest');
+        deviceService.getAllDevicesByUserId(userId, messages, errors)
+            .then(
+                devices => commit('getDevicesByUserIdSuccess', devices),
+                error => commit('getDevicesByUserIdFailure', error)
+            );
+    },
+
     getDeviceQRcodeById({ commit }, {userId, deviceId, messages, errors}) {
         commit('getDeviceQRcodeByIdRequest');
         deviceService.getDeviceQRcodeById(userId, deviceId, messages, errors)

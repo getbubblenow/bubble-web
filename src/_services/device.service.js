@@ -3,6 +3,7 @@ import { util } from '../_helpers';
 
 export const deviceService = {
     getDevicesByUserId,
+    getAllDevicesByUserId,
     getDeviceQRcodeById,
     getDeviceVPNconfById,
     addDeviceByUserId,
@@ -11,6 +12,10 @@ export const deviceService = {
 
 function getDevicesByUserId(userId, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/devices`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+}
+
+function getAllDevicesByUserId(userId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/devices?all`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function getDeviceQRcodeById(userId, deviceId, messages, errors) {
