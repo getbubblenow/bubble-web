@@ -10,22 +10,25 @@
             <tbody v-if="appData && appData.results && appData.results.length && appData.results.length > 0">
             <tr v-for="row in appData.results">
                 <td v-for="field in app.dataConfig.fields">
-                    <span v-if="field === 'expiration'">
+                    <span v-if="field.name === 'expiration'">
                         <span v-if="row[field.name] !== null && row[field.name] > 0">{{messages.date_format_app_data_expiration.parseDateMessage(row[field.name], messages)}}</span>
                         <span v-else>{{messages.message_app_data_no_expiration}}</span>
                     </span>
-                    <span v-else-if="field === 'ctime' || field === 'mtime'">
+                    <span v-else-if="field.name === 'ctime' || field.name === 'mtime'">
                         {{messages.date_format_app_data_epoch_time.parseDateMessage(row[field.name], messages)}}
                     </span>
                     <span v-else>{{row[field.name]}}</span>
                 </td>
             </tr>
             <tr>
-                <td align="left">
-                    <span v-if="this.pageNumber > 1">{{messages.message_app_data_previous_page}}</span>
+                <td>{{messages.message_data_results.parseMessage(this)}}</td>
+            </tr>
+            <tr v-if="hasPrevPage() || hasNextPage()">
+                <td align="left" v-if="hasPrevPage()">
+                    <button @click="prevPage()">{{messages.message_app_data_previous_page}}</button>
                 </td>
-                <td align="right">
-                    <span v-if="hasNextPage()">{{messages.message_app_data_next_page}}</span>
+                <td align="right" v-if="hasNextPage()">
+                    <button @click="nextPage()">{{messages.message_app_data_next_page}}</button>
                 </td>
             </tr>
             </tbody>
@@ -59,7 +62,10 @@
         },
         computed: {
             ...mapState('apps', ['app', 'site', 'appData']),
-            ...mapState('system', ['messages'])
+            ...mapState('system', ['messages']),
+            numPages () {
+                return 1 + parseInt(this.appData.totalCount / this.query.pageSize);
+            }
         },
         created () {
             this.appId = this.$route.params.app;
@@ -86,8 +92,40 @@
                 'getAppByUserId', 'getAppSiteByUserId', 'getAppDataByUserId', 'getAppSiteDataByUserId'
             ]),
             ...mapGetters('apps', ['loading']),
+            hasPrevPage () { return this.query.pageNumber > 1; },
             hasNextPage () {
-                return this.appData.totalCount && (this.appData.totalCount > (this.pageNumber * this.pageSize));
+                return this.appData.totalCount && (this.appData.totalCount > (this.query.pageNumber * this.query.pageSize));
+            },
+            nextPage () {
+                this.query.pageNumber++;
+                this.refreshData();
+            },
+            prevPage () {
+                this.query.pageNumber--;
+                this.refreshData();
+            },
+            refreshData () {
+                if (this.siteId) {
+                    this.getAppSiteDataByUserId({
+                        userId: this.user.name,
+                        appId: this.appId,
+                        siteId: this.siteId,
+                        viewId: this.viewId,
+                        query: this.query,
+                        messages: this.messages,
+                        errors: this.errors
+                    });
+                } else {
+                    this.getAppDataByUserId({
+                        userId: this.user.name,
+                        appId: this.appId,
+                        siteId: this.siteId,
+                        viewId: this.viewId,
+                        query: this.query,
+                        messages: this.messages,
+                        errors: this.errors
+                    });
+                }
             },
             getTotalColumns () {
                 let cols = this.app.dataConfig.fields.length;
@@ -102,27 +140,7 @@
                     for (let i=0; i<allViews.length; i++) {
                         if (allViews[i].name === this.viewId) {
                             this.viewDetails = allViews[i];
-                            if (this.siteId) {
-                                this.getAppSiteDataByUserId({
-                                    userId: this.user.name,
-                                    appId: this.appId,
-                                    siteId: this.siteId,
-                                    viewId: this.viewId,
-                                    query: this.query,
-                                    messages: this.messages,
-                                    errors: this.errors
-                                });
-                            } else {
-                                this.getAppDataByUserId({
-                                    userId: this.user.name,
-                                    appId: this.appId,
-                                    siteId: this.siteId,
-                                    viewId: this.viewId,
-                                    query: this.query,
-                                    messages: this.messages,
-                                    errors: this.errors
-                                });
-                            }
+                            this.refreshData();
                             return;
                         }
                     }
