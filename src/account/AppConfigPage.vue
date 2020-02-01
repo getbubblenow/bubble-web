@@ -68,9 +68,11 @@
             <hr/>
             <form v-if="appConfigData" @submit.prevent="singleItemAction()">
                 <div v-for="field in configView.fields" class="form-group">
-                    <label :htmlFor="field">{{messages['app_'+app.name+'_config_field_'+field]}}</label>
+                    <label :htmlFor="field">{{messages['app_'+app.name+'_config_field_'+field]}}:</label>
 
-                    <textarea v-if="appFields[field].control === 'textarea'" v-model="appConfigData[field]" class="form-control"></textarea>
+                    <span v-if="appFields[field].mode === 'readOnly' && appFields[field].control === 'flag'"><b>{{messages['message_'+appConfigData[field]]}}</b></span>
+                    <span v-else-if="appFields[field].mode === 'readOnly'"><b>{{appConfigData[field]}}</b></span>
+                    <textarea v-else-if="appFields[field].control === 'textarea'" v-model="appConfigData[field]" class="form-control"></textarea>
                     <input v-else-if="appFields[field].control === 'flag'" type="checkbox" v-model="appConfigData[field]" :name="field" class="form-control" />
                     <input v-else type="text" v-model="appConfigData[field]" :name="field" class="form-control" />
 
@@ -96,8 +98,11 @@
                         <div v-for="param in action.params" class="form-group">
                             <label :htmlFor="param">{{messages['app_'+app.name+'_config_field_'+param]}}</label>
 
-                            <textarea v-if="appFields[param].inputType === 'textarea'" v-model="appActionParams[action.name][param]" class="form-control"></textarea>
-                            <input v-else :type="appFields[param].inputType" v-model="appActionParams[action.name][param]" :name="param" class="form-control" />
+                            <span v-if="appFields[param].mode === 'readOnly' && appFields[param].control === 'flag'"><b>{{messages['message_'+appActionParams[action.name][param]]}}</b></span>
+                            <span v-else-if="appFields[param].mode === 'readOnly'"><b>{{appActionParams[action.name][param]}}</b></span>
+                            <textarea v-else-if="appFields[param].control === 'textarea'" v-model="appActionParams[action.name][param]" class="form-control"></textarea>
+                            <input v-else-if="appFields[param].control === 'flag'" type="checkbox" v-model="appActionParams[action.name][param]" :name="field" class="form-control" />
+                            <input v-else type="text" v-model="appActionParams[action.name][param]" :name="param" class="form-control" />
 
                             <small v-if="messages['app_'+app.name+'_config_field_'+param+'_description'].length > 0">{{messages['app_'+app.name+'_config_field_'+param+'_description']}}</small>
                             <div v-if="errors.has(param)" class="invalid-feedback d-block">{{ errors.first(param) }}</div>
