@@ -1,7 +1,7 @@
 <template>
     <div class="jumbotron">
         <totp-modal/>
-        <sidebar-menu :hide-toggle="true" :menu="menu" v-if="status.loggedIn"/>
+        <sidebar-menu :hide-toggle="true" :menu="menu" v-if="status.loggedIn && activated"/>
         <div class="container">
             <div class="row">
                 <div class="col-sm-6 offset-sm-3">
