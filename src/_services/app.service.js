@@ -18,7 +18,9 @@ export const appService = {
 
     getAppDataByUserId,
     getAppSiteDataByUserId,
-    takeDataAction
+    takeDataAction,
+
+    getAppConfigViewByUserId
 };
 
 // MITM
@@ -79,4 +81,9 @@ function getAppSiteDataByUserId(userId, appId, siteId, viewId, query, messages, 
 
 function takeDataAction(userId, appId, dataId, action, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/data/${dataId}/actions/${action}`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
+}
+
+// Config
+function getAppConfigViewByUserId(userId, appId, viewId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/config/${viewId}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }

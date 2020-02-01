@@ -6,7 +6,7 @@ const state = {
         enableMitm: false, disableMitm: false,
         apps: false, app: false, enableApp: false, disableApp: false,
         sites: false, site: false, enableSite: false, disableSite: false,
-        appData: false, action: false
+        appData: false, appConfig: false, action: false
     },
     mitmEnabled: null,
     error: null,
@@ -15,6 +15,7 @@ const state = {
     sites: [],
     site: null,
     appData: null,
+    appConfigData: null,
     actionResult: null
 };
 
@@ -150,6 +151,16 @@ const actions = {
             .then(
                 appData => commit('takeDataActionSuccess', appData),
                 error => commit('takeDataActionFailure', error)
+            );
+    },
+
+    // App Config
+    getAppConfigViewByUserId({ commit }, {userId, appId, viewId, messages, errors}) {
+        commit('getAppConfigViewByUserIdRequest');
+        appService.getAppConfigViewByUserId(userId, appId, viewId, messages, errors)
+            .then(
+                appConfigData => commit('getAppConfigViewByUserIdSuccess', appConfigData),
+                error => commit('getAppConfigViewByUserIdFailure', error)
             );
     }
 };
@@ -330,6 +341,19 @@ const mutations = {
     },
     takeDataActionFailure(state, error) {
         state.loading.action = false;
+        state.error = error;
+    },
+
+    // App Config
+    getAppConfigViewByUserIdRequest(state) {
+        state.loading.appConfig = true;
+    },
+    getAppConfigViewByUserIdSuccess(state, appConfigData) {
+        state.loading.appConfig = false;
+        state.appConfigData = appConfigData;
+    },
+    getAppConfigViewByUserIdFailure(state, error) {
+        state.loading.appConfig = false;
         state.error = error;
     }
 };
