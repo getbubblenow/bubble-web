@@ -57,6 +57,21 @@
                 </table>
             </div>
         </div>
+
+        <div v-if="appConfigViews && appConfigViews.length > 0">
+            <h2>{{messages['app_'+app.name+'_name']}} {{messages.table_title_app_config_views}}</h2>
+            <div>
+                <table border="1">
+                    <tbody>
+                    <tr v-for="view in appConfigViews">
+                        <td nowrap="nowrap">
+                            <router-link :to="{ path: '/app/'+ app.name + '/config/' + view.name }">{{messages['app_'+app.name+'_config_view_'+view.name]}}</router-link>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     </div>
 </template>
@@ -70,7 +85,8 @@
             return {
                 user: util.currentUser(),
                 appId: null,
-                appViews: null
+                appViews: null,
+                appConfigViews: null
             };
         },
         computed: {
@@ -136,6 +152,15 @@
                         }
                     }
                     this.appViews = appViews;
+
+                    const allConfigViews = a.dataConfig.configViews;
+                    const appConfigViews = [];
+                    for (let i=0; i<allConfigViews.length; i++) {
+                        if (typeof allConfigViews[i].root !== 'undefined' && allConfigViews[i].root !== null && allConfigViews[i].root === true) {
+                            appConfigViews.push(allConfigViews[i]);
+                        }
+                    }
+                    this.appConfigViews = appConfigViews;
                 }
             },
             site (s) {
