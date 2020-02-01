@@ -167,6 +167,13 @@ const getters = {
                 title: messages.label_menu_networks,
                 icon: messages.label_menu_networks_icon
             });
+            if (account.state.user.admin === true) {
+                menu.splice(4, 0, {
+                    href: '/apps',
+                    title: messages.label_menu_apps,
+                    icon: messages.label_menu_apps_icon
+                });
+            }
         } else {
             menu.splice(3, 0, {
                 href: '/devices',
