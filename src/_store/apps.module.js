@@ -162,6 +162,15 @@ const actions = {
                 appConfigData => commit('getAppConfigViewByUserIdSuccess', appConfigData),
                 error => commit('getAppConfigViewByUserIdFailure', error)
             );
+    },
+
+    takeConfigItemAction({ commit }, {userId, appId, viewId, itemId, params, action, messages, errors}) {
+        commit('takeConfigItemActionRequest');
+        appService.takeConfigItemAction(userId, appId, viewId, itemId, params, action, messages, errors)
+            .then(
+                actionResult => commit('takeConfigItemActionSuccess', actionResult),
+                error => commit('takeConfigItemActionFailure', error)
+            );
     }
 };
 
@@ -354,6 +363,18 @@ const mutations = {
     },
     getAppConfigViewByUserIdFailure(state, error) {
         state.loading.appConfig = false;
+        state.error = error;
+    },
+
+    takeConfigItemActionRequest(state) {
+        state.loading.action = true;
+    },
+    takeConfigItemActionSuccess(state, actionResult) {
+        state.loading.action = false;
+        state.actionResult = actionResult;
+    },
+    takeConfigItemActionFailure(state, error) {
+        state.loading.action = false;
         state.error = error;
     }
 };

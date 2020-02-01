@@ -20,7 +20,8 @@ export const appService = {
     getAppSiteDataByUserId,
     takeDataAction,
 
-    getAppConfigViewByUserId
+    getAppConfigViewByUserId,
+    takeConfigItemAction
 };
 
 // MITM
@@ -86,4 +87,8 @@ function takeDataAction(userId, appId, dataId, action, messages, errors) {
 // Config
 function getAppConfigViewByUserId(userId, appId, viewId, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/config/${viewId}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+}
+
+function takeConfigItemAction(userId, appId, viewId, itemId, params, action, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/config/${viewId}/actions/${action}?id=${itemId}`, util.postWithAuth(params)).then(util.handleCrudResponse(messages, errors));
 }

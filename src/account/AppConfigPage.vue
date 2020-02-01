@@ -14,6 +14,9 @@
                 <th v-for="field in configView.fields">
                     {{messages['app_'+app.name+'_config_field_'+field]}}
                 </th>
+                <th v-if="itemActions && itemActions.length > 0">
+                    {{messages.message_config_data_actions}}
+                </th>
             </tr>
             </thead>
             <tbody>
@@ -46,6 +49,11 @@
                         </span>
                     </span>
                 </td>
+                <td v-if="itemActions && itemActions.length > 0">
+                    <div v-for="action in itemActions">
+                        <button v-if="actionIsAvailable(action, row)" @click="itemAction(action, row.id)">{{messages['app_'+app.name+'_config_action_'+action.name]}}</button>
+                    </div>
+                </td>
             </tr>
             </tbody>
 
@@ -76,7 +84,9 @@
                 appId: null,
                 viewId: null,
                 appFields: null,
-                configView: null
+                configView: null,
+                itemActions: null,
+                appActions: null
             };
         },
         computed: {
@@ -102,9 +112,25 @@
         },
         methods: {
             ...mapActions('apps', [
-                'getAppByUserId', 'getAppConfigViewByUserId'
+                'getAppByUserId', 'getAppConfigViewByUserId', 'takeConfigItemAction'
             ]),
             ...mapGetters('apps', ['loading']),
+            actionIsAvailable(action, row) {
+                if (typeof action.when === 'undefined' || action.when === null) return true;
+                return safeEval(action.when, {'item': row}) === true;
+            },
+            itemAction(action, itemId, params) {
+                this.takeConfigItemAction({
+                    userId: this.user.name,
+                    appId: this.appId,
+                    viewId: this.viewId,
+                    itemId: itemId,
+                    params: (typeof params === 'undefined' || params === null ? {} : params),
+                    action: action.name,
+                    messages: this.messages,
+                    errors: this.errors
+                });
+            }
         },
         watch: {
             app (a) {
@@ -120,15 +146,36 @@
                     for (let i=0; i<allConfigViews.length; i++) {
                         if (allConfigViews[i].name === this.viewId) {
                             this.configView = allConfigViews[i];
-                            return;
+                            const itemActions = [];
+                            const appActions = [];
+                            if (typeof this.configView.actions !== 'undefined' && this.configView.actions !== null && this.configView.actions.length > 0) {
+                                for (let j=0; j<this.configView.actions.length; j++) {
+                                    const action = this.configView.actions[j];
+                                    if (action.scope === 'item') {
+                                        itemActions.push(action);
+                                    } else if (action.scope === 'app') {
+                                        appActions.push(action);
+                                    } else {
+                                        console.warn('invalid scope for action: '+action.scope);
+                                    }
+                                }
+                            }
+                            this.itemActions = itemActions;
+                            this.appActions = appActions;
                         }
                     }
-                    console.warn('config view not found: '+this.viewId);
+                    // console.warn('config view not found: '+this.viewId+' -- received: a='+JSON.stringify(a));
                 }
             },
-            appConfigData (configData) {
-                if (configData) {
-
+            actionResult (ar) {
+                if (ar) {
+                    this.getAppConfigViewByUserId({
+                        userId: this.user.uuid,
+                        appId: this.appId,
+                        viewId: this.viewId,
+                        messages: this.messages,
+                        errors: this.errors
+                    });
                 }
             }
         }
