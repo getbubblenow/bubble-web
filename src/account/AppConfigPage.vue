@@ -2,6 +2,8 @@
     <div>
         <h3 v-if="app">{{messages['app_'+app.name+'_config_view_'+viewId]}}</h3>
 
+        <div v-if="errors.has(lastAction)" class="invalid-feedback d-block"><h5>{{ errors.first(lastAction) }}</h5></div>
+
         <div v-if="loading()">
             {{messages.loading_app_config_data}}
         </div>
@@ -112,7 +114,8 @@
                 itemActions: null,
                 appActions: null,
                 itemActionParams: {},
-                appActionParams: {}
+                appActionParams: {},
+                lastAction: 'no_action'
             };
         },
         computed: {
@@ -146,6 +149,8 @@
                 return safeEval(action.when, {'item': row}) === true;
             },
             itemAction(action, itemId) {
+                this.lastAction = action.name;
+                this.errors.clear();
                 this.takeConfigItemAction({
                     userId: this.user.name,
                     appId: this.appId,
@@ -158,6 +163,8 @@
                 });
             },
             appAction(action) {
+                this.lastAction = action.name;
+                this.errors.clear();
                 this.takeConfigAppAction({
                     userId: this.user.name,
                     appId: this.appId,
@@ -208,16 +215,18 @@
             },
             actionResult (ar) {
                 if (ar) {
-                    console.log('clearing form fields...');
-                    for (let action in this.itemActionParams) {
-                        if (this.itemActionParams.hasOwnProperty(action)) {
-                            this.itemActionParams[action] = {};
+                    if (this.itemActionParams) {
+                        for (let action in this.itemActionParams) {
+                            if (this.itemActionParams.hasOwnProperty(action)) {
+                                this.itemActionParams[action] = {};
+                            }
                         }
                     }
-
-                    for (let action in this.appActionParams) {
-                        if (this.appActionParams.hasOwnProperty(action)) {
-                            this.appActionParams[action] = {};
+                    if (this.appActionParams) {
+                        for (let action in this.appActionParams) {
+                            if (this.appActionParams.hasOwnProperty(action)) {
+                                this.appActionParams[action] = {};
+                            }
                         }
                     }
 

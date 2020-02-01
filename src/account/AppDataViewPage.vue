@@ -228,6 +228,7 @@
                 return safeEval(action.when, {'data': row}) === true;
             },
             dataAction(action, dataId) {
+                this.errors.clear();
                 this.takeDataAction({
                     userId: this.user.name,
                     appId: this.appId,
