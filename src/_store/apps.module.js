@@ -155,9 +155,9 @@ const actions = {
     },
 
     // App Config
-    getAppConfigViewByUserId({ commit }, {userId, appId, viewId, messages, errors}) {
+    getAppConfigViewByUserId({ commit }, {userId, appId, viewId, itemId, messages, errors}) {
         commit('getAppConfigViewByUserIdRequest');
-        appService.getAppConfigViewByUserId(userId, appId, viewId, messages, errors)
+        appService.getAppConfigViewByUserId(userId, appId, viewId, itemId, messages, errors)
             .then(
                 appConfigData => commit('getAppConfigViewByUserIdSuccess', appConfigData),
                 error => commit('getAppConfigViewByUserIdFailure', error)

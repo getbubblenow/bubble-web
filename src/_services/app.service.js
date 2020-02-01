@@ -86,8 +86,9 @@ function takeDataAction(userId, appId, dataId, action, messages, errors) {
 }
 
 // Config
-function getAppConfigViewByUserId(userId, appId, viewId, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/config/${viewId}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+function getAppConfigViewByUserId(userId, appId, viewId, itemId, messages, errors) {
+    const id = (typeof itemId !== 'undefined' && itemId !== null ? `?id=${itemId}` : '');
+    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/config/${viewId}${id}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function takeConfigItemAction(userId, appId, viewId, itemId, params, action, messages, errors) {

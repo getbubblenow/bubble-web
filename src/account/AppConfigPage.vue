@@ -10,7 +10,8 @@
         <div v-else-if="appConfigData && configView">
 
             <!-- table of results -->
-        <table border="1" v-if="appConfigData instanceof Array">
+            <div v-if="appConfigData instanceof Array">
+        <table border="1">
             <thead>
             <tr>
                 <th v-for="field in configView.fields">
@@ -60,24 +61,46 @@
             </tbody>
 
         </table>
-        <!-- single item view -->
-        <table border="1" v-else>
+            </div>
 
-        </table>
+        <!-- single item view -->
+        <div v-else>
+            <hr/>
+            <form v-if="appConfigData" @submit.prevent="singleItemAction()">
+                <div v-for="field in configView.fields" class="form-group">
+                    <label :htmlFor="field">{{messages['app_'+app.name+'_config_field_'+field]}}</label>
+
+                    <textarea v-if="appFields[field].control === 'textarea'" v-model="appConfigData[field]" class="form-control"></textarea>
+                    <input v-else-if="appFields[field].control === 'flag'" type="checkbox" v-model="appConfigData[field]" :name="field" class="form-control" />
+                    <input v-else type="text" v-model="appConfigData[field]" :name="field" class="form-control" />
+
+                    <small v-if="messages['app_'+app.name+'_config_field_'+field+'_description'].length > 0">{{messages['app_'+app.name+'_config_field_'+field+'_description']}}</small>
+                    <div v-if="errors.has(field)" class="invalid-feedback d-block">{{ errors.first(field) }}</div>
+                </div>
+
+                <div v-for="action in itemActions">
+                    <button v-if="actionIsAvailable(action, appConfigData)" @click="singleItemAction(action)" class="btn btn-primary" :disabled="loading()">{{messages['app_'+app.name+'_config_button_'+action.name]}}</button>
+                </div>
+            </form>
+
+        </div>
 
             <!-- app-scoped actions -->
             <div v-for="action in appActions">
-
+                <hr/>
                 <!-- actions with parameters: show a form -->
                 <div v-if="typeof action.params !== 'undefined' || action.params !== null || action.params.length > 0">
                     <h4>{{messages['app_'+app.name+'_config_action_'+action.name]}}</h4>
                     <form @submit.prevent="appAction(action)">
 
                         <div v-for="param in action.params" class="form-group">
-                            <label :htmlFor="param.name">{{messages['app_'+app.name+'_config_field_'+param.name]}}</label>
-                            <input v-model="appActionParams[action.name][param.name]" :name="param.name" class="form-control"/>
-                            <small v-if="messages['app_'+app.name+'_config_field_'+param.name+'_description'].length > 0">{{messages['app_'+app.name+'_config_field_'+param.name+'_description']}}</small>
-                            <div v-if="errors.has(param.name)" class="invalid-feedback d-block">{{ errors.first(param.name) }}</div>
+                            <label :htmlFor="param">{{messages['app_'+app.name+'_config_field_'+param]}}</label>
+
+                            <textarea v-if="appFields[param].inputType === 'textarea'" v-model="appActionParams[action.name][param]" class="form-control"></textarea>
+                            <input v-else :type="appFields[param].inputType" v-model="appActionParams[action.name][param]" :name="param" class="form-control" />
+
+                            <small v-if="messages['app_'+app.name+'_config_field_'+param+'_description'].length > 0">{{messages['app_'+app.name+'_config_field_'+param+'_description']}}</small>
+                            <div v-if="errors.has(param)" class="invalid-feedback d-block">{{ errors.first(param) }}</div>
                         </div>
 
                         <button class="btn btn-primary" :disabled="loading()">{{messages['app_'+app.name+'_config_button_'+action.name]}}</button>
@@ -109,6 +132,7 @@
                 user: util.currentUser(),
                 appId: null,
                 viewId: null,
+                itemId: null,
                 appFields: null,
                 configView: null,
                 itemActions: null,
@@ -123,44 +147,54 @@
             ...mapState('system', ['messages'])
         },
         created () {
-            this.appId = this.$route.params.app;
-            this.viewId = this.$route.params.view;
-            this.getAppByUserId({
-                userId: this.user.uuid,
-                appId: this.appId,
-                messages: this.messages,
-                errors: this.errors
-            });
-            this.getAppConfigViewByUserId({
-                userId: this.user.uuid,
-                appId: this.appId,
-                viewId: this.viewId,
-                messages: this.messages,
-                errors: this.errors
-            });
+            this.initView();
         },
         methods: {
             ...mapActions('apps', [
                 'getAppByUserId', 'getAppConfigViewByUserId', 'takeConfigItemAction', 'takeConfigAppAction'
             ]),
             ...mapGetters('apps', ['loading']),
+            initView() {
+                this.appId = this.$route.params.app;
+                this.viewId = this.$route.params.view;
+                this.itemId = this.$route.params.item;
+                this.getAppByUserId({
+                    userId: this.user.uuid,
+                    appId: this.appId,
+                    messages: this.messages,
+                    errors: this.errors
+                });
+                this.getAppConfigViewByUserId({
+                    userId: this.user.uuid,
+                    appId: this.appId,
+                    viewId: this.viewId,
+                    itemId: this.itemId,
+                    messages: this.messages,
+                    errors: this.errors
+                });
+            },
             actionIsAvailable(action, row) {
                 if (typeof action.when === 'undefined' || action.when === null) return true;
                 return safeEval(action.when, {'item': row}) === true;
             },
             itemAction(action, itemId) {
-                this.lastAction = action.name;
-                this.errors.clear();
-                this.takeConfigItemAction({
-                    userId: this.user.name,
-                    appId: this.appId,
-                    viewId: this.viewId,
-                    itemId: itemId,
-                    params: this.itemActionParams[action.name],
-                    action: action.name,
-                    messages: this.messages,
-                    errors: this.errors
-                });
+                if (typeof action.view !== 'undefined' && action.view !== null) {
+                    this.$router.push({path: '/app/'+this.appId+'/config/'+action.view+'/'+itemId});
+                    this.initView();
+                } else {
+                    this.lastAction = action.name;
+                    this.errors.clear();
+                    this.takeConfigItemAction({
+                        userId: this.user.name,
+                        appId: this.appId,
+                        viewId: this.viewId,
+                        itemId: itemId,
+                        params: this.itemActionParams[action.name],
+                        action: action.name,
+                        messages: this.messages,
+                        errors: this.errors
+                    });
+                }
             },
             appAction(action) {
                 this.lastAction = action.name;
@@ -174,6 +208,10 @@
                     messages: this.messages,
                     errors: this.errors
                 });
+            },
+            singleItemAction(action) {
+                if (typeof action === 'undefined' || action === null) return;
+                console.log('singleItemAction called');
             }
         },
         watch: {
@@ -206,8 +244,8 @@
                                     }
                                 }
                             }
-                            this.itemActions = itemActions;
-                            this.appActions = appActions;
+                            this.itemActions = itemActions.sort((a, b) => (a.index - b.index));
+                            this.appActions = appActions.sort((a, b) => (a.index - b.index));
                         }
                     }
                     // console.warn('config view not found: '+this.viewId+' -- received: a='+JSON.stringify(a));
