@@ -171,6 +171,15 @@ const actions = {
                 actionResult => commit('takeConfigItemActionSuccess', actionResult),
                 error => commit('takeConfigItemActionFailure', error)
             );
+    },
+
+    takeConfigAppAction({ commit }, {userId, appId, viewId, params, action, messages, errors}) {
+        commit('takeConfigAppActionRequest');
+        appService.takeConfigAppAction(userId, appId, viewId, params, action, messages, errors)
+            .then(
+                actionResult => commit('takeConfigAppActionSuccess', actionResult),
+                error => commit('takeConfigAppActionFailure', error)
+            );
     }
 };
 
@@ -374,6 +383,18 @@ const mutations = {
         state.actionResult = actionResult;
     },
     takeConfigItemActionFailure(state, error) {
+        state.loading.action = false;
+        state.error = error;
+    },
+
+    takeConfigAppActionRequest(state) {
+        state.loading.action = true;
+    },
+    takeConfigAppActionSuccess(state, actionResult) {
+        state.loading.action = false;
+        state.actionResult = actionResult;
+    },
+    takeConfigAppActionFailure(state, error) {
         state.loading.action = false;
         state.error = error;
     }

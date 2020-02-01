@@ -5,7 +5,7 @@
         <div v-if="loading()">
             {{messages.loading_app_config_data}}
         </div>
-        <div v-else-if="appConfigData && appConfigData.length && appConfigData.length > 0 && configView">
+        <div v-else-if="appConfigData && configView">
 
             <!-- table of results -->
         <table border="1" v-if="appConfigData instanceof Array">
@@ -58,11 +58,35 @@
             </tbody>
 
         </table>
-
-            <!-- single item view -->
+        <!-- single item view -->
         <table border="1" v-else>
 
         </table>
+
+            <!-- app-scoped actions -->
+            <div v-for="action in appActions">
+
+                <!-- actions with parameters: show a form -->
+                <div v-if="typeof action.params !== 'undefined' || action.params !== null || action.params.length > 0">
+                    <h4>{{messages['app_'+app.name+'_config_action_'+action.name]}}</h4>
+                    <form @submit.prevent="appAction(action)">
+
+                        <div v-for="param in action.params" class="form-group">
+                            <label :htmlFor="param.name">{{messages['app_'+app.name+'_config_field_'+param.name]}}</label>
+                            <input v-model="appActionParams[action.name][param.name]" :name="param.name" class="form-control"/>
+                            <small v-if="messages['app_'+app.name+'_config_field_'+param.name+'_description'].length > 0">{{messages['app_'+app.name+'_config_field_'+param.name+'_description']}}</small>
+                            <div v-if="errors.has(param.name)" class="invalid-feedback d-block">{{ errors.first(param.name) }}</div>
+                        </div>
+
+                        <button class="btn btn-primary" :disabled="loading()">{{messages['app_'+app.name+'_config_button_'+action.name]}}</button>
+                    </form>
+                </div>
+
+                <!-- actions with no parameters: just a button -->
+                <div v-else>
+                    <button class="btn btn-primary" :disabled="loading()">{{messages['app_'+app.name+'_config_action_'+action.name]}}</button>
+                </div>
+            </div>
 
         </div>
         <div v-else>
@@ -86,7 +110,9 @@
                 appFields: null,
                 configView: null,
                 itemActions: null,
-                appActions: null
+                appActions: null,
+                itemActionParams: {},
+                appActionParams: {}
             };
         },
         computed: {
@@ -112,20 +138,31 @@
         },
         methods: {
             ...mapActions('apps', [
-                'getAppByUserId', 'getAppConfigViewByUserId', 'takeConfigItemAction'
+                'getAppByUserId', 'getAppConfigViewByUserId', 'takeConfigItemAction', 'takeConfigAppAction'
             ]),
             ...mapGetters('apps', ['loading']),
             actionIsAvailable(action, row) {
                 if (typeof action.when === 'undefined' || action.when === null) return true;
                 return safeEval(action.when, {'item': row}) === true;
             },
-            itemAction(action, itemId, params) {
+            itemAction(action, itemId) {
                 this.takeConfigItemAction({
                     userId: this.user.name,
                     appId: this.appId,
                     viewId: this.viewId,
                     itemId: itemId,
-                    params: (typeof params === 'undefined' || params === null ? {} : params),
+                    params: this.itemActionParams[action.name],
+                    action: action.name,
+                    messages: this.messages,
+                    errors: this.errors
+                });
+            },
+            appAction(action) {
+                this.takeConfigAppAction({
+                    userId: this.user.name,
+                    appId: this.appId,
+                    viewId: this.viewId,
+                    params: this.appActionParams[action.name],
                     action: action.name,
                     messages: this.messages,
                     errors: this.errors
@@ -153,8 +190,10 @@
                                     const action = this.configView.actions[j];
                                     if (action.scope === 'item') {
                                         itemActions.push(action);
+                                        this.itemActionParams[action.name] = {};
                                     } else if (action.scope === 'app') {
                                         appActions.push(action);
+                                        this.appActionParams[action.name] = {};
                                     } else {
                                         console.warn('invalid scope for action: '+action.scope);
                                     }
@@ -169,6 +208,19 @@
             },
             actionResult (ar) {
                 if (ar) {
+                    console.log('clearing form fields...');
+                    for (let action in this.itemActionParams) {
+                        if (this.itemActionParams.hasOwnProperty(action)) {
+                            this.itemActionParams[action] = {};
+                        }
+                    }
+
+                    for (let action in this.appActionParams) {
+                        if (this.appActionParams.hasOwnProperty(action)) {
+                            this.appActionParams[action] = {};
+                        }
+                    }
+
                     this.getAppConfigViewByUserId({
                         userId: this.user.uuid,
                         appId: this.appId,

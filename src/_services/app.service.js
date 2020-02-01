@@ -21,7 +21,8 @@ export const appService = {
     takeDataAction,
 
     getAppConfigViewByUserId,
-    takeConfigItemAction
+    takeConfigItemAction,
+    takeConfigAppAction
 };
 
 // MITM
@@ -91,4 +92,8 @@ function getAppConfigViewByUserId(userId, appId, viewId, messages, errors) {
 
 function takeConfigItemAction(userId, appId, viewId, itemId, params, action, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/config/${viewId}/actions/${action}?id=${itemId}`, util.postWithAuth(params)).then(util.handleCrudResponse(messages, errors));
+}
+
+function takeConfigAppAction(userId, appId, viewId, params, action, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/config/${viewId}/actions/${action}`, util.putWithAuth(params)).then(util.handleCrudResponse(messages, errors));
 }
