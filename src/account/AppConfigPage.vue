@@ -2,7 +2,7 @@
     <div>
         <h3 v-if="app">{{messages['app_'+app.name+'_config_view_'+viewId]}}</h3>
 
-        <div v-if="errors.has(lastAction)" class="invalid-feedback d-block"><h5>{{ errors.first(lastAction) }}</h5></div>
+        <div v-if="lastAction && errors.has(lastAction.name)" class="invalid-feedback d-block"><h5>{{ errors.first(lastAction.name) }}</h5></div>
 
         <div v-if="loading()">
             {{messages.loading_app_config_data}}
@@ -144,7 +144,7 @@
                 appActions: null,
                 itemActionParams: {},
                 appActionParams: {},
-                lastAction: 'no_action'
+                lastAction: null
             };
         },
         computed: {
@@ -187,7 +187,7 @@
                     this.$router.push({path: '/app/'+this.appId+'/config/'+action.view+'/'+itemId});
                     this.initView();
                 } else {
-                    this.lastAction = action.name;
+                    this.lastAction = action;
                     this.errors.clear();
                     this.takeConfigItemAction({
                         userId: this.user.name,
@@ -202,7 +202,7 @@
                 }
             },
             appAction(action) {
-                this.lastAction = action.name;
+                this.lastAction = action;
                 this.errors.clear();
                 this.takeConfigAppAction({
                     userId: this.user.name,
@@ -216,7 +216,18 @@
             },
             singleItemAction(action) {
                 if (typeof action === 'undefined' || action === null) return;
-                console.log('singleItemAction called');
+                this.lastAction = action;
+                this.errors.clear();
+                this.takeConfigItemAction({
+                    userId: this.user.name,
+                    appId: this.appId,
+                    viewId: this.viewId,
+                    itemId: this.itemId,
+                    params: this.appConfigData,
+                    action: action.name,
+                    messages: this.messages,
+                    errors: this.errors
+                });
             }
         },
         watch: {
@@ -273,13 +284,20 @@
                         }
                     }
 
-                    this.getAppConfigViewByUserId({
-                        userId: this.user.uuid,
-                        appId: this.appId,
-                        viewId: this.viewId,
-                        messages: this.messages,
-                        errors: this.errors
-                    });
+                    if (this.lastAction && typeof this.lastAction.successView !== 'undefined' && this.lastAction.successView !== null) {
+                        const successView = this.lastAction.successView.parseMessage(this);
+                        console.log('parsed this.lastAction.successView ('+this.lastAction.successView+') => '+successView);
+                        this.$router.push({path: '/app/'+this.appId+'/config/'+successView});
+                        this.initView();
+                    } else {
+                        this.getAppConfigViewByUserId({
+                            userId: this.user.uuid,
+                            appId: this.appId,
+                            viewId: this.viewId,
+                            messages: this.messages,
+                            errors: this.errors
+                        });
+                    }
                 }
             }
         }
