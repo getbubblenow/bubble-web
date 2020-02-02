@@ -58,7 +58,7 @@
             </div>
         </div>
 
-        <div v-if="appConfigViews && appConfigViews.length > 0">
+        <div v-if="typeof appConfigViews !== 'undefined' && appConfigViews !== null && appConfigViews.length > 0">
             <h2>{{messages['app_'+app.name+'_name']}} {{messages.table_title_app_config_views}}</h2>
             <div>
                 <table border="1">
@@ -153,14 +153,16 @@
                     }
                     this.appViews = appViews;
 
-                    const allConfigViews = a.dataConfig.configViews;
-                    const appConfigViews = [];
-                    for (let i=0; i<allConfigViews.length; i++) {
-                        if (typeof allConfigViews[i].root !== 'undefined' && allConfigViews[i].root !== null && allConfigViews[i].root === true) {
-                            appConfigViews.push(allConfigViews[i]);
+                    if (a.dataConfig.configViews) {
+                        const allConfigViews = a.dataConfig.configViews;
+                        const appConfigViews = [];
+                        for (let i=0; i<allConfigViews.length; i++) {
+                            if (typeof allConfigViews[i].root !== 'undefined' && allConfigViews[i].root !== null && allConfigViews[i].root === true) {
+                                appConfigViews.push(allConfigViews[i]);
+                            }
                         }
+                        this.appConfigViews = appConfigViews;
                     }
-                    this.appConfigViews = appConfigViews;
                 }
             },
             site (s) {
