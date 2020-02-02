@@ -13,6 +13,8 @@ export const util = {
 
     userLoggedIn: function() { return !!util.currentUser(); },
 
+    logout: function() { return localStorage.clear(); },
+
     authHeader: function() {
         // return authorization header with jwt token
         let user = util.currentUser();
@@ -164,9 +166,15 @@ export const util = {
                     const field = parts[1];
                     const message = messages[messageTemplate];
                     errors.add({field: field, msg: message});
-                    if (messageTemplate === 'err_totpToken_invalid') {
+                    if (messageTemplate === 'err_logout_noSession') {
+                        console.log('setValidationErrors: detected err_logout_noSession, logging out');
+                        util.logout();
+                        localStorage.clear();
+                    } else if (messageTemplate === 'err_totpToken_invalid') {
                         // console.log('received '+messageTemplate+' -- setting window.showTotpModal = true');
                         window.showTotpModal = true;
+                    } else {
+                        console.log('setValidationErrors: nothing special: '+messageTemplate);
                     }
                 //     console.log('>>>>> field '+field+' added error: '+message+', errors='+JSON.stringify(errors));
                 // } else {
@@ -210,10 +218,12 @@ export const util = {
             if (typeof name === 'undefined') return '???undefined';
             if (name === null) return '???null';
             if (name === '') return '???empty';
-            if (target.hasOwnProperty(name)) return target[name];
-            const altName = name.toString().replace(/\./g, '_');
-            if (target.hasOwnProperty(altName)) return target[altName];
-            return '???'+name.toString();
+            const checkExists = name.toString().startsWith("!");
+            const index = checkExists ? name.toString().substring(1) : name;
+            if (target.hasOwnProperty(index)) return checkExists ? true : target[index];
+            const altName = index.toString().replace(/\./g, '_');
+            if (target.hasOwnProperty(altName)) return checkExists ? true : target[altName];
+            return checkExists ? false : '???'+name.toString();
         }
     },
 

@@ -19,32 +19,22 @@
 
         <em v-if="loading()">{{messages.loading_apps}}</em>
         <div v-if="apps && apps.length > 0">
-            <h2>{{messages.table_title_apps}}</h2>
-            <table border="1">
-                <thead>
-                <tr>
-                    <th nowrap="nowrap">{{messages.label_field_app_name}}</th>
-                    <th nowrap="nowrap">{{messages.label_field_app_description}}</th>
-                    <th nowrap="nowrap">{{messages.label_field_app_enabled}}</th>
-                    <th><!-- control button --></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="app in apps">
-                    <td nowrap="nowrap"><router-link :to="{ path: '/app/'+ app.name }">{{messages['app_'+app.name+'_name']}}</router-link></td>
-                    <td>{{messages['app_'+app.name+'_description']}}</td>
-                    <td>{{messages['message_'+app.enabled]}}</td>
-                    <td v-if="app.enabled">
-                        <button @click="disableApp(app.name)">{{messages.button_label_app_disable}}</button>
-                    </td>
-                    <td v-else>
-                        <button @click="enableApp(app.name)">{{messages.button_label_app_enable}}</button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
 
+            <h2>{{messages.table_title_apps}}</h2>
+
+            <div v-for="app in apps">
+                <hr/>
+                <router-link :to="{ path: '/app/'+ app.name }"><h3>{{messages['app_'+app.name+'_name']}}</h3></router-link>
+                <div v-if="messages['!app_'+app.name+'_summary']"><h5>{{messages['app_'+app.name+'_summary']}}</h5></div>
+                <p>{{messages['app_'+app.name+'_description']}}</p>
+                <div>
+                    {{messages.label_field_app_enabled}}: {{messages['message_'+app.enabled]}}
+                    <button v-if="app.enabled" @click="disableApp(app.name)">{{messages.button_label_app_disable}}</button>
+                    <button v-else @click="enableApp(app.name)">{{messages.button_label_app_enable}}</button>
+                </div>
+            </div>
+
+        </div>
         <div v-if="!apps || apps.length === 0">
             {{messages.message_no_apps}}
         </div>

@@ -70,7 +70,12 @@ function getAllUsers(messages, errors) {
 }
 
 function getMe(messages, errors) {
-    return fetch(`${config.apiUrl}/me`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/me`, util.getWithAuth()).then(
+        response => {
+            if (!response.ok && response.status === 404) util.logout();
+            return response;
+        }
+    ).then(util.handleCrudResponse(messages, errors));
 }
 
 function getUserById(userId, messages, errors) {

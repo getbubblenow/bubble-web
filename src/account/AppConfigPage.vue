@@ -10,13 +10,13 @@
 
         <div v-if="lastAction && errors.has(lastAction.name)" class="invalid-feedback d-block"><h5>{{ errors.first(lastAction.name) }}</h5></div>
 
-        <div v-if="loading()">
+        <div v-if="loading() && !hasActionFocus">
             {{messages.loading_app_config_data}}
         </div>
         <div v-else-if="appConfigData && configView">
 
             <!-- table of results -->
-            <div v-if="appConfigData instanceof Array">
+            <div v-if="appConfigData instanceof Array && !hasActionFocus">
         <table border="1">
             <thead>
             <tr v-if="configView.fields">
@@ -70,20 +70,14 @@
             </div>
 
         <!-- single item view -->
-        <div v-else>
+        <div v-else-if="!hasActionFocus">
             <hr/>
             <form v-if="appConfigData" @submit.prevent="singleItemAction()">
-                <div v-for="field in configView.fields" class="form-group">
-                    <label :htmlFor="field">{{messages['app_'+app.name+'_config_field_'+field]}}:</label>
-
-                    <span v-if="appFields[field].mode === 'readOnly' && appFields[field].control === 'flag'"><b>{{messages['message_'+appConfigData[field]]}}</b></span>
-                    <span v-else-if="appFields[field].mode === 'readOnly'"><b>{{appConfigData[field]}}</b></span>
-                    <textarea v-else-if="appFields[field].control === 'textarea'" v-model="appConfigData[field]" class="form-control"></textarea>
-                    <input v-else-if="appFields[field].control === 'flag'" type="checkbox" v-model="appConfigData[field]" :name="field" class="form-control" />
-                    <input v-else type="text" v-model="appConfigData[field]" :name="field" class="form-control" />
-
-                    <small v-if="messages['app_'+app.name+'_config_field_'+field+'_description'].length > 0">{{messages['app_'+app.name+'_config_field_'+field+'_description']}}</small>
-                    <div v-if="errors.has(field)" class="invalid-feedback d-block">{{ errors.first(field) }}</div>
+                showing config fields
+                <div v-for="field in configView.fields">
+                    <form-field v-bind:field="appFields[field]"
+                                v-bind:thing="appConfigData"
+                                v-bind:messagePrefix="'app_'+app.name+'_config_field_'"></form-field>
                 </div>
 
                 <div v-for="action in itemActions">
@@ -95,47 +89,42 @@
 
             <!-- app-scoped actions -->
             <div v-for="action in appActions">
-                <hr/>
+                <div v-if="!hasActionFocus || actionFocus === action.name">
 
-                <!-- last action status -->
-                <div v-if="lastAction && lastAction.name === action.name">
-                    <div v-if="successResponseMessage" class="invalid-feedback d-block"><hr/><h5>{{messages[successResponseMessage]}}</h5><hr/></div>
-                    <div v-if="successResponseMessageDescription !== null && successResponseMessageDescription !== ''">
-                        {{messages[successResponseMessageDescription]}}
-                        <hr/>
-                    </div>
-                </div>
+                    <hr/>
 
-                <!-- actions with parameters: show a form -->
-                <div v-if="typeof action.params !== 'undefined' || action.params !== null || action.params.length > 0">
-                    <h4>{{messages['app_'+app.name+'_config_action_'+action.name]}}</h4>
-                    <form @submit.prevent="appAction(action)">
-
-                        <div v-for="param in action.params" class="form-group">
-                            <label :htmlFor="param">{{messages['app_'+app.name+'_config_field_'+param]}}</label>
-
-                            <span v-if="appFields[param].mode === 'readOnly' && appFields[param].control === 'flag'"><b>{{messages['message_'+appActionParams[action.name][param]]}}</b></span>
-                            <span v-else-if="appFields[param].mode === 'readOnly'"><b>{{appActionParams[action.name][param]}}</b></span>
-                            <textarea v-else-if="appFields[param].control === 'textarea'" v-model="appActionParams[action.name][param]" class="form-control"></textarea>
-                            <input v-else-if="appFields[param].control === 'flag'" type="checkbox" v-model="appActionParams[action.name][param]" :name="param" class="form-control" />
-                            <input v-else type="text" v-model="appActionParams[action.name][param]" :name="param" class="form-control" />
-
-                            <small v-if="messages['app_'+app.name+'_config_field_'+param+'_description'].length > 0">{{messages['app_'+app.name+'_config_field_'+param+'_description']}}</small>
-                            <div v-if="errors.has(param)" class="invalid-feedback d-block">{{ errors.first(param) }}</div>
+                    <!-- last action status -->
+                    <div v-if="lastAction && lastAction.name === action.name">
+                        <div v-if="successResponseMessage" class="invalid-feedback d-block"><hr/><h5>{{messages[successResponseMessage]}}</h5><hr/></div>
+                        <div v-if="successResponseMessageDescription !== null && successResponseMessageDescription !== ''">
+                            {{messages[successResponseMessageDescription]}}
+                            <hr/>
                         </div>
+                    </div>
 
-                        <button class="btn btn-primary" :disabled="loading()">{{messages['app_'+app.name+'_config_button_'+action.name]}}</button>
-                    </form>
-                </div>
+                    <!-- actions with parameters: show a form -->
+                    <div v-if="typeof action.params !== 'undefined' || action.params !== null || action.params.length > 0">
+                        <h4>{{messages['app_'+app.name+'_config_action_'+action.name]}}</h4>
+                        <form @submit.prevent="appAction(action)">
+                            <div v-for="param in action.params">
+                                <form-field :field="appFields[param]"
+                                            :thing="appActionParams[action.name]"
+                                            :messagePrefix="'app_'+app.name+'_config_field_'"></form-field>
+                            </div>
 
-                <!-- actions with no parameters: just a button -->
-                <div v-else>
-                    <button class="btn btn-primary" :disabled="loading()">{{messages['app_'+app.name+'_config_action_'+action.name]}}</button>
+                            <button class="btn btn-primary" :disabled="loading()">{{messages['app_'+app.name+'_config_button_'+action.name]}}</button>
+                        </form>
+                    </div>
+
+                    <!-- actions with no parameters: just a button -->
+                    <div v-else>
+                        <button class="btn btn-primary" :disabled="loading()">{{messages['app_'+app.name+'_config_action_'+action.name]}}</button>
+                    </div>
                 </div>
             </div>
 
         </div>
-        <div v-else>
+        <div v-else-if="!hasActionFocus">
             {{messages.message_no_config_data}}
         </div>
 
@@ -154,6 +143,7 @@
                 appId: null,
                 viewId: null,
                 itemId: null,
+                actionFocus: null,
                 appFields: null,
                 configView: null,
                 itemActions: null,
@@ -167,9 +157,13 @@
         },
         computed: {
             ...mapState('apps', ['app', 'appConfigData', 'actionResult']),
-            ...mapState('system', ['messages'])
+            ...mapState('system', ['messages']),
+            hasActionFocus () {
+                return this.actionFocus !== null && this.lastAction === null;
+            }
         },
         created () {
+            this.actionFocus = this.$route.query.action;
             this.initView();
         },
         methods: {
@@ -283,15 +277,32 @@
                             if (typeof this.configView.actions !== 'undefined' && this.configView.actions !== null && this.configView.actions.length > 0) {
                                 for (let j=0; j<this.configView.actions.length; j++) {
                                     const action = this.configView.actions[j];
+                                    const hasParams = typeof action.params !== 'undefined' && action.params !== null && action.params.length > 0;
                                     if (action.scope === 'item') {
                                         itemActions.push(action);
-                                        this.itemActionParams[action.name] = {};
+                                        if (hasParams) this.itemActionParams[action.name] = {};
                                     } else if (action.scope === 'app') {
                                         appActions.push(action);
-                                        this.appActionParams[action.name] = {};
+                                        if (hasParams) this.appActionParams[action.name] = {};
                                     } else {
                                         console.warn('invalid scope for action: '+action.scope);
                                     }
+
+                                    if (hasParams && this.$route.query) {  // set defaults from query params
+                                        for (let k=0; k<action.params.length; k++) {
+                                            const param = action.params[k];
+                                            if (this.$route.query.hasOwnProperty(param)) {
+                                                if (action.scope === 'item') {
+                                                    console.log('setting item action '+action.name+' param for inbound field: '+param+'='+this.$route.query[param]);
+                                                    this.itemActionParams[action.name][param] = this.$route.query[param];
+                                                } else if (action.scope === 'app') {
+                                                    console.log('setting app action '+action.name+' param for inbound field: '+param+'='+this.$route.query[param]);
+                                                    this.appActionParams[action.name][param] = this.$route.query[param];
+                                                }
+                                            }
+                                        }
+                                    }
+
                                 }
                             }
                             this.itemActions = itemActions.sort((a, b) => (a.index - b.index));

@@ -52,7 +52,14 @@ String.prototype.parseMessage = function (vue, ctx) {
     const context = (typeof ctx !== 'undefined' && ctx !== null) ? Object.assign(vue, ctx) : vue;
     return this ? ''+this.replace(/{{[\w][\w\._]*?}}/g, match => {
         const expression = match.slice(2, -2);
-        return evalInContext(context, expression)
+        return evalInContext(context, expression);
+    }) : '';
+};
+
+String.prototype.parseExpression = function (ctx) {
+    return this ? ''+this.replace(/{{.+?}}/g, match => {
+        const expression = match.slice(2, -2);
+        return safeEval(expression, ctx);
     }) : '';
 };
 
