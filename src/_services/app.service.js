@@ -95,6 +95,7 @@ function takeConfigItemAction(userId, appId, viewId, itemId, params, action, mes
     return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/config/${viewId}/actions/${action}?id=${itemId}`, util.postWithAuth(params)).then(util.handleCrudResponse(messages, errors));
 }
 
-function takeConfigAppAction(userId, appId, viewId, params, action, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/config/${viewId}/actions/${action}`, util.putWithAuth(params)).then(util.handleCrudResponse(messages, errors));
+function takeConfigAppAction(userId, appId, viewId, itemId, params, action, messages, errors) {
+    const id = (typeof itemId !== 'undefined' && itemId !== null ? `?id=${itemId}` : '');
+    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/config/${viewId}/actions/${action}${id}`, util.putWithAuth(params)).then(util.handleCrudResponse(messages, errors));
 }

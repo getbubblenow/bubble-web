@@ -202,32 +202,43 @@
                 }
             },
             appAction(action) {
-                this.lastAction = action;
-                this.errors.clear();
-                this.takeConfigAppAction({
-                    userId: this.user.name,
-                    appId: this.appId,
-                    viewId: this.viewId,
-                    params: this.appActionParams[action.name],
-                    action: action.name,
-                    messages: this.messages,
-                    errors: this.errors
-                });
+                if (typeof action.view !== 'undefined' && action.view !== null) {
+                    this.$router.push({path: '/app/'+this.appId+'/config/'+action.view+(this.itemId ? +'/'+this.itemId : '')});
+                    this.initView();
+                } else {
+                    this.lastAction = action;
+                    this.errors.clear();
+                    this.takeConfigAppAction({
+                        userId: this.user.name,
+                        appId: this.appId,
+                        viewId: this.viewId,
+                        itemId: this.itemId,
+                        params: this.appActionParams[action.name],
+                        action: action.name,
+                        messages: this.messages,
+                        errors: this.errors
+                    });
+                }
             },
             singleItemAction(action) {
                 if (typeof action === 'undefined' || action === null) return;
-                this.lastAction = action;
-                this.errors.clear();
-                this.takeConfigItemAction({
-                    userId: this.user.name,
-                    appId: this.appId,
-                    viewId: this.viewId,
-                    itemId: this.itemId,
-                    params: this.appConfigData,
-                    action: action.name,
-                    messages: this.messages,
-                    errors: this.errors
-                });
+                if (typeof action.view !== 'undefined' && action.view !== null) {
+                    this.$router.push({path: '/app/'+this.appId+'/config/'+action.view+'/'+this.itemId});
+                    this.initView();
+                } else {
+                    this.lastAction = action;
+                    this.errors.clear();
+                    this.takeConfigItemAction({
+                        userId: this.user.name,
+                        appId: this.appId,
+                        viewId: this.viewId,
+                        itemId: this.itemId,
+                        params: this.appConfigData,
+                        action: action.name,
+                        messages: this.messages,
+                        errors: this.errors
+                    });
+                }
             }
         },
         watch: {
@@ -286,7 +297,6 @@
 
                     if (this.lastAction && typeof this.lastAction.successView !== 'undefined' && this.lastAction.successView !== null) {
                         const successView = this.lastAction.successView.parseMessage(this);
-                        console.log('parsed this.lastAction.successView ('+this.lastAction.successView+') => '+successView);
                         this.$router.push({path: '/app/'+this.appId+'/config/'+successView});
                         this.initView();
                     } else {

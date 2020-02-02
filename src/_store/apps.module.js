@@ -173,9 +173,9 @@ const actions = {
             );
     },
 
-    takeConfigAppAction({ commit }, {userId, appId, viewId, params, action, messages, errors}) {
+    takeConfigAppAction({ commit }, {userId, appId, viewId, itemId, params, action, messages, errors}) {
         commit('takeConfigAppActionRequest');
-        appService.takeConfigAppAction(userId, appId, viewId, params, action, messages, errors)
+        appService.takeConfigAppAction(userId, appId, viewId, itemId, params, action, messages, errors)
             .then(
                 actionResult => commit('takeConfigAppActionSuccess', actionResult),
                 error => commit('takeConfigAppActionFailure', error)
