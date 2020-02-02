@@ -2,6 +2,12 @@
     <div>
         <h3 v-if="app">{{messages['app_'+app.name+'_config_view_'+viewId]}}</h3>
 
+        <div v-if="successResponseMessage" class="invalid-feedback d-block"><hr/><h5>{{messages[successResponseMessage]}}</h5><hr/></div>
+        <div v-if="successResponseMessageDescription !== null && successResponseMessageDescription !== ''">
+            {{messages[successResponseMessageDescription]}}
+            <hr/>
+        </div>
+
         <div v-if="lastAction && errors.has(lastAction.name)" class="invalid-feedback d-block"><h5>{{ errors.first(lastAction.name) }}</h5></div>
 
         <div v-if="loading()">
@@ -13,7 +19,7 @@
             <div v-if="appConfigData instanceof Array">
         <table border="1">
             <thead>
-            <tr>
+            <tr v-if="configView.fields">
                 <th v-for="field in configView.fields">
                     {{messages['app_'+app.name+'_config_field_'+field]}}
                 </th>
@@ -90,6 +96,16 @@
             <!-- app-scoped actions -->
             <div v-for="action in appActions">
                 <hr/>
+
+                <!-- last action status -->
+                <div v-if="lastAction && lastAction.name === action.name">
+                    <div v-if="successResponseMessage" class="invalid-feedback d-block"><hr/><h5>{{messages[successResponseMessage]}}</h5><hr/></div>
+                    <div v-if="successResponseMessageDescription !== null && successResponseMessageDescription !== ''">
+                        {{messages[successResponseMessageDescription]}}
+                        <hr/>
+                    </div>
+                </div>
+
                 <!-- actions with parameters: show a form -->
                 <div v-if="typeof action.params !== 'undefined' || action.params !== null || action.params.length > 0">
                     <h4>{{messages['app_'+app.name+'_config_action_'+action.name]}}</h4>
@@ -101,7 +117,7 @@
                             <span v-if="appFields[param].mode === 'readOnly' && appFields[param].control === 'flag'"><b>{{messages['message_'+appActionParams[action.name][param]]}}</b></span>
                             <span v-else-if="appFields[param].mode === 'readOnly'"><b>{{appActionParams[action.name][param]}}</b></span>
                             <textarea v-else-if="appFields[param].control === 'textarea'" v-model="appActionParams[action.name][param]" class="form-control"></textarea>
-                            <input v-else-if="appFields[param].control === 'flag'" type="checkbox" v-model="appActionParams[action.name][param]" :name="field" class="form-control" />
+                            <input v-else-if="appFields[param].control === 'flag'" type="checkbox" v-model="appActionParams[action.name][param]" :name="param" class="form-control" />
                             <input v-else type="text" v-model="appActionParams[action.name][param]" :name="param" class="form-control" />
 
                             <small v-if="messages['app_'+app.name+'_config_field_'+param+'_description'].length > 0">{{messages['app_'+app.name+'_config_field_'+param+'_description']}}</small>
@@ -144,7 +160,9 @@
                 appActions: null,
                 itemActionParams: {},
                 appActionParams: {},
-                lastAction: null
+                lastAction: null,
+                successResponseMessage: null,
+                successResponseMessageDescription: null
             };
         },
         computed: {
@@ -159,6 +177,11 @@
                 'getAppByUserId', 'getAppConfigViewByUserId', 'takeConfigItemAction', 'takeConfigAppAction'
             ]),
             ...mapGetters('apps', ['loading']),
+            resetMessages() {
+                this.errors.clear();
+                this.successResponseMessage = null;
+                this.successResponseMessageDescription = null;
+            },
             initView() {
                 this.appId = this.$route.params.app;
                 this.viewId = this.$route.params.view;
@@ -183,12 +206,12 @@
                 return safeEval(action.when, {'item': row}) === true;
             },
             itemAction(action, itemId) {
+                this.resetMessages();
                 if (typeof action.view !== 'undefined' && action.view !== null) {
                     this.$router.push({path: '/app/'+this.appId+'/config/'+action.view+'/'+itemId});
                     this.initView();
                 } else {
                     this.lastAction = action;
-                    this.errors.clear();
                     this.takeConfigItemAction({
                         userId: this.user.name,
                         appId: this.appId,
@@ -202,12 +225,12 @@
                 }
             },
             appAction(action) {
+                this.resetMessages();
                 if (typeof action.view !== 'undefined' && action.view !== null) {
                     this.$router.push({path: '/app/'+this.appId+'/config/'+action.view+(this.itemId ? +'/'+this.itemId : '')});
                     this.initView();
                 } else {
                     this.lastAction = action;
-                    this.errors.clear();
                     this.takeConfigAppAction({
                         userId: this.user.name,
                         appId: this.appId,
@@ -222,12 +245,12 @@
             },
             singleItemAction(action) {
                 if (typeof action === 'undefined' || action === null) return;
+                this.resetMessages();
                 if (typeof action.view !== 'undefined' && action.view !== null) {
                     this.$router.push({path: '/app/'+this.appId+'/config/'+action.view+'/'+this.itemId});
                     this.initView();
                 } else {
                     this.lastAction = action;
-                    this.errors.clear();
                     this.takeConfigItemAction({
                         userId: this.user.name,
                         appId: this.appId,
@@ -280,34 +303,48 @@
             },
             actionResult (ar) {
                 if (ar) {
-                    if (this.itemActionParams) {
-                        for (let action in this.itemActionParams) {
-                            if (this.itemActionParams.hasOwnProperty(action)) {
-                                this.itemActionParams[action] = {};
+                    console.log('received ar with response: '+JSON.stringify(ar.response));
+                    if (typeof ar.response !== 'undefined' && ar.response !== null) {
+                        if (typeof this.lastAction.successMessage !== 'undefined' && this.lastAction.successMessage !== null && this.lastAction.successMessage !== '') {
+                            const resolution = ar.response[this.lastAction.successMessage];
+                            if (typeof resolution === 'undefined' || resolution === null || resolution === '' || !resolution) {
+                                console.warn("watch.actionResult: bad resolution: "+JSON.stringify(resolution));
+                            } else {
+                                this.successResponseMessage = 'app_' + this.app.name + '_config_response_' + resolution;
+                                this.successResponseMessageDescription = 'app_' + this.app.name + '_config_response_' + resolution + "_description";
                             }
                         }
-                    }
-                    if (this.appActionParams) {
-                        for (let action in this.appActionParams) {
-                            if (this.appActionParams.hasOwnProperty(action)) {
-                                this.appActionParams[action] = {};
-                            }
-                        }
-                    }
 
-                    if (this.lastAction && typeof this.lastAction.successView !== 'undefined' && this.lastAction.successView !== null) {
-                        const successView = this.lastAction.successView.parseMessage(this);
-                        this.$router.push({path: '/app/'+this.appId+'/config/'+successView});
-                        this.initView();
                     } else {
-                        this.getAppConfigViewByUserId({
-                            userId: this.user.uuid,
-                            appId: this.appId,
-                            viewId: this.viewId,
-                            itemId: this.itemId,
-                            messages: this.messages,
-                            errors: this.errors
-                        });
+                        if (this.itemActionParams) {
+                            for (let action in this.itemActionParams) {
+                                if (this.itemActionParams.hasOwnProperty(action)) {
+                                    this.itemActionParams[action] = {};
+                                }
+                            }
+                        }
+                        if (this.appActionParams) {
+                            for (let action in this.appActionParams) {
+                                if (this.appActionParams.hasOwnProperty(action)) {
+                                    this.appActionParams[action] = {};
+                                }
+                            }
+                        }
+
+                        if (this.lastAction && typeof this.lastAction.successView !== 'undefined' && this.lastAction.successView !== null) {
+                            const successView = this.lastAction.successView.parseMessage(this);
+                            this.$router.push({path: '/app/' + this.appId + '/config/' + successView});
+                            this.initView();
+                        } else {
+                            this.getAppConfigViewByUserId({
+                                userId: this.user.uuid,
+                                appId: this.appId,
+                                viewId: this.viewId,
+                                itemId: this.itemId,
+                                messages: this.messages,
+                                errors: this.errors
+                            });
+                        }
                     }
                 }
             }
