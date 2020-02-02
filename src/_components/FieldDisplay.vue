@@ -50,9 +50,6 @@
             textLimit: Number,
             longTextExpandable: Boolean
         },
-        created() {
-            // console.log('FieldDisplay.created: this.field='+this.field);
-        },
         computed: {
             ...mapState('system', ['messages'])
         },
