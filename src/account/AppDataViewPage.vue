@@ -37,50 +37,50 @@
                     <hr/>
                 </div>
             </div>
-        <div v-else>
+            <div v-else>
 
-        <table v-if="app && viewFields && viewFields.length > 0" border="1">
-            <thead>
-            <tr>
-                <th v-for="field in viewFields">{{messages['app_'+app.name+'_field_'+field.name]}}</th>
-                <th v-if="app.dataConfig.actions && app.dataConfig.actions.length && app.dataConfig.actions.length > 0">{{messages.message_data_actions}}</th>
-            </tr>
-            </thead>
-            <tbody v-if="appData && appData.results && appData.results.length && appData.results.length > 0">
-            <tr v-for="row in appData.results">
-                <td v-for="field in viewFields" nowrap="nowrap">
-                <field-display :messagePrefix="'app_'+app.name+'_field_'"
-                               :customDateMessagePrefix="'app_'+app.name+'_view_'+viewId+'_'"
-                               :thing="row"
-                               :field="field"
-                               :longTextExpandable="false"></field-display>
-                </td>
-                <td v-if="app.dataConfig.actions && app.dataConfig.actions.length && app.dataConfig.actions.length > 0">
-                    <div v-for="action in app.dataConfig.actions">
-                        <button v-if="actionIsAvailable(action, row)" @click="dataAction(action, row)">{{messages['app_'+app.name+'_action_'+action.name]}}</button>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td :colspan="totalColumns">{{messages.message_data_results.parseMessage(this)}}</td>
-            </tr>
-            <tr v-if="hasPrevPage() || hasNextPage()">
-                <td align="left" v-if="hasPrevPage()" nowrap="nowrap">
-                    <button @click="prevPage()">{{messages.message_app_data_previous_page}}</button>
-                </td>
-                <td align="right" v-if="hasNextPage()" nowrap="nowrap">
-                    <button @click="nextPage()">{{messages.message_app_data_next_page}}</button>
-                </td>
-            </tr>
-            </tbody>
-            <tbody v-else>
-            <tr>
-                <td :colspan="totalColumns" v-if="!loading()">{{messages.message_no_data}}</td>
-                <td :colspan="totalColumns" v-if="loading()">{{messages.loading_app_data}}</td>
-            </tr>
-            </tbody>
-        </table>
-        </div>
+                <table v-if="app && viewFields && viewFields.length > 0" border="1">
+                    <thead>
+                    <tr>
+                        <th v-for="field in viewFields">{{messages['app_'+app.name+'_field_'+field.name]}}</th>
+                        <th v-if="app.dataConfig.actions && app.dataConfig.actions.length && app.dataConfig.actions.length > 0">{{messages.message_data_actions}}</th>
+                    </tr>
+                    </thead>
+                    <tbody v-if="appData && appData.results && appData.results.length && appData.results.length > 0">
+                    <tr v-for="row in appData.results">
+                        <td v-for="field in viewFields" nowrap="nowrap">
+                            <field-display :messagePrefix="'app_'+app.name+'_field_'"
+                                           :customDateMessagePrefix="'app_'+app.name+'_view_'+viewId+'_'"
+                                           :thing="row"
+                                           :field="field"
+                                           :longTextExpandable="false"></field-display>
+                        </td>
+                        <td v-if="app.dataConfig.actions && app.dataConfig.actions.length && app.dataConfig.actions.length > 0">
+                            <div v-for="action in app.dataConfig.actions">
+                                <button v-if="actionIsAvailable(action, row)" @click="dataAction(action, row)">{{messages['app_'+app.name+'_action_'+action.name]}}</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td :colspan="totalColumns">{{messages.message_data_results.parseMessage(this)}}</td>
+                    </tr>
+                    <tr v-if="hasPrevPage() || hasNextPage()">
+                        <td align="left" v-if="hasPrevPage()" nowrap="nowrap">
+                            <button @click="prevPage()">{{messages.message_app_data_previous_page}}</button>
+                        </td>
+                        <td align="right" v-if="hasNextPage()" nowrap="nowrap">
+                            <button @click="nextPage()">{{messages.message_app_data_next_page}}</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tbody v-else>
+                    <tr>
+                        <td :colspan="totalColumns" v-if="!loading()">{{messages.message_no_data}}</td>
+                        <td :colspan="totalColumns" v-if="loading()">{{messages.loading_app_data}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </template>
