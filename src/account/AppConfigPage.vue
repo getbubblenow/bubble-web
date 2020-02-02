@@ -294,6 +294,7 @@
                             userId: this.user.uuid,
                             appId: this.appId,
                             viewId: this.viewId,
+                            itemId: this.itemId,
                             messages: this.messages,
                             errors: this.errors
                         });
