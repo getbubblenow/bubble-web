@@ -10,13 +10,13 @@
                 </div>
             </div>
         </div>
-        <div>
+        <div v-if="this.locales && this.locales.length > 1">
             <hr/>
             <button @click="toggleLocaleView()">{{messages.button_label_set_locale}}</button>
             <div v-if="showLocaleSelector">
                 <div class="form-group">
                     <label for="locale">{{messages.field_label_locale}}</label>
-                    <select @change="updateLocale()"  v-if="this.locales && this.locales.length > 0" v-model="selectedLocale" name="locale" class="form-control">
+                    <select @change="updateLocale()" v-model="selectedLocale" name="locale" class="form-control">
                         <option value="detect">{{messages['locale_detect']}}</option>
                         <option v-for="opt in this.locales" v-bind:value="opt">{{messages['locale_'+opt]}}</option>
                     </select>
@@ -102,6 +102,10 @@ export default {
         this.loadMessages('pre_auth', this.selectedLocale);
         this.loadMessages('countries', this.selectedLocale);
         this.loadMessages('timezones', this.selectedLocale);
+        if (util.userLoggedIn()) {
+            this.loadMessages('post_auth', this.locale);
+            this.loadMessages('apps', this.locale);
+        }
     }
 };
 </script>

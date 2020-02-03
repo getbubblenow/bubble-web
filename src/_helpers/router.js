@@ -95,8 +95,12 @@ export const router = new Router({
     { path: '/login', component: LoginPage },
     { path: '/logout', component: LogoutPage },
 
-    { path: '/admin/users', component: AccountsPage },
-    { path: '/admin/users/:id', component: ProfilePage },
+    { path: '/admin/accounts', component: AccountsPage },
+    { path: '/admin/new_account', component: ProfilePage },
+    { path: '/admin/accounts/:id', component: ProfilePage },
+    { path: '/admin/accounts/:id/policy', component: PolicyPage },
+    { path: '/admin/accounts/:id/changePassword', component: ChangePasswordPage },
+    { path: '/admin/accounts/:id/keys', component: SshKeysPage },
     { path: '/admin/model', component: ModelSetupPage },
 
     // otherwise redirect to home

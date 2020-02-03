@@ -152,42 +152,38 @@ const getters = {
             href: '/me',
             title: messages.label_menu_account,
             icon: messages.label_menu_account_icon
-        }, {
-            href: '/notifications',
-            title: messages.label_menu_notifications,
-            icon: messages.label_menu_notifications_icon
-        }, {
-            href: '/logout',
-            title: messages.label_menu_logout,
-            icon: messages.label_menu_logout_icon
+        // }, {
+        //     href: '/notifications',
+        //     title: messages.label_menu_notifications,
+        //     icon: messages.label_menu_notifications_icon
         }];
         if (configs.sageLauncher) {
-            menu.splice(3, 0, {
+            menu.splice(2, 0, {
                 href: '/me/bubbles',
                 title: messages.label_menu_networks,
                 icon: messages.label_menu_networks_icon
             });
             if (account.state.user.admin === true) {
-                menu.splice(4, 0, {
+                menu.splice(3, 0, {
                     href: '/apps',
                     title: messages.label_menu_apps,
                     icon: messages.label_menu_apps_icon
                 });
             }
         } else {
-            menu.splice(3, 0, {
+            menu.splice(2, 0, {
                 href: '/devices',
                 title: messages.label_menu_devices,
                 icon: messages.label_menu_devices_icon
             });
-            menu.splice(4, 0, {
+            menu.splice(3, 0, {
                 href: '/apps',
                 title: messages.label_menu_apps,
                 icon: messages.label_menu_apps_icon
             });
         }
         if (configs.paymentsEnabled) {
-            menu.splice(4, 0,{
+            menu.splice(3, 0,{
                 href: '/me/bills',
                 title: messages.label_menu_bills,
                 icon: messages.label_menu_bills_icon
@@ -199,7 +195,7 @@ const getters = {
                 title: messages.label_menu_admin,
                 icon: messages.label_menu_admin_icon,
                 child: [{
-                    href: '/admin/users',
+                    href: '/admin/accounts',
                     title: messages.label_menu_admin_users,
                     icon: messages.label_menu_admin_users_icon
                 }, {
@@ -224,6 +220,11 @@ const getters = {
                 });
             }
         }
+        menu.push({
+            href: '/logout',
+            title: messages.label_menu_logout,
+            icon: messages.label_menu_logout_icon
+        });
         return menu;
     }
 };

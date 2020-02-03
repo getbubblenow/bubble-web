@@ -4,7 +4,7 @@ import { util } from '../_helpers';
 
 const state = {
     loading: {
-        users: false, user: false, updating: false, deleting: false,
+        users: false, user: false, creating: false, updating: false, deleting: false,
         policy: false, updatingPolicy: false, addPolicyContact: false, removePolicyContact: false,
         listSshKeys: false, addSshKey: false, removeSshKey: false
     },
@@ -53,12 +53,12 @@ function setAuthenticator(policy) {
 }
 
 const actions = {
-    getAllUsers({ commit }, {messages, errors}) {
-        commit('getAllUsersRequest');
-        userService.getAllUsers(messages, errors)
+    searchAccounts({ commit }, {query, messages, errors}) {
+        commit('searchAccountsRequest');
+        userService.searchAccounts(query, messages, errors)
             .then(
-                users => commit('getAllUsersSuccess', users),
-                error => commit('getAllUsersFailure', error)
+                users => commit('searchAccountsSuccess', users),
+                error => commit('searchAccountsFailure', error)
             );
     },
 
@@ -71,12 +71,30 @@ const actions = {
             );
     },
 
+    createUser({ commit }, {user, messages, errors}) {
+        commit('createUserRequest', user);
+        userService.createUser(user, messages, errors)
+            .then(
+                user => commit('createUserSuccess', user),
+                error => commit('createUserFailure', { user, error: error.toString() })
+            );
+    },
+
     updateUser({ commit }, {user, messages, errors}) {
         commit('updateUserRequest', user);
         userService.updateUser(user, messages, errors)
             .then(
                 user => commit('updateUserSuccess', user),
                 error => commit('updateUserFailure', { user, error: error.toString() })
+            );
+    },
+
+    updateSelf({ commit }, {user, messages, errors}) {
+        commit('updateSelfRequest', user);
+        userService.updateUser(user, messages, errors)
+            .then(
+                user => commit('updateSelfSuccess', user),
+                error => commit('updateSelfFailure', { user, error: error.toString() })
             );
     },
 
@@ -143,7 +161,7 @@ const actions = {
             );
     },
 
-    delete({ commit }, {userId, messages, errors}) {
+    deleteUser({ commit }, {userId, messages, errors}) {
         commit('deleteRequest', userId);
         userService.deleteUser(userId, messages, errors)
             .then(
@@ -154,14 +172,14 @@ const actions = {
 };
 
 const mutations = {
-    getAllUsersRequest(state) {
+    searchAccountsRequest(state) {
         state.loading.users = true;
     },
-    getAllUsersSuccess(state, users) {
+    searchAccountsSuccess(state, users) {
         state.loading.users = false;
         state.users = users;
     },
-    getAllUsersFailure(state, error) {
+    searchAccountsFailure(state, error) {
         state.loading.users = false;
         state.errors.all = error;
     },
@@ -233,16 +251,40 @@ const mutations = {
         state.errors.policy = error;
     },
 
+    createUserRequest(state, user) {
+        state.loading.creating = true;
+    },
+    createUserSuccess(state, user) {
+        state.loading.creating = false;
+        state.user = user;
+    },
+    createUserFailure(state, { id, error }) {
+        state.loading.creating = false;
+        state.errors.create = error;
+    },
+
     updateUserRequest(state, user) {
         state.loading.updating = true;
     },
     updateUserSuccess(state, user) {
         state.loading.updating = false;
+        state.user = user;
+    },
+    updateUserFailure(state, { id, error }) {
+        state.loading.updating = false;
+        state.errors.update = error;
+    },
+
+    updateSelfRequest(state, user) {
+        state.loading.updating = true;
+    },
+    updateSelfSuccess(state, user) {
+        state.loading.updating = false;
         user.token = account.state.user.token;  // preserve token
         state.user = account.state.user = user;
         localStorage.setItem(util.USER_KEY, JSON.stringify(user));
     },
-    updateUserFailure(state, { id, error }) {
+    updateSelfFailure(state, { id, error }) {
         state.loading.updating = false;
         state.errors.update = error;
     },
@@ -289,30 +331,14 @@ const mutations = {
         // todo: use proper delete API
         // add 'deleting:true' property to user being deleted
         state.loading.deleting = true;
-        state.users = state.users.map(user =>
-            user.uuid === id
-                ? { ...user, deleting: true }
-                : user
-        )
     },
     deleteSuccess(state, id) {
         state.loading.deleting = false;
-        // remove deleted user from state
-        state.users = state.users.filter(user => user.uuid !== id)
+        state.users = [];
     },
     deleteFailure(state, { id, error }) {
         state.loading.deleting = false;
-        // remove 'deleting:true' property and add 'deleteError:[error]' property to user 
-        state.users = state.users.map(user => {
-            if (user.uuid === id) {
-                // make copy of user without 'deleting:true' property
-                const { deleting, ...userCopy } = user;
-                // return copy of user with 'deleteError:[error]' property
-                return { ...userCopy, deleteError: error };
-            }
-
-            return user;
-        })
+        state.errors.deleteUser = error;
     }
 };
 

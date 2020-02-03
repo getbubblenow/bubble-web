@@ -68,16 +68,18 @@ String.prototype.parseDateMessage = function (millis, messages) {
     const date = new Date(millis);
     const context = {
         YYYY: date.getFullYear(),
-        MMM: messages['label_date_month_'+date.getMonth()],
-        MM: messages['label_date_month_short_'+date.getMonth()],
+        MMMM: messages['label_date_month_'+date.getMonth()],
+        MMM: messages['label_date_month_short_'+date.getMonth()],
+        MM: date.getMonth() < 10 ? '0' + messages['label_date_month_number_'+date.getMonth()] : messages['label_date_month_number_'+date.getMonth()],
         M: messages['label_date_month_number_'+date.getMonth()],
         EEE: messages['label_date_day_'+date.getDay()],
         E: messages['label_date_day_short_'+date.getDay()],
+        dd: date.getDate() < 10 ? '0' + date.getDate() : date.getDate(),
         d: date.getDate(),
         H: date.getHours(),
         h: (date.getHours() > 12 ? date.getHours() - 12 : date.getHours()+1),
-        A: (date.getHours() > 12 ? messages['label_date_day_half_pm'] : messages['label_date_day_half_am']),
-        a: (date.getHours() > 12 ? messages['label_date_day_half_pm'] : messages['label_date_day_half_am']).toLowerCase(),
+        A: (date.getHours() > 12 ? messages['label_date_day_half_pm'].toUpperCase() : messages['label_date_day_half_am']).toUpperCase(),
+        a: (date.getHours() > 12 ? messages['label_date_day_half_pm'].toLowerCase() : messages['label_date_day_half_am']).toLowerCase(),
         m: date.getMinutes() < 10 ? '0'+date.getMinutes() : date.getMinutes(),
         s: date.getSeconds() < 10 ? '0'+date.getSeconds() : date.getSeconds()
     };

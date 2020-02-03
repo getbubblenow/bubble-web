@@ -5,7 +5,7 @@ export const userService = {
     login,
     logout,
     register,
-    getAllUsers,
+    searchAccounts,
     getMe,
     getUserById,
     getPolicyByUserId,
@@ -16,6 +16,7 @@ export const userService = {
     addSshKeyByUserId,
     removeSshKeyByUserId,
     listSshKeysByUserId,
+    createUser,
     updateUser,
     deleteUser,
     approveAction,
@@ -65,8 +66,8 @@ function register(user, messages, errors) {
         .then(setSessionUser);
 }
 
-function getAllUsers(messages, errors) {
-    return fetch(`${config.apiUrl}/users`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+function searchAccounts(query, messages, errors) {
+    return fetch(`${config.apiUrl}/search/account`, util.postWithAuth(query)).then(util.handleCrudResponse(messages, errors));
 }
 
 function getMe(messages, errors) {
@@ -147,8 +148,12 @@ function listSshKeysByUserId(userId, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/keys`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
+function createUser(user, messages, errors) {
+    return fetch(`${config.apiUrl}/users`, util.putWithAuth(user)).then(util.handleCrudResponse(messages, errors));
+}
+
 function updateUser(user, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${user.uuid}`, util.postWithAuth(user)).then(util.handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/users/${user.name}`, util.postWithAuth(user)).then(util.handleCrudResponse(messages, errors));
 }
 
 function deleteUser(userId, messages, errors) {

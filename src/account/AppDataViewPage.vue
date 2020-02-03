@@ -86,7 +86,7 @@
 </template>
 
 <script>
-    import { mapState, mapActions, mapGetters } from 'vuex'
+    import { mapState, mapActions, mapGetters } from 'vuex';
     import { util } from '../_helpers';
     import { safeEval } from '../_store';
 
