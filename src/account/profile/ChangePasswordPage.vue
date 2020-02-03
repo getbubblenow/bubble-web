@@ -1,18 +1,145 @@
 <template>
     <div>
-        Change Password
+        <h2>{{messages.form_title_change_password}}<span v-if="this.me === false"> - {{this.userId}}</span></h2>
+
+        <form @submit.prevent="changePass()">
+            <div v-if="me === true && hasRequiredExternalAuth">
+                <div class="form-group">
+                    <p>{{messages.message_change_password_external_auth}}</p>
+                    <div v-for="info in requiredExternalAuthContacts">
+                        {{message['field_label_'+contact.type]}}: {{contact.info}}
+                    </div>
+                    <button class="btn btn-primary" :disabled="loading()">{{messages.button_label_request_password_reset}}</button>
+                    <img v-show="loading()" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                </div>
+            </div>
+            <div v-else>
+                <div v-if="me === true && hasRequiredAuthenticator">
+                    <p>{{messages.message_change_password_authenticator_auth}}</p>
+                    <label htmlFor="totpToken">{{messages.field_label_totp_code}}</label>
+                    <input v-validate="'required'" v-model="totpToken" name="totpToken" class="form-control"/>
+                    <div v-if="submitted && errors.has('totpToken')" class="invalid-feedback d-block">{{ errors.first('totpToken') }}</div>
+                </div>
+
+                <div v-if="me === true || user.admin" class="form-group">
+                    <label htmlFor="currentPassword">{{messages.field_label_current_password}}</label>
+                    <input type="password" v-validate="'required'" v-model="currentPassword" name="currentPassword" class="form-control"/>
+                    <div v-if="submitted && errors.has('oldPassword')" class="invalid-feedback d-block">{{ errors.first('oldPassword') }}</div>
+                </div>
+
+                <div class="form-group">
+                    <label htmlFor="newPassword">{{messages.field_label_new_password}}</label>
+                    <input type="password" v-validate="'required'" v-model="newPassword" name="newPassword" class="form-control"/>
+                    <div v-if="submitted && errors.has('password')" class="invalid-feedback d-block">{{ errors.first('password') }}</div>
+                </div>
+                <div class="form-group">
+                    <label htmlFor="newPasswordConfirm">{{messages.field_label_new_password_confirm}}</label>
+                    <input type="password" v-validate="'required'" v-model="newPasswordConfirm" name="newPasswordConfirm" class="form-control"/>
+                </div>
+
+                <div class="form-group">
+                    <button class="btn btn-primary" :disabled="loading()">{{messages.button_label_change_password}}</button>
+                    <img v-show="loading()" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                </div>
+            </div>
+
+        </form>
     </div>
 </template>
 
 <script>
-    import { mapState, mapActions } from 'vuex'
+    import { mapState, mapActions, mapGetters } from 'vuex';
+    import { util } from '../../_helpers';
 
     export default {
-        computed: {
+        data() {
+            return {
+                submitted: false,
+                me: null,
+                linkPrefix: null,
+                userId: null,
+                currentUser: util.currentUser(),
+                currentPassword: null,
+                newPassword: null,
+                newPasswordConfirm: null,
+                totpToken: null
+            }
         },
-        created () {
+        computed: {
+            ...mapState('users', ['user', 'policy']),
+            ...mapState('system', ['messages']),
+            requiredExternalAuthContacts () {
+                const contacts = [];
+                if (this.policy && this.policy.accountContacts && this.policy.accountContacts.length > 0) {
+                    for (let i=0; i<this.policy.accountContacts.length; i++) {
+                        const contact = this.policy.accountContacts[i];
+                        if (contact.type && contact.type !== 'authenticator' && contact.requiredForAccountOperations === true && contact.info) {
+                            contacts.push(contact);
+                        }
+                    }
+                }
+                return contacts;
+            },
+            hasRequiredAuthenticator () {
+                return this.policy && this.authenticatorRequired(this.policy);
+            },
+            hasRequiredExternalAuth () {
+                return this.requiredExternalAuthContacts.length > 0;
+            }
         },
         methods: {
+            ...mapActions('users', ['getPolicyByUserId', 'changePassword']),
+            ...mapGetters('users', ['loading']),
+            authenticatorRequired (p) {
+                if (p && p.accountContacts && p.accountContacts.length > 0) {
+                    for (let i=0; i<p.accountContacts.length; i++) {
+                        const contact = p.accountContacts[i];
+                        if (contact.type === 'authenticator' && contact.requiredForAccountOperations === true) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            },
+            changePass (e) {
+                this.submitted = true;
+                this.errors.clear();
+                console.log('changePass called');
+            }
+        },
+        created () {
+            this.me = this.$route.path.startsWith('/me/');
+            if (this.me) {
+                this.linkPrefix = '/me';
+                if (this.currentUser === null) {
+                    this.admin = false;
+                    console.warn('ChangePasswordPage.created: /me requested but no currentUser, sending to home page');
+                    this.$router.push('/');
+                    return;
+
+                } else {
+                    this.admin = this.currentUser.admin === true;
+                    this.userId = this.currentUser.uuid;
+                    this.getUserById({userId: this.currentUser.uuid, messages: this.messages, errors: this.errors});
+                    this.getPolicyByUserId({userId: this.currentUser.uuid, messages: this.messages, errors: this.errors});
+                }
+
+            } else if (this.currentUser.admin !== true) {
+                console.warn('ChangePasswordPage.created: not admin and path not /me, sending to /me ...');
+                this.$router.push('/me');
+                return;
+
+            } else if (typeof this.$route.params.id === 'undefined' || this.$route.params.id === null) {
+                console.warn('ChangePasswordPage.created: no id param found, sending to accounts page');
+                this.$router.push('/admin/accounts');
+                return;
+
+            } else {
+                this.userId = this.$route.params.id;
+                this.linkPrefix = '/admin/accounts/' + this.userId;
+                this.getUserById({userId: this.userId, messages: this.messages, errors: this.errors});
+                this.getPolicyByUserId({userId: this.userId, messages: this.messages, errors: this.errors});
+            }
         }
     };
 </script>
