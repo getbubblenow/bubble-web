@@ -7,7 +7,7 @@
             <div v-if="errors.has('request')" class="invalid-feedback d-block">{{ errors.first('request') }}</div>
         </div>
 
-        <h2>{{messages.form_title_account_policy}}</h2>
+        <h2>{{messages.form_title_account_policy}}<span v-if="this.me === false"> - {{this.userId}}</span></h2>
         <form @submit.prevent="updatePolicy">
             <hr/>
             <div class="form-group">
@@ -337,6 +337,7 @@
 
 <script>
     import { mapState, mapActions, mapGetters } from 'vuex';
+    import { util } from '../../_helpers';
 
     // convenience methods
     import { isAuthenticator, isNotAuthenticator } from '../../_store/users.module';
@@ -366,6 +367,10 @@
     export default {
         data() {
             return {
+                me: null,
+                userId: null,
+                linkPrefix: null,
+                currentUser: util.currentUser(),
                 submitted: false,
                 deletionPolicy: '',
                 accountOperationTimeout: '',
@@ -384,15 +389,12 @@
             }
         },
         computed: {
-            ...mapState('account', {
-                currentUser: state => state.user
-            }),
             ...mapState('account', ['actionStatus']),
             ...mapState('system', [
                 'messages', 'accountDeletionOptions', 'timeDurationOptions', 'timeDurationOptionsReversed',
                 'contactTypes', 'detectedLocale', 'countries'
             ]),
-            ...mapState('users', ['policy', 'contact', 'authenticator']),
+            ...mapState('users', ['user', 'policy', 'contact', 'authenticator']),
             hasAuthenticator() {
                 for (let i=0; i<this.contacts.length; i++) {
                     if (isAuthenticator(this.contacts[i])) return true;
@@ -433,7 +435,7 @@
                 this.errors.clear();
                 this.submitted = true;
                 this.updatePolicyByUserId({
-                    userId: this.currentUser.uuid,
+                    userId: this.userId,
                     policy: {
                         deletionPolicy: this.deletionPolicy,
                         accountOperationTimeout: this.messages.durationToMillis(this.accountOperationTimeout, this.accountOperationTimeoutUnits),
@@ -453,7 +455,7 @@
                 this.errors.clear();
                 // console.log('addContact: adding: '+JSON.stringify(contactToAdd));
                 this.addPolicyContactByUserId({
-                    userId: this.currentUser.uuid,
+                    userId: this.userId,
                     contact: contactToAdd,
                     messages: this.messages,
                     errors: this.errors
@@ -462,7 +464,7 @@
             removeContact(uuid) {
                 this.errors.clear();
                 this.removePolicyContactByUserId({
-                    userId: this.currentUser.uuid,
+                    userId: this.userId,
                     contactUuid: uuid,
                     messages: this.messages,
                     errors: this.errors
@@ -484,7 +486,7 @@
                 const c = this.prepContact(contact);
                 // console.log('contactFlag: update: '+JSON.stringify(c));
                 this.addPolicyContactByUserId({
-                    userId: this.currentUser.uuid,
+                    userId: this.userId,
                     contact: c,
                     messages: this.messages,
                     errors: this.errors
@@ -510,7 +512,7 @@
                 const c = this.prepContact(contact);
                 c.authFactor = factor;
                 this.addPolicyContactByUserId({
-                    userId: this.currentUser.uuid,
+                    userId: this.userId,
                     contact: c,
                     messages: this.messages,
                     errors: this.errors
@@ -524,7 +526,7 @@
             resendVerification(contact) {
                 this.errors.clear();
                 this.resendVerificationCode({
-                    userId: this.currentUser.uuid,
+                    userId: this.userId,
                     contact: contact,
                     messages: this.messages,
                     errors: this.errors
@@ -565,7 +567,7 @@
                     if (isAuthenticator(type)) {
                         // console.log('submitVerification: sending authenticator code: '+code);
                         this.sendAuthenticatorCode({
-                            userId: this.currentUser.uuid,
+                            userId: this.userId,
                             code: code,
                             authOnly: null,
                             verifyOnly: true,
@@ -574,7 +576,7 @@
                         });
                     } else {
                         this.approveAction({
-                            userId: this.currentUser.uuid,
+                            userId: this.userId,
                             code: code,
                             messages: this.messages,
                             errors: this.errors
@@ -609,13 +611,13 @@
                 // console.log('watch.contact: received: '+JSON.stringify(c));
                 if (typeof c.error === 'undefined' || c.error === null) {
                     // force reload policy, refreshes contacts
-                    this.getPolicyByUserId({userId: this.currentUser.uuid, messages: this.messages, errors: this.errors});
+                    this.getPolicyByUserId({userId: this.userId, messages: this.messages, errors: this.errors});
                 }
             },
             actionStatus (status) {
                 // console.log('watch.actionStatus: received: '+JSON.stringify(status));
                 if (status.success) {
-                    this.getPolicyByUserId({userId: this.currentUser.uuid, messages: this.messages, errors: this.errors});
+                    this.getPolicyByUserId({userId: this.userId, messages: this.messages, errors: this.errors});
                 }
             },
             authenticator (auth) {
@@ -642,7 +644,27 @@
             }
         },
         created () {
-            this.getPolicyByUserId({userId: this.currentUser.uuid, messages: this.messages, errors: this.errors});
+            this.me = this.$route.path.startsWith('/me/');
+            if (this.me) {
+                this.userId = this.currentUser.uuid;
+                this.linkPrefix = '/me';
+                this.getPolicyByUserId({userId: this.currentUser.uuid, messages: this.messages, errors: this.errors});
+
+            } else if (this.currentUser.admin !== true) {
+                console.warn('PolicyPage.created: /me requested but no currentUser, sending to home page');
+                this.$router.push('/');
+                return;
+
+            } else if (typeof this.$route.params.id === 'undefined' || this.$route.params.id === null) {
+                console.warn('PolicyPage.created: no id param found, sending to accounts page');
+                this.$router.push('/admin/accounts');
+                return;
+
+            } else {
+                this.userId = this.$route.params.id;
+                this.linkPrefix = '/admin/accounts/' + this.userId;
+                this.getPolicyByUserId({userId: this.userId, messages: this.messages, errors: this.errors});
+            }
             // console.log('PolicyPage.created: $route.params='+JSON.stringify(this.$route.query));
             if (this.$route.query.action) {
                 this.inboundAction = {

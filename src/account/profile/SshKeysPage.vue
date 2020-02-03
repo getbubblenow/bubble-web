@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h4>{{messages.form_title_ssh_keys}}</h4>
+        <h4>{{messages.form_title_ssh_keys}}<span v-if="this.me === false"> - {{this.userId}}</span></h4>
         <table border="1">
             <thead>
             <tr>
@@ -71,15 +71,18 @@
 </template>
 
 <script>
-    import { mapState, mapActions, mapGetters } from 'vuex'
-    import { util } from '../../_helpers'
-    import { Settings } from 'luxon'
+    import { mapState, mapActions, mapGetters } from 'vuex';
+    import { util } from '../../_helpers';
+    import { Settings } from 'luxon';
 
     export default {
         data() {
             return {
+                me: null,
+                userId: null,
+                linkPrefix: null,
                 submitted: false,
-                user: util.currentUser(),
+                currentUser: util.currentUser(),
                 name: null,
                 expiration: null,
                 sshPublicKey: null,
@@ -90,7 +93,7 @@
         },
         computed: {
             ...mapState('system', ['messages', 'detectedTimezone', 'detectedLocale']),
-            ...mapState('users', ['sshKeys']),
+            ...mapState('users', ['user', 'sshKeys']),
             newKeyValid () {
                 return (this.name !== null && this.name !== '')
                 && (this.sshPublicKey !== null && this.sshPublicKey !== '' && this.sshPublicKey.startsWith('ssh-rsa '));
@@ -107,7 +110,7 @@
                 this.errors.clear();
                 this.submitted = true;
                 this.addSshKeyByUserId({
-                    userId: this.user.uuid,
+                    userId: this.userId,
                     sshKey: {
                         name: this.name,
                         sshPublicKey: this.sshPublicKey,
@@ -120,7 +123,7 @@
             },
             removeSshKey (keyId) {
                 this.removeSshKeyByUserId({
-                    userId: this.user.uuid,
+                    userId: this.userId,
                     sshKeyId: keyId,
                     messages: this.messages,
                     errors: this.errors
@@ -143,15 +146,45 @@
             } else {
                 this.timezone = this.detectedTimezone.timeZoneId;
             }
-            const user = util.currentUser();
-            if (util.userHasLocale(user)) {
-                Settings.defaultLocale = util.jsLocale(this.user, null);
-            } else if (this.detectedLocale === null) {
-                this.detectLocale();
+
+            this.me = this.$route.path.startsWith('/me/');
+            if (this.me) {
+                this.linkPrefix = '/me';
+                if (this.currentUser === null) {
+                    this.admin = false;
+                    console.warn('SshKeysPage.created: /me requested but no currentUser, sending to home page');
+                    this.$router.push('/');
+                    return;
+
+                } else {
+                    this.admin = this.currentUser.admin === true;
+                    this.userId = this.currentUser.uuid;
+                }
+
+            } else if (this.currentUser.admin !== true) {
+                console.warn('SshKeysPage.created: not admin and path not /me, sending to /me ...');
+                this.$router.push('/me');
+                return;
+
+            } else if (typeof this.$route.params.id === 'undefined' || this.$route.params.id === null) {
+                console.warn('SshKeysPage.created: no id param found, sending to accounts page');
+                this.$router.push('/admin/accounts');
+                return;
+
             } else {
-                Settings.defaultLocale = util.jsLocale(null, this.detectedLocale);
+                this.userId = this.$route.params.id;
+                this.linkPrefix = '/admin/accounts/' + this.userId;
             }
-            this.listSshKeysByUserId({userId: user.uuid, messages: this.messages, errors: this.errors});
+
+            // const user = util.currentUser();
+            // if (util.userHasLocale(user)) {
+            //     Settings.defaultLocale = util.jsLocale(this.user, null);
+            // } else if (this.detectedLocale === null) {
+            //     this.detectLocale();
+            // } else {
+            //     Settings.defaultLocale = util.jsLocale(null, this.detectedLocale);
+            // }
+            this.listSshKeysByUserId({userId: this.userId, messages: this.messages, errors: this.errors});
         }
     };
 </script>

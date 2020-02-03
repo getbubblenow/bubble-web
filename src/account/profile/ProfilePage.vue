@@ -144,8 +144,10 @@
                 this.linkPrefix = '/me';
                 if (this.currentUser === null) {
                     this.admin = false;
-                    console.warn('/me requested but no currentUser, sending to home page');
+                    console.warn('ProfilePage.created: /me requested but no currentUser, sending to home page');
                     this.$router.push('/');
+                    return;
+
                 } else {
                     this.admin = this.currentUser.admin === true;
                     this.getUserById({
@@ -156,8 +158,9 @@
                 }
 
             } else if (this.currentUser.admin !== true) {
-                console.log('ProfilePage.created: not admin and path not /me, sending to /me ...');
+                console.warn('ProfilePage.created: not admin and path not /me, sending to /me ...');
                 this.$router.push('/me');
+                return;
 
             } else {
                 this.admin = this.currentUser.admin === true;
