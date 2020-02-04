@@ -3,28 +3,29 @@
         <h2>{{messages.form_title_change_password}}<span v-if="this.me === false"> - {{this.userId}}</span></h2>
 
         <form @submit.prevent="changePass()">
-            <div v-if="me === true && hasRequiredExternalAuth">
+            <div v-if="isMe && requiredExternalAuthContacts.length > 0">
                 <div class="form-group">
                     <p>{{messages.message_change_password_external_auth}}</p>
-                    <div v-for="info in requiredExternalAuthContacts">
-                        {{message['field_label_'+contact.type]}}: {{contact.info}}
+                    <div v-for="contact in requiredExternalAuthContacts">
+                        {{messages['field_label_'+contact.type]}}: {{contact.info}}
                     </div>
                     <button class="btn btn-primary" :disabled="loading()">{{messages.button_label_request_password_reset}}</button>
                     <img v-show="loading()" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
                 </div>
             </div>
             <div v-else>
-                <div v-if="me === true && hasRequiredAuthenticator">
+                <div v-if="isMe && hasRequiredAuthenticator">
                     <p>{{messages.message_change_password_authenticator_auth}}</p>
                     <label htmlFor="totpToken">{{messages.field_label_totp_code}}</label>
                     <input v-validate="'required'" v-model="totpToken" name="totpToken" class="form-control"/>
                     <div v-if="submitted && errors.has('totpToken')" class="invalid-feedback d-block">{{ errors.first('totpToken') }}</div>
                 </div>
 
-                <div v-if="me === true || user.admin" class="form-group">
+                <div v-if="isMe || user.admin" class="form-group">
                     <label htmlFor="currentPassword">{{messages.field_label_current_password}}</label>
                     <input type="password" v-validate="'required'" v-model="currentPassword" name="currentPassword" class="form-control"/>
                     <div v-if="submitted && errors.has('oldPassword')" class="invalid-feedback d-block">{{ errors.first('oldPassword') }}</div>
+                    <div v-if="submitted && errors.has('currentPassword')" class="invalid-feedback d-block">{{ errors.first('currentPassword') }}</div>
                 </div>
 
                 <div class="form-group">
@@ -56,51 +57,26 @@
             return {
                 submitted: false,
                 me: null,
+                isMe: null,
                 linkPrefix: null,
                 userId: null,
                 currentUser: util.currentUser(),
                 currentPassword: null,
                 newPassword: null,
                 newPasswordConfirm: null,
-                totpToken: null
+                totpToken: null,
+                hasRequiredAuthenticator: null,
+                hasRequiredExternalAuth: null,
+                requiredExternalAuthContacts: []
             }
         },
         computed: {
             ...mapState('users', ['user', 'policy', 'changePasswordResponse']),
-            ...mapState('system', ['messages']),
-            requiredExternalAuthContacts () {
-                const contacts = [];
-                if (this.policy && this.policy.accountContacts && this.policy.accountContacts.length > 0) {
-                    for (let i=0; i<this.policy.accountContacts.length; i++) {
-                        const contact = this.policy.accountContacts[i];
-                        if (contact.type && contact.type !== 'authenticator' && contact.requiredForAccountOperations === true && contact.info) {
-                            contacts.push(contact);
-                        }
-                    }
-                }
-                return contacts;
-            },
-            hasRequiredAuthenticator () {
-                return this.policy && this.authenticatorRequired(this.policy);
-            },
-            hasRequiredExternalAuth () {
-                return this.requiredExternalAuthContacts.length > 0;
-            }
+            ...mapState('system', ['messages'])
         },
         methods: {
             ...mapActions('users', ['getUserById', 'getPolicyByUserId', 'changePassword', 'adminChangePassword']),
             ...mapGetters('users', ['loading']),
-            authenticatorRequired (p) {
-                if (p && p.accountContacts && p.accountContacts.length > 0) {
-                    for (let i=0; i<p.accountContacts.length; i++) {
-                        const contact = p.accountContacts[i];
-                        if (contact.type === 'authenticator' && contact.requiredForAccountOperations === true) {
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            },
             changePass (e) {
                 this.submitted = true;
                 this.errors.clear();
@@ -146,6 +122,7 @@
                 } else {
                     this.admin = this.currentUser.admin === true;
                     this.userId = this.currentUser.uuid;
+                    this.isMe = (this.me === true || this.currentUser.uuid === this.userId || this.currentUser.name === this.userId);
                     this.getUserById({userId: this.currentUser.uuid, messages: this.messages, errors: this.errors});
                     this.getPolicyByUserId({userId: this.currentUser.uuid, messages: this.messages, errors: this.errors});
                 }
@@ -163,11 +140,29 @@
             } else {
                 this.userId = this.$route.params.id;
                 this.linkPrefix = '/admin/accounts/' + this.userId;
+                this.isMe = (this.me === true || this.currentUser.uuid === this.userId || this.currentUser.name === this.userId);
                 this.getUserById({userId: this.userId, messages: this.messages, errors: this.errors});
                 this.getPolicyByUserId({userId: this.userId, messages: this.messages, errors: this.errors});
             }
         },
         watch: {
+            policy (p) {
+                if (p) {
+                    const contacts = [];
+                    if (p.accountContacts && p.accountContacts.length > 0) {
+                        for (let i=0; i<p.accountContacts.length; i++) {
+                            const contact = p.accountContacts[i];
+                            if (contact.type !== 'authenticator' && contact.requiredForAccountOperations === true && contact.info) {
+                                contacts.push(contact);
+                            } else if (contact.type === 'authenticator' && contact.requiredForAccountOperations === true) {
+                                this.hasRequiredAuthenticator = true;
+                            }
+                        }
+                    }
+                    console.log('watch.policy: setting requiredExternalAuthContacts = '+JSON.stringify(contacts));
+                    this.requiredExternalAuthContacts = contacts;
+                }
+            },
             changePasswordResponse (r) {
                 if (r) {
                     console.log('watch.changePasswordResponse: received '+JSON.stringify(r));

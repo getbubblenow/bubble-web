@@ -432,6 +432,7 @@
                     this.approveAction({
                         userId: util.currentUser().uuid,
                         code: code,
+                        data: null,
                         messages: this.messages,
                         errors: this.errors
                     });

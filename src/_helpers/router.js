@@ -19,6 +19,7 @@ import AppDataViewPage from '../account/AppDataViewPage'
 import AppConfigPage from '../account/AppConfigPage'
 import NotificationsPage from '../account/NotificationsPage'
 import ChangePasswordPage from '../account/profile/ChangePasswordPage'
+import SetPasswordPage from "../account/profile/SetPasswordPage";
 import SshKeysPage from '../account/profile/SshKeysPage'
 import NetworksPage from '../account/NetworksPage'
 import NewNetworkPage from '../account/NewNetworkPage'
@@ -62,6 +63,7 @@ export const router = new Router({
         { path: '/me/policy', component: PolicyPage },
         { path: '/me/action', component: ActionPage },
         { path: '/me/changePassword', component: ChangePasswordPage },
+        { path: '/me/setPassword/:code', component: SetPasswordPage },
         { path: '/me/keys', component: SshKeysPage },
         { path: '/devices', component: DevicesPage },
         { path: '/apps', component: AppsPage },

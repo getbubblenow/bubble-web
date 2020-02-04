@@ -174,7 +174,7 @@ export const util = {
                         // console.log('received '+messageTemplate+' -- setting window.showTotpModal = true');
                         window.showTotpModal = true;
                     } else {
-                        console.log('setValidationErrors: nothing special: '+messageTemplate);
+                        // console.log('setValidationErrors: nothing special: '+messageTemplate);
                     }
                 //     console.log('>>>>> field '+field+' added error: '+message+', errors='+JSON.stringify(errors));
                 // } else {

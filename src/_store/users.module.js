@@ -173,7 +173,7 @@ const actions = {
 
     changePassword({ commit }, {request, messages, errors}) {
         commit('changePasswordRequest', request);
-        userService.changePasswordUser(request, messages, errors)
+        userService.changePassword(request, messages, errors)
             .then(
                 response => commit('changePasswordSuccess', response),
                 error => commit('changePasswordFailure', { error: error.toString() })
@@ -369,7 +369,7 @@ const mutations = {
         state.changePasswordResponse = response;
     },
     changePasswordFailure(state, { error }) {
-        state.loading.deleting = false;
+        state.loading.changingPassword = false;
         state.errors.changePassword = error;
     }
 };

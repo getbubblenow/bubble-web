@@ -81,6 +81,7 @@
                         this.approveAction({
                             userId: this.username,
                             code: code,
+                            data: null,
                             messages: this.messages,
                             errors: this.errors
                         });

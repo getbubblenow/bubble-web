@@ -5,7 +5,7 @@
 </template>
 
 <script>
-    import { mapState, mapActions } from 'vuex'
+    import { mapState, mapActions } from 'vuex';
 
     export default {
         data () {
@@ -29,6 +29,7 @@
                 this.approveAction({
                     userId: this.currentUser.uuid,
                     code: this.$route.query.approve,
+                    data: null,
                     messages: this.messages,
                     errors: this.errors
                 });
@@ -54,8 +55,14 @@
                     if (status.success) {
                         console.log('ActionPage.watch.actionStatus: sending to policy page with success');
                         this.$router.push({path: '/me/policy', query: {action: this.actionType, ok: 'true'}});
+
+                    } else if (status.error !== null && status.type === 'approve'
+                        && this.errors && this.errors.items && this.errors.items.length === 1
+                        && this.errors.items[0].field === 'password') {
+                        console.log('detected password reset, sending to setPassword page');
+                        this.$router.push('/me/setPassword/'+this.$route.query.approve);
+
                     } else {
-                        console.log('ActionPage.watch.actionStatus: sending to policy page with failure');
                         this.$router.push({path: '/me/policy', query: {action: this.actionType}});
                     }
                 }

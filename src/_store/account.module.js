@@ -124,9 +124,9 @@ const actions = {
             );
     },
 
-    approveAction({ commit }, {userId, code, messages, errors}) {
+    approveAction({ commit }, {userId, code, data, messages, errors}) {
         commit('approveActionRequest');
-        userService.approveAction(userId, code, messages, errors)
+        userService.approveAction(userId, code, data, messages, errors)
             .then(
                 policy => commit('approveActionSuccess', policy),
                 error => commit('approveActionFailure', error)

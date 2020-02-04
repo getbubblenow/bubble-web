@@ -101,8 +101,10 @@ function removePolicyContactByUserId(userId, contactUuid, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/policy/contacts/${contactUuid}`, util.deleteWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
-function approveAction(userId, code, messages, errors) {
-    return fetch(`${config.apiUrl}/auth/approve/${code}`, util.postWithAuth([{'name': 'account', 'value': userId}]))
+function approveAction(userId, code, data, messages, errors) {
+    const approveData = [{name: 'account', value: userId}];
+    if (data != null && data.length > 0) approveData.push(...data);
+    return fetch(`${config.apiUrl}/auth/approve/${code}`, util.postWithAuth(approveData))
         .then(util.handleCrudResponse(messages, errors))
         .then(setSessionUser);
 }
