@@ -79,6 +79,18 @@
             </div>
             <div>
                 {{messages['plan_description_'+accountPlan.plan]}}
+                <div v-if="networkType === 'fork'"><hr/>{{messages.field_label_plan_fork_apps}}</div>
+                <div v-else-if="selectedPlan && selectedPlan.apps && selectedPlan.apps.length > 0">
+                    <hr/>
+                    {{messages.field_label_plan_node_apps}}
+                    <div v-for="app in selectedPlan.apps">
+                        <hr/>
+                        <h5>{{messages['app_'+app.name+'_name']}}</h5>
+                        <div v-if="messages['!app_'+app.name+'_summary']"><h6><b>{{messages['app_'+app.name+'_summary']}}</b></h6></div>
+                        <p>{{messages['app_'+app.name+'_description']}}</p>
+                    </div>
+                    <hr/>
+                </div>
             </div>
             <hr/>
 
@@ -344,6 +356,9 @@
                 }
                 return plans_array;
             },
+            selectedPlan: function () {
+                return this.accountPlan && this.accountPlan.plan ? this.findPlan(this.accountPlan.plan) : null;
+            },
             footprintObjects: function () {
                 const fp_array = [];
                 if (this.footprints) {
@@ -459,6 +474,14 @@
                     }
                 }
                 console.log('findRegion: uuid not found: '+uuid);
+                return null;
+            },
+            findPlan(name) {
+                if (this.planObjects) {
+                    for (let i=0; i<this.planObjects.length; i++) {
+                        if (this.planObjects[i].name === name) return this.planObjects[i];
+                    }
+                }
                 return null;
             },
             refreshCloudRegions() {
