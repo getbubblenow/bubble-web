@@ -66,7 +66,7 @@
             }
         },
         computed: {
-            ...mapState('users', ['user', 'policy']),
+            ...mapState('users', ['user', 'policy', 'changePasswordResponse']),
             ...mapState('system', ['messages']),
             requiredExternalAuthContacts () {
                 const contacts = [];
@@ -88,7 +88,7 @@
             }
         },
         methods: {
-            ...mapActions('users', ['getPolicyByUserId', 'changePassword']),
+            ...mapActions('users', ['getUserById', 'getPolicyByUserId', 'changePassword', 'adminChangePassword']),
             ...mapGetters('users', ['loading']),
             authenticatorRequired (p) {
                 if (p && p.accountContacts && p.accountContacts.length > 0) {
@@ -104,6 +104,32 @@
             changePass (e) {
                 this.submitted = true;
                 this.errors.clear();
+                // todo: validate that newPassword and newPasswordConfirm match
+                if (this.me) {
+                    this.changePassword({
+                        request: {
+                            oldPassword: this.currentPassword,
+                            newPassword: this.newPassword,
+                            totpToken: this.totpToken
+                        },
+                        messages: this.messages,
+                        errors: this.errors
+                    });
+                } else if (this.currentUser.admin) {
+                    this.adminChangePassword({
+                        userId: this.userId,
+                        request: {
+                            oldPassword: this.currentPassword,
+                            newPassword: this.newPassword,
+                            totpToken: this.totpToken
+                        },
+                        messages: this.messages,
+                        errors: this.errors
+                    });
+                } else {
+                    // should never happen
+                    console.warn('Not current user and not admin, API call would fail anyway, not sending');
+                }
                 console.log('changePass called');
             }
         },
@@ -139,6 +165,13 @@
                 this.linkPrefix = '/admin/accounts/' + this.userId;
                 this.getUserById({userId: this.userId, messages: this.messages, errors: this.errors});
                 this.getPolicyByUserId({userId: this.userId, messages: this.messages, errors: this.errors});
+            }
+        },
+        watch: {
+            changePasswordResponse (r) {
+                if (r) {
+                    console.log('watch.changePasswordResponse: received '+JSON.stringify(r));
+                }
             }
         }
     };

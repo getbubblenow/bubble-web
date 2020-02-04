@@ -4,7 +4,7 @@ import { util } from '../_helpers';
 
 const state = {
     loading: {
-        users: false, user: false, creating: false, updating: false, deleting: false,
+        users: false, user: false, creating: false, updating: false, deleting: false, changingPassword: false,
         policy: false, updatingPolicy: false, addPolicyContact: false, removePolicyContact: false,
         listSshKeys: false, addSshKey: false, removeSshKey: false
     },
@@ -15,7 +15,8 @@ const state = {
     contact: null,
     authenticator: {},
     sshKey: null,
-    sshKeys: []
+    sshKeys: [],
+    changePasswordResponse: null
 };
 
 export const CONTACT_TYPE_AUTHENTICATOR = 'authenticator';
@@ -166,9 +167,28 @@ const actions = {
         userService.deleteUser(userId, messages, errors)
             .then(
                 id => commit('deleteSuccess', id),
-                error => commit('deleteFailure', { id, error: error.toString() })
+                error => commit('deleteFailure', { userId, error: error.toString() })
+            );
+    },
+
+    changePassword({ commit }, {request, messages, errors}) {
+        commit('changePasswordRequest', request);
+        userService.changePasswordUser(request, messages, errors)
+            .then(
+                response => commit('changePasswordSuccess', response),
+                error => commit('changePasswordFailure', { error: error.toString() })
+            );
+    },
+
+    adminChangePassword({ commit }, {userId, request, messages, errors}) {
+        commit('changePasswordRequest', userId);
+        userService.adminChangePassword(userId, request, messages, errors)
+            .then(
+                id => commit('changePasswordSuccess', id),
+                error => commit('changePasswordFailure', { error: error.toString() })
             );
     }
+
 };
 
 const mutations = {
@@ -339,6 +359,18 @@ const mutations = {
     deleteFailure(state, { id, error }) {
         state.loading.deleting = false;
         state.errors.deleteUser = error;
+    },
+
+    changePasswordRequest(state, id) {
+        state.loading.changingPassword = true;
+    },
+    changePasswordSuccess(state, response) {
+        state.loading.changingPassword = false;
+        state.changePasswordResponse = response;
+    },
+    changePasswordFailure(state, { error }) {
+        state.loading.deleting = false;
+        state.errors.changePassword = error;
     }
 };
 
