@@ -6,18 +6,18 @@
                 <label for="name">{{messages.field_label_username}}</label>
                 <input type="text" v-model="name" name="name" class="form-control" :class="{ 'is-invalid': submitted && !name }" />
                 <div v-show="submitted && !name" class="invalid-feedback">Name is required</div>
-                <div v-if="submitted && errors.has('account')" class="invalid-feedback">{{ errors.first('account') }}</div>
+                <div v-if="submitted && errors.has('account')" class="invalid-feedback d-block">{{ errors.first('account') }}</div>
             </div>
             <div class="form-group">
                 <label htmlFor="password">{{messages.field_label_password}}</label>
                 <input type="password" v-model="password" name="password" class="form-control" :class="{ 'is-invalid': submitted && !password }" />
-                <div v-show="submitted && !password" class="invalid-feedback">Password is required</div>
+                <div v-show="submitted && !password" class="invalid-feedback d-block">Password is required</div>
             </div>
             <div v-if="configs && configs.locked === true" class="form-group">
                 <label htmlFor="unlockKey">{{messages.field_label_unlock_key}}</label>
                 <input type="password" v-model="unlockKey" name="unlockKey" class="form-control" :class="{ 'is-invalid': submitted && !unlockKey }" />
                 <div v-show="submitted && !unlockKey" class="invalid-feedback">Unlock Key is required</div>
-                <div v-if="submitted && errors.has('unlockKey')" class="invalid-feedback">{{ errors.first('unlockKey') }}</div>
+                <div v-if="submitted && errors.has('unlockKey')" class="invalid-feedback d-block">{{ errors.first('unlockKey') }}</div>
             </div>
             <div class="form-group">
                 <button class="btn btn-primary" :disabled="status.loggingIn">{{messages.button_label_login}}</button>
