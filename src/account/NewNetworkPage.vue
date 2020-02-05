@@ -66,23 +66,23 @@
             <div v-if="customize.plan === true" class="form-group">
                 <label htmlFor="plan">{{messages.field_label_plan}}</label>
                 <select v-validate="'required'" v-if="planObjects" v-model="accountPlan.plan" name="plan" class="form-control" :class="{ 'is-invalid': submitted && errors.has('plan') }">
-                    <option v-for="plan in planObjects" :value="plan.name">{{messages['plan_name_'+plan.name]}}</option>
+                    <option v-for="plan in planObjects" :value="plan.name">{{messages['plan_name_'+plan.name]}} - {{messages.price_format.parseExpression({messages: messages, ...plan})}}</option>
                 </select>
                 <div v-if="submitted && errors.has('plan')" class="invalid-feedback d-block">{{ errors.first('plan') }}</div>
                 <button @click="customize.plan = false">{{messages.button_label_use_default}}</button>
             </div>
             <div v-if="customize.plan === false">
                 {{messages.field_label_plan}}:
-                <span v-if="defaults.plan">{{messages['plan_name_'+defaults.plan]}}</span>
+                <span v-if="findPlan(defaults.plan) && defaults.plan">{{messages['plan_name_'+defaults.plan]}} - {{messages.price_format.parseExpression({messages: messages, ...findPlan(defaults.plan)})}}</span>
                 <span v-else v-html="messages.message_auto_detecting"></span>
                 <button @click="customize.plan = true">{{messages.button_label_customize}}</button>
             </div>
             <div>
                 {{messages['plan_description_'+accountPlan.plan]}}
-                <div v-if="networkType === 'fork'"><hr/>{{messages.field_label_plan_fork_apps}}</div>
+                <div v-if="networkType === 'fork'"><hr/>{{messages.message_plan_fork_apps}}</div>
                 <div v-else-if="selectedPlan && selectedPlan.apps && selectedPlan.apps.length > 0">
                     <hr/>
-                    {{messages.field_label_plan_node_apps}}
+                    {{messages.message_plan_node_apps}}
                     <div v-for="app in selectedPlan.apps">
                         <hr/>
                         <h5>{{messages['app_'+app.name+'_name']}}</h5>
@@ -352,7 +352,9 @@
                         plans_array.push({
                             ...this.plans[i],
                             localName: this.messages['plan_name_' + this.plans[i].name],
-                            description: this.messages['plan_description_' + this.plans[i].name]
+                            description: this.messages['plan_description_' + this.plans[i].name],
+                            priceMajorUnits: this.plans[i].price / 100,
+                            priceMinorUnits: this.plans[i].price % 100
                         })
                     }
                 }
