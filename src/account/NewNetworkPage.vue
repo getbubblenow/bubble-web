@@ -213,6 +213,8 @@
 
             <!-- payment -->
             <div v-if="configs && configs.paymentsEnabled">
+                <div v-if="submitted && errors.has('purchase')" class="invalid-feedback d-block">{{ errors.first('purchase') }}</div>
+
                 <div class="form-group">
                     <label htmlFor="paymentMethod">{{messages.field_label_paymentMethod}}</label>
                     <div v-if="typeof paymentMethods === 'undefined' || paymentMethods === null || paymentMethods.length === 0" class="invalid-feedback d-block">
