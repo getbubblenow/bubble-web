@@ -159,7 +159,7 @@
             ...mapState('apps', ['app', 'appConfigData', 'actionResult']),
             ...mapState('system', ['messages']),
             hasActionFocus () {
-                return this.actionFocus !== null && this.lastAction === null;
+                return typeof this.actionFocus !== 'undefined' && this.actionFocus !== null && this.actionFocus !== '' && this.lastAction === null;
             }
         },
         created () {
