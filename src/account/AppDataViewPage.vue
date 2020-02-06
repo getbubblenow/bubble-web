@@ -1,5 +1,7 @@
 <template>
     <div v-if="app">
+        <h2>{{messages['app_'+app.name+'_name']}} - {{messages['app_'+app.name+'_view_'+viewId]}}</h2>
+
         <table v-if="app && viewParams && viewParams.length > 0">
             <tr v-for="param in viewParams">
                 <td>{{messages['app_'+app.name+'_param_'+param.name]}}: </td>
@@ -23,6 +25,7 @@
                 <div v-for="row in appData.results">
                     <field-display v-for="field in viewFields"
                                    :messagePrefix="'app_'+app.name+'_field_'"
+                                   :showLabel="true"
                                    :customDateMessagePrefix="'app_'+app.name+'_view_'+viewId+'_'"
                                    :thing="row"
                                    :field="field"
@@ -73,14 +76,12 @@
                         </td>
                     </tr>
                     </tbody>
-                    <tbody v-else>
-                    <tr>
-                        <td :colspan="totalColumns" v-if="!loading()">{{messages.message_no_data}}</td>
-                        <td :colspan="totalColumns" v-if="loading()">{{messages.loading_app_data}}</td>
-                    </tr>
-                    </tbody>
                 </table>
             </div>
+        </div>
+        <div v-else>
+            <span v-if="!loading()">{{messages.message_no_data}}</span>
+            <span v-if="loading()">{{messages.loading_app_data}}</span>
         </div>
     </div>
 </template>

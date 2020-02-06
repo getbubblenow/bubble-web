@@ -77,9 +77,9 @@ String.prototype.parseDateMessage = function (millis, messages) {
         dd: date.getDate() < 10 ? '0' + date.getDate() : date.getDate(),
         d: date.getDate(),
         H: date.getHours(),
-        h: (date.getHours() > 12 ? date.getHours() - 12 : date.getHours()+1),
-        A: (date.getHours() > 12 ? messages['label_date_day_half_pm'].toUpperCase() : messages['label_date_day_half_am']).toUpperCase(),
-        a: (date.getHours() > 12 ? messages['label_date_day_half_pm'].toLowerCase() : messages['label_date_day_half_am']).toLowerCase(),
+        h: (date.getHours() > 12 ? date.getHours() - 12 : date.getHours() === 0 ? 12 : date.getHours()),
+        A: (date.getHours() >= 12 ? messages['label_date_day_half_pm'].toUpperCase() : messages['label_date_day_half_am']).toUpperCase(),
+        a: (date.getHours() >= 12 ? messages['label_date_day_half_pm'].toLowerCase() : messages['label_date_day_half_am']).toLowerCase(),
         m: date.getMinutes() < 10 ? '0'+date.getMinutes() : date.getMinutes(),
         s: date.getSeconds() < 10 ? '0'+date.getSeconds() : date.getSeconds()
     };

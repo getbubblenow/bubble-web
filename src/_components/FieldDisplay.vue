@@ -1,7 +1,7 @@
 <template>
     <div v-if="field && thing[field.name] !== null && thing[field.name] !== ''">
 
-        {{messages[messagePrefix+field.name]}}:
+        <span v-if="showLabel">{{messages[messagePrefix+field.name]}}:</span>
 
         <span v-if="typeof thing[field.name] === 'boolean'">
             {{messages['message_'+thing[field.name]]}}
@@ -40,6 +40,7 @@
 
     export default {
         props: {
+            showLabel: true,
             messagePrefix: String,
             customDateMessagePrefix: String,
             field: Object,
