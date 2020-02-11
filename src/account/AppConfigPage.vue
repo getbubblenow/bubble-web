@@ -13,7 +13,7 @@
         <div v-if="loading() && !hasActionFocus">
             {{messages.loading_app_config_data}}
         </div>
-        <div v-else-if="appConfigData && configView">
+        <div v-else-if="configView">
 
             <!-- table of results -->
             <div v-if="appConfigData instanceof Array && !hasActionFocus">
@@ -197,7 +197,12 @@
             },
             actionIsAvailable(action, row) {
                 if (typeof action.when === 'undefined' || action.when === null) return true;
-                return safeEval(action.when, {'item': row}) === true;
+                try {
+                    return safeEval(action.when, {'item': row}) === true;
+                } catch (e) {
+                    console.log('actionIsAvailable: error evaluating when='+action.when+' for item='+JSON.stringify(row)+': '+e);
+                    return false;
+                }
             },
             itemAction(action, itemId) {
                 this.resetMessages();
