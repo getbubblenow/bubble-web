@@ -3,12 +3,12 @@
         <h2>{{messages['app_'+app.name+'_name']}} - {{messages['app_'+app.name+'_view_'+viewId]}}</h2>
 
         <table v-if="app && viewParams && viewParams.length > 0">
-            <tr v-for="param in viewParams">
+            <tr v-for="param in viewParams" v-bind:key="param.name">
                 <td>{{messages['app_'+app.name+'_param_'+param.name]}}: </td>
                 <td v-if="param.name === 'device'">
                     <select v-model="paramValues[param.name]" v-if="devices">
                         <option value="">{{messages.option_all_devices}}</option>
-                        <option v-for="device in devices" :value="device.uuid">{{device.name}}</option>
+                        <option v-for="device in devices" :value="device.uuid" v-bind:key="device.name">{{device.name}}</option>
                     </select>
                 </td>
                 <td v-else>
@@ -22,8 +22,8 @@
 
         <div v-if="viewDetails && appData && appData.results && appData.results.length && appData.results.length > 0">
             <div v-if="viewDetails.layout === 'tiles'">
-                <div v-for="row in appData.results">
-                    <field-display v-for="field in viewFields"
+                <div v-for="row in appData.results" v-bind:key="row.uuid">
+                    <field-display v-for="field in viewFields" v-bind:key="field.name"
                                    :messagePrefix="'app_'+app.name+'_field_'"
                                    :showLabel="true"
                                    :customDateMessagePrefix="'app_'+app.name+'_view_'+viewId+'_'"
@@ -32,7 +32,7 @@
                                    :longTextExpandable="false"></field-display>
 
                     <div v-if="typeof app.dataConfig.actions !== 'undefined' && app.dataConfig.actions !== null && app.dataConfig.actions.length > 0">
-                        <span v-for="action in app.dataConfig.actions">
+                        <span v-for="action in app.dataConfig.actions" v-bind:key="action.name">
                             <button v-if="actionIsAvailable(action, row)" @click="dataAction(action, row)">{{messages['app_'+app.name+'_action_'+action.name]}}</button>
                         </span>
                     </div>
@@ -45,13 +45,13 @@
                 <table v-if="app && viewFields && viewFields.length > 0" border="1">
                     <thead>
                     <tr>
-                        <th v-for="field in viewFields">{{messages['app_'+app.name+'_field_'+field.name]}}</th>
+                        <th v-for="field in viewFields" v-bind:key="field.name">{{messages['app_'+app.name+'_field_'+field.name]}}</th>
                         <th v-if="app.dataConfig.actions && app.dataConfig.actions.length && app.dataConfig.actions.length > 0">{{messages.message_data_actions}}</th>
                     </tr>
                     </thead>
                     <tbody v-if="appData && appData.results && appData.results.length && appData.results.length > 0">
-                    <tr v-for="row in appData.results">
-                        <td v-for="field in viewFields" nowrap="nowrap">
+                    <tr v-for="row in appData.results" v-bind:key="row.uuid">
+                        <td v-for="field in viewFields" nowrap="nowrap" v-bind:key="field.name">
                             <field-display :messagePrefix="'app_'+app.name+'_field_'"
                                            :customDateMessagePrefix="'app_'+app.name+'_view_'+viewId+'_'"
                                            :thing="row"
@@ -59,7 +59,7 @@
                                            :longTextExpandable="false"></field-display>
                         </td>
                         <td v-if="app.dataConfig.actions && app.dataConfig.actions.length && app.dataConfig.actions.length > 0">
-                            <div v-for="action in app.dataConfig.actions">
+                            <div v-for="action in app.dataConfig.actions" v-bind:key="action.name">
                                 <button v-if="actionIsAvailable(action, row)" @click="dataAction(action, row)">{{messages['app_'+app.name+'_action_'+action.name]}}</button>
                             </div>
                         </td>

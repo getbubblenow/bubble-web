@@ -24,7 +24,9 @@
 
             <div v-for="app in apps">
                 <hr/>
-                <router-link :to="{ path: '/app/'+ app.name }"><h3>{{messages['app_'+app.name+'_name']}}</h3></router-link>
+                <router-link :to="{ path: '/app/'+ app.name }">
+                    <h3><img width="64" v-if="icons && icons[app.name]" :src="icons[app.name]"/> {{messages['app_'+app.name+'_name']}}</h3>
+                </router-link>
                 <div v-if="messages['!app_'+app.name+'_summary']"><h5>{{messages['app_'+app.name+'_summary']}}</h5></div>
                 <p>{{messages['app_'+app.name+'_description']}}</p>
                 <div>
@@ -52,7 +54,7 @@
             };
         },
         computed: {
-            ...mapState('apps', ['mitmEnabled', 'apps', 'app']),
+            ...mapState('apps', ['mitmEnabled', 'apps', 'app', 'icons']),
             ...mapState('system', ['messages'])
         },
         created () {
@@ -110,6 +112,7 @@
         },
         watch: {
             app (a) {
+                // app was enable/disabled, refresh apps
                 this.getAppsByUserId({
                     userId: this.user.uuid,
                     messages: this.messages,

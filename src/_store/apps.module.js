@@ -11,6 +11,7 @@ const state = {
     mitmEnabled: null,
     error: null,
     apps: [],
+    icons: {},
     app: null,
     sites: [],
     site: null,
@@ -53,7 +54,29 @@ const actions = {
         commit('getAppsByUserIdRequest');
         appService.getAppsByUserId(userId, messages, errors)
             .then(
-                apps => commit('getAppsByUserIdSuccess', apps),
+                apps => {
+                    if (apps && apps.length && apps.length > 0) {
+                        for (let i=0; i<apps.length; i++) {
+                            let app = apps[i];
+                            if (typeof state.icons[app.name] === 'undefined' || state.icons[app.name] === null) {
+                                appService.getAppAssetByUserId(
+                                    userId, app.name, 'icon', messages, errors
+                                ).then(
+                                    assetData => {
+                                        if (typeof app.assets === 'undefined' || app.assets === null) {
+                                            app.assets = {};
+                                        }
+                                        console.log('setting app icon: '+app.name);
+                                        const newIcon = {};
+                                        newIcon[app.name] = assetData;
+                                        state.icons = Object.assign({}, state.icons, newIcon);
+                                    }
+                                );
+                            }
+                        }
+                    }
+                    commit('getAppsByUserIdSuccess', apps);
+                },
                 error => commit('getAppsByUserIdFailure', error)
             );
     },

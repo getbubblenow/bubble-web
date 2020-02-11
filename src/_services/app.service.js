@@ -8,6 +8,7 @@ export const appService = {
 
     getAppsByUserId,
     getAppByUserId,
+    getAppAssetByUserId,
     enableAppByUserId,
     disableAppByUserId,
 
@@ -45,6 +46,10 @@ function getAppsByUserId(userId, messages, errors) {
 
 function getAppByUserId(userId, appId, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+}
+
+function getAppAssetByUserId(userId, appId, assetId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/apps/${appId}/assets/${assetId}`, util.getWithAuth()).then(util.handlePlaintextResponse(messages, errors));
 }
 
 function enableAppByUserId(userId, appId, messages, errors) {
