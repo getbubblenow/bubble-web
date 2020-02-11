@@ -24,9 +24,7 @@
 
             <div v-for="app in apps">
                 <hr/>
-                <router-link :to="{ path: '/app/'+ app.name }">
-                    <h3><img width="64" v-if="icons && icons[app.name]" :src="icons[app.name]"/> {{messages['app_'+app.name+'_name']}}</h3>
-                </router-link>
+                <router-link :to="{ path: '/app/'+ app.name }"><h3><img width="64" v-if="icons && icons[app.name]" :src="icons[app.name]"/>{{messages['app_'+app.name+'_name']}}</h3></router-link>
                 <div v-if="messages['!app_'+app.name+'_summary']"><h5>{{messages['app_'+app.name+'_summary']}}</h5></div>
                 <p>{{messages['app_'+app.name+'_description']}}</p>
                 <div>
