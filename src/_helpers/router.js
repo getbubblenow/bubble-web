@@ -14,6 +14,7 @@ import PolicyPage from '../account/profile/PolicyPage'
 import DevicesPage from '../account/DevicesPage'
 import AppsPage from '../account/AppsPage'
 import AppPage from '../account/AppPage'
+import BillsPage from '../account/payment/BillsPage'
 import AppSitePage from '../account/AppSitePage'
 import AppDataViewPage from '../account/AppDataViewPage'
 import AppConfigPage from '../account/AppConfigPage'
@@ -65,6 +66,7 @@ export const router = new Router({
         { path: '/me/changePassword', component: ChangePasswordPage },
         { path: '/me/setPassword/:code', component: SetPasswordPage },
         { path: '/me/keys', component: SshKeysPage },
+        { path: '/me/bills', component: BillsPage },
         { path: '/devices', component: DevicesPage },
         { path: '/apps', component: AppsPage },
         { path: '/app/:app', component: AppPage },

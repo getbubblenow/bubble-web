@@ -8,3 +8,4 @@ export * from './accountPlan.service';
 export * from './network.service';
 export * from './device.service';
 export * from './app.service';
+export * from './bill.service';

@@ -151,13 +151,11 @@
             if (this.me) {
                 this.linkPrefix = '/me';
                 if (this.currentUser === null) {
-                    this.admin = false;
                     console.warn('SshKeysPage.created: /me requested but no currentUser, sending to home page');
                     this.$router.push('/');
                     return;
 
                 } else {
-                    this.admin = this.currentUser.admin === true;
                     this.userId = this.currentUser.uuid;
                 }
 
@@ -175,15 +173,6 @@
                 this.userId = this.$route.params.id;
                 this.linkPrefix = '/admin/accounts/' + this.userId;
             }
-
-            // const user = util.currentUser();
-            // if (util.userHasLocale(user)) {
-            //     Settings.defaultLocale = util.jsLocale(this.user, null);
-            // } else if (this.detectedLocale === null) {
-            //     this.detectLocale();
-            // } else {
-            //     Settings.defaultLocale = util.jsLocale(null, this.detectedLocale);
-            // }
             this.listSshKeysByUserId({userId: this.userId, messages: this.messages, errors: this.errors});
         }
     };

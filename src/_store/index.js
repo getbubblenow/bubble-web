@@ -13,6 +13,7 @@ import { accountPlans } from './accountPlans.module';
 import { networks } from './networks.module';
 import { devices } from './devices.module';
 import { apps } from './apps.module';
+import { bills } from './bills.module';
 
 Vue.use(Vuex);
 
@@ -29,7 +30,8 @@ export const store = new Vuex.Store({
         accountPlans,
         networks,
         devices,
-        apps
+        apps,
+        bills
     }
 });
 
