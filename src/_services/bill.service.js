@@ -11,5 +11,5 @@ function getAllBillsByAccount(userId, messages, errors) {
 }
 
 function getBillByAccountAndId(userId, billId, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/bills/${billId}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/users/${userId}/bills/${billId}?payments=true`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
