@@ -182,13 +182,6 @@ const getters = {
                 icon: messages.label_menu_apps_icon
             });
         }
-        if (configs.paymentsEnabled) {
-            menu.splice(3, 0,{
-                href: '/me/bills',
-                title: messages.label_menu_bills,
-                icon: messages.label_menu_bills_icon
-            });
-        }
         if (account.state.user.admin === true) {
             const admin_menu = {
                 href: '/admin',

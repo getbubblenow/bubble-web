@@ -229,6 +229,37 @@ export const util = {
 
     addMessages: function(existing, updates) {
         return new Proxy(Object.assign({}, existing, updates), util.messageNotFoundHandler);
+    },
+
+    validateAccount: function (vue)  {
+        vue.me = vue.$route.path.startsWith('/me/');
+        if (vue.me) {
+            vue.linkPrefix = '/me';
+            if (vue.currentUser === null) {
+                console.warn('validateAccount: /me requested but no currentUser, sending to home page');
+                vue.$router.push('/');
+                return false;
+
+            } else {
+                vue.userId = vue.currentUser.uuid;
+            }
+
+        } else if (vue.currentUser.admin !== true) {
+            console.warn('validateAccount: not admin and path not /me, sending to /me ...');
+            vue.$router.push('/me');
+            return false;
+
+        } else if (typeof vue.$route.params.id === 'undefined' || vue.$route.params.id === null) {
+            console.warn('validateAccount: no id param found, sending to accounts page');
+            vue.$router.push('/admin/accounts');
+            return false;
+
+        } else {
+            vue.userId = vue.$route.params.id;
+            vue.linkPrefix = '/admin/accounts/' + vue.userId;
+        }
+        this.isMe = (this.me === true || util.currentUser().uuid === this.userId || util.currentUser().name === this.userId);
+        return true;
     }
 
 };

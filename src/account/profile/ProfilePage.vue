@@ -10,6 +10,10 @@
             <hr/>
             <router-link :to="linkPrefix+'/keys'">{{messages.link_label_account_ssh_keys}}</router-link>
             <hr/>
+            <router-link :to="linkPrefix+'/payment'">{{messages.link_label_account_payments}}</router-link>
+            <hr/>
+            <router-link :to="linkPrefix+'/bills'">{{messages.link_label_account_bills}}</router-link>
+            <hr/>
         </div>
 
         <form @submit.prevent="handleSubmit">

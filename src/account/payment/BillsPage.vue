@@ -64,7 +64,6 @@
 <script>
     import { mapState, mapActions, mapGetters } from 'vuex';
     import { util } from '../../_helpers';
-    import { Settings } from 'luxon';
 
     export default {
         data() {
@@ -98,33 +97,9 @@
             }
         },
         created () {
-            this.me = this.$route.path.startsWith('/me/');
-            if (this.me) {
-                this.linkPrefix = '/me';
-                if (this.currentUser === null) {
-                    console.warn('BillsPage.created: /me requested but no currentUser, sending to home page');
-                    this.$router.push('/');
-                    return;
-
-                } else {
-                    this.userId = this.currentUser.uuid;
-                }
-
-            } else if (this.currentUser.admin !== true) {
-                console.warn('BillsPage.created: not admin and path not /me, sending to /me ...');
-                this.$router.push('/me');
-                return;
-
-            } else if (typeof this.$route.params.id === 'undefined' || this.$route.params.id === null) {
-                console.warn('BillsPage.created: no id param found, sending to accounts page');
-                this.$router.push('/admin/accounts');
-                return;
-
-            } else {
-                this.userId = this.$route.params.id;
-                this.linkPrefix = '/admin/accounts/' + this.userId;
+            if (util.validateAccount(this)) {
+                this.getAllBillsByAccount({userId: this.userId, messages: this.messages, errors: this.errors});
             }
-            this.getAllBillsByAccount({userId: this.userId, messages: this.messages, errors: this.errors});
         }
     };
 </script>

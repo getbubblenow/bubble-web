@@ -9,11 +9,11 @@ import { plans } from './plans.module';
 import { footprints } from './footprints.module';
 import { domains } from './domains.module';
 import { paymentMethods } from './paymentMethods.module';
+import { bills } from './bills.module';
 import { accountPlans } from './accountPlans.module';
 import { networks } from './networks.module';
 import { devices } from './devices.module';
 import { apps } from './apps.module';
-import { bills } from './bills.module';
 
 Vue.use(Vuex);
 
@@ -27,11 +27,11 @@ export const store = new Vuex.Store({
         footprints,
         domains,
         paymentMethods,
+        bills,
         accountPlans,
         networks,
         devices,
-        apps,
-        bills
+        apps
     }
 });
 

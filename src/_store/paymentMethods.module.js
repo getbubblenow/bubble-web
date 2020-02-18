@@ -5,7 +5,7 @@ const state = {
     loading: {
         paymentMethods: false, paymentMethod: false,
         accountPaymentMethods: false, accountPaymentMethod: false,
-        adding: false
+        adding: false, updating: false, deleting: false
     },
     paymentStatus: {},
     error: null,
@@ -27,6 +27,16 @@ const actions = {
                 error => commit('getAllPaymentMethodsFailure', error)
             );
     },
+
+    getAllAccountPaymentMethods({ commit }, {userId, messages, errors}) {
+        commit('getAllAccountPaymentMethodsRequest');
+        paymentMethodService.getAllAccountPaymentMethods(userId, messages, errors)
+            .then(
+                paymentMethods => commit('getAllAccountPaymentMethodsSuccess', paymentMethods),
+                error => commit('getAllAccountPaymentMethodsFailure', error)
+            );
+    },
+
     getPublicById({ commit }, {paymentMethodId, messages, errors}) {
         commit('getPublicByIdRequest');
         paymentMethodService.getPublicById(paymentMethodId, messages, errors)
@@ -66,6 +76,22 @@ const actions = {
                 errors => commit('addAccountPaymentMethodFailure', errors)
             );
     },
+    setAccountPaymentMethodForPlan({ commit }, {userId, planId, pmId, messages, errors}) {
+        commit('setAccountPaymentMethodForPlanRequest');
+        paymentMethodService.setAccountPaymentMethodForPlan(userId, planId, pmId, messages, errors)
+            .then(
+                pm => commit('setAccountPaymentMethodForPlanSuccess', pm),
+                errors => commit('setAccountPaymentMethodForPlanFailure', errors)
+            );
+    },
+    deleteAccountPaymentMethod({ commit }, {userId, pmId, messages, errors}) {
+        commit('deleteAccountPaymentMethodRequest');
+        paymentMethodService.deleteAccountPaymentMethod(userId, pmId, messages, errors)
+            .then(
+                ok => commit('deleteAccountPaymentMethodSuccess', ok),
+                errors => commit('deleteAccountPaymentMethodFailure', errors)
+            );
+    },
     clearPaymentInfo({ commit }) {
         commit('clearPaymentInfoSuccess');
     }
@@ -83,6 +109,19 @@ const mutations = {
         state.loading.paymentMethods = false;
         state.error = { error };
     },
+
+    getAllAccountPaymentMethodsRequest(state) {
+        state.loading.accountPaymentMethods = true;
+    },
+    getAllAccountPaymentMethodsSuccess(state, paymentMethods) {
+        state.loading.accountPaymentMethods = false;
+        state.accountPaymentMethods = paymentMethods;
+    },
+    getAllAccountPaymentMethodsFailure(state, error) {
+        state.loading.accountPaymentMethods = false;
+        state.error = { error };
+    },
+
     getPublicByIdRequest(state) {
         state.loading.paymentMethod = true;
     },
@@ -140,6 +179,36 @@ const mutations = {
         state.loading.adding = false;
         state.paymentStatus = {};
         state.errors = errors;
+    },
+
+    setAccountPaymentMethodForPlanRequest(state) {
+        state.loading.updating = true;
+        state.errors = null;
+        state.paymentStatus = { updatingPaymentMethod: true };
+    },
+    setAccountPaymentMethodForPlanSuccess(state, pm) {
+        state.loading.updating = false;
+        state.paymentStatus = { updatedPaymentMethod: true };
+    },
+    setAccountPaymentMethodForPlanFailure(state, errors) {
+        state.loading.updating = false;
+        state.paymentStatus = {};
+        state.errors = errors;
+    },
+
+    deleteAccountPaymentMethodRequest(state) {
+        state.loading.deleting = true;
+        state.paymentStatus = { deletingPaymentMethod: true };
+        state.errors = null;
+    },
+    deleteAccountPaymentMethodSuccess(state, ok) {
+        state.loading.deleting = false;
+        state.paymentStatus = { deletedPaymentMethod: true };
+        state.errors = null;
+    },
+    deleteAccountPaymentMethodFailure(state, errors) {
+        state.loading.deleting = false;
+        state.paymentStatus = {};
     },
 
     clearPaymentInfoSuccess(state) {

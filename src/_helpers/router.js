@@ -15,6 +15,7 @@ import DevicesPage from '../account/DevicesPage'
 import AppsPage from '../account/AppsPage'
 import AppPage from '../account/AppPage'
 import BillsPage from '../account/payment/BillsPage'
+import PaymentMethodsPage from "../account/payment/PaymentMethodsPage";
 import AppSitePage from '../account/AppSitePage'
 import AppDataViewPage from '../account/AppDataViewPage'
 import AppConfigPage from '../account/AppConfigPage'
@@ -34,13 +35,21 @@ import { util } from '../_helpers'
 
 Vue.use(Router);
 
+const paymentMethods = {
+  pay_stripe: StripePayment,
+  pay_invite: InviteCodePayment,
+  pay_free: FreePayment,
+  pay_unknown: UnknownPayment
+};
+
+const paymentMethodsChildren = [
+  { path: '', components: paymentMethods }
+];
+
 const newNetworkChildren = [
   { path: '', components: {
       default: NewNetworkPage,
-      pay_stripe: StripePayment,
-      pay_invite: InviteCodePayment,
-      pay_free: FreePayment,
-      pay_unknown: UnknownPayment
+      ...paymentMethods
     }
   }
 ];
@@ -67,6 +76,7 @@ export const router = new Router({
         { path: '/me/setPassword/:code', component: SetPasswordPage },
         { path: '/me/keys', component: SshKeysPage },
         { path: '/me/bills', component: BillsPage },
+        { path: '/me/payment', component: PaymentMethodsPage, children: paymentMethodsChildren },
         { path: '/devices', component: DevicesPage },
         { path: '/apps', component: AppsPage },
         { path: '/app/:app', component: AppPage },
@@ -105,6 +115,8 @@ export const router = new Router({
     { path: '/admin/accounts/:id/policy', component: PolicyPage },
     { path: '/admin/accounts/:id/changePassword', component: ChangePasswordPage },
     { path: '/admin/accounts/:id/keys', component: SshKeysPage },
+    { path: '/admin/accounts/:id/bills', component: BillsPage },
+    { path: '/admin/accounts/:id/payment', component: PaymentMethodsPage, children: paymentMethodsChildren },
     { path: '/admin/model', component: ModelSetupPage },
 
     // otherwise redirect to home

@@ -221,8 +221,8 @@
                         <h5>{{messages.err_noPaymentMethods}}</h5>
                     </div>
                     <span v-for="pm in paymentMethods">
-                    <button class="btn btn-primary" :disabled="loading()" @click="setPaymentMethod(pm)">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
-                </span>
+                        <button class="btn btn-primary" :disabled="loading()" @click="setPaymentMethod(pm)">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
+                    </span>
                 </div>
 
                 <div v-if="selectedPaymentMethod !== null && selectedPaymentMethod.paymentMethodType === 'credit'">

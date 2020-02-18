@@ -9,11 +9,11 @@ export const accountPlanService = {
 };
 
 function getAllAccountPlans(userId, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/accountPlans`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/users/${userId}/plans`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function getAccountPlanById(userId, accountPlanId, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/accountPlans/${accountPlanId}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/users/${userId}/plans/${accountPlanId}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function newAccountPlan(userId, accountPlan, messages, errors) {

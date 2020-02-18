@@ -110,37 +110,7 @@
             }
         },
         created () {
-            this.me = this.$route.path.startsWith('/me/');
-            if (this.me) {
-                this.linkPrefix = '/me';
-                if (this.currentUser === null) {
-                    this.admin = false;
-                    console.warn('ChangePasswordPage.created: /me requested but no currentUser, sending to home page');
-                    this.$router.push('/');
-                    return;
-
-                } else {
-                    this.admin = this.currentUser.admin === true;
-                    this.userId = this.currentUser.uuid;
-                    this.isMe = (this.me === true || this.currentUser.uuid === this.userId || this.currentUser.name === this.userId);
-                    this.getUserById({userId: this.currentUser.uuid, messages: this.messages, errors: this.errors});
-                    this.getPolicyByUserId({userId: this.currentUser.uuid, messages: this.messages, errors: this.errors});
-                }
-
-            } else if (this.currentUser.admin !== true) {
-                console.warn('ChangePasswordPage.created: not admin and path not /me, sending to /me ...');
-                this.$router.push('/me');
-                return;
-
-            } else if (typeof this.$route.params.id === 'undefined' || this.$route.params.id === null) {
-                console.warn('ChangePasswordPage.created: no id param found, sending to accounts page');
-                this.$router.push('/admin/accounts');
-                return;
-
-            } else {
-                this.userId = this.$route.params.id;
-                this.linkPrefix = '/admin/accounts/' + this.userId;
-                this.isMe = (this.me === true || this.currentUser.uuid === this.userId || this.currentUser.name === this.userId);
+            if (util.validateAccount(this)) {
                 this.getUserById({userId: this.userId, messages: this.messages, errors: this.errors});
                 this.getPolicyByUserId({userId: this.userId, messages: this.messages, errors: this.errors});
             }

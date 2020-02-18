@@ -645,25 +645,7 @@
             }
         },
         created () {
-            this.me = this.$route.path.startsWith('/me/');
-            if (this.me) {
-                this.userId = this.currentUser.uuid;
-                this.linkPrefix = '/me';
-                this.getPolicyByUserId({userId: this.currentUser.uuid, messages: this.messages, errors: this.errors});
-
-            } else if (this.currentUser.admin !== true) {
-                console.warn('PolicyPage.created: /me requested but no currentUser, sending to home page');
-                this.$router.push('/');
-                return;
-
-            } else if (typeof this.$route.params.id === 'undefined' || this.$route.params.id === null) {
-                console.warn('PolicyPage.created: no id param found, sending to accounts page');
-                this.$router.push('/admin/accounts');
-                return;
-
-            } else {
-                this.userId = this.$route.params.id;
-                this.linkPrefix = '/admin/accounts/' + this.userId;
+            if (util.validateAccount(this)) {
                 this.getPolicyByUserId({userId: this.userId, messages: this.messages, errors: this.errors});
             }
             // console.log('PolicyPage.created: $route.params='+JSON.stringify(this.$route.query));

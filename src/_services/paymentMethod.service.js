@@ -3,14 +3,21 @@ import { util } from '../_helpers';
 
 export const paymentMethodService = {
     getAllPaymentMethods,
+    getAllAccountPaymentMethods,
     getPublicById,
     getAllByAccount,
     getByAccountAndId,
-    addAccountPaymentMethod
+    addAccountPaymentMethod,
+    setAccountPaymentMethodForPlan,
+    deleteAccountPaymentMethod,
 };
 
 function getAllPaymentMethods(messages, errors) {
     return fetch(`${config.apiUrl}/paymentMethods`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+}
+
+function getAllAccountPaymentMethods(userId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/paymentMethods?all=true`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function getPublicById(paymentMethodId, messages, errors) {
@@ -27,4 +34,13 @@ function getByAccountAndId(userId, paymentMethodId, messages, errors) {
 
 function addAccountPaymentMethod(userId, paymentMethod, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/paymentMethods`, util.putWithAuth(paymentMethod)).then(util.handleCrudResponse(messages, errors));
+}
+
+function setAccountPaymentMethodForPlan(userId, planId, pmId, messages, errors) {
+    const update = {paymentMethod: pmId};
+    return fetch(`${config.apiUrl}/users/${userId}/plans/${planId}`, util.postWithAuth(update)).then(util.handleCrudResponse(messages, errors));
+}
+
+function deleteAccountPaymentMethod(userId, pmId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/paymentMethods/${pmId}`, util.deleteWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
