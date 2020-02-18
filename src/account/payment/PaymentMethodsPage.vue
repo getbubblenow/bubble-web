@@ -10,8 +10,8 @@
                     <td>{{messages.label_account_payment_method_info}}</td>
                     <td>{{messages.label_account_payment_method_added}}</td>
                     <td>{{messages.label_account_payment_method_current}}</td>
-                    <td>{{messages.label_account_payment_method_set}}</td>
-                    <td>{{messages.label_account_payment_method_remove}}</td>
+                    <td v-if="payMethods.length > 1">{{messages.label_account_payment_method_set}}</td>
+                    <td v-if="payMethods.length > 1">{{messages.label_account_payment_method_remove}}</td>
                 </tr>
                 </thead>
                 <tbody>
@@ -25,17 +25,17 @@
                     </td>
                     <td v-else></td>
 
-                    <td v-if="accountPlans && accountPlans.length > 0">
+                    <td v-if="accountPlans && accountPlans.length > 0 && payMethods.length > 1">
                         <div v-for="ap in accountPlans">
                             <button style="white-space:nowrap" v-if="ap.paymentMethod !== pm.uuid" @click="setPayMethodForPlan(ap.uuid, pm.uuid)">{{ap.name}}</button>
                         </div>
                     </td>
-                    <td v-else></td>
+                    <td v-else-if="payMethods.length > 1"></td>
 
-                    <td v-if="pm.deletable">
+                    <td v-if="pm.deletable && payMethods.length > 1">
                         <button v-if="pm.deletable" @click="deletePayMethod(pm.uuid)">{{messages.button_label_account_payment_delete}}</button>
                     </td>
-                    <td v-else></td>
+                    <td v-else-if="payMethods.length > 1"></td>
                 </tr>
                 </tbody>
             </table>
