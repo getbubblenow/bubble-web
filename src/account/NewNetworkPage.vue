@@ -212,23 +212,23 @@
             </div>
 
             <!-- payment -->
-            <div v-if="configs && configs.paymentsEnabled && paymentMethods && paymentMethods.length">
+            <div v-if="configs && configs.paymentsEnabled && payMethods && payMethods.length">
                 <div v-if="submitted && errors.has('purchase')" class="invalid-feedback d-block">{{ errors.first('purchase') }}</div>
 
                 <div class="form-group">
                     <label htmlFor="paymentMethod">{{messages.field_label_paymentMethod}}</label>
-                    <div v-if="typeof paymentMethods === 'undefined' || paymentMethods === null || paymentMethods.length === 0" class="invalid-feedback d-block">
+                    <div v-if="typeof payMethods === 'undefined' || payMethods === null || payMethods.length === 0" class="invalid-feedback d-block">
                         <h5>{{messages.err_noPaymentMethods}}</h5>
                     </div>
-                    <div v-else-if="paymentMethods.length > 1">
-                        <span v-for="pm in paymentMethods">
-                            <button class="btn btn-primary" :disabled="loading()" @click="setPaymentMethod(pm)">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
+                    <div v-else-if="payMethods.length > 1">
+                        <span v-for="pm in payMethods">
+                            <button v-if="!pm.driverClass.endsWith('NoopCloud')" class="btn btn-primary" :disabled="loading()" @click="setPaymentMethod(pm)">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
                         </span>
                     </div>
                 </div>
 
-                <div v-for="pm in paymentMethods">
-                    <div v-if="paymentMethods.length === 1 || (selectedPaymentMethod !== null && selectedPaymentMethod.uuid === pm.uuid)">
+                <div v-for="pm in payMethods">
+                    <div v-if="selectedPaymentMethod !== null && selectedPaymentMethod.uuid === pm.uuid">
                         <router-view name="pay_stripe" v-if="pm.driverClass.endsWith('StripePaymentDriver')"></router-view>
                         <router-view name="pay_invite" v-if="pm.driverClass.endsWith('CodePaymentDriver')"></router-view>
                         <router-view name="pay_free" v-if="pm.driverClass.endsWith('FreePaymentDriver')"></router-view>
@@ -305,6 +305,7 @@
                 verifiedContacts: false,
                 anyContacts: false,
                 firstContact: null,
+                payMethods: null,
                 selectedPaymentMethod: null
             };
         },
@@ -544,9 +545,20 @@
                 }
             },
             paymentMethods (pms) {
-                if (pms && pms.length && pms.length === 1) {
-                    this.selectedPaymentMethod = pms[0];
-                    this.setPaymentMethod(pms[0]);
+                if (pms && pms.length) {
+                    console.log('watch.paymentMethods: received '+JSON.stringify(pms));
+                    const okMethods = [];
+                    for (let i=0; i<pms.length; i++) {
+                        const pm = pms[i];
+                        if (!pm.driverClass.endsWith('NoopCloud')) {
+                            okMethods.push(pm);
+                        }
+                    }
+                    if (okMethods.length === 1) {
+                        this.selectedPaymentMethod = okMethods[0];
+                        this.setPaymentMethod(okMethods[0]);
+                    }
+                    this.payMethods = okMethods;
                 }
             },
             paymentMethod (pm) {
