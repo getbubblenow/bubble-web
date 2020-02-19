@@ -31,7 +31,7 @@
                 <input type="checkbox" id="user.contact.receivePromotionalMessages" v-model="user.contact.receivePromotionalMessages">
             </div>
             <div class="form-group">
-                <label for="user.agreeToTerms">{{messages.field_label_agreeToTerms}}</label>
+                <label for="user.agreeToTerms" v-html="messages.field_label_agreeToTerms"></label>
                 <input type="checkbox" id="user.agreeToTerms" v-model="user.agreeToTerms">
             </div>
             <div class="form-group">
