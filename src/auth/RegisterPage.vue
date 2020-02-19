@@ -33,6 +33,7 @@
             <div class="form-group">
                 <label for="user.agreeToTerms" v-html="messages.field_label_agreeToTerms"></label>
                 <input type="checkbox" id="user.agreeToTerms" v-model="user.agreeToTerms">
+                <div v-if="submitted && errors.has('terms')" class="invalid-feedback d-block">{{ errors.first('terms') }}</div>
             </div>
             <div class="form-group">
                 <button class="btn btn-primary" :disabled="status.registering">{{messages.button_label_register}}</button>
