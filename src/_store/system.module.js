@@ -12,7 +12,8 @@ const state = {
         entityClasses: [],
         locales: ['en_US'],
         cloudConfigs: {},
-        sslPort: null
+        sslPort: null,
+        promoCodePolicy: null
     },
     entityConfigs: {},
     searchResults: [],
@@ -219,7 +220,9 @@ const getters = {
             icon: messages.label_menu_logout_icon
         });
         return menu;
-    }
+    },
+    promoCodesEnabled: function () { return state.promoCodePolicy === 'required' || state.promoCodePolicy === 'optional'; },
+    promoCodeRequired: function () { return state.promoCodePolicy === 'required'; }
 };
 
 const mutations = {

@@ -14,8 +14,13 @@
             </div>
             <div class="form-group">
                 <label for="email">{{messages.field_label_email}}</label>
-                <input type="text" v-model="user.contact.info" name="email" class="form-control" :class="{ 'is-invalid': submitted && errors.has('email') }" />
+                <input type="text" v-model="user.contact.info" v-validate="'required'" name="email" class="form-control" :class="{ 'is-invalid': submitted && errors.has('email') }" />
                 <div v-if="submitted && errors.has('email')" class="invalid-feedback">{{ errors.first('email') }}</div>
+            </div>
+            <div class="form-group" v-if="promoCodesEnabled">
+                <label for="promoCode">{{messages.field_label_promoCode}}</label>
+                <input type="text" v-model="user.promoCode" v-validate="{required: promoCodeRequired}" name="promoCode" class="form-control" :class="{ 'is-invalid': submitted && errors.has('promoCode') }" />
+                <div v-if="submitted && errors.has('promoCode')" class="invalid-feedback">{{ errors.first('promoCode') }}</div>
             </div>
             <div class="form-group">
                 <label for="user.contact.receiveInformationalMessages">{{messages.field_label_receiveInformationalMessages}}</label>
@@ -35,7 +40,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapGetters } from 'vuex'
 
 export default {
     data () {
@@ -48,7 +53,8 @@ export default {
                     info: '',
                     receiveInformationalMessages: false,
                     receivePromotionalMessages: false
-                }
+                },
+                promoCode: null
             },
             submitted: false
         }
@@ -59,6 +65,7 @@ export default {
     },
     methods: {
         ...mapActions('account', ['register']),
+        ...mapGetters('system', ['promoCodesEnabled', 'promoCodeRequired']),
         handleSubmit(e) {
             this.submitted = true;
             this.$validator.validate().then(valid => {
