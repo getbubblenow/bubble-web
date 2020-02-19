@@ -85,7 +85,7 @@
                     {{messages.message_plan_node_apps}}
                     <div v-for="app in selectedPlan.apps">
                         <hr/>
-                        <h5>{{messages['app_'+app.name+'_name']}}</h5>
+                        <h5><img width="64" v-if="icons && icons[app.name]" :src="icons[app.name]"/>{{messages['app_'+app.name+'_name']}}</h5>
                         <div v-if="messages['!app_'+app.name+'_summary']"><h6><b>{{messages['app_'+app.name+'_summary']}}</b></h6></div>
                         <p>{{messages['app_'+app.name+'_description']}}</p>
                     </div>
@@ -212,7 +212,7 @@
             </div>
 
             <!-- payment -->
-            <div v-if="configs && configs.paymentsEnabled">
+            <div v-if="configs && configs.paymentsEnabled && paymentMethods && paymentMethods.length">
                 <div v-if="submitted && errors.has('purchase')" class="invalid-feedback d-block">{{ errors.first('purchase') }}</div>
 
                 <div class="form-group">
@@ -220,25 +220,20 @@
                     <div v-if="typeof paymentMethods === 'undefined' || paymentMethods === null || paymentMethods.length === 0" class="invalid-feedback d-block">
                         <h5>{{messages.err_noPaymentMethods}}</h5>
                     </div>
-                    <span v-for="pm in paymentMethods">
-                        <button class="btn btn-primary" :disabled="loading()" @click="setPaymentMethod(pm)">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
-                    </span>
+                    <div v-else-if="paymentMethods.length > 1">
+                        <span v-for="pm in paymentMethods">
+                            <button class="btn btn-primary" :disabled="loading()" @click="setPaymentMethod(pm)">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
+                        </span>
+                    </div>
                 </div>
 
-                <div v-if="selectedPaymentMethod !== null && selectedPaymentMethod.paymentMethodType === 'credit'">
-                    <router-view name="pay_stripe" v-if="selectedPaymentMethod.driverClass.endsWith('StripePaymentDriver')"></router-view>
-                    <router-view name="pay_unknown" v-else></router-view>
-                </div>
-                <div v-else-if="selectedPaymentMethod !== null && selectedPaymentMethod.paymentMethodType === 'code'">
-                    <router-view name="pay_invite" v-if="selectedPaymentMethod.driverClass.endsWith('CodePaymentDriver')"></router-view>
-                    <router-view name="pay_unknown" v-else></router-view>
-                </div>
-                <div v-else-if="selectedPaymentMethod !== null && selectedPaymentMethod.paymentMethodType === 'free'">
-                    <router-view name="pay_free" v-if="selectedPaymentMethod.driverClass.endsWith('FreePaymentDriver')"></router-view>
-                    <router-view name="pay_unknown" v-else></router-view>
-                </div>
-                <div v-else-if="selectedPaymentMethod !== null">
-                    <router-view name="pay_unknown"></router-view>
+                <div v-for="pm in paymentMethods">
+                    <div v-if="paymentMethods.length === 1 || (selectedPaymentMethod !== null && selectedPaymentMethod.uuid === pm.uuid)">
+                        <router-view name="pay_stripe" v-if="pm.driverClass.endsWith('StripePaymentDriver')"></router-view>
+                        <router-view name="pay_invite" v-if="pm.driverClass.endsWith('CodePaymentDriver')"></router-view>
+                        <router-view name="pay_free" v-if="pm.driverClass.endsWith('FreePaymentDriver')"></router-view>
+<!--                        <router-view name="pay_unknown" v-else></router-view>-->
+                    </div>
                 </div>
             </div>
 
@@ -317,6 +312,7 @@
             ...mapState('system', ['messages', 'locales', 'timezones', 'detectedTimezone', 'detectedLocale', 'configs']),
             ...mapState('domains', ['domains']),
             ...mapState('plans', ['plans']),
+            ...mapState('apps', ['icons']),
             ...mapState('footprints', ['footprints']),
             ...mapState('paymentMethods', ['paymentMethods', 'accountPaymentMethod', 'paymentMethod', 'paymentInfo']),
             ...mapState('networks', ['nearestRegions', 'newNodeNotification']),
@@ -395,6 +391,7 @@
             ...mapGetters('networks', ['loading']),
             ...mapActions('domains', ['getAllDomains']),
             ...mapActions('plans', ['getAllPlans']),
+            ...mapActions('apps', ['getAppsByUserId']),
             ...mapActions('footprints', ['getAllFootprints']),
             ...mapActions('paymentMethods', ['getAllPaymentMethods', 'setPaymentMethod']),
             initDefaults() {
@@ -404,6 +401,7 @@
                 this.detectLocale();
                 this.getAllDomains({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
                 this.getAllPlans(this.messages, this.errors);
+                this.getAppsByUserId({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
                 this.getAllFootprints({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
                 this.getAllPaymentMethods(this.messages, this.errors);
                 this.listSshKeysByUserId({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
@@ -543,6 +541,12 @@
                     if (this.defaults.region === '' || (typeof regions.find(r => r.uuid  === this.defaults.region.uuid) === 'undefined')) {
                         this.defaults.region = regions[0];
                     }
+                }
+            },
+            paymentMethods (pms) {
+                if (pms && pms.length && pms.length === 1) {
+                    this.selectedPaymentMethod = pms[0];
+                    this.setPaymentMethod(pms[0]);
                 }
             },
             paymentMethod (pm) {
