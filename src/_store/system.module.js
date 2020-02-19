@@ -8,7 +8,6 @@ const state = {
         allowRegistration: false,
         paymentsEnabled: false,
         sageLauncher: false,
-        cloudDrivers: [],
         entityClasses: [],
         locales: ['en_US'],
         cloudConfigs: {},
