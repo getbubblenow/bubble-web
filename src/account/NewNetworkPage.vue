@@ -210,6 +210,7 @@
             <div class="form-group">
                 <label for="sendMetrics">{{messages.field_label_send_metrics}}</label>
                 <input type="checkbox" id="sendMetrics" v-model="accountPlan.sendMetrics">
+                <div v-if="submitted && errors.has('sendMetrics')" class="invalid-feedback d-block">{{ errors.first('sendMetrics') }}</div>
             </div>
             <hr/>
 
