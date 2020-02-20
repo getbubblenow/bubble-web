@@ -81,15 +81,15 @@
                 {{messages['plan_description_'+accountPlan.plan]}}
                 <div v-if="networkType === 'fork'"><hr/>{{messages.message_plan_fork_apps}}</div>
                 <div v-else-if="selectedPlan && selectedPlan.apps && selectedPlan.apps.length > 0">
-                    <hr/>
-                    {{messages.message_plan_node_apps}}
+                    <div v-if="typeof selectedPlan.maxAccounts !== 'undefined' && selectedPlan.maxAccounts !== null">&bullet; {{messages.message_plan_max_accounts.parseExpression({max: selectedPlan.maxAccounts})}}</div>
+                    <div v-else>&bullet; {{messages.message_plan_no_max_accounts}}</div>
+                    &bullet; {{messages.message_plan_node_apps}}
                     <div v-for="app in selectedPlan.apps">
                         <hr/>
                         <h5><img width="64" v-if="icons && icons[app.name]" :src="icons[app.name]"/>{{messages['app_'+app.name+'_name']}}</h5>
                         <div v-if="messages['!app_'+app.name+'_summary']"><h6><b>{{messages['app_'+app.name+'_summary']}}</b></h6></div>
                         <p>{{messages['app_'+app.name+'_description']}}</p>
                     </div>
-                    <hr/>
                 </div>
             </div>
             <hr/>
@@ -206,10 +206,15 @@
             <div>{{messages.field_description_network_ssh_key}}</div>
             <hr/>
 
-            </div>  <!-- end showAdvanced -->
-            <div v-else>
-
+            <!-- error and metrics reporting -->
+            <div class="form-group">
+                <label for="sendMetrics">{{messages.field_label_send_metrics}}</label>
+                <input type="checkbox" id="sendMetrics" v-model="accountPlan.sendMetrics">
             </div>
+            <hr/>
+
+            </div>  <!-- end showAdvanced -->
+            <div v-else></div>
 
             <!-- payment -->
             <div v-if="configs && configs.paymentsEnabled && payMethods && payMethods.length">
@@ -275,7 +280,8 @@
                         paymentInfo: null
                     },
                     sshKey: '',
-                    forkHost: ''
+                    forkHost: '',
+                    sendMetrics: true
                 },
                 networkType: 'bubble',
                 cloudRegionUuid: null,
@@ -546,7 +552,6 @@
             },
             paymentMethods (pms) {
                 if (pms && pms.length) {
-                    console.log('watch.paymentMethods: received '+JSON.stringify(pms));
                     const okMethods = [];
                     for (let i=0; i<pms.length; i++) {
                         const pm = pms[i];
