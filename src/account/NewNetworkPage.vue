@@ -226,8 +226,10 @@
                     <div v-if="typeof accountPayMethods !== 'undefined' && accountPayMethods !== null && accountPayMethods.length > 0">
                         <h5>{{messages.field_label_existingPaymentMethod}}</h5>
                         <div v-for="apm in accountPayMethods">
-                            <button class="btn btn-primary" :disabled="loading()" @click="setAccountPaymentMethod(apm)">{{messages['payment_method_'+apm.paymentMethodType]}}: {{apm.maskedPaymentInfo}}</button>
+                            <button v-if="accountPlan.paymentMethodObject.uuid === apm.uuid" class="btn btn-success" :disabled="loading()">{{messages['payment_method_'+apm.paymentMethodType]}}: {{apm.maskedPaymentInfo}}</button>
+                            <button v-else class="btn btn-primary" :disabled="loading()" @click="setAccountPaymentMethod(apm)">{{messages['payment_method_'+apm.paymentMethodType]}}: {{apm.maskedPaymentInfo}}</button>
                         </div>
+                        <hr/>
                     </div>
 
                     <!-- add a new payment method -->
@@ -255,7 +257,7 @@
             <hr/>
 
             <div class="form-group">
-                <button class="btn btn-primary" :disabled="loading() || !isComplete">{{messages.button_label_create_new_network}}</button>
+                <button class="btn btn-primary" :disabled="loading() || !isComplete" @click="launchBubble()">{{messages.button_label_create_new_network}}</button>
                 <img v-show="loading()" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
             </div>
         </form>
@@ -517,13 +519,14 @@
                 this.accountPlan.paymentMethodObject.uuid = apm.uuid;
                 this.accountPlan.paymentMethodObject.paymentMethodType = null;
                 this.accountPlan.paymentMethodObject.paymentInfo = null;
+                return false;
             },
-            handleSubmit(e) {
+            launchBubble () {
                 this.submitted = true;
                 this.errors.clear();
                 this.$validator.validate().then(valid => {
                     if (valid) {
-                        if (this.paymentInfo) {
+                        if (this.paymentInfo || this.accountPlan.paymentMethodObject.uuid) {
                             const cloudRegion = this.findRegion(this.cloudRegionUuid);
                             if (cloudRegion === null) {
                                 this.errors.add({field: 'region', msg: this.messages['err_region_notFound']});
@@ -540,7 +543,8 @@
                         }
                     }
                 });
-            }
+            },
+            handleSubmit(e) {}
         },
         watch: {
             domains (doms) {
@@ -606,6 +610,7 @@
                     this.selectedPaymentMethod = pm;
                     this.accountPlan.paymentMethodObject.paymentMethodType = pm.paymentMethodType;
                     this.accountPlan.paymentMethodObject.paymentInfo = null;
+                    this.accountPlan.paymentMethodObject.uuid = null;
                 }
             },
             paymentInfo (info) {
@@ -614,8 +619,11 @@
                 }
             },
             accountPaymentMethod (apm) {
+                console.log('watch.accountPaymentMethod: received: '+JSON.stringify(apm));
                 if (apm) {
-                    this.accountPlan.paymentMethodObject.uuid = apm.uuid
+                    this.accountPlan.paymentMethodObject.uuid = apm.uuid;
+                    this.accountPlan.paymentMethodObject.paymentMethodType = null;
+                    this.accountPlan.paymentMethodObject.paymentInfo = null;
                 }
             },
             policy (p) {

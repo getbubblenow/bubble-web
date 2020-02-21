@@ -32,10 +32,10 @@
                     </td>
                     <td v-else-if="payMethods.length > 1"></td>
 
-                    <td v-if="pm.deletable && payMethods.length > 1">
+                    <td v-if="pm.deletable">
                         <button v-if="pm.deletable" @click="deletePayMethod(pm.uuid)">{{messages.button_label_account_payment_delete}}</button>
                     </td>
-                    <td v-else-if="payMethods.length > 1"></td>
+                    <td v-else></td>
                 </tr>
                 </tbody>
             </table>
