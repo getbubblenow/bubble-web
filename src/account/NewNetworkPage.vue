@@ -222,7 +222,16 @@
                 <div v-if="submitted && errors.has('purchase')" class="invalid-feedback d-block">{{ errors.first('purchase') }}</div>
 
                 <div class="form-group">
-                    <label htmlFor="paymentMethod">{{messages.field_label_paymentMethod}}</label>
+                    <!-- use existing payment method -->
+                    <div v-if="typeof accountPayMethods !== 'undefined' && accountPayMethods !== null && accountPayMethods.length > 0">
+                        <h5>{{messages.field_label_existingPaymentMethod}}</h5>
+                        <div v-for="apm in accountPayMethods">
+                            <button class="btn btn-primary" :disabled="loading()" @click="setAccountPaymentMethod(apm)">{{messages['payment_method_'+apm.paymentMethodType]}}: {{apm.maskedPaymentInfo}}</button>
+                        </div>
+                    </div>
+
+                    <!-- add a new payment method -->
+                    <label htmlFor="paymentMethod">{{messages.field_label_newPaymentMethod}}</label>
                     <div v-if="typeof payMethods === 'undefined' || payMethods === null || payMethods.length === 0" class="invalid-feedback d-block">
                         <h5>{{messages.err_noPaymentMethods}}</h5>
                     </div>
@@ -313,6 +322,7 @@
                 anyContacts: false,
                 firstContact: null,
                 payMethods: null,
+                accountPayMethods: null,
                 selectedPaymentMethod: null
             };
         },
@@ -322,7 +332,9 @@
             ...mapState('plans', ['plans']),
             ...mapState('apps', ['icons']),
             ...mapState('footprints', ['footprints']),
-            ...mapState('paymentMethods', ['paymentMethods', 'accountPaymentMethod', 'paymentMethod', 'paymentInfo']),
+            ...mapState('paymentMethods', [
+                'paymentMethods', 'accountPaymentMethods', 'accountPaymentMethod', 'paymentMethod', 'paymentInfo'
+            ]),
             ...mapState('networks', ['nearestRegions', 'newNodeNotification']),
             ...mapState('networks', {
                 error: state => state.error
@@ -336,8 +348,10 @@
                     && (this.customize.timezone === false || this.accountPlan.timezone !== '')
                     && (this.customize.plan === false || this.accountPlan.plan !== '')
                     && (this.customize.footprint === false || this.accountPlan.footprint !== '')
-                    && (this.accountPlan.paymentMethodObject.paymentMethodType != null)
-                    && (this.accountPlan.paymentMethodObject.paymentInfo != null);
+                    && (
+                        (this.accountPlan.paymentMethodObject.paymentMethodType != null) && (this.accountPlan.paymentMethodObject.paymentInfo != null)
+                        || (this.accountPlan.paymentMethodObject.uuid != null)
+                    );
             },
             timezoneObjects: function () {
                 const tz_objects = [];
@@ -401,7 +415,8 @@
             ...mapActions('plans', ['getAllPlans']),
             ...mapActions('apps', ['getAppsByUserId']),
             ...mapActions('footprints', ['getAllFootprints']),
-            ...mapActions('paymentMethods', ['getAllPaymentMethods', 'setPaymentMethod']),
+            ...mapActions('paymentMethods', ['getAllPaymentMethods', 'getAllAccountPaymentMethods', 'setPaymentMethod']),
+
             initDefaults() {
                 const currentUser = util.currentUser();
                 this.getPolicyByUserId({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
@@ -412,6 +427,7 @@
                 this.getAppsByUserId({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
                 this.getAllFootprints({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
                 this.getAllPaymentMethods(this.messages, this.errors);
+                this.getAllAccountPaymentMethods({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
                 this.listSshKeysByUserId({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
                 this.getNearestRegions({footprintId: null, messages: this.messages, errors: this.errors});
             },
@@ -497,6 +513,11 @@
             refreshCloudRegions() {
                 this.getNearestRegions({footprintId: this.accountPlan.footprint, messages: this.messages, errors: this.errors});
             },
+            setAccountPaymentMethod (apm) {
+                this.accountPlan.paymentMethodObject.uuid = apm.uuid;
+                this.accountPlan.paymentMethodObject.paymentMethodType = null;
+                this.accountPlan.paymentMethodObject.paymentInfo = null;
+            },
             handleSubmit(e) {
                 this.submitted = true;
                 this.errors.clear();
@@ -565,6 +586,19 @@
                         this.setPaymentMethod(okMethods[0]);
                     }
                     this.payMethods = okMethods;
+                }
+            },
+            accountPaymentMethods (pms) {
+                if (pms) {
+                    const payMethods = [];
+                    for (let i=0; i<pms.length; i++) {
+                        const pm = pms[i];
+                        if ((typeof pm.promotion === 'undefined' || pm.promotion === null || !pm.promotion)
+                            && (typeof pm.deleted === 'undefined' || pm.deleted === null)) {
+                            payMethods.push(pm);
+                        }
+                    }
+                    this.accountPayMethods = payMethods;
                 }
             },
             paymentMethod (pm) {

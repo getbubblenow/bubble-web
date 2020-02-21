@@ -1,3 +1,5 @@
+import config from 'config';
+
 let landingPage = null;
 
 export const util = {
@@ -213,17 +215,19 @@ export const util = {
         return url;
     },
 
+    unknownMessage: function (msg) { return config.production ? '' : '???'+msg; },
+
     messageNotFoundHandler: {
         get: function (target, name) {
-            if (typeof name === 'undefined') return '???undefined';
-            if (name === null) return '???null';
-            if (name === '') return '???empty';
+            if (typeof name === 'undefined') return util.unknownMessage('undefined');
+            if (name === null) return util.unknownMessage('null');
+            if (name === '') return util.unknownMessage('empty');
             const checkExists = name.toString().startsWith("!");
             const index = checkExists ? name.toString().substring(1) : name;
             if (target.hasOwnProperty(index)) return checkExists ? true : target[index];
             const altName = index.toString().replace(/\./g, '_');
             if (target.hasOwnProperty(altName)) return checkExists ? true : target[altName];
-            return checkExists ? false : '???'+name.toString();
+            return checkExists ? false : util.unknownMessage(name.toString());
         }
     },
 
