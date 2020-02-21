@@ -12,7 +12,8 @@ const state = {
         locales: ['en_US'],
         cloudConfigs: {},
         sslPort: null,
-        promoCodePolicy: null
+        promoCodePolicy: null,
+        requireSendMetrics: null
     },
     entityConfigs: {},
     searchResults: [],

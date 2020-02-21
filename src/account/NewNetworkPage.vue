@@ -207,7 +207,7 @@
             <hr/>
 
             <!-- error and metrics reporting -->
-            <div class="form-group">
+            <div class="form-group" v-if="configs.requireSendMetrics && configs.requireSendMetrics !== true">
                 <label for="sendMetrics">{{messages.field_label_send_metrics}}</label>
                 <input type="checkbox" id="sendMetrics" v-model="accountPlan.sendMetrics">
                 <div v-if="submitted && errors.has('sendMetrics')" class="invalid-feedback d-block">{{ errors.first('sendMetrics') }}</div>
@@ -531,6 +531,9 @@
                             if (cloudRegion === null) {
                                 this.errors.add({field: 'region', msg: this.messages['err_region_notFound']});
                             } else {
+                                if (this.configs.requireSendMetrics) {
+                                    this.accountPlan.sendMetrics = true;
+                                }
                                 this.addPlanAndStartNetwork({
                                     userId: this.user.uuid,
                                     accountPlan: this.accountPlan,
