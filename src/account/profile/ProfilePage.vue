@@ -213,6 +213,7 @@
                             };
                             updatedProfile.sendWelcomeEmail = this.subject.sendWelcomeEmail;
                             updatedProfile.password = this.subject.password;
+                            updatedProfile.agreeToTerms = true;
                             this.createUser({user: updatedProfile, messages: this.messages, errors: this.errors});
                         } else {
                             this.updateUser({user: updatedProfile, messages: this.messages, errors: this.errors});
