@@ -9,7 +9,6 @@ import { Datetime } from 'vue-datetime';
 // import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 // library.add(faCoffee);
 
-import 'vue-sidebar-menu/dist/vue-sidebar-menu.css';
 import 'vue-select/dist/vue-select.css';
 
 import { store } from './_store';
