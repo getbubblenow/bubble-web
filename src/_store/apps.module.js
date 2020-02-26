@@ -66,7 +66,6 @@ const actions = {
                                         if (typeof app.assets === 'undefined' || app.assets === null) {
                                             app.assets = {};
                                         }
-                                        console.log('setting app icon: '+app.name);
                                         const newIcon = {};
                                         newIcon[app.name] = assetData;
                                         state.icons = Object.assign({}, state.icons, newIcon);
@@ -212,12 +211,10 @@ const mutations = {
         state.loading.getMitmStatus = true;
     },
     getMitmStatusSuccess(state, enabled) {
-        console.log('getMitmStatusSuccess: enabled='+enabled);
         state.loading.getMitmStatus = false;
         state.mitmEnabled = enabled;
     },
     getMitmStatusFailure(state, error) {
-        console.log('getMitmStatusFailure: error='+error);
         state.loading.getMitmStatus = false;
         state.error = error;
     },
