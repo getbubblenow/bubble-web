@@ -8,6 +8,7 @@ const state = {
         allowRegistration: false,
         paymentsEnabled: false,
         sageLauncher: false,
+        bubbleNode: null,
         entityClasses: [],
         locales: ['en_US'],
         cloudConfigs: {},
@@ -142,84 +143,93 @@ const actions = {
 };
 
 const getters = {
-    menu: function () {
+    dashboardApps: function () {
         const configs = state.configs;
         const messages = state.messages;
-        const menu = [{
-            href: '/',
-            title: messages.label_menu_dashboard,
-            icon: messages.label_menu_dashboard_icon
-        }, {
+        const isAdmin = account.state.user.admin === true;
+        const dashApps = [];
+        dashApps.push({
             href: '/me',
             title: messages.label_menu_account,
-            icon: messages.label_menu_account_icon
-        // }, {
-        //     href: '/notifications',
-        //     title: messages.label_menu_notifications,
-        //     icon: messages.label_menu_notifications_icon
-        }];
+            icon: messages.label_menu_account_icon,
+            index: 0
+        });
         if (configs.sageLauncher) {
-            menu.splice(2, 0, {
-                href: '/me/bubbles',
+            dashApps.push({
+                href: '/bubbles',
                 title: messages.label_menu_networks,
-                icon: messages.label_menu_networks_icon
+                icon: messages.label_menu_networks_icon,
+                index: 1
             });
-            if (account.state.user.admin === true) {
-                menu.splice(3, 0, {
-                    href: '/apps',
-                    title: messages.label_menu_apps,
-                    icon: messages.label_menu_apps_icon
-                });
-            }
         } else {
-            menu.splice(2, 0, {
+            dashApps.push({
                 href: '/devices',
                 title: messages.label_menu_devices,
-                icon: messages.label_menu_devices_icon
+                icon: messages.label_menu_devices_icon,
+                index: 2
             });
-            menu.splice(3, 0, {
+            dashApps.push({
                 href: '/apps',
                 title: messages.label_menu_apps,
-                icon: messages.label_menu_apps_icon
+                icon: messages.label_menu_apps_icon,
+                index: 3
             });
         }
-        if (account.state.user.admin === true) {
-            const admin_menu = {
-                href: '/admin',
-                title: messages.label_menu_admin,
-                icon: messages.label_menu_admin_icon,
-                child: [{
-                    href: '/admin/accounts',
-                    title: messages.label_menu_admin_users,
-                    icon: messages.label_menu_admin_users_icon
-                }, {
-                    href: '/admin/model',
-                    title: messages.label_menu_admin_model,
-                    icon: messages.label_menu_admin_model_icon
-                }]
-            };
-            menu.splice(1, 0, admin_menu);
-            if (configs.sageLauncher)  {
-                admin_menu.child.push({
-                    href: '/admin/bubbles',
-                    title: messages.label_menu_admin_networks,
-                    icon: messages.label_menu_admin_networks_icon
-                });
-            }
+        if (isAdmin && configs.sageLauncher) {
+            const adminApps = [{
+                href: '/',
+                title: messages.label_menu_dashboard,
+                icon: messages.label_menu_dashboard_icon,
+                index: 0
+            }];
+            adminApps.push({
+                href: '/admin/accounts',
+                title: messages.label_menu_admin_users,
+                icon: messages.label_menu_admin_users_icon,
+                index: 1
+            });
+            adminApps.push({
+                href: '/admin/model',
+                title: messages.label_menu_admin_model,
+                icon: messages.label_menu_admin_model_icon,
+                index: 2
+            });
+            adminApps.push({
+                href: '/admin/bubbles',
+                title: messages.label_menu_admin_networks,
+                icon: messages.label_menu_admin_networks_icon,
+                index: 3
+            });
             if (configs.paymentsEnabled) {
-                admin_menu.child.push({
+                adminApps.push({
                     href: '/admin/bills',
                     title: messages.label_menu_admin_bills,
-                    icon: messages.label_menu_admin_bills_icon
+                    icon: messages.label_menu_admin_bills_icon,
+                    index: 4
                 });
             }
+            dashApps.push({
+                href: '/?app=admin',
+                title: messages.label_menu_admin,
+                icon: messages.label_menu_admin_icon,
+                index: 4,
+                apps: adminApps
+            });
+        } else if (isAdmin) {
+            dashApps.push({
+                href: '/admin/accounts',
+                title: messages.label_menu_admin_users,
+                icon: messages.label_menu_admin_users_icon,
+                index: 4
+            });
         }
-        menu.push({
+        dashApps.push({
             href: '/logout',
             title: messages.label_menu_logout,
-            icon: messages.label_menu_logout_icon
+            icon: messages.label_menu_logout_icon,
+            index: 1000
         });
-        return menu;
+        return dashApps;
     },
     promoCodesEnabled: function () { return state.promoCodePolicy === 'required' || state.promoCodePolicy === 'optional'; },
     promoCodeRequired: function () { return state.promoCodePolicy === 'required'; }

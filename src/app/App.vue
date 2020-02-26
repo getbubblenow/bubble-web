@@ -1,10 +1,14 @@
 <template>
     <div class="jumbotron">
         <totp-modal/>
-        <sidebar-menu :hide-toggle="true" :menu="menu" v-if="status.loggedIn && activated"/>
+
+        <router-link v-if="status.loggedIn && activated && path && path !== '' && path !== '/'" to="/" class="icon-dash-cell">
+            <div class="icon-dash-title"><i aria-hidden="true" :class="'icon-dash-app '+messages.label_menu_dashboard_icon" :title="messages.label_menu_dashboard"></i><br/>{{messages.label_menu_dashboard}}</div>
+        </router-link>
+
         <div class="container">
             <div class="row">
-                <div class="col-sm-6 offset-sm-3">
+                <div class="col-sm-6 offset-sm-2">
                     <div v-if="alert.message" :class="`alert ${alert.type}`">{{alert.message}}</div>
                     <router-view></router-view>
                 </div>
@@ -41,12 +45,12 @@ export default {
     },
     computed: {
         ...mapState('account', ['status', 'user', 'locale', 'registrationError']),
-        ...mapState('system', ['activated', 'configs', 'messages', 'messageGroupsLoaded', 'menu']),
-        ...mapGetters('system', ['menu']),
+        ...mapState('system', ['activated', 'configs', 'messages', 'messageGroupsLoaded']),
         ...mapState({
             alert: state => state.alert
         }),
-        locales () { return this.configs.locales; }
+        locales () { return this.configs.locales; },
+        path () { return this.$route.path; }
     },
     methods: {
         ...mapActions({ clearAlert: 'alert/clear' }),
@@ -96,7 +100,7 @@ export default {
         const user = util.currentUser();
         this.selectedLocale = (user !== null && typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : 'detect');
         this.loadIsActivated();
-        this.loadSystemConfigs();  // determine if we can show the registration link
+        this.loadSystemConfigs();
         this.loadTimezones();
 
         this.loadMessages('pre_auth', this.selectedLocale);

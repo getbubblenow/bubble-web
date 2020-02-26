@@ -1,14 +1,15 @@
 <template>
     <div>
-        <h1>{{messages.label_homepage_hello && messages.label_homepage_hello.parseMessage(this)}}</h1>
-        <hr/>
+<!--        <h1>{{messages.label_homepage_hello && messages.label_homepage_hello.parseMessage(this)}}</h1>-->
+<!--        <hr/>-->
         <router-view></router-view>
     </div>
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions } from 'vuex';
 
+// todo: this can all move
 export default {
     computed: {
         ...mapState({

@@ -1,13 +1,13 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 
-import HomePage from '../account/HomePage'
 import ActivationPage from '../auth/ActivationPage'
 import ModelSetupPage from '../admin/ModelSetupPage'
 import RegisterPage from '../auth/RegisterPage'
 import LoginPage from '../auth/LoginPage'
 import LogoutPage from '../auth/LogoutPage'
 import MultifactorAuthPage from '../auth/MultifactorAuthPage'
+import DashboardPage from '../account/DashboardPage'
 import ProfilePage from '../account/profile/ProfilePage'
 import ActionPage from '../account/profile/ActionPage'
 import PolicyPage from '../account/profile/PolicyPage'
@@ -57,50 +57,39 @@ const newNetworkChildren = [
 export const router = new Router({
   mode: 'history',
   routes: [
+    { path: '', component: DashboardPage },
+    { path: '/', component: DashboardPage },
+
+    { path: '/me', component: ProfilePage },
+    { path: '/me/policy', component: PolicyPage },
+    { path: '/me/action', component: ActionPage },
+    { path: '/me/changePassword', component: ChangePasswordPage },
+    { path: '/me/setPassword/:code', component: SetPasswordPage },
+    { path: '/me/keys', component: SshKeysPage },
+    { path: '/me/bills', component: BillsPage },
+    { path: '/me/payment', component: PaymentMethodsPage, children: paymentMethodsChildren },
+    { path: '/devices', component: DevicesPage },
+    { path: '/apps', component: AppsPage },
+    { path: '/app/:app', component: AppPage },
+    { path: '/app/:app/config/:view', component: AppConfigPage },
+    { path: '/app/:app/config/:view/:item', component: AppConfigPage },
+    { path: '/app/:app/view/:view', component: AppDataViewPage },
+    { path: '/app/:app/site/:site', component: AppSitePage },
+    { path: '/app/:app/site/:site/view/:view', component: AppDataViewPage },
+    { path: '/notifications', component: NotificationsPage },
     {
-      path: '/', component: HomePage,
+      path: '/bubbles', component: NetworksPage ,
       children: [
         {
-          path: '', component: NetworksPage,
-          children: [
-            {
-              path: '', component: NewNetworkPage,
-              children: newNetworkChildren
-            },
-          ]
-        },
-        { path: '/me', component: ProfilePage },
-        { path: '/me/policy', component: PolicyPage },
-        { path: '/me/action', component: ActionPage },
-        { path: '/me/changePassword', component: ChangePasswordPage },
-        { path: '/me/setPassword/:code', component: SetPasswordPage },
-        { path: '/me/keys', component: SshKeysPage },
-        { path: '/me/bills', component: BillsPage },
-        { path: '/me/payment', component: PaymentMethodsPage, children: paymentMethodsChildren },
-        { path: '/devices', component: DevicesPage },
-        { path: '/apps', component: AppsPage },
-        { path: '/app/:app', component: AppPage },
-        { path: '/app/:app/config/:view', component: AppConfigPage },
-        { path: '/app/:app/config/:view/:item', component: AppConfigPage },
-        { path: '/app/:app/view/:view', component: AppDataViewPage },
-        { path: '/app/:app/site/:site', component: AppSitePage },
-        { path: '/app/:app/site/:site/view/:view', component: AppDataViewPage },
-        { path: '/notifications', component: NotificationsPage },
-        {
-          path: '/bubbles', component: NetworksPage ,
-          children: [
-            {
-              path: '', component: NewNetworkPage,
-              children: newNetworkChildren
-            },
-          ]
-        },
-        { path: '/new_bubble', component: NewNetworkPage,
+          path: '', component: NewNetworkPage,
           children: newNetworkChildren
         },
-        { path: '/bubble/:id', component: NetworkPage }
       ]
     },
+    { path: '/new_bubble', component: NewNetworkPage,
+      children: newNetworkChildren
+    },
+    { path: '/bubble/:id', component: NetworkPage },
     { path: '/action', component: ActionPage },
 
     { path: '/activate', component: ActivationPage },
@@ -119,7 +108,7 @@ export const router = new Router({
     { path: '/admin/accounts/:id/payment', component: PaymentMethodsPage, children: paymentMethodsChildren },
     { path: '/admin/model', component: ModelSetupPage },
 
-    // otherwise redirect to home
+    // otherwise redirect to dashboard
     { path: '*', redirect: '/' }
   ]
 });

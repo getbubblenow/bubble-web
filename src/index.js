@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import VeeValidate from 'vee-validate';
-import VueSidebarMenu from 'vue-sidebar-menu'
 import vSelect from 'vue-select'
 import { Datetime } from 'vue-datetime';
 
@@ -21,7 +20,6 @@ import FormField from "./_components/FormField";
 import App from './app/App';
 
 Vue.use(VeeValidate);
-Vue.use(VueSidebarMenu);
 Vue.component('v-select', vSelect);
 Vue.component('datetime', Datetime);
 Vue.component('totp-modal', TotpModal);
