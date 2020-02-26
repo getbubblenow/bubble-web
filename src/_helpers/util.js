@@ -187,15 +187,17 @@ export const util = {
         }
     },
 
-    checkLoading: function(loadingObject) {
+    checkLoading: function(loadingObject, store) {
         return function() {
             for (const key in loadingObject) {
                 if (loadingObject.hasOwnProperty(key)) {
                     if (loadingObject[key] === true) {
+                        // console.log('checkLoading('+store+'): returning true because key='+key+' was true');
                         return true;
                     }
                 }
             }
+            // console.log('checkLoading('+store+'): returning false');
             return false;
         };
     },

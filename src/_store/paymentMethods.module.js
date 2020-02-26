@@ -217,7 +217,7 @@ const mutations = {
 };
 
 const getters = {
-    loading: util.checkLoading(state.loading)
+    loading: util.checkLoading(state.loading, 'paymentMethods')
 };
 
 export const paymentMethods = {

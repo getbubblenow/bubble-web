@@ -49,10 +49,6 @@
             </table>
         </div>
 
-        <div v-if="!devices || devices.length === 0">
-            {{messages.message_no_devices}}
-        </div>
-
         <hr/>
 
         <form @submit.prevent="addDevice()">
@@ -67,10 +63,29 @@
 
             <hr/>
             <div class="form-group">
-                <button class="btn btn-primary" :disabled="loading()">{{messages.button_label_add_device}}</button>
-                <img v-show="loading()" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                <button class="btn btn-primary" :disabled="loading">{{messages.button_label_add_device}}</button>
+                <img v-show="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
             </div>
         </form>
+
+        <hr/>
+
+        <div>
+            <h4>{{messages.message_download_ca_cert}}</h4>
+            <a href="/api/auth/cacert?type=pem">{{messages.message_os_apple}}</a> |
+            <a href="/api/auth/cacert?type=p12">{{messages.message_os_windows}}</a> |
+            <a href="/api/auth/cacert?type=cer">{{messages.message_os_android}}</a> |
+            <a href="/api/auth/cacert?type=crt">{{messages.message_os_linux}}</a>
+            <hr/>
+        </div>
+
+        <div v-if="user && user.admin">
+            <h4>{{messages.form_title_mitm}}: {{mitmEnabled ? messages.message_mitm_enabled : messages.message_mitm_disabled}}</h4>
+            <button v-if="mitmEnabled" :disabled="mitmLoading" @click="mitmOff()">{{messages.button_label_mitm_disable}}</button>
+            <button v-else :disabled="mitmLoading" @click="mitmOn()">{{messages.button_label_mitm_enable}}</button>
+            <div v-if="errors.has('mitm')" class="invalid-feedback d-block">{{ errors.first('mitm') }}</div>
+            <hr/>
+        </div>
 
     </div>
 </template>
@@ -83,18 +98,27 @@
     export default {
         data () {
             return {
+                user: util.currentUser(),
                 userId: util.currentUser().uuid,
                 submitted: false,
                 deviceName: null,
                 displayVpnConfig: {},
-                config: config
+                config: config,
+                mitmLoading: true
             };
         },
         computed: {
+            ...mapState('apps', ['mitmEnabled']),
             ...mapState('devices', ['devices', 'device', 'qrCodeImageBase64', 'vpnConfBase64']),
-            ...mapState('system', ['messages'])
+            ...mapState('system', ['messages']),
+            ...mapGetters('devices', ['loading'])
         },
         created () {
+            this.getMitmStatus({
+                userId: this.userId,
+                messages: this.messages,
+                errors: this.errors
+            });
             this.getDevicesByUserId({
                 userId: this.userId,
                 messages: this.messages,
@@ -102,11 +126,11 @@
             });
         },
         methods: {
+            ...mapActions('apps', ['getMitmStatus', 'enableMitm', 'disableMitm']),
             ...mapActions('devices', [
                 'getDevicesByUserId', 'addDeviceByUserId', 'removeDeviceByUserId',
                 'getDeviceQRcodeById', 'getDeviceVPNconfById'
             ]),
-            ...mapGetters('devices', ['loading']),
             addDevice () {
                 this.errors.clear();
                 this.submitted = true;
@@ -156,6 +180,24 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+            },
+            mitmOn () {
+                this.mitmLoading = true;
+                this.errors.clear();
+                this.enableMitm({
+                    userId: this.user.uuid,
+                    messages: this.messages,
+                    errors: this.errors
+                });
+            },
+            mitmOff () {
+                this.mitmLoading = true;
+                this.errors.clear();
+                this.disableMitm({
+                    userId: this.user.uuid,
+                    messages: this.messages,
+                    errors: this.errors
+                });
             }
         },
         watch: {
@@ -164,6 +206,9 @@
                     // after device added, clear device name field
                     this.deviceName = null;
                 }
+            },
+            mitmEnabled (m) {
+                this.mitmLoading = false;
             }
         }
     };

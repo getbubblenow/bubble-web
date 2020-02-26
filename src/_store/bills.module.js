@@ -55,7 +55,7 @@ const mutations = {
 };
 
 const getters = {
-    loading: util.checkLoading(state.loading)
+    loading: util.checkLoading(state.loading, 'bills')
 };
 
 export const bills = {

@@ -212,10 +212,12 @@ const mutations = {
         state.loading.getMitmStatus = true;
     },
     getMitmStatusSuccess(state, enabled) {
+        console.log('getMitmStatusSuccess: enabled='+enabled);
         state.loading.getMitmStatus = false;
         state.mitmEnabled = enabled;
     },
     getMitmStatusFailure(state, error) {
+        console.log('getMitmStatusFailure: error='+error);
         state.loading.getMitmStatus = false;
         state.error = error;
     },
@@ -424,7 +426,7 @@ const mutations = {
 };
 
 const getters = {
-    loading: util.checkLoading(state.loading)
+    loading: util.checkLoading(state.loading, 'apps')
 };
 
 export const apps = {
