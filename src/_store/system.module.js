@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2020 Bubble, Inc.  All rights reserved.
+ * For personal (non-commercial) use, see license: https://git.bubblev.org/bubblev/bubble/src/branch/master/LICENSE.md
+ */
 import { systemService } from '../_services';
 import { account } from "./account.module";
 import { router, util } from "../_helpers";
