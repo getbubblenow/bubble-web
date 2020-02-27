@@ -29,6 +29,10 @@
                 </div>
             </div>
         </div>
+        <div class="bubble-footer">
+            <a href="https://bubblev.com/">bubblev.com</a> |
+            <router-link to="/legal">{{messages.title_legal_topics}}</router-link>
+        </div>
     </div>
 </template>
 

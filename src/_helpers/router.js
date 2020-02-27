@@ -5,6 +5,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 
+import LegalPage from '../app/LegalPage'
 import ActivationPage from '../auth/ActivationPage'
 import ModelSetupPage from '../admin/ModelSetupPage'
 import RegisterPage from '../auth/RegisterPage'
@@ -63,6 +64,7 @@ export const router = new Router({
   routes: [
     { path: '', component: DashboardPage },
     { path: '/', component: DashboardPage },
+    { path: '/legal', component: LegalPage },
 
     { path: '/me', component: ProfilePage },
     { path: '/me/policy', component: PolicyPage },
@@ -118,7 +120,7 @@ export const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/login', '/logout', '/register', '/auth', '/activate'];
+  const publicPages = ['/login', '/logout', '/register', '/auth', '/activate', '/legal'];
   const authRequired = !publicPages.includes(to.path);
   const user = util.currentUser();
 
