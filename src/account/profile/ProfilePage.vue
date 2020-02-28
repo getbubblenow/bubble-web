@@ -2,7 +2,8 @@
 <template>
     <div>
         <h2 v-if="newUser !== null && newUser === true">{{messages.title_account_new}}</h2>
-        <h2 v-else-if="newUser !== null">{{messages.title_account_manage}}</h2>
+        <h2 v-else>{{messages.title_account_manage}}: {{subject.name}}</h2>
+        <hr/>
 
         <div v-if="newUser === null || newUser === false">
             <router-link :to="linkPrefix+'/changePassword'">{{messages.link_label_change_password}}</router-link>
@@ -22,10 +23,7 @@
         <form @submit.prevent="handleSubmit">
             <div v-if="submitted && errors.has('user')" class="invalid-feedback d-block"><h5>{{ errors.first('user') }}</h5></div>
 
-            <div v-if="newUser === null || newUser === false || admin !== true" class="form-group">
-                <span>{{messages.field_label_username}}: {{subject.name}}</span>
-            </div>
-            <div v-else class="form-group">
+            <div v-if="newUser !== null && newUser === true && admin === true" class="form-group">
                 <label htmlFor="url">{{messages.field_label_username}}</label>
                 <input type="text" v-model="subject.name" name="name" class="form-control"/>
                 <div v-if="submitted && errors.has('name')" class="invalid-feedback d-block">{{ errors.first('name') }}</div>

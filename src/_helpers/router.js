@@ -11,6 +11,7 @@ import ModelSetupPage from '../admin/ModelSetupPage'
 import RegisterPage from '../auth/RegisterPage'
 import LoginPage from '../auth/LoginPage'
 import LogoutPage from '../auth/LogoutPage'
+import ForgotPasswordPage from '../auth/ForgotPasswordPage'
 import MultifactorAuthPage from '../auth/MultifactorAuthPage'
 import DashboardPage from '../account/DashboardPage'
 import ProfilePage from '../account/profile/ProfilePage'
@@ -97,12 +98,14 @@ export const router = new Router({
     },
     { path: '/bubble/:id', component: NetworkPage },
     { path: '/action', component: ActionPage },
+    { path: '/resetPassword/:code', component: SetPasswordPage },
 
     { path: '/activate', component: ActivationPage },
     { path: '/register', component: RegisterPage },
     { path: '/auth', component: MultifactorAuthPage },
     { path: '/login', component: LoginPage },
     { path: '/logout', component: LogoutPage },
+    { path: '/forgotPassword', component: ForgotPasswordPage },
 
     { path: '/admin/accounts', component: AccountsPage },
     { path: '/admin/new_account', component: ProfilePage },
@@ -120,8 +123,8 @@ export const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/login', '/logout', '/register', '/auth', '/activate', '/legal'];
-  const authRequired = !publicPages.includes(to.path);
+  const publicPages = ['/login', '/logout', '/forgotPassword', '/resetPassword', '/register', '/action', '/auth', '/activate', '/legal'];
+  const authRequired = !publicPages.includes(to.path) && publicPages.filter(p => to.path.startsWith(p)).length === 0;
   const user = util.currentUser();
 
   if (authRequired) {

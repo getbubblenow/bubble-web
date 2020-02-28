@@ -26,7 +26,6 @@
     export default {
         data() {
             return {
-                user: util.currentUser(),
                 submitted: false,
                 token: '',
                 refresher: null,
@@ -59,7 +58,7 @@
             sendTotpToken () {
                 this.submitted = true;
                 this.sendAuthenticatorCode({
-                    userId: this.user.uuid,
+                    userId: util.currentUser().uuid,
                     code: this.token,
                     authOnly: true,
                     messages: this.messages,

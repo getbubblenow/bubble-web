@@ -118,7 +118,7 @@ export const util = {
         });
     },
 
-    handleCrudResponse: function(messages, errors) {
+    handleCrudResponse: function(messages, errors, enableTotpModal) {
         return function (response) {
             return response.text().then(text => {
                 const data = text && JSON.parse(text);
@@ -129,7 +129,8 @@ export const util = {
 
                     } else if (response.status === 422) {
                         console.log('handleCrudResponse: received 422, error: ' + JSON.stringify(data));
-                        util.setValidationErrors(data, messages, errors);
+                        const errors = util.setValidationErrors(data, messages, errors, enableTotpModal);
+                        return Promise.reject(errors);
                     }
 
                     const error = (data && data.message) || response.statusText;
@@ -163,25 +164,33 @@ export const util = {
         }
     },
 
-    setValidationErrors: function(data, messages, errors) {
+    setValidationErrors: function(data, messages, errors, enableTotpModal) {
+        const errs = [];
         for (let i=0; i<data.length; i++) {
             const messageTemplate = data[i].messageTemplate.replace(/\./g, '_');
             if (messageTemplate) {
+                errs.push(messageTemplate);
                 const parts = messageTemplate.split(/[_]+/);
                 if (parts.length === 3 && parts[0] === 'err') {
                     const field = parts[1];
                     const message = messages[messageTemplate];
-                    errors.add({field: field, msg: message});
+                    const err = {field: field, msg: message};
+                    if (typeof errors !== 'undefined') errors.add(err);
                     if (messageTemplate === 'err_logout_noSession') {
                         console.log('setValidationErrors: detected err_logout_noSession, logging out');
                         util.logout();
                         localStorage.clear();
-                    } else if (messageTemplate === 'err_totpToken_invalid') {
-                        // console.log('received '+messageTemplate+' -- setting window.showTotpModal = true');
-                        window.showTotpModal = true;
-                    } else {
-                        // console.log('setValidationErrors: nothing special: '+messageTemplate);
-                    }
+                    } else if (messageTemplate === 'err_totpToken_invalid' || messageTemplate === 'err_totpToken_required') {
+                        if (typeof enableTotpModal !== 'undefined' && enableTotpModal === false) {
+                            // console.log('setValidationErrors: totp required, but not raising modal');
+                            window.showTotpModal = false;
+                        } else {
+                            // console.log('received '+messageTemplate+' -- setting window.showTotpModal = true');
+                            window.showTotpModal = true;
+                        }
+                    } // else {
+                //         console.log('setValidationErrors: nothing special: '+messageTemplate);
+                //     }
                 //     console.log('>>>>> field '+field+' added error: '+message+', errors='+JSON.stringify(errors));
                 // } else {
                 //     console.log('>>>>> data item did not contain a valid error: '+JSON.stringify(data[i]));
@@ -189,6 +198,7 @@ export const util = {
             }
             // todo: else add "global" error message for unrecognized/non-field error
         }
+        return errs;
     },
 
     checkLoading: function(loadingObject, store) {

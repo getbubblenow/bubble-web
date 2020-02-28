@@ -4,25 +4,33 @@
         <h2>{{messages.form_title_change_password}}<span v-if="this.me === false"> - {{this.userId}}</span></h2>
 
         <form @submit.prevent="changePass()">
-            <div v-if="isMe && requiredExternalAuthContacts.length > 0">
+            <div v-if="me && requiredExternalAuthContacts.length > 0">
                 <div class="form-group">
                     <p>{{messages.message_change_password_external_auth}}</p>
                     <div v-for="contact in requiredExternalAuthContacts">
                         {{messages['field_label_'+contact.type]}}: {{contact.info}}
                     </div>
+                </div>
+                <div v-if="me && hasRequiredAuthenticator" class="form-group">
+                    <p>{{messages.message_change_password_authenticator_auth}}</p>
+                    <label htmlFor="totpToken">{{messages.field_label_totp_code}}</label>
+                    <input v-validate="'required'" v-model="totpToken" name="totpToken" class="form-control"/>
+                    <div v-if="submitted && errors.has('totpToken')" class="invalid-feedback d-block">{{ errors.first('totpToken') }}</div>
+                </div>
+                <div class="form-group">
                     <button class="btn btn-primary" :disabled="loading()">{{messages.button_label_request_password_reset}}</button>
                     <img v-show="loading()" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
                 </div>
             </div>
             <div v-else>
-                <div v-if="isMe && hasRequiredAuthenticator">
+                <div v-if="me && hasRequiredAuthenticator">
                     <p>{{messages.message_change_password_authenticator_auth}}</p>
                     <label htmlFor="totpToken">{{messages.field_label_totp_code}}</label>
                     <input v-validate="'required'" v-model="totpToken" name="totpToken" class="form-control"/>
                     <div v-if="submitted && errors.has('totpToken')" class="invalid-feedback d-block">{{ errors.first('totpToken') }}</div>
                 </div>
 
-                <div v-if="isMe || user.admin" class="form-group">
+                <div v-if="me || user.admin" class="form-group">
                     <label htmlFor="currentPassword">{{messages.field_label_current_password}}</label>
                     <input type="password" v-validate="'required'" v-model="currentPassword" name="currentPassword" class="form-control"/>
                     <div v-if="submitted && errors.has('oldPassword')" class="invalid-feedback d-block">{{ errors.first('oldPassword') }}</div>
@@ -58,7 +66,6 @@
             return {
                 submitted: false,
                 me: null,
-                isMe: null,
                 linkPrefix: null,
                 userId: null,
                 currentUser: util.currentUser(),

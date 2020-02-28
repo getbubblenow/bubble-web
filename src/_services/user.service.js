@@ -8,6 +8,7 @@ import { util } from '../_helpers';
 export const userService = {
     login,
     logout,
+    forgotPassword,
     register,
     searchAccounts,
     getMe,
@@ -40,12 +41,12 @@ function setSessionUser (user) {
     return user;
 }
 
-function login(name, password, unlockKey, messages, errors) {
+function login(name, password, totpToken, unlockKey, messages, errors) {
     const unlockParam = (typeof unlockKey !== 'undefined' && unlockKey !== null) ? `?k=${unlockKey}` : '';
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 'name': name, 'password': password })
+        body: JSON.stringify({ 'name': name, 'password': password, 'totpToken': totpToken })
     };
     return fetch(`${config.apiUrl}/auth/login${unlockParam}`, requestOptions)
         .then(handleAuthResponse(messages, errors))
@@ -58,6 +59,11 @@ function logout(messages, errors) {
         return Promise.resolve();
     }
     return fetch(`${config.apiUrl}/auth/logout`, util.getWithAuth())
+        .then(util.handleCrudResponse(messages, errors));
+}
+
+function forgotPassword(username, messages, errors) {
+    return fetch(`${config.apiUrl}/auth/forgotPassword`, util.postWithAuth({name: username}))
         .then(util.handleCrudResponse(messages, errors));
 }
 
@@ -105,11 +111,11 @@ function removePolicyContactByUserId(userId, contactUuid, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/policy/contacts/${contactUuid}`, util.deleteWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
-function approveAction(userId, code, data, messages, errors) {
+function approveAction(userId, code, data, messages, errors, enableTotpModal) {
     const approveData = [{name: 'account', value: userId}];
     if (data != null && data.length > 0) approveData.push(...data);
     return fetch(`${config.apiUrl}/auth/approve/${code}`, util.postWithAuth(approveData))
-        .then(util.handleCrudResponse(messages, errors))
+        .then(util.handleCrudResponse(messages, errors, enableTotpModal))
         .then(setSessionUser);
 }
 
@@ -187,12 +193,33 @@ function handleAuthResponse(messages, errors) {
                     location.reload(true);
 
                 } else if (response.status === 404) {
-                    // set error from API
-                    // todo: show nicer error message
+                    // username or password was incorrect
+                    if (typeof errors !== 'undefined') {
+                        const message = messages['err_name_notFound'];
+                        const err = {field: 'name', msg: message};
+                        errors.add(err);
+                    }
                     console.log('handleAuthResponse: received 404, user not found: '+JSON.stringify(data));
 
                 } else if (response.status === 422) {
-                    util.setValidationErrors(data, messages, errors);
+                    console.log('handleAuthResponse: received 422: '+JSON.stringify(data));
+                    const errors = util.setValidationErrors(data, messages, errors, false);
+                    console.log('handleAuthResponse: received errors: '+JSON.stringify(errors));
+                    if (errors !== null && errors.length > 0) {
+                        const totpInvalidError = errors.indexOf('err_totpToken_invalid');
+                        if (totpInvalidError !== -1) {
+                            console.log('handleAuthResponse: rejecting with totpInvalid');
+                            return Promise.reject(errors[totpInvalidError]);
+                        }
+
+                        const totpRequiredError = errors.indexOf('err_totpToken_required');
+                        if (totpRequiredError !== -1) {
+                            console.log('handleAuthResponse: rejecting with totpRequired');
+                            return Promise.reject(errors[totpRequiredError]);
+                        }
+                    }
+                    console.log('handleAuthResponse: plain old rejecting with errors: '+JSON.stringify(errors));
+                    return Promise.reject(errors);
                 }
                 const error = (data && data.message) || response.statusText;
                 return Promise.reject(error);

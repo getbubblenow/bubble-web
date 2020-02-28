@@ -18,6 +18,7 @@ const defaultStatus = {
     denying: false,
     authenticating: false,
     sendingVerification: false,
+    sendingResetPasswordMessage: false,
     registrationError: null
 };
 
@@ -26,6 +27,8 @@ const state = {
     status: Object.assign({}, defaultStatus, {loggedIn: (user != null)}),
     user: user,
     actionStatus: {},
+    loginError: null,
+    resetPasswordMessageSent: false,
     locale: user == null ? 'detect' : (typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : 'detect')
 };
 
@@ -51,7 +54,7 @@ const actions = {
     },
     login({ dispatch, commit }, { user, messages, errors }) {
         commit('loginRequest', { name: user.name });
-        userService.login(user.name, user.password, user.unlockKey, messages, errors)
+        userService.login(user.name, user.password, user.totpToken, user.unlockKey, messages, errors)
             .then(
                 user => {
                     commit('loginSuccess', user);
@@ -71,10 +74,7 @@ const actions = {
                         router.replace('/auth');
                     }
                 },
-                error => {
-                    commit('loginFailure', error);
-                    dispatch('alert/error', error, { root: true });
-                }
+                error => commit('loginFailure', error)
             );
     },
     logout({ commit }, {messages, errors}) {
@@ -83,6 +83,14 @@ const actions = {
             .then(
                 ok => commit('logoutSuccess'),
                 error => commit('logoutFailure', error)
+            );
+    },
+    forgotPassword({ commit }, {username, messages, errors}) {
+        commit('forgotPasswordRequest');
+        userService.forgotPassword(username, messages, errors)
+            .then(
+                ok => commit('forgotPasswordSuccess'),
+                error => commit('forgotPasswordFailure', error)
             );
     },
     register({ dispatch, commit }, {user, messages, errors}) {
@@ -128,9 +136,9 @@ const actions = {
             );
     },
 
-    approveAction({ commit }, {userId, code, data, messages, errors}) {
+    approveAction({ commit }, {userId, code, data, messages, errors, enableTotpModal}) {
         commit('approveActionRequest');
-        userService.approveAction(userId, code, data, messages, errors)
+        userService.approveAction(userId, code, data, messages, errors, enableTotpModal)
             .then(
                 policy => commit('approveActionSuccess', policy),
                 error => commit('approveActionFailure', error)
@@ -191,6 +199,7 @@ const mutations = {
         state.status = Object.assign({}, state.status, {loggedIn: false});
     },
     loginRequest(state, user) {
+        state.loginError = null;
         state.status = Object.assign({}, state.status, {loggingIn: true});
         state.user = user;
     },
@@ -206,7 +215,8 @@ const mutations = {
         state.user = user;
         state.locale = (typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : state.locale);
     },
-    loginFailure(state) {
+    loginFailure(state, error) {
+        state.loginError = error;
         state.status = Object.assign({}, state.status, {loggingIn: false, loggedIn: false});
         state.user = null;
     },
@@ -219,6 +229,19 @@ const mutations = {
     },
     logoutFailure(state, error) {
         console.log('logout failed: '+JSON.stringify(error));
+    },
+
+    forgotPasswordRequest(state) {
+        state.status = Object.assign({}, {sendingResetPasswordMessage: true});
+        state.resetPasswordMessageSent = false;
+    },
+    forgotPasswordSuccess(state) {
+        state.status = Object.assign({}, defaultStatus);
+        state.resetPasswordMessageSent = true;
+    },
+    forgotPasswordFailure(state, error) {
+        state.status = Object.assign({}, defaultStatus);
+        console.log('forgotPassword failed: '+JSON.stringify(error));
     },
 
     registerRequest(state, user) {
@@ -281,7 +304,10 @@ const mutations = {
     approveActionSuccess(state, user) {
         state.status = Object.assign({}, state.status, {approving: false});
         state.actionStatus = { success: true, type: 'approve', result: user };
-        if (user.token) state.user = user;
+        if (user.token) {
+            localStorage.setItem(util.USER_KEY, JSON.stringify(user));
+            state.user = user;
+        }
     },
     approveActionFailure(state, error) {
         state.status = Object.assign({}, state.status, {approving: false});
