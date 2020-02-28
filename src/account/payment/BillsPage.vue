@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://git.bubblev.org/bubblev/bubble/src/branch/master/LICENSE.md -->
+<!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://bubblev.com/bubble-license/ -->
 <template>
     <div>
         <h4>{{messages.title_bills}}<span v-if="this.me === false"> - {{this.userId}}</span></h4>
