@@ -4,8 +4,10 @@
         <em v-if="loading()">{{messages.loading_app}}</em>
 
         <div v-if="app">
-        <h2>{{messages['app_'+app.name+'_name']}} {{messages.table_title_app_sites}}</h2>
-        <div v-if="sites && sites.length > 0">
+        <h2 v-if="(sites && sites.length > 0 && (sites.length > 1 || sites[0].url !== '*')) || !sites || sites.length === 0">
+            {{messages['app_'+app.name+'_name']}} {{messages.table_title_app_sites}}
+        </h2>
+        <div v-if="sites && sites.length > 0 && (sites.length > 1 || sites[0].url !== '*')">
             <table border="1">
                 <thead>
                 <tr>
@@ -143,16 +145,17 @@
         watch: {
             app (a) {
                 if (a && a.dataConfig && a.dataConfig.presentation
-                        && (a.dataConfig.presentation === 'app' || a.dataConfig.presentation === 'app_and_site')
-                        && a.dataConfig.views && a.dataConfig.views.length && a.dataConfig.views.length > 0) {
-                    const allViews = a.dataConfig.views;
-                    const appViews = [];
-                    for (let i=0; i<allViews.length; i++) {
-                        if (allViews[i].presentation && allViews[i].presentation === 'app') {
-                            appViews.push(allViews[i]);
+                        && (a.dataConfig.presentation === 'app' || a.dataConfig.presentation === 'app_and_site')) {
+                    if (a.dataConfig.views && a.dataConfig.views.length && a.dataConfig.views.length > 0) {
+                        const allViews = a.dataConfig.views;
+                        const appViews = [];
+                        for (let i = 0; i < allViews.length; i++) {
+                            if (allViews[i].presentation && allViews[i].presentation === 'app') {
+                                appViews.push(allViews[i]);
+                            }
                         }
+                        this.appViews = appViews;
                     }
-                    this.appViews = appViews;
 
                     if (a.dataConfig.configViews) {
                         const allConfigViews = a.dataConfig.configViews;
