@@ -3,6 +3,7 @@
  * For personal (non-commercial) use, see license: https://bubblev.com/bubble-license/
  */
 import config from 'config';
+import { ErrorBag } from 'vee-validate';
 
 let landingPage = null;
 
@@ -128,9 +129,10 @@ export const util = {
                         console.log('handleCrudResponse: received 404: ' + JSON.stringify(data));
 
                     } else if (response.status === 422) {
-                        console.log('handleCrudResponse: received 422, error: ' + JSON.stringify(data));
-                        const errors = util.setValidationErrors(data, messages, errors, enableTotpModal);
-                        return Promise.reject(errors);
+                        // console.log('handleCrudResponseA: errors='+JSON.stringify(errors));
+                        const validationErrors = util.setValidationErrors(data, messages, errors, enableTotpModal);
+                        // console.log('handleCrudResponseB: errors='+JSON.stringify(errors)+', validationErrors='+JSON.stringify(validationErrors));
+                        return Promise.reject(validationErrors);
                     }
 
                     const error = (data && data.message) || response.statusText;

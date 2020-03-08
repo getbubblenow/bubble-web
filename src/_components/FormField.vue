@@ -10,7 +10,7 @@
         <input v-else-if="field.control === 'flag'" type="checkbox" v-model="thing[field.name]" :name="field" class="form-control" />
         <input v-else type="text" v-model="thing[field.name]" :name="field" class="form-control" />
 
-<!--        <small v-if="messages['!'+messagePrefix+field+'_description']">{{messages[messagePrefix+field+'_description']}}</small>-->
+        <small v-if="messages['!'+messagePrefix+field.name+'_description']">{{messages[messagePrefix+field.name+'_description']}}</small>
 <!--        <div v-if="errors.has(field)" class="invalid-feedback d-block">{{ errors.first(field) }}</div>-->
     </div>
 

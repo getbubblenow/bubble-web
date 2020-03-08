@@ -42,7 +42,7 @@
                     <span v-else-if="field === 'ctime' || field === 'mtime'">
                         {{messages.date_format_app_data_epoch_time.parseDateMessage(row[field], messages)}}
                     </span>
-                    <span v-else-if="(''+row[field]).length < 30">
+                    <span v-else-if="(''+row[field]).length < 30 || (typeof appFields[field].truncate !== 'undefined' && appFields[field].truncate === false)">
                         <span v-if="typeof appFields[field] !== 'undefined' && typeof appFields[field].type !== 'undefined' && appFields[field].type === 'http_url'">
                             <a :href="row[field]" target="_blank">{{row[field]}}</a>
                         </span>
