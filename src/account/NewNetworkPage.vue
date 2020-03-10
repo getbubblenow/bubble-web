@@ -246,10 +246,10 @@
                 </div>
 
                 <div v-for="pm in payMethods">
-                    <div v-if="selectedPaymentMethod !== null && selectedPaymentMethod.uuid === pm.uuid">
+                    <div v-if="selectedPaymentMethod !== null && selectedPaymentMethod.driverClass !== null && selectedPaymentMethod.driverClass === pm.driverClass">
                         <router-view name="pay_stripe" v-if="pm.driverClass.endsWith('StripePaymentDriver')"></router-view>
-                        <router-view name="pay_invite" v-if="pm.driverClass.endsWith('CodePaymentDriver')"></router-view>
-                        <router-view name="pay_free" v-if="pm.driverClass.endsWith('FreePaymentDriver')"></router-view>
+                        <router-view name="pay_invite" v-else-if="pm.driverClass.endsWith('CodePaymentDriver')"></router-view>
+                        <router-view name="pay_free" v-else-if="pm.driverClass.endsWith('FreePaymentDriver')"></router-view>
 <!--                        <router-view name="pay_unknown" v-else></router-view>-->
                     </div>
                 </div>
