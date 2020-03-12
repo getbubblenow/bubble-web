@@ -6,22 +6,27 @@
             <div class="form-group">
                 <label for="name">{{messages.field_label_username}}</label>
                 <input type="text" v-model="user.name" v-validate="'required'" name="name" class="form-control" :class="{ 'is-invalid': submitted && errors.has('name') }" />
-                <div v-if="submitted && errors.has('name')" class="invalid-feedback">{{ errors.first('name') }}</div>
+                <div v-if="submitted && errors.has('name')" class="invalid-feedback d-block">{{ errors.first('name') }}</div>
             </div>
             <div class="form-group">
                 <label htmlFor="password">{{messages.field_label_password}}</label>
                 <input type="password" v-model="user.password" v-validate="{ required: true, min: 6 }" name="password" class="form-control" :class="{ 'is-invalid': submitted && errors.has('password') }" />
-                <div v-if="submitted && errors.has('password')" class="invalid-feedback">{{ errors.first('password') }}</div>
+                <div v-if="submitted && errors.has('password')" class="invalid-feedback d-block">{{ errors.first('password') }}</div>
+            </div>
+            <div class="form-group">
+                <label htmlFor="password">{{messages.field_label_confirm_password}}</label>
+                <input type="password" v-model="confirmPassword" v-validate="{ required: true, min: 6 }" name="confirmPassword" class="form-control" :class="{ 'is-invalid': submitted && errors.has('confirmPassword') }" />
+                <div v-if="submitted && errors.has('confirmPassword')" class="invalid-feedback d-block">{{ errors.first('confirmPassword') }}</div>
             </div>
             <div class="form-group">
                 <label for="email">{{messages.field_label_email}}</label>
                 <input type="text" v-model="user.contact.info" v-validate="'required'" name="email" class="form-control" :class="{ 'is-invalid': submitted && errors.has('email') }" />
-                <div v-if="submitted && errors.has('email')" class="invalid-feedback">{{ errors.first('email') }}</div>
+                <div v-if="submitted && errors.has('email')" class="invalid-feedback d-block">{{ errors.first('email') }}</div>
             </div>
             <div class="form-group" v-if="promoCodesEnabled">
                 <label for="promoCode">{{messages.field_label_promoCode}}</label>
                 <input type="text" v-model="user.promoCode" v-validate="{required: promoCodeRequired}" name="promoCode" class="form-control" :class="{ 'is-invalid': submitted && errors.has('promoCode') }" />
-                <div v-if="submitted && errors.has('promoCode')" class="invalid-feedback">{{ errors.first('promoCode') }}</div>
+                <div v-if="submitted && errors.has('promoCode')" class="invalid-feedback d-block">{{ errors.first('promoCode') }}</div>
             </div>
             <div class="form-group">
                 <label for="user.contact.receiveInformationalMessages">{{messages.field_label_receiveInformationalMessages}}</label>
@@ -63,6 +68,7 @@ export default {
                 agreeToTerms: null,
                 promoCode: null
             },
+            confirmPassword: '',
             submitted: false
         }
     },
@@ -74,10 +80,15 @@ export default {
         ...mapActions('account', ['register']),
         ...mapGetters('system', ['promoCodesEnabled', 'promoCodeRequired']),
         handleSubmit(e) {
+            this.errors.clear();
             this.submitted = true;
             this.$validator.validate().then(valid => {
                 if (valid) {
-                    this.register({user: this.user, messages: this.messages, errors: this.errors});
+                    if (this.user.password !== this.confirmPassword) {
+                        this.errors.add({field: 'confirmPassword', msg: this.messages['err_confirmPassword_mismatch']})
+                    } else {
+                        this.register({user: this.user, messages: this.messages, errors: this.errors});
+                    }
                 }
             });
         }

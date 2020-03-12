@@ -202,24 +202,24 @@ function handleAuthResponse(messages, errors) {
                     console.log('handleAuthResponse: received 404, user not found: '+JSON.stringify(data));
 
                 } else if (response.status === 422) {
-                    console.log('handleAuthResponse: received 422: '+JSON.stringify(data));
-                    const errors = util.setValidationErrors(data, messages, errors, false);
-                    console.log('handleAuthResponse: received errors: '+JSON.stringify(errors));
-                    if (errors !== null && errors.length > 0) {
-                        const totpInvalidError = errors.indexOf('err_totpToken_invalid');
+                    // console.log('handleAuthResponse: received 422: '+JSON.stringify(data));
+                    const errs = util.setValidationErrors(data, messages, errors, false);
+                    // console.log('handleAuthResponse: received errors: '+JSON.stringify(errors));
+                    if (errs !== null && errs.length > 0) {
+                        const totpInvalidError = errs.indexOf('err_totpToken_invalid');
                         if (totpInvalidError !== -1) {
                             console.log('handleAuthResponse: rejecting with totpInvalid');
-                            return Promise.reject(errors[totpInvalidError]);
+                            return Promise.reject(errs[totpInvalidError]);
                         }
 
-                        const totpRequiredError = errors.indexOf('err_totpToken_required');
+                        const totpRequiredError = errs.indexOf('err_totpToken_required');
                         if (totpRequiredError !== -1) {
                             console.log('handleAuthResponse: rejecting with totpRequired');
-                            return Promise.reject(errors[totpRequiredError]);
+                            return Promise.reject(errs[totpRequiredError]);
                         }
                     }
-                    console.log('handleAuthResponse: plain old rejecting with errors: '+JSON.stringify(errors));
-                    return Promise.reject(errors);
+                    // console.log('handleAuthResponse: plain old rejecting with errors: '+JSON.stringify(errs));
+                    return Promise.reject(errs);
                 }
                 const error = (data && data.message) || response.statusText;
                 return Promise.reject(error);

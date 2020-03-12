@@ -177,7 +177,11 @@ export const util = {
                     const field = parts[1];
                     const message = messages[messageTemplate];
                     const err = {field: field, msg: message};
-                    if (typeof errors !== 'undefined') errors.add(err);
+                    if (typeof errors !== 'undefined') {
+                        errors.add(err);
+                    } else {
+                        // console.log('setValidationErrors: errors is undefined, not adding: '+JSON.stringify(err));
+                    }
                     if (messageTemplate === 'err_logout_noSession') {
                         console.log('setValidationErrors: detected err_logout_noSession, logging out');
                         util.logout();
