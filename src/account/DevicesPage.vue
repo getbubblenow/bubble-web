@@ -73,10 +73,12 @@
 
         <div>
             <h4>{{messages.message_download_ca_cert}}</h4>
-            <a href="/api/auth/cacert?type=pem">{{messages.message_os_apple}}</a> |
-            <a href="/api/auth/cacert?type=p12">{{messages.message_os_windows}}</a> |
-            <a href="/api/auth/cacert?type=cer">{{messages.message_os_android}}</a> |
-            <a href="/api/auth/cacert?type=crt">{{messages.message_os_linux}}</a>
+            <a href="/api/auth/cacert?deviceType=macosx">{{messages.message_os_macosx}}</a> |
+            <a href="/api/auth/cacert?deviceType=ios">{{messages.message_os_ios}}</a> |
+            <a href="/api/auth/cacert?deviceType=windows">{{messages.message_os_windows}}</a> |
+            <a href="/api/auth/cacert?deviceType=android">{{messages.message_os_android}}</a> |
+            <a href="/api/auth/cacert?deviceType=linux">{{messages.message_os_linux}}</a> |
+            <a href="/api/auth/cacert?deviceType=firefox">{{messages.message_os_firefox}}</a>
             <hr/>
         </div>
 
