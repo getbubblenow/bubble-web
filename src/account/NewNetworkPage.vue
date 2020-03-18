@@ -281,10 +281,21 @@
             </div>
 
             <div>
-                <label for="showAdvanced">{{messages.field_label_show_advanced_plan_options}}</label>
+                <label for="showAdvanced"><b>{{messages.field_label_show_advanced_plan_options}}</b></label>
                 <input type="checkbox" name="showAdvanced" v-model="showAdvanced"/>
             </div>
+
             <hr/>
+            <div v-if="promos">
+                <h5>{{messages.title_account_promotions}}</h5>
+                <table border="0">
+                    <tr v-for="promo in promos">
+                        <td><b>{{messages['label_promotion_'+promo.name]}}</b>:</td>
+                        <td>{{messages['label_promotion_'+promo.name+'_description']}}</td>
+                    </tr>
+                </table>
+                <hr/>
+            </div>
 
             <div class="form-group">
                 <button class="btn btn-primary" :disabled="loading() || !isComplete" @click="launchBubble()">{{messages.button_label_create_new_network}}</button>
@@ -366,7 +377,7 @@
             ...mapState('apps', ['icons']),
             ...mapState('footprints', ['footprints']),
             ...mapState('paymentMethods', [
-                'paymentMethods', 'accountPaymentMethods', 'accountPaymentMethod', 'paymentMethod', 'paymentInfo'
+                'paymentMethods', 'accountPaymentMethods', 'accountPaymentMethod', 'paymentMethod', 'paymentInfo', 'promos'
             ]),
             ...mapState('networks', ['nearestRegions', 'newNodeNotification']),
             ...mapState('networks', {
@@ -379,17 +390,7 @@
                     && this.user && this.user.admin === true;
             },
             isComplete() {
-                // return (this.accountPlan.name !== '' || this.accountPlan.forkHost !== '')
-                //     && (this.customize.domain === false || this.accountPlan.domain !== '')
-                //     && (this.customize.locale === false || this.accountPlan.locale !== '')
-                //     && (this.customize.timezone === false || this.accountPlan.timezone !== '')
-                //     && (this.customize.plan === false || this.accountPlan.plan !== '')
-                //     && (this.customize.footprint === false || this.accountPlan.footprint !== '')
-                //     && (
-                //         (this.accountPlan.paymentMethodObject.paymentMethodType != null) && (this.accountPlan.paymentMethodObject.paymentInfo != null)
-                //         || (this.accountPlan.paymentMethodObject.uuid != null)
-                //     );
-                const complete = (this.accountPlan.name !== '' || this.accountPlan.forkHost !== '')
+                return (this.accountPlan.name !== '' || this.accountPlan.forkHost !== '')
                     && (this.customize.domain === false || this.accountPlan.domain !== '')
                     && (this.customize.locale === false || this.accountPlan.locale !== '')
                     && (this.customize.timezone === false || this.accountPlan.timezone !== '')
@@ -399,8 +400,6 @@
                         (this.accountPlan.paymentMethodObject.paymentMethodType != null) && (this.accountPlan.paymentMethodObject.paymentInfo != null)
                         || (this.accountPlan.paymentMethodObject.uuid != null)
                     );
-                console.log('isComplete: returning '+complete+', this.accountPlan.name='+this.accountPlan.name+', this.accountPlan.paymentMethodObject.uuid='+this.accountPlan.paymentMethodObject.uuid);
-                return complete;
             },
             timezoneObjects: function () {
                 const tz_objects = [];
@@ -468,7 +467,9 @@
             ...mapActions('plans', ['getAllPlans']),
             ...mapActions('apps', ['getAppsByUserId']),
             ...mapActions('footprints', ['getAllFootprints']),
-            ...mapActions('paymentMethods', ['getAllPaymentMethods', 'getAllAccountPaymentMethods', 'setPaymentMethod']),
+            ...mapActions('paymentMethods', [
+                'getAllPaymentMethods', 'getAllAccountPaymentMethods', 'setPaymentMethod', 'getPromosByAccount'
+            ]),
 
             initDefaults() {
                 const currentUser = util.currentUser();
@@ -487,6 +488,7 @@
                 this.getAllAccountPaymentMethods({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
                 this.listSshKeysByUserId({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
                 this.getNearestRegions({footprintId: null, messages: this.messages, errors: this.errors});
+                this.getPromosByAccount({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
             },
             isAuthenticator(val) { return window.isAuthenticator(val); },
             isNotAuthenticator(val) { return window.isNotAuthenticator(val); },

@@ -44,7 +44,7 @@ module.exports = {
     externals: {
         // global app config object
         config: JSON.stringify({
-            // production: true,
+            production: true,
             apiUrl: '/api'
         })
     }

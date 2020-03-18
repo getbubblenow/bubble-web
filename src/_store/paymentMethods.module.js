@@ -9,7 +9,7 @@ const state = {
     loading: {
         paymentMethods: false, paymentMethod: false,
         accountPaymentMethods: false, accountPaymentMethod: false,
-        adding: false, updating: false, deleting: false
+        adding: false, updating: false, deleting: false, promos: false
     },
     paymentStatus: {},
     error: null,
@@ -19,7 +19,8 @@ const state = {
     paymentInfo: null,
     accountPaymentMethods: null,
     accountPaymentMethod: null,
-    accountPaymentUuid: null
+    accountPaymentUuid: null,
+    promos: null
 };
 
 const actions = {
@@ -98,7 +99,16 @@ const actions = {
     },
     clearPaymentInfo({ commit }) {
         commit('clearPaymentInfoSuccess');
-    }
+    },
+
+    getPromosByAccount({ commit }, {userId, messages, errors}) {
+        commit('getPromosByAccountRequest');
+        paymentMethodService.getPromosByAccount(userId, messages, errors)
+            .then(
+                promos => commit('getPromosByAccountSuccess', promos),
+                error => commit('getPromosByAccountFailure', error)
+            );
+    },
 };
 
 const mutations = {
@@ -217,6 +227,18 @@ const mutations = {
 
     clearPaymentInfoSuccess(state) {
         state.paymentInfo = null;
+    },
+
+    getPromosByAccountRequest(state) {
+        state.loading.promos = true;
+    },
+    getPromosByAccountSuccess(state, promos) {
+        state.loading.promos = false;
+        state.promos = promos;
+    },
+    getPromosByAccountFailure(state, error) {
+        state.loading.promos = false;
+        state.error = { error };
     }
 };
 

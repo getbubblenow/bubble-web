@@ -14,6 +14,7 @@ export const paymentMethodService = {
     addAccountPaymentMethod,
     setAccountPaymentMethodForPlan,
     deleteAccountPaymentMethod,
+    getPromosByAccount
 };
 
 function getAllPaymentMethods(messages, errors) {
@@ -52,4 +53,8 @@ function setAccountPaymentMethodForPlan(userId, planId, pmId, messages, errors) 
 
 function deleteAccountPaymentMethod(userId, pmId, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/paymentMethods/${pmId}`, util.deleteWithAuth()).then(util.handleCrudResponse(messages, errors));
+}
+
+function getPromosByAccount(userId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/promos`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
