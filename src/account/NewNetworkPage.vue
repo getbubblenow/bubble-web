@@ -3,6 +3,13 @@
     <div>
         <h2>{{messages.form_title_new_network}}</h2>
 
+        <div v-if="inboundAction" :class="`alert ${inboundAction.alertType}`">
+            {{messages['message_inbound_'+inboundAction.actionType]}}
+            {{messages['message_inbound_'+inboundAction.status]}}
+            <div v-if="errors.has('token')" class="invalid-feedback d-block">{{ errors.first('token') }}</div>
+            <div v-if="errors.has('request')" class="invalid-feedback d-block">{{ errors.first('request') }}</div>
+        </div>
+
         <div v-if="!anyContacts && !user.admin">
             <h3>{{messages.message_no_contacts}}</h3>
             <router-link v-if="!anyContacts" to="/me/policy">{{messages.link_label_no_contacts}}</router-link>
@@ -279,6 +286,7 @@
         data() {
             return {
                 user: util.currentUser(),
+                inboundAction: null,
                 showAdvanced: false,
                 accountPlan: {
                     name: '',
@@ -651,6 +659,7 @@
             }
         },
         created() {
+            this.inboundAction = util.setInboundAction(this.$route);
             this.initDefaults();
         }
     };

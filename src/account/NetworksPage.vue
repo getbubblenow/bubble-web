@@ -44,11 +44,16 @@
             ...mapState('system', ['messages'])
         },
         created () {
-            this.getAllNetworks({userId: util.currentUser().uuid, messages: this.messages, errors: this.errors});
+            const user = util.currentUser();
+            const selectedLocale = (user !== null && typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : 'detect');
+            this.getAllNetworks({userId: user.uuid, messages: this.messages, errors: this.errors});
+            this.loadMessages('post_auth', selectedLocale);
+            this.loadMessages('apps', selectedLocale);
         },
         methods: {
             ...mapActions('networks', ['getAllNetworks', 'stopNetwork', 'deleteNetwork']),
-            ...mapGetters('networks', ['loading'])
+            ...mapGetters('networks', ['loading']),
+            ...mapActions('system', ['loadMessages']),
         },
         watch: {
             networks (nets) {

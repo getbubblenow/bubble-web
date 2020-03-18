@@ -43,7 +43,6 @@
         methods: {
             ...mapActions('paymentMethods', ['addAccountPaymentMethod']),
             authorizeCard(e) {
-                console.log('authorizedCard: starting with e='+JSON.stringify(e));
                 util.setSkipRegistration();
                 const comp = this;
                 this.errors.clear();
@@ -53,7 +52,6 @@
                         self.hasCardErrors = true;
                         self.$forceUpdate(); // Forcing the DOM to update so the Stripe Element can update.
                     } else {
-                        console.log('authorizedCard: no errors, calling addAccountPaymentMethod');
                         comp.submitted = true;
                         comp.addAccountPaymentMethod({
                             userId: comp.user && comp.user.uuid ? comp.user.uuid : null,

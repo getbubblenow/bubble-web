@@ -294,6 +294,28 @@ export const util = {
         }
         this.isMe = (this.me === true || util.currentUser().uuid === this.userId || util.currentUser().name === this.userId);
         return true;
+    },
+
+    setInboundAction: function (route) {
+        if (route.query.action) {
+            const inboundAction = {
+                actionType: route.query.action
+            };
+            if (inboundAction.actionType === 'invalid') {
+                inboundAction.status = 'invalid';
+                inboundAction.alertType = 'alert-danger';
+            } else {
+                if (route.query.ok) {
+                    inboundAction.status = 'success';
+                    inboundAction.alertType = 'alert-success';
+                } else {
+                    inboundAction.status = 'failure';
+                    inboundAction.alertType = 'alert-danger';
+                }
+            }
+            return inboundAction;
+        }
+        return null;
     }
 
 };

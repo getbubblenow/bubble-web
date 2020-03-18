@@ -72,8 +72,8 @@
                     console.log('ActionPage.watch.actionStatus: still requesting, doing nothing');
                 } else {
                     if (status.success) {
-                        console.log('ActionPage.watch.actionStatus: sending to policy page with success');
-                        this.$router.push({path: '/me/policy', query: {action: this.actionType, ok: 'true'}});
+                        console.log('ActionPage.watch.actionStatus: sending to /bubbles with success');
+                        this.$router.push({path: '/bubbles', query: {action: this.actionType, ok: 'true'}});
 
                     } else if (status.error !== null && status.type === 'approve'
                         && this.errors && this.errors.items && this.errors.items.length === 1

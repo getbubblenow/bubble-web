@@ -650,23 +650,7 @@
                 this.getPolicyByUserId({userId: this.userId, messages: this.messages, errors: this.errors});
             }
             // console.log('PolicyPage.created: $route.params='+JSON.stringify(this.$route.query));
-            if (this.$route.query.action) {
-                this.inboundAction = {
-                    actionType: this.$route.query.action
-                };
-                if (this.inboundAction.actionType === 'invalid') {
-                    this.inboundAction.status = 'invalid';
-                    this.inboundAction.alertType = 'alert-danger';
-                } else {
-                    if (this.$route.query.ok) {
-                        this.inboundAction.status = 'success';
-                        this.inboundAction.alertType = 'alert-success';
-                    } else {
-                        this.inboundAction.status = 'failure';
-                        this.inboundAction.alertType = 'alert-danger';
-                    }
-                }
-            }
+            this.inboundAction = util.setInboundAction(this.$route);
             this.newContactSmsCountry = countryFromLocale(this.detectedLocale);
         }
     };

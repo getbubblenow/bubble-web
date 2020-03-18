@@ -112,7 +112,6 @@ export default {
     },
     created () {
         if (this.$route.query.plan) {
-            console.log('query.plan='+this.$route.query.plan);
             this.getAllPaymentMethods(this.messages, this.errors);
             this.getPlanById({
                 planId: this.$route.query.plan,
@@ -128,9 +127,7 @@ export default {
         ...mapGetters('system', ['promoCodesEnabled', 'promoCodeRequired']),
         handleSubmit(e) {
             this.errors.clear();
-            console.log('handleSubmit called: e='+JSON.stringify(e));
             if (util.checkSkipRegistration()) {
-                console.log('handleSubmit skipping registration this time');
                 return;
             }
             this.submitted = true;
