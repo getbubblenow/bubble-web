@@ -39,7 +39,9 @@
         <div v-else>
         <form @submit.prevent="handleSubmit">
 
-            <div v-if="configs && configs.sageLauncher && configs.sageLauncher === true && user && user.admin === true">
+            <div v-if="showAdvanced || showForkOption">
+
+            <div v-if="showForkOption">
                 <!-- network type -->
                 <div class="form-group">
                     <label for="networkType">{{messages.field_label_network_type}}</label>
@@ -119,19 +121,11 @@
             </div>
             <hr/>
 
-            <div>
-                <label for="showAdvanced">{{messages.field_label_show_advanced_plan_options}}</label>
-                <input type="checkbox" name="showAdvanced" v-model="showAdvanced"/>
-            </div>
-            <hr/>
-
-            <div v-if="showAdvanced">
-
             <!-- cloud+region -->
             <div v-if="customize.region === true" class="form-group">
                 <label htmlFor="region">{{messages.field_label_region}}</label>
                 <select name="region" v-validate="'required'" v-model="cloudRegionUuid" v-if="regions" class="form-control" :class="{ 'is-invalid': submitted && errors.has('region') }">
-                    <option v-for="region in regions" :value="region.uuid">{{region.name}} (~{{parseInt(region.distance/1000)}} {{messages.msg_km_distance_away}})</option>
+                    <option v-for="region in regions" :value="region.uuid">{{region.name}} {{regionDistance(region.uuid)}}</option>
                 </select>
                 <div v-if="submitted && errors.has('region')" class="invalid-feedback d-block">{{ errors.first('region') }}</div>
                 <button @click="customize.region = false">{{messages.button_label_use_default}}</button>
@@ -222,9 +216,6 @@
             </div>
             <hr/>
 
-            </div>  <!-- end showAdvanced -->
-            <div v-else></div>
-
             <!-- payment -->
             <div v-if="configs && configs.paymentsEnabled && payMethods && payMethods.length">
                 <div v-if="submitted && errors.has('purchase')" class="invalid-feedback d-block">{{ errors.first('purchase') }}</div>
@@ -262,6 +253,37 @@
                 </div>
             </div>
 
+            </div>  <!-- end showAdvanced -->
+            <div v-else>
+                <table border="0">
+                    <tr>
+                        <td>{{messages.field_label_plan}}:</td>
+                        <td>{{selectedPlanName}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{messages.field_label_network_name}}:</td>
+                        <td>{{accountPlan.name}}.{{accountPlan.domain}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{messages.field_label_region}}:</td>
+                        <td>{{findRegionName(cloudRegionUuid)}} {{regionDistance(cloudRegionUuid)}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{messages.field_label_locale}}:</td>
+                        <td>{{messages['locale_'+accountPlan.locale]}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{messages.field_label_timezone}}:</td>
+                        <td>{{tzDescription(accountPlan.timezone)}}</td>
+                    </tr>
+                </table>
+
+            </div>
+
+            <div>
+                <label for="showAdvanced">{{messages.field_label_show_advanced_plan_options}}</label>
+                <input type="checkbox" name="showAdvanced" v-model="showAdvanced"/>
+            </div>
             <hr/>
 
             <div class="form-group">
@@ -352,8 +374,22 @@
             }),
             ...mapState('users', ['policy', 'sshKeys']),
             ...mapState('account', ['actionStatus']),
+            showForkOption () {
+                return this.configs && this.configs.sageLauncher && this.configs.sageLauncher === true
+                    && this.user && this.user.admin === true;
+            },
             isComplete() {
-                return (this.accountPlan.name !== '' || this.accountPlan.forkHost !== '')
+                // return (this.accountPlan.name !== '' || this.accountPlan.forkHost !== '')
+                //     && (this.customize.domain === false || this.accountPlan.domain !== '')
+                //     && (this.customize.locale === false || this.accountPlan.locale !== '')
+                //     && (this.customize.timezone === false || this.accountPlan.timezone !== '')
+                //     && (this.customize.plan === false || this.accountPlan.plan !== '')
+                //     && (this.customize.footprint === false || this.accountPlan.footprint !== '')
+                //     && (
+                //         (this.accountPlan.paymentMethodObject.paymentMethodType != null) && (this.accountPlan.paymentMethodObject.paymentInfo != null)
+                //         || (this.accountPlan.paymentMethodObject.uuid != null)
+                //     );
+                const complete = (this.accountPlan.name !== '' || this.accountPlan.forkHost !== '')
                     && (this.customize.domain === false || this.accountPlan.domain !== '')
                     && (this.customize.locale === false || this.accountPlan.locale !== '')
                     && (this.customize.timezone === false || this.accountPlan.timezone !== '')
@@ -363,6 +399,8 @@
                         (this.accountPlan.paymentMethodObject.paymentMethodType != null) && (this.accountPlan.paymentMethodObject.paymentInfo != null)
                         || (this.accountPlan.paymentMethodObject.uuid != null)
                     );
+                console.log('isComplete: returning '+complete+', this.accountPlan.name='+this.accountPlan.name+', this.accountPlan.paymentMethodObject.uuid='+this.accountPlan.paymentMethodObject.uuid);
+                return complete;
             },
             timezoneObjects: function () {
                 const tz_objects = [];
@@ -391,6 +429,10 @@
             },
             selectedPlan: function () {
                 return this.accountPlan && this.accountPlan.plan ? this.findPlan(this.accountPlan.plan) : null;
+            },
+            selectedPlanName: function () {
+                const splan = this.selectedPlan;
+                return splan === null ? null : this.messages['plan_name_'+splan.name];
             },
             footprintObjects: function () {
                 const fp_array = [];
@@ -431,6 +473,7 @@
             initDefaults() {
                 const currentUser = util.currentUser();
                 const selectedLocale = (currentUser !== null && typeof currentUser.locale !== 'undefined' && currentUser.locale !== null ? currentUser.locale : 'detect');
+                this.accountPlan.name = currentUser.name;
                 this.loadMessages('post_auth', selectedLocale);
                 this.loadMessages('apps', selectedLocale);
                 this.getPolicyByUserId({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
@@ -513,8 +556,17 @@
                         if (this.regions[i].uuid === uuid) return this.regions[i];
                     }
                 }
-                console.log('findRegion: uuid not found: '+uuid);
+                if (uuid !== null) console.log('findRegion: uuid not found: '+uuid);
                 return null;
+            },
+            findRegionName(uuid) {
+                const region = this.findRegion(uuid);
+                return region !== null && typeof region.name !== 'undefined' ? region.name : null;
+            },
+            regionDistance (uuid) {
+                const region = this.findRegion(uuid);
+                if (region === null) return null;
+                return "(~"+parseInt(region.distance/1000)+" "+this.messages.msg_km_distance_away+")";
             },
             findPlan(name) {
                 if (this.planObjects) {
@@ -528,9 +580,12 @@
                 this.getNearestRegions({footprintId: this.accountPlan.footprint, messages: this.messages, errors: this.errors});
             },
             setAccountPaymentMethod (apm) {
-                this.accountPlan.paymentMethodObject.uuid = apm.uuid;
-                this.accountPlan.paymentMethodObject.paymentMethodType = null;
-                this.accountPlan.paymentMethodObject.paymentInfo = null;
+                console.log('setAccountPaymentMethod: setting apm='+JSON.stringify(apm));
+                this.accountPlan.paymentMethodObject = {
+                    uuid: apm.uuid,
+                    paymentMethodType: null,
+                    paymentInfo: null
+                };
                 return false;
             },
             launchBubble () {
@@ -618,14 +673,21 @@
                         }
                     }
                     this.accountPayMethods = payMethods;
+                    if (this.accountPlan.paymentMethodObject.uuid === null && payMethods.length > 0) {
+                        console.log('watch.apm: setting paymethod='+JSON.stringify(payMethods[0]));
+                        this.setAccountPaymentMethod(payMethods[0]);
+                    }
                 }
             },
             paymentMethod (pm) {
                 if (pm) {
+                    console.log("watch.paymentMethod: pm="+JSON.stringify(pm));
                     this.selectedPaymentMethod = pm;
-                    this.accountPlan.paymentMethodObject.paymentMethodType = pm.paymentMethodType;
-                    this.accountPlan.paymentMethodObject.paymentInfo = null;
-                    this.accountPlan.paymentMethodObject.uuid = null;
+                    if (this.accountPlan.paymentMethodObject.uuid === null) {
+                        this.accountPlan.paymentMethodObject.paymentMethodType = pm.paymentMethodType;
+                        this.accountPlan.paymentMethodObject.paymentInfo = null;
+                        this.accountPlan.paymentMethodObject.uuid = null;
+                    }
                 }
             },
             paymentInfo (info) {
