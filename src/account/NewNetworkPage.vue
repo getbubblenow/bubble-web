@@ -582,7 +582,6 @@
                 this.getNearestRegions({footprintId: this.accountPlan.footprint, messages: this.messages, errors: this.errors});
             },
             setAccountPaymentMethod (apm) {
-                console.log('setAccountPaymentMethod: setting apm='+JSON.stringify(apm));
                 this.accountPlan.paymentMethodObject = {
                     uuid: apm.uuid,
                     paymentMethodType: null,
@@ -676,14 +675,12 @@
                     }
                     this.accountPayMethods = payMethods;
                     if (this.accountPlan.paymentMethodObject.uuid === null && payMethods.length > 0) {
-                        console.log('watch.apm: setting paymethod='+JSON.stringify(payMethods[0]));
                         this.setAccountPaymentMethod(payMethods[0]);
                     }
                 }
             },
             paymentMethod (pm) {
                 if (pm) {
-                    console.log("watch.paymentMethod: pm="+JSON.stringify(pm));
                     this.selectedPaymentMethod = pm;
                     if (this.accountPlan.paymentMethodObject.uuid === null) {
                         this.accountPlan.paymentMethodObject.paymentMethodType = pm.paymentMethodType;
@@ -698,7 +695,6 @@
                 }
             },
             accountPaymentMethod (apm) {
-                console.log('watch.accountPaymentMethod: received: '+JSON.stringify(apm));
                 if (apm) {
                     this.accountPlan.paymentMethodObject.uuid = apm.uuid;
                     this.accountPlan.paymentMethodObject.paymentMethodType = null;
