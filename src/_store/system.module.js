@@ -150,7 +150,7 @@ const getters = {
     dashboardApps: function () {
         const configs = state.configs;
         const messages = state.messages;
-        const isAdmin = account.state.user.admin === true;
+        const isAdmin = account.state.user !== null && account.state.user.admin === true;
         const dashApps = [];
         dashApps.push({
             href: '/me',

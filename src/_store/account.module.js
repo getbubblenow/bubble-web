@@ -52,7 +52,7 @@ const actions = {
                 }
             );
     },
-    login({ dispatch, commit }, { user, messages, errors }) {
+    login({ dispatch, commit }, { user, systemConfigs, messages, errors }) {
         commit('loginRequest', { name: user.name });
         userService.login(user.name, user.password, user.totpToken, user.unlockKey, messages, errors)
             .then(
@@ -65,8 +65,14 @@ const actions = {
                         }
                         const landing = util.getLandingPage();
                         if (landing === null) {
-                            router.replace('/');
+                            console.log('account.login: no landing page, systemConfigs.bubbleNode=='+systemConfigs.bubbleNode);
+                            if (systemConfigs.bubbleNode === false) {
+                                router.replace('/bubbles');
+                            } else {
+                                router.replace('/');
+                            }
                         } else {
+                            console.log('account.login: landing page=='+JSON.stringify(landing)+', systemConfigs.bubbleNode=='+systemConfigs.bubbleNode);
                             util.resetLandingPage();
                             router.replace(landing.fullPath);
                         }
@@ -99,7 +105,7 @@ const actions = {
             .then(
                 user => {
                     commit('registerSuccess', user);
-                    router.push('/');
+                    router.push('/new_bubble');
                     setTimeout(() => {
                         // display success message after route change completes
                         dispatch('alert/success', messages.alert_registration_success, { root: true });

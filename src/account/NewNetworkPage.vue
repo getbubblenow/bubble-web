@@ -250,7 +250,7 @@
                         <router-view name="pay_stripe" v-if="pm.driverClass.endsWith('StripePaymentDriver')"></router-view>
                         <router-view name="pay_invite" v-else-if="pm.driverClass.endsWith('CodePaymentDriver')"></router-view>
                         <router-view name="pay_free" v-else-if="pm.driverClass.endsWith('FreePaymentDriver')"></router-view>
-<!--                        <router-view name="pay_unknown" v-else></router-view>-->
+                        <!-- <router-view name="pay_unknown" v-else></router-view> -->
                     </div>
                 </div>
             </div>
@@ -411,7 +411,7 @@
         methods: {
             ...mapActions('users', ['getPolicyByUserId', 'listSshKeysByUserId']),
             ...mapActions('account', ['approveAction', 'resendVerificationCode']),
-            ...mapActions('system', ['detectTimezone', 'detectLocale']),
+            ...mapActions('system', ['detectTimezone', 'detectLocale', 'loadMessages']),
             ...mapActions('networks', ['getNearestRegions', 'addPlanAndStartNetwork']),
             ...mapGetters('networks', ['loading']),
             ...mapActions('domains', ['getAllDomains']),
@@ -422,6 +422,9 @@
 
             initDefaults() {
                 const currentUser = util.currentUser();
+                const selectedLocale = (currentUser !== null && typeof currentUser.locale !== 'undefined' && currentUser.locale !== null ? currentUser.locale : 'detect');
+                this.loadMessages('post_auth', selectedLocale);
+                this.loadMessages('apps', selectedLocale);
                 this.getPolicyByUserId({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
                 this.detectTimezone();
                 this.detectLocale();

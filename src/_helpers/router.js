@@ -85,7 +85,7 @@ export const router = new Router({
     { path: '/app/:app/site/:site/view/:view', component: AppDataViewPage },
     { path: '/notifications', component: NotificationsPage },
     {
-      path: '/bubbles', component: NetworksPage ,
+      path: '/bubbles', component: NetworksPage,
       children: [
         {
           path: '', component: NewNetworkPage,
@@ -101,7 +101,7 @@ export const router = new Router({
     { path: '/resetPassword/:code', component: SetPasswordPage },
 
     { path: '/activate', component: ActivationPage },
-    { path: '/register', component: RegisterPage },
+    { path: '/register', component: RegisterPage, children: paymentMethodsChildren },
     { path: '/auth', component: MultifactorAuthPage },
     { path: '/login', component: LoginPage },
     { path: '/logout', component: LogoutPage },

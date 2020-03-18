@@ -56,6 +56,9 @@ export default {
             submitted: false
         }
     },
+    created () {
+        this.loadSystemConfigs();
+    },
     computed: {
         ...mapState('account', ['status', 'loginError', 'resetPasswordMessageSent']),
         ...mapState('system', ['configs', 'messages'])
@@ -68,7 +71,12 @@ export default {
             this.submitted = true;
             const { name, password, totpToken, unlockKey } = this;
             if (name && password) {
-                this.login({user: {name, password, totpToken, unlockKey}, messages: this.messages, errors: this.errors});
+                this.login({
+                    user: {name, password, totpToken, unlockKey},
+                    systemConfigs: this.configs,
+                    messages: this.messages,
+                    errors: this.errors
+                });
             }
         }
     },

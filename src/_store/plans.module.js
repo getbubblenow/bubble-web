@@ -22,9 +22,9 @@ const actions = {
             );
     },
 
-    getPlanById({ commit }, {userId, accountPlanId, messages, errors}) {
+    getPlanById({ commit }, {planId, messages, errors}) {
         commit('getPlanByIdRequest');
-        planService.getPlanById(userId, accountPlanId, messages, errors)
+        planService.getPlanById(planId, messages, errors)
             .then(
                 plan => commit('getPlanByIdSuccess', plan),
                 error => commit('getPlanByIdFailure', error)

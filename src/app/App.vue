@@ -112,8 +112,8 @@ export default {
         this.loadMessages('countries', this.selectedLocale);
         this.loadMessages('timezones', this.selectedLocale);
         if (util.userLoggedIn()) {
-            this.loadMessages('post_auth', this.locale);
-            this.loadMessages('apps', this.locale);
+            this.loadMessages('post_auth', this.selectedLocale);
+            this.loadMessages('apps', this.selectedLocale);
         }
     }
 };

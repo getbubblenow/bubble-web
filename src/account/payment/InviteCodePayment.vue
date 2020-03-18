@@ -45,7 +45,7 @@
                 this.submitted = true;
                 this.errors.clear();
                 this.addAccountPaymentMethod({
-                    userId: this.user.uuid,
+                    userId: this.user && this.user.uuid ? this.user.uuid : null,
                     paymentMethod: {
                         paymentMethodType: 'code',
                         paymentInfo: this.invite_code

@@ -37,7 +37,12 @@ function getByAccountAndId(userId, paymentMethodId, messages, errors) {
 }
 
 function addAccountPaymentMethod(userId, paymentMethod, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/paymentMethods`, util.putWithAuth(paymentMethod)).then(util.handleCrudResponse(messages, errors));
+    if (userId !== null) {
+        return fetch(`${config.apiUrl}/users/${userId}/paymentMethods`, util.putWithAuth(paymentMethod)).then(util.handleCrudResponse(messages, errors));
+    } else {
+        paymentMethod.uuid = '__NEW';
+        return Promise.resolve(paymentMethod);
+    }
 }
 
 function setAccountPaymentMethodForPlan(userId, planId, pmId, messages, errors) {

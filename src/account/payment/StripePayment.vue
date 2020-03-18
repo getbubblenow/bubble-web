@@ -8,15 +8,15 @@
         <div v-if="submitted && errors.has('paymentMethodType')" class="invalid-feedback d-block">{{ errors.first('paymentMethodType') }}</div>
         <div v-if="submitted && errors.has('paymentMethodService')" class="invalid-feedback d-block">{{ errors.first('paymentMethodService') }}</div>
         <div v-if="submitted && errors.has('paymentInfo')" class="invalid-feedback d-block">{{ errors.first('paymentInfo') }}</div>
-        <button v-if="paymentStatus.addingPaymentMethod || !paymentStatus.addedPaymentMethod" @click="authorizeCard" class="btn btn-primary" :disabled="paymentStatus.addingPaymentMethod">{{messages.button_label_submit_card}}</button>
+        <button v-if="paymentStatus.addingPaymentMethod || !paymentStatus.addedPaymentMethod" value="paymentButton" @click="authorizeCard" class="btn btn-primary" :disabled="paymentStatus.addingPaymentMethod">{{messages.button_label_submit_card}}</button>
         <span v-if="paymentStatus.addedPaymentMethod">{{messages.message_verified_card}}</span>
     </div>
 </template>
 
 <script>
-    import { mapState, mapActions } from 'vuex'
+    import { mapState, mapActions } from 'vuex';
     import { paymentMethods } from "../../_store/paymentMethods.module";
-    import { util } from '../../_helpers'
+    import { util } from '../../_helpers';
 
     export default {
         data() {
@@ -43,6 +43,8 @@
         methods: {
             ...mapActions('paymentMethods', ['addAccountPaymentMethod']),
             authorizeCard(e) {
+                console.log('authorizedCard: starting with e='+JSON.stringify(e));
+                util.setSkipRegistration();
                 const comp = this;
                 this.errors.clear();
                 window.stripe.createToken(this.card).then(function(result) {
@@ -50,11 +52,11 @@
                         console.log('authorizedCard: had errors: '+JSON.stringify(result.error));
                         self.hasCardErrors = true;
                         self.$forceUpdate(); // Forcing the DOM to update so the Stripe Element can update.
-                        return;
                     } else {
+                        console.log('authorizedCard: no errors, calling addAccountPaymentMethod');
                         comp.submitted = true;
                         comp.addAccountPaymentMethod({
-                            userId: comp.user.uuid,
+                            userId: comp.user && comp.user.uuid ? comp.user.uuid : null,
                             paymentMethod: {
                                 paymentMethodType: 'credit',
                                 paymentInfo: result.token.id
@@ -64,6 +66,7 @@
                         });
                     }
                 });
+                return false;
             }
         }
     };

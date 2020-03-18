@@ -6,12 +6,20 @@ import config from 'config';
 import { ErrorBag } from 'vee-validate';
 
 let landingPage = null;
+let skipRegistrationSubmission = false;
 
 export const util = {
     USER_KEY: 'user',
     getLandingPage: function () { return landingPage; },
     setLandingPage: function (page) { landingPage = page; },
     resetLandingPage: function () { landingPage = null; },
+
+    setSkipRegistration: function () { skipRegistrationSubmission = true; },
+    checkSkipRegistration: function () {
+        const skip = skipRegistrationSubmission;
+        skipRegistrationSubmission = false;
+        return skip;
+    },
 
     currentUser: function() {
         const userJson = localStorage.getItem(util.USER_KEY);
