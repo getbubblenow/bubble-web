@@ -13,6 +13,7 @@
                     <th>{{messages.label_field_device_vpn_config}}</th>
                     <th nowrap="nowrap">{{messages.label_field_device_certificate}}</th>
                     <th>{{messages.label_field_device_ctime}}</th>
+                    <th>{{messages.label_field_device_help}}</th>
                     <th><!-- delete --></th>
                 </tr>
                 </thead>
@@ -45,6 +46,15 @@
                     </td>
                     <td nowrap="nowrap"><a v-if="device.deviceType" :href="'/api/auth/cacert?deviceType='+device.deviceType">{{messages['device_type_'+device.deviceType]}}</a></td>
                     <td nowrap="nowrap">{{messages.label_device_ctime_format.parseDateMessage(device.ctime, messages)}}</td>
+                    <td>
+                        <div v-if="displayDeviceHelp[device.uuid] === true" class="device-vpn-config-div">
+                            <div v-html="messages['device_type_'+device.deviceType+'_help_html']"></div>
+                            <button @click="hideDeviceHelp()" class="btn btn-primary">{{messages.button_label_close_device_help}}</button>
+                        </div>
+                        <div v-else>
+                            <button @click="showDeviceHelp(device.uuid)">{{messages.label_field_device_help}}</button>
+                        </div>
+                    </td>
                     <td>
                         <i @click="removeDevice(device.uuid)" aria-hidden="true" :class="messages.button_label_remove_device_icon" :title="messages.button_label_remove_device"></i>
                         <span class="sr-only">{{messages.button_label_remove_device}}</span>
@@ -119,6 +129,7 @@
                 deviceName: null,
                 deviceType: null,
                 displayVpnConfig: {},
+                displayDeviceHelp: {},
                 config: config,
                 mitmLoading: true
             };
@@ -198,6 +209,12 @@
             },
             hideVpnConfig () { this.displayVpnConfig = {}; },
 
+            showDeviceHelp (id) {
+                this.displayDeviceHelp = {};
+                this.displayDeviceHelp[id] = true;
+            },
+            hideDeviceHelp () { this.displayDeviceHelp = {}; },
+
             downloadURI(uri, name) {  // adapted from https://stackoverflow.com/a/15832662/1251543
                 let link = document.createElement("a");
                 link.download = name;
@@ -231,6 +248,7 @@
                     // after device added, clear device fields
                     this.deviceName = null;
                     this.deviceType = null;
+                    if (dev.uuid) this.displayDeviceHelp[dev.uuid] = true;
                 }
             },
             mitmEnabled (m) {
