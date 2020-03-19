@@ -8,11 +8,12 @@ import { util } from '../_helpers';
 const state = {
     loading: {
         devices: false, addDevice: false, removeDevice: false,
-        qrCode: false, vpnConf: false
+        qrCode: false, vpnConf: false, deviceTypes: false
     },
     error: null,
     devices: [],
     device: null,
+    deviceTypes: null,
     qrCodeImageBase64: null,
     vpnConfBase64: null
 };
@@ -33,6 +34,15 @@ const actions = {
             .then(
                 devices => commit('getDevicesByUserIdSuccess', devices),
                 error => commit('getDevicesByUserIdFailure', error)
+            );
+    },
+
+    getAllDeviceTypesByUserId({ commit }, {userId, messages, errors}) {
+        commit('getAllDeviceTypesByUserIdRequest');
+        deviceService.getAllDeviceTypesByUserId(userId, messages, errors)
+            .then(
+                devices => commit('getAllDeviceTypesByUserIdSuccess', devices),
+                error => commit('getAllDeviceTypesByUserIdFailure', error)
             );
     },
 
@@ -83,6 +93,18 @@ const mutations = {
     },
     getDevicesByUserIdFailure(state, error) {
         state.loading.devices = false;
+        state.error = error;
+    },
+
+    getAllDeviceTypesByUserIdRequest(state) {
+        state.loading.deviceTypes = true;
+    },
+    getAllDeviceTypesByUserIdSuccess(state, deviceTypes) {
+        state.loading.deviceTypes = false;
+        state.deviceTypes = deviceTypes;
+    },
+    getAllDeviceTypesByUserIdFailure(state, error) {
+        state.loading.deviceTypes = false;
         state.error = error;
     },
 

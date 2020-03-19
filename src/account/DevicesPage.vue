@@ -8,8 +8,10 @@
                 <thead>
                 <tr>
                     <th nowrap="nowrap">{{messages.label_field_device_name}}</th>
+                    <th nowrap="nowrap">{{messages.label_field_device_type}}</th>
 <!--                    <th nowrap="nowrap">{{messages.label_field_device_enabled}}</th>-->
                     <th>{{messages.label_field_device_vpn_config}}</th>
+                    <th nowrap="nowrap">{{messages.label_field_device_certificate}}</th>
                     <th>{{messages.label_field_device_ctime}}</th>
                     <th><!-- delete --></th>
                 </tr>
@@ -17,8 +19,8 @@
                 <tbody>
                 <tr v-for="device in devices">
                     <td nowrap="nowrap">{{device.name}}</td>
+                    <td nowrap="nowrap">{{messages['device_type_'+device.deviceType]}}</td>
 <!--                    <td>{{messages['message_'+device.enabled]}}</td>-->
-                    <td nowrap="nowrap">{{messages.label_device_ctime_format.parseDateMessage(device.ctime, messages)}}</td>
                     <td>
                         <div v-if="displayVpnConfig[device.uuid] === true" class="device-vpn-config-div">
                             <h3>{{device.name}}</h3>
@@ -41,6 +43,8 @@
                             <button @click="showVpnConfig(device.uuid)">{{messages.message_device_vpn_show_config}}</button>
                         </div>
                     </td>
+                    <td nowrap="nowrap"><a v-if="device.deviceType" :href="'/api/auth/cacert?deviceType='+device.deviceType">{{messages['device_type_'+device.deviceType]}}</a></td>
+                    <td nowrap="nowrap">{{messages.label_device_ctime_format.parseDateMessage(device.ctime, messages)}}</td>
                     <td>
                         <i @click="removeDevice(device.uuid)" aria-hidden="true" :class="messages.button_label_remove_device_icon" :title="messages.button_label_remove_device"></i>
                         <span class="sr-only">{{messages.button_label_remove_device}}</span>
@@ -62,9 +66,16 @@
                 <div v-if="submitted && errors.has('deviceName')" class="invalid-feedback d-block">{{ errors.first('deviceName') }}</div>
             </div>
 
+            <div class="form-group" v-if="deviceTypes">
+                <label htmlFor="deviceType">{{messages.label_field_device_type}}</label>
+                <select v-model="deviceType" name="deviceType" class="form-control">
+                    <option v-for="type in deviceTypes" :value="type">{{messages['device_type_'+type]}}</option>
+                </select>
+            </div>
+
             <hr/>
             <div class="form-group">
-                <button class="btn btn-primary" :disabled="loading">{{messages.button_label_add_device}}</button>
+                <button class="btn btn-primary" :disabled="loading || !addDeviceReady">{{messages.button_label_add_device}}</button>
                 <img v-show="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
             </div>
         </form>
@@ -73,6 +84,7 @@
 
         <div>
             <h4>{{messages.message_download_ca_cert}}</h4>
+            <!-- todo: use a v-for here, don't explicitly list deviceTypes, which may change -->
             <a href="/api/auth/cacert?deviceType=macosx">{{messages.message_os_macosx}}</a> |
             <a href="/api/auth/cacert?deviceType=ios">{{messages.message_os_ios}}</a> |
             <a href="/api/auth/cacert?deviceType=windows">{{messages.message_os_windows}}</a> |
@@ -105,6 +117,7 @@
                 userId: util.currentUser().uuid,
                 submitted: false,
                 deviceName: null,
+                deviceType: null,
                 displayVpnConfig: {},
                 config: config,
                 mitmLoading: true
@@ -112,9 +125,12 @@
         },
         computed: {
             ...mapState('apps', ['mitmEnabled']),
-            ...mapState('devices', ['devices', 'device', 'qrCodeImageBase64', 'vpnConfBase64']),
+            ...mapState('devices', ['deviceTypes', 'devices', 'device', 'qrCodeImageBase64', 'vpnConfBase64']),
             ...mapState('system', ['messages']),
-            ...mapGetters('devices', ['loading'])
+            ...mapGetters('devices', ['loading']),
+            addDeviceReady: function () {
+                return this.deviceName !== null && this.deviceName !== '' && this.deviceType !== null  && this.deviceType !== '';
+            }
         },
         created () {
             this.getMitmStatus({
@@ -127,11 +143,16 @@
                 messages: this.messages,
                 errors: this.errors
             });
+            this.getAllDeviceTypesByUserId({
+                userId: this.userId,
+                messages: this.messages,
+                errors: this.errors
+            })
         },
         methods: {
             ...mapActions('apps', ['getMitmStatus', 'enableMitm', 'disableMitm']),
             ...mapActions('devices', [
-                'getDevicesByUserId', 'addDeviceByUserId', 'removeDeviceByUserId',
+                'getAllDeviceTypesByUserId', 'getDevicesByUserId', 'addDeviceByUserId', 'removeDeviceByUserId',
                 'getDeviceQRcodeById', 'getDeviceVPNconfById'
             ]),
             addDevice () {
@@ -140,7 +161,8 @@
                 this.addDeviceByUserId({
                     userId: this.userId,
                     device: {
-                        name: this.deviceName
+                        name: this.deviceName,
+                        deviceType: this.deviceType
                     },
                     messages: this.messages,
                     errors: this.errors
@@ -206,8 +228,9 @@
         watch: {
             device(dev) {
                 if (dev) {
-                    // after device added, clear device name field
+                    // after device added, clear device fields
                     this.deviceName = null;
+                    this.deviceType = null;
                 }
             },
             mitmEnabled (m) {
