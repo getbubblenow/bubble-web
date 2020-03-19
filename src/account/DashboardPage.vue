@@ -13,6 +13,7 @@
 
 <script>
     import { mapState, mapActions, mapGetters } from 'vuex';
+    import { util } from '../_helpers';
 
     export default {
         computed: {
@@ -21,7 +22,8 @@
                 users: state => state.users.all
             }),
             ...mapState('account', ['locale']),
-            ...mapState('system', ['messages', 'detectedTimezone', 'detectedLocale']),
+            ...mapState('devices', ['devices']),
+            ...mapState('system', ['messages', 'detectedTimezone', 'detectedLocale', 'configs']),
             ...mapGetters('system', ['dashboardApps']),
             queryApp () {
                 if (typeof this.$route.query.app !== 'undefined' && this.$route.query.app !== null && this.$route.query.app !== '') {
@@ -46,13 +48,24 @@
             }
         },
         methods: {
-            ...mapActions('system', ['loadMessages', 'loadTimezones', 'detectTimezone', 'detectLocale'])
+            ...mapActions('system', ['loadMessages', 'loadTimezones', 'detectTimezone', 'detectLocale']),
+            ...mapActions('devices', ['getAllDevicesByUserId'])
         },
         created () {
             this.loadMessages('post_auth', this.locale);
             this.loadMessages('apps', this.locale);
             this.detectLocale();
             this.detectTimezone();
+            this.getAllDevicesByUserId({userId: util.currentUser().uuid, messages: this.messages, errors: this.errors});
+        },
+        watch: {
+            devices (devs) {
+                if (this.configs && this.configs.bubbleNode && this.configs.bubbleNode === true && devs && devs.length) {
+                    if (devs.length === 0) {
+                        this.$route.push('/devices');
+                    }
+                }
+            }
         }
     };
 </script>
