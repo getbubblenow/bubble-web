@@ -60,9 +60,9 @@
         },
         watch: {
             devices (devs) {
-                if (this.configs && this.configs.bubbleNode && this.configs.bubbleNode === true && devs && devs.length) {
+                if (this.configs && this.configs.bubbleNode === true && devs && typeof devs.length !== 'undefined') {
                     if (devs.length === 0) {
-                        this.$route.push('/devices');
+                        this.$router.push('/devices');
                     }
                 }
             }
