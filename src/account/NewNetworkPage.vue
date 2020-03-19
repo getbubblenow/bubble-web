@@ -286,7 +286,7 @@
             </div>
 
             <hr/>
-            <div v-if="promos">
+            <div v-if="promos && promos.length && promos.length > 0">
                 <h5>{{messages.title_account_promotions}}</h5>
                 <table border="0">
                     <tr v-for="promo in promos">
