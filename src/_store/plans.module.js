@@ -22,6 +22,15 @@ const actions = {
             );
     },
 
+    getCurrentPlans({ commit }, {messages, errors}) {
+        commit('getCurrentPlansRequest');
+        planService.getCurrentPlans(messages, errors)
+            .then(
+                plans => commit('getCurrentPlansSuccess', plans),
+                error => commit('getCurrentPlansFailure', error)
+            );
+    },
+
     getPlanById({ commit }, {planId, messages, errors}) {
         commit('getPlanByIdRequest');
         planService.getPlanById(planId, messages, errors)
@@ -44,6 +53,19 @@ const mutations = {
         state.loading.plans = false;
         state.error = { error };
     },
+
+    getCurrentPlansRequest(state) {
+        state.loading.plans = true;
+    },
+    getCurrentPlansSuccess(state, plans) {
+        state.loading.plans = false;
+        state.plans = plans;
+    },
+    getCurrentPlansFailure(state, error) {
+        state.loading.plans = false;
+        state.error = { error };
+    },
+
     getPlanByIdRequest(state) {
         state.loading.plan = true;
     },

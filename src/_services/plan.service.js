@@ -7,11 +7,16 @@ import { util } from '../_helpers';
 
 export const planService = {
     getAllPlans,
+    getCurrentPlans,
     getPlanById
 };
 
 function getAllPlans(messages, errors) {
     return fetch(`${config.apiUrl}/plans`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+}
+
+function getCurrentPlans(messages, errors) {
+    return fetch(`${config.apiUrl}/currentPlans`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function getPlanById(planId, messages, errors) {
