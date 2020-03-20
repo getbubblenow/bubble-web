@@ -280,7 +280,7 @@
 
             </div>
 
-            <div>
+            <div v-if="!showForkOption">
                 <label for="showAdvanced"><b>{{messages.field_label_show_advanced_plan_options}}</b></label>
                 <input type="checkbox" name="showAdvanced" v-model="showAdvanced"/>
             </div>
