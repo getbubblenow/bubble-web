@@ -15,12 +15,21 @@
             <div :id="'progressBar_details_'+networkId">{{messages[stats.messageKey]}}</div>
             <hr/>
         </div>
+
+        <div v-if="showSetupHelp">
+            <h5 v-html="messages.title_launch_help_html"></h5>
+            <div v-if="network && network.state === 'running'" v-html="messages.message_launch_success_help_html"></div>
+            <div v-else v-html="messages.message_launch_help_html"></div>
+            <hr/>
+        </div>
+
         <div>
             <div>
                 <div>{{messages.label_field_networks_locale}}: {{messages['locale_'+network.locale] || network.locale}}</div>
                 <div>{{messages.label_field_networks_timezone}}: {{messages['tz_name_'+network.timezone] || network.timezone}}</div>
             </div>
         </div>
+
         <div v-if="networkNodes">
             <table border="1">
                 <thead>
@@ -117,7 +126,10 @@
                 'network', 'newNodeNotification', 'networkStatuses', 'networkNodes', 'networkKeysRequested',
                 'deletedNetwork', 'networkKeys'
             ]),
-            ...mapState('system', ['messages', 'configs'])
+            ...mapState('system', ['messages', 'configs']),
+            showSetupHelp () {
+                return (this.network !== null && (this.network.state === 'running' || this.network.state === 'starting'));
+            }
         },
         methods: {
             ...mapActions('networks', [
