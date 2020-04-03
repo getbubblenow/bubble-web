@@ -47,7 +47,7 @@
                     <td nowrap="nowrap"><a v-if="device.deviceType" :href="'/api/auth/cacert?deviceType='+device.deviceType">{{messages['device_type_'+device.deviceType]}}</a></td>
                     <td nowrap="nowrap">{{messages.label_device_ctime_format.parseDateMessage(device.ctime, messages)}}</td>
                     <td>
-                        <div v-if="displayDeviceHelp[device.uuid] === true" class="device-vpn-config-div">
+                        <div v-if="displayDeviceHelp[device.uuid] === true" class="device-help-div">
                             <div v-html="messages['device_type_'+device.deviceType+'_help_html']"></div>
                             <button @click="hideDeviceHelp()" class="btn btn-primary">{{messages.button_label_close_device_help}}</button>
                         </div>
@@ -159,6 +159,14 @@
                 messages: this.messages,
                 errors: this.errors
             })
+        },
+        mounted() {
+            window.addEventListener('keyup', ev => {
+                if (ev.key === "Escape") {
+                    this.hideVpnConfig();
+                    this.hideDeviceHelp();
+                }
+            });
         },
         methods: {
             ...mapActions('apps', ['getMitmStatus', 'enableMitm', 'disableMitm']),
