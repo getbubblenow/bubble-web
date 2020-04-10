@@ -18,7 +18,7 @@ In your `${HOME}/.bubble-test.env` file, add this line (fix the path to point to
 
     export BUBBLE_ASSETS_DIR=/path/to/bubble-web/dist
 
-In the `bubble/bubble-server` directory, run the test named `bubble.test.dev.DevServerTest`, like so:
+In the `bubble/bubble-server` directory, run the test named `bubble.test.dev.DevServerTest`, which will run the API and perform initial activation.
 
     mvn -Dtest=bubble.test.dev.DevServerTest test
 
