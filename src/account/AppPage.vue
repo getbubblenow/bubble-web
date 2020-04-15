@@ -156,17 +156,16 @@
                         }
                         this.appViews = appViews;
                     }
-
-                    if (a.dataConfig.configViews) {
-                        const allConfigViews = a.dataConfig.configViews;
-                        const appConfigViews = [];
-                        for (let i=0; i<allConfigViews.length; i++) {
-                            if (typeof allConfigViews[i].root !== 'undefined' && allConfigViews[i].root !== null && allConfigViews[i].root === true) {
-                                appConfigViews.push(allConfigViews[i]);
-                            }
+                }
+                if (a && a.dataConfig && a.dataConfig.configViews && a.dataConfig.configViews.length > 0) {
+                    const allConfigViews = a.dataConfig.configViews;
+                    const appConfigViews = [];
+                    for (let i=0; i<allConfigViews.length; i++) {
+                        if (typeof allConfigViews[i].root !== 'undefined' && allConfigViews[i].root !== null && allConfigViews[i].root === true) {
+                            appConfigViews.push(allConfigViews[i]);
                         }
-                        this.appConfigViews = appConfigViews;
                     }
+                    this.appConfigViews = appConfigViews;
                 }
             },
             site (s) {
