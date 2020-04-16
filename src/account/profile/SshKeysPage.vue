@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://bubblev.com/bubble-license/ -->
+<!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
     <div>
         <h4>{{messages.form_title_ssh_keys}}<span v-if="this.me === false"> - {{this.userId}}</span></h4>

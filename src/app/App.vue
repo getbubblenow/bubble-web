@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://bubblev.com/bubble-license/ -->
+<!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
     <div class="jumbotron">
         <totp-modal/>
@@ -30,7 +30,7 @@
             </div>
         </div>
         <div class="bubble-footer">
-            <a href="https://bubblev.com/">bubblev.com</a> |
+            <a href="https://getbubblenow.com/">getbubblenow.com</a> |
             <router-link to="/legal">{{messages.title_legal_topics}}</router-link>
         </div>
     </div>

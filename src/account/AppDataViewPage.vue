@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://bubblev.com/bubble-license/ -->
+<!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
     <div v-if="app">
         <h2>{{messages['app_'+app.name+'_name']}} - {{messages['app_'+app.name+'_view_'+viewId]}}</h2>
