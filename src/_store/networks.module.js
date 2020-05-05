@@ -243,6 +243,8 @@ const mutations = {
 
     requestNetworkKeysRequest(state) {
         state.loading.requestNetworkKeys = true;
+        state.networkKeysRequested = null;
+        state.networkKeys = null;
     },
     requestNetworkKeysSuccess(state, networkId) {
         state.loading.requestNetworkKeys = false;
@@ -255,6 +257,8 @@ const mutations = {
 
     retrieveNetworkKeysRequest(state) {
         state.loading.retrieveNetworkKeys = true;
+        state.networkKeysRequested = null;
+        state.networkKeys = null;
     },
     retrieveNetworkKeysSuccess(state, keys) {
         state.loading.retrieveNetworkKeys = false;

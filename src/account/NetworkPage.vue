@@ -54,10 +54,14 @@
         </div>
 
         <div v-if="network.state === 'running' && configs.networkUuid && network.uuid === configs.networkUuid">
-            <button @click="requestRestoreKey()">{{messages.link_network_action_request_keys}}</button>
+            <button class="btn btn-secondary" @click="requestRestoreKey()"
+                    :disabled="loading && loading.requestNetworkKeys">
+                {{messages.link_network_action_request_keys}}
+            </button>
+            <img v-show="loading && loading.requestNetworkKeys" :src="loadingImgSrc" />
             <div v-if="errors.has('networkKeys')" class="invalid-feedback d-block">{{ errors.first('networkKeys') }}</div>
             <div v-if="networkKeysRequested && networkKeysRequested === networkId">{{messages.message_network_action_keys_requested}}</div>
-
+            <hr />
             <h5>{{messages.message_network_action_retrieve_keys}}</h5>
             <form @submit.prevent="retrieveRestoreKey()">
                 <div class="form-group">
@@ -67,17 +71,23 @@
                 </div>
                 <div class="form-group">
                     <label for="restoreKeyPassword">{{messages.field_network_key_download_password}}</label>
-                    <input type="text" v-model="restoreKeyPassword" v-validate="'required'" name="restoreKeyPassword" class="form-control" :class="{ 'is-invalid': errors.has('password') }" />
+                    <input type="text" v-model="restoreKeyPassword" v-validate="'required'" name="restoreKeyPassword"
+                           class="form-control" :class="{ 'is-invalid': errors.has('password') }"
+                           :autofocus="this.$route.query.hasOwnProperty('keys_code')"/>
                     <div v-if="errors.has('password')" class="invalid-feedback">{{ errors.first('password') }}</div>
                 </div>
-                <button>{{messages.button_label_retrieve_keys}}</button>
-                <div v-if="networkKeys">
-                    <hr/>
-                    <h4><b>{{messages.message_network_keys}}</b></h4>: {{networkKeys}}
-                    <hr/>
-                    {{messages.message_network_keys_description}}
-                </div>
+                <button class="btn btn-secondary" :disabled="loading && loading.retrieveNetworkKeys">
+                    {{ messages.button_label_retrieve_keys }}
+                </button>
+                <img v-show="loading && loading.retrieveNetworkKeys" :src="loadingImgSrc" />
             </form>
+            <div v-if="networkKeys">
+                <hr />
+                <h4><b>{{ messages.message_network_keys }}</b></h4>
+                <textarea v-model="networkKeys.data" name="networkKeys" class="form-control" cols="50"
+                          readonly="true" />
+                {{ messages.message_network_keys_description }}
+            </div>
         </div>
 
         <hr/>
@@ -92,13 +102,13 @@
             <div v-if="errors.has('accountPlan')" class="invalid-feedback d-block">{{ errors.first('accountPlan') }}</div>
             <div v-if="network.state === 'running' || network.state === 'starting'" style="border: 2px solid #000;">
                 <hr/>
-                <button @click="stopNet()" class="text-danger">{{messages.link_network_action_stop}}</button>
+                <button @click="stopNet()" class="btn btn-danger">{{messages.link_network_action_stop}}</button>
                 {{messages.link_network_action_stop_description}}
             </div>
             <div v-else></div>
             <hr/>
             <div v-if="network.state === 'stopped' || network.state === 'error_stopping'" style="border: 2px solid #000;">
-                <button @click="deleteNet()" class="text-danger">{{messages.link_network_action_delete}}</button>
+                <button @click="deleteNet()" class="btn btn-danger">{{messages.link_network_action_delete}}</button>
                 {{messages.link_network_action_delete_description}}
             </div>
         </div>
@@ -107,8 +117,9 @@
 </template>
 
 <script>
-    import { mapState, mapActions, mapGetters } from 'vuex'
-    import { util } from '../_helpers'
+    import { mapState, mapActions, mapGetters } from 'vuex';
+    import { util } from '../_helpers';
+    import { loadingImgSrc } from '../_store';
 
     export default {
         data() {
@@ -118,13 +129,14 @@
                 stats: null,
                 refresher: null,
                 restoreKeyCode: null,
-                restoreKeyPassword: null
+                restoreKeyPassword: null,
+                loadingImgSrc: loadingImgSrc
             };
         },
         computed: {
             ...mapState('networks', [
                 'network', 'newNodeNotification', 'networkStatuses', 'networkNodes', 'networkKeysRequested',
-                'deletedNetwork', 'networkKeys'
+                'deletedNetwork', 'networkKeys', 'loading'
             ]),
             ...mapState('system', ['messages', 'configs']),
             showSetupHelp () {
@@ -134,9 +146,8 @@
         methods: {
             ...mapActions('networks', [
                 'getNetworkById', 'deleteNetwork', 'getStatusesByNetworkId', 'getNodesByNetworkId',
-                'stopNetwork', 'deleteNetwork', 'requestNetworkKeys'
+                'stopNetwork', 'deleteNetwork', 'requestNetworkKeys', 'retrieveNetworkKeys'
             ]),
-            ...mapGetters('networks', ['loading']),
             refreshStatus (userId) {
                 this.getNetworkById({userId: userId, networkId: this.networkId, messages: this.messages, errors: this.errors});
                 this.getStatusesByNetworkId({
@@ -200,6 +211,7 @@
             const user = util.currentUser();
             this.refreshStatus(user.uuid);
             this.startStatusRefresher(user);
+            this.restoreKeyCode = this.$route.query.keys_code;
         },
         beforeDestroy () {
             clearInterval(this.refresher);
