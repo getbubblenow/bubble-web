@@ -12,6 +12,8 @@ export const userService = {
     register,
     searchAccounts,
     getMe,
+    requestAccountDownload,
+    downloadAccount,
     getUserById,
     getPolicyByUserId,
     updatePolicyByUserId,
@@ -89,6 +91,26 @@ function getMe(messages, errors) {
             return response;
         }
     ).then(util.handleCrudResponse(messages, errors));
+}
+
+function requestAccountDownload(messages, errors) {
+    return fetch(`${config.apiUrl}/me/download`, util.postWithAuth()).then(util.handlePlaintextResponse(messages, errors));
+}
+
+function downloadAccount(token, messages, errors) {
+    const fileName = (util.currentUser().name || util.currentUser().uuid || token) + ".json";
+
+    return fetch(`${config.apiUrl}/me/download/${token}`, util.postWithAuth())
+        .then(util.handlePlaintextResponse(messages, errors))
+        .then(text => {
+            try {
+                return JSON.stringify(JSON.parse(text, (_, v) => typeof v === 'string' ? (JSON.parse(v) || v) : v),
+                                      null, '\t');
+            } catch(err) {
+                Promise.reject(text || err);
+            }
+        })
+        .then(util.handleDataToDownloadAsFile(fileName, 'application/json'));
 }
 
 function getUserById(userId, messages, errors) {

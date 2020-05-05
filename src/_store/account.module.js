@@ -19,7 +19,9 @@ const defaultStatus = {
     authenticating: false,
     sendingVerification: false,
     sendingResetPasswordMessage: false,
-    registrationError: null
+    registrationError: null,
+    requestAccountDownloadRequestSent: false,
+    downloadingAccount: false
 };
 
 const state = {
@@ -179,6 +181,18 @@ const actions = {
                 },
                 error => commit('resendVerificationCodeFailure', error)
             );
+    },
+    requestAccountDownload({ commit }, {messages, errors}) {
+        commit('requestAccountDownloadRequest');
+        userService.requestAccountDownload(messages, errors)
+                   .then(ok => commit('requestAccountDownloadSuccess'),
+                         error => commit('requestAccountDownloadFailure', error));
+    },
+    downloadAccount({ commit }, {token, messages, errors}) {
+        commit('downloadAccountRequest');
+        userService.downloadAccount(token, messages, errors)
+                   .then(ok => commit('downloadAccountSuccess'),
+                         error => commit('downloadAccountFailure', error));
     }
 };
 
@@ -367,6 +381,33 @@ const mutations = {
     resendVerificationCodeFailure(state, error) {
         state.status = Object.assign({}, state.status, {sendingVerification: false});
         state.actionStatus = { error: error, type: 'verify' };
+    },
+
+    requestAccountDownloadRequest(state) {
+        state.status = Object.assign({}, state.status,
+                                     { downloadingAccount: false, requestAccountDownloadRequestSent: false });
+        state.actionStatus = { requesting: true, type: 'requestDownload' };
+    },
+    requestAccountDownloadSuccess(state) {
+        state.status = Object.assign({}, state.status, { requestAccountDownloadRequestSent: true });
+        state.actionStatus = { success: true, type: 'requestDownload' };
+    },
+    requestAccountDownloadFailure(state, error) {
+        state.actionStatus = { error: error, type: 'requestDownload' };
+        console.log('requestAccountDownloadFailure: ' + JSON.stringify(error));
+    },
+
+    downloadAccountRequest(state) {
+        state.status = Object.assign({}, state.status, { downloadingAccount: true });
+        state.actionStatus = { requesting: true, type: 'download' };
+    },
+    downloadAccountSuccess(state) {
+        state.status = Object.assign({}, state.status, { downloadingAccount: false });
+        state.actionStatus = { success: true, type: 'download' };
+    },
+    downloadAccountFailure(state, error) {
+        state.actionStatus = { error: error, type: 'download' };
+        console.log('downloadAccountFailure: ' + JSON.stringify(error));
     }
 };
 

@@ -34,7 +34,7 @@
 
                             <hr/>
 
-                            <button v-if="vpnConfBase64" @click="downloadURI('data:text/plain;base64,'+vpnConfBase64, 'vpn.conf')">{{messages.message_device_vpn_download_conf}}</button>
+                            <button v-if="vpnConfBase64" @click="util.downloadURI('data:text/plain;base64,'+vpnConfBase64, 'vpn.conf')">{{messages.message_device_vpn_download_conf}}</button>
                             <div v-if="errors.has('deviceVpnConf')" class="invalid-feedback d-block">{{ errors.first('deviceVpnConf') }}</div>
 
                             <hr/>
@@ -225,14 +225,6 @@
             },
             hideDeviceHelp () { this.displayDeviceHelp = {}; },
 
-            downloadURI(uri, name) {  // adapted from https://stackoverflow.com/a/15832662/1251543
-                let link = document.createElement("a");
-                link.download = name;
-                link.href = uri;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            },
             mitmOn () {
                 this.mitmLoading = true;
                 this.errors.clear();

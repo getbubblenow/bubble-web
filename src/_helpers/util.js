@@ -155,23 +155,47 @@ export const util = {
         return function (response) {
             return response.text().then(text => {
                 if (!response.ok) {
+                    let errData = JSON.parse('' + text) || text;
+                    if (Array.isArray(errData)) errData = errData[0];
+
                     if (response.status === 404) {
                         // todo: show nicer error message
-                        const errData = JSON.parse(''+text);
-                        console.log('handleCrudResponse: received 404: ' + text);
+                        console.log('handlePlaintextResponse: received 404: ' + (errData.resource || errData));
 
                     } else if (response.status === 422) {
-                        const errData = JSON.parse(''+text);
-                        console.log('handleCrudResponse: received 422, error: ' + text);
+                        console.log('handlePlaintextResponse: received 422, error: '
+                                    + ((errData.message + ": " + errData.invalidValue) || errData));
                         util.setValidationErrors(errData, messages, errors);
                     }
 
-                    const error = (data && data.message) || response.statusText;
+                    const error = errData.message || errData || response.statusText;
                     return Promise.reject(error);
                 }
                 return text;
             });
         }
+    },
+
+    handleDataToDownloadAsFile: function(fileName, mimeType) {
+        return function(data) {
+            // Original taken from: https://javascript.info/blob#blob-as-url
+            const uri = URL.createObjectURL(new Blob([data], {type: mimeType}));
+            try {
+                util.downloadURI(uri, fileName);
+            } catch(err) {
+                return Promise.reject(err);
+            } finally {
+                URL.revokeObjectURL(uri);
+            }
+            return 'ok';
+        };
+    },
+
+    downloadURI: function(uri, name) {
+        const link = document.createElement("a");
+        link.download = name;
+        link.href = uri;
+        link.click();
     },
 
     setValidationErrors: function(data, messages, errors, enableTotpModal) {

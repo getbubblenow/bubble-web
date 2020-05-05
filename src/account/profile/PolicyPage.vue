@@ -1,6 +1,14 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
     <div>
+        <div v-if="showDownloadMessages && status.downloadingAccount">
+            <div v-if="actionStatus.requesting" :class="`alert alert-info`">{{ messages.downloading_notice }}</div>
+            <div v-if="!actionStatus.requesting && actionStatus.type === 'download' && actionStatus.error"
+                 class="invalid-feedback d-block alert alert-danger">
+                {{ messages.downloading_failed }}
+            </div>
+        </div>
+
         <div v-if="inboundAction" :class="`alert ${inboundAction.alertType}`">
             {{messages['message_inbound_'+inboundAction.actionType]}}
             {{messages['message_inbound_'+inboundAction.status]}}
@@ -10,6 +18,27 @@
 
         <h2>{{messages.form_title_account_policy}}<span v-if="this.me === false"> - {{this.userId}}</span></h2>
         <form @submit.prevent="updatePolicy">
+            <span v-if="me && currentUser.name != 'root'">
+                <hr/>
+                <div class="form-group">
+                    <label htmlFor="downloadAccountBtn">{{messages.field_label_account_download}}</label>
+                    <button class="btn btn-primary" name="downloadAccountBtn" :disabled="actionStatus.requesting"
+                            v-on:click="clickRequestAccountDownload()">
+                        {{ messages.button_label_account_download }}
+                    </button>
+                    <img v-show="loading()" :src="loadingImgSrc" />
+                    <div v-if="showDownloadMessages && !actionStatus.requesting">
+                        <div v-if="actionStatus.type === 'requestDownload' && actionStatus.error"
+                             class="invalid-feedback d-block alert alert-danger">
+                            {{ actionStatus.error }}
+                        </div>
+                        <div v-if="status.requestAccountDownloadRequestSent" class="alert alert-info">
+                            {{messages.field_label_account_download_requested_notice}}
+                        </div>
+                    </div>
+                </div>
+            </span>
+
             <hr/>
             <div class="form-group">
                 <label htmlFor="deletionPolicy">{{messages.field_label_policy_account_deletion}}</label>
@@ -388,11 +417,12 @@
                 verifyingContact: null,
                 inboundAction: null,
                 watchedPolicy: null,
+                showDownloadMessages: false,
                 loadingImgSrc: loadingImgSrc
             }
         },
         computed: {
-            ...mapState('account', ['actionStatus']),
+            ...mapState('account', ['actionStatus', 'status']),
             ...mapState('system', [
                 'messages', 'accountDeletionOptions', 'timeDurationOptions', 'timeDurationOptionsReversed',
                 'contactTypes', 'detectedLocale', 'countries'
@@ -427,9 +457,12 @@
             }
         },
         methods: {
-            ...mapActions('account', ['approveAction', 'denyAction', 'sendAuthenticatorCode', 'resendVerificationCode']),
+            ...mapActions('account', [
+                'approveAction', 'denyAction', 'sendAuthenticatorCode', 'resendVerificationCode',
+                'requestAccountDownload', 'downloadAccount'
+            ]),
             ...mapActions('users', [
-                'getPolicyByUserId', 'updatePolicyByUserId', 'addPolicyContactByUserId', 'removePolicyContactByUserId',
+                'getPolicyByUserId', 'updatePolicyByUserId', 'addPolicyContactByUserId', 'removePolicyContactByUserId'
             ]),
             ...mapGetters('users', ['loading']),
             isAuthenticator(val) { return window.isAuthenticator(val); },
@@ -520,6 +553,12 @@
                     messages: this.messages,
                     errors: this.errors
                 });
+            },
+            clickRequestAccountDownload() {
+                this.errors.clear();
+                this.showDownloadMessages = true;
+                this.requestAccountDownload({ messages: this.messages, errors: this.errors });
+                return false; // do not follow the click
             },
             startVerifyContact(contact) {
                 // console.log('startVerifyContact: '+JSON.stringify(contact));
@@ -654,6 +693,14 @@
             // console.log('PolicyPage.created: $route.params='+JSON.stringify(this.$route.query));
             this.inboundAction = util.setInboundAction(this.$route);
             this.newContactSmsCountry = countryFromLocale(this.detectedLocale);
+
+            this.showDownloadMessages = false;
+            if (this.$route.query.hasOwnProperty('download')) {
+                this.showDownloadMessages = true;
+                this.downloadAccount({
+                    token: this.$route.query.download, messages: this.messages, errors: this.errors
+                });
+            }
         }
     };
 </script>

@@ -69,6 +69,7 @@ export const router = new Router({
 
     { path: '/me', component: ProfilePage },
     { path: '/me/policy', component: PolicyPage },
+    { path: '/me/download/:uuid', redirect: r => ({ path: '/me/policy', query: { download: r.params.uuid } }) },
     { path: '/me/action', component: ActionPage },
     { path: '/me/changePassword', component: ChangePasswordPage },
     { path: '/me/setPassword/:code', component: SetPasswordPage },
