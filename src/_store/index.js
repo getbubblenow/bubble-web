@@ -85,6 +85,7 @@ String.prototype.parseDateMessage = function (millis, messages) {
     const date = new Date(millis);
     const context = {
         YYYY: date.getFullYear(),
+        YY: (date.getFullYear() % 100 < 10 ? '0' + (date.getFullYear() % 100) : (date.getFullYear() % 100)),
         MMMM: messages['label_date_month_'+date.getMonth()],
         MMM: messages['label_date_month_short_'+date.getMonth()],
         MM: date.getMonth() < 10 ? '0' + messages['label_date_month_number_'+date.getMonth()] : messages['label_date_month_number_'+date.getMonth()],
