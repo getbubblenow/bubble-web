@@ -132,9 +132,14 @@ export const util = {
             return response.text().then(text => {
                 const data = text && JSON.parse(text);
                 if (!response.ok) {
-                    if (response.status === 404) {
+                    if (response.status === 401) {                        
+                        console.log('handleCrudResponse: unauthenticated request: ' + JSON.stringify(data));
+                        util.logout();
+                        vue.$route.replace('/login');
+                    
+                    } else if (response.status === 404) {
                         // todo: show nicer error message
-                        console.log('handleCrudResponse: received 404: ' + JSON.stringify(data));
+                        console.log('handleCrudResponse: received 404: ' + JSON.stringify(data)); 
 
                     } else if (response.status === 422) {
                         // console.log('handleCrudResponseA: errors='+JSON.stringify(errors));
@@ -158,7 +163,12 @@ export const util = {
                     let errData = JSON.parse('' + text) || text;
                     if (Array.isArray(errData)) errData = errData[0];
 
-                    if (response.status === 404) {
+                    if (response.status === 401) {                        
+                        console.log('handlePlaintextResponse: unauthenticated request: ' + JSON.stringify(data));
+                        util.logout();
+                        vue.$route.replace('/login');
+                    
+                    } else if (response.status === 404) {
                         // todo: show nicer error message
                         console.log('handlePlaintextResponse: received 404: ' + (errData.resource || errData));
 

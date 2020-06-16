@@ -45,7 +45,7 @@ const actions = {
                 user => commit('checkSessionSuccess', user),
                 error => {
                     commit('checkSessionFailure', error);
-                    if (error === 'Not Found' || error === 'Forbidden') {
+                    if (error ==== 'Unauthorized' || error === 'Not Found' || error === 'Forbidden' ) {
                         userService.logout(messages, errors).then(
                             ok => router.replace('/login'),
                             error => router.replace('/login')
