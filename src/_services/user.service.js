@@ -7,6 +7,7 @@ import { util } from '../_helpers';
 
 export const userService = {
     login,
+    appLogin,
     logout,
     forgotPassword,
     register,
@@ -51,6 +52,16 @@ function login(name, password, totpToken, unlockKey, messages, errors) {
         body: JSON.stringify({ 'name': name, 'password': password, 'totpToken': totpToken })
     };
     return fetch(`${config.apiUrl}/auth/login${unlockParam}`, requestOptions)
+        .then(handleAuthResponse(messages, errors))
+        .then(setSessionUser);
+}
+
+function appLogin(session, messages, errors) {
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    };
+    return fetch(`${config.apiUrl}/auth/appLogin/${session}`, requestOptions)
         .then(handleAuthResponse(messages, errors))
         .then(setSessionUser);
 }

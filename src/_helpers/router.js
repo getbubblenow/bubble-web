@@ -13,6 +13,7 @@ import LoginPage from '../auth/LoginPage'
 import LogoutPage from '../auth/LogoutPage'
 import ForgotPasswordPage from '../auth/ForgotPasswordPage'
 import MultifactorAuthPage from '../auth/MultifactorAuthPage'
+import AppLoginPage from '../auth/AppLoginPage'
 import DashboardPage from '../account/DashboardPage'
 import ProfilePage from '../account/profile/ProfilePage'
 import ActionPage from '../account/profile/ActionPage'
@@ -107,6 +108,7 @@ export const router = new Router({
     { path: '/login', component: LoginPage },
     { path: '/logout', component: LogoutPage },
     { path: '/forgotPassword', component: ForgotPasswordPage },
+    { path: '/appLogin', component: AppLoginPage },
 
     { path: '/admin/accounts', component: AccountsPage },
     { path: '/admin/new_account', component: ProfilePage },
@@ -123,8 +125,14 @@ export const router = new Router({
   ]
 });
 
+const publicPages = [
+  '/login', '/logout', '/register', '/appLogin',
+  '/forgotPassword', '/resetPassword',
+  '/action', '/auth',
+  '/activate', '/legal'
+];
+
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/login', '/logout', '/forgotPassword', '/resetPassword', '/register', '/action', '/auth', '/activate', '/legal'];
   const authRequired = !publicPages.includes(to.path) && publicPages.filter(p => to.path.startsWith(p)).length === 0;
   const user = util.currentUser();
 

@@ -31,7 +31,6 @@ export const util = {
     logout: function() { return localStorage.clear(); },
 
     authHeader: function() {
-        // return authorization header with jwt token
         let user = util.currentUser();
 
         if (user && user.token) {
@@ -135,7 +134,6 @@ export const util = {
                     if (response.status === 401) {                        
                         console.log('handleCrudResponse: unauthenticated request: ' + JSON.stringify(data));
                         util.logout();
-                        vue.$route.replace('/login');
                     
                     } else if (response.status === 404) {
                         // todo: show nicer error message

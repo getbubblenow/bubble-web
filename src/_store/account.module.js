@@ -45,7 +45,7 @@ const actions = {
                 user => commit('checkSessionSuccess', user),
                 error => {
                     commit('checkSessionFailure', error);
-                    if (error ==== 'Unauthorized' || error === 'Not Found' || error === 'Forbidden' ) {
+                    if (error === 'Unauthorized' || error === 'Not Found' || error === 'Forbidden' ) {
                         userService.logout(messages, errors).then(
                             ok => router.replace('/login'),
                             error => router.replace('/login')
@@ -83,6 +83,22 @@ const actions = {
                     }
                 },
                 error => commit('loginFailure', error)
+            );
+    },
+    appLogin({ commit }, { session, uri, messages, errors }) {
+        commit('appLoginRequest');
+        userService.appLogin(session, messages, errors)
+            .then(
+                user => commit('appLoginSuccess', {user, uri}),
+                error => {
+                    commit('appLoginFailure', error);
+                    if (error === 'Unauthorized' || error === 'Not Found' || error === 'Forbidden' ) {
+                        userService.logout(messages, errors).then(
+                            ok => router.replace('/login'),
+                            error => router.replace('/login')
+                        );
+                    }
+                }
             );
     },
     logout({ commit }, {messages, errors}) {
@@ -209,6 +225,7 @@ const mutations = {
                 state.user = null;
             } else {
                 localStorage.setItem(util.USER_KEY, JSON.stringify(user));
+                state.status = Object.assign({}, state.status, {loggingIn: false, loggedIn: true});
                 state.user = user;
             }
         }
@@ -239,6 +256,26 @@ const mutations = {
         state.loginError = error;
         state.status = Object.assign({}, state.status, {loggingIn: false, loggedIn: false});
         state.user = null;
+    },
+
+    appLoginRequest(state) {},
+    appLoginSuccess(state, {user, uri}) {
+        if (user.token) {
+            if (util.currentUser() === null) {
+                // we must have logged out while this request was in flight... do nothing
+                state.user = null;
+            } else {
+                localStorage.setItem(util.USER_KEY, JSON.stringify(user));
+                state.status = Object.assign({}, state.status, {loggingIn: false, loggedIn: true});
+                state.user = user;
+            }
+        }
+        state.locale = (typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : state.locale);
+        if (user.token) router.replace(uri);
+    },
+    appLoginFailure(state, error) {
+        state.user = null;
+        state.status = Object.assign({}, state.status, {loggedIn: false});
     },
 
     logoutRequest(state) {},
