@@ -64,9 +64,6 @@
             } else {
                 this.$router.push({path:'/me/profile', params: {action: 'invalid'}});
             }
-            if (util.userLoggedIn()) {
-                this.loadMessages('post_auth', this.selectedLocale);
-            }
         },
         watch: {
             actionStatus (status) {

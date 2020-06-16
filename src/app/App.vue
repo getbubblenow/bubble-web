@@ -94,6 +94,7 @@ export default {
             if (typeof u !== 'undefined' && u !== null) {
                 this.selectedLocale = u.locale;
                 this.reloadMessages();
+                this.loadMessages('post_auth', this.selectedLocale);
             }
         },
         locale (loc) {
