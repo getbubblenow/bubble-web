@@ -7,12 +7,10 @@ import { util } from '../_helpers';
 
 const state = {
     loading: {
-        enableMitm: false, disableMitm: false,
         apps: false, app: false, enableApp: false, disableApp: false,
         sites: false, site: false, enableSite: false, disableSite: false,
         appData: false, appConfig: false, action: false
     },
-    mitmEnabled: null,
     error: null,
     apps: [],
     icons: {},
@@ -25,34 +23,6 @@ const state = {
 };
 
 const actions = {
-    // MITM
-    getMitmStatus({ commit }, {userId, messages, errors}) {
-        commit('getMitmStatusRequest');
-        appService.getMitmStatus(userId, messages, errors)
-            .then(
-                enabled => commit('getMitmStatusSuccess', enabled),
-                error => commit('getMitmStatusFailure', error)
-            );
-    },
-
-    enableMitm({ commit }, {userId, messages, errors}) {
-        commit('enableMitmRequest');
-        appService.enableMitm(userId, messages, errors)
-            .then(
-                enabled => commit('enableMitmSuccess', enabled),
-                error => commit('enableMitmFailure', error)
-            );
-    },
-
-    disableMitm({ commit }, {userId, messages, errors}) {
-        commit('disableMitmRequest');
-        appService.disableMitm(userId, messages, errors)
-            .then(
-                enabled => commit('disableMitmSuccess', enabled),
-                error => commit('disableMitmFailure', error)
-            );
-    },
-
     // Apps
     getAppsByUserId({ commit }, {userId, messages, errors}) {
         commit('getAppsByUserIdRequest');
@@ -210,43 +180,6 @@ const actions = {
 };
 
 const mutations = {
-    // MITM
-    getMitmStatusRequest(state) {
-        state.loading.getMitmStatus = true;
-    },
-    getMitmStatusSuccess(state, enabled) {
-        state.loading.getMitmStatus = false;
-        state.mitmEnabled = enabled;
-    },
-    getMitmStatusFailure(state, error) {
-        state.loading.getMitmStatus = false;
-        state.error = error;
-    },
-
-    enableMitmRequest(state) {
-        state.loading.enableMitm = true;
-    },
-    enableMitmSuccess(state, enabled) {
-        state.loading.enableMitm = false;
-        state.mitmEnabled = enabled;
-    },
-    enableMitmFailure(state, error) {
-        state.loading.apps = false;
-        state.error = error;
-    },
-
-    disableMitmRequest(state) {
-        state.loading.disableMitm = true;
-    },
-    disableMitmSuccess(state, enabled) {
-        state.loading.disableMitm = false;
-        state.mitmEnabled = enabled;
-    },
-    disableMitmFailure(state, error) {
-        state.loading.apps = false;
-        state.error = error;
-    },
-
     // Apps
     getAppsByUserIdRequest(state) {
         state.loading.apps = true;

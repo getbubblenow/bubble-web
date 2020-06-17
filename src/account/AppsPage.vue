@@ -36,7 +36,7 @@
             };
         },
         computed: {
-            ...mapState('apps', ['mitmEnabled', 'apps', 'app', 'icons']),
+            ...mapState('apps', ['apps', 'app', 'icons']),
             ...mapState('system', ['messages'])
         },
         created () {

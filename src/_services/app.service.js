@@ -6,10 +6,6 @@ import config from 'config';
 import { util } from '../_helpers';
 
 export const appService = {
-    getMitmStatus,
-    enableMitm,
-    disableMitm,
-
     getAppsByUserId,
     getAppByUserId,
     getAppAssetByUserId,
@@ -29,19 +25,6 @@ export const appService = {
     takeConfigItemAction,
     takeConfigAppAction
 };
-
-// MITM
-function getMitmStatus(userId, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/mitm`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
-}
-
-function enableMitm(userId, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/mitm/enable`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
-}
-
-function disableMitm(userId, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/mitm/disable`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
-}
 
 // Apps
 function getAppsByUserId(userId, messages, errors) {

@@ -208,11 +208,26 @@
             <div>{{messages.field_description_network_ssh_key}}</div>
             <hr/>
 
-            <!-- error and metrics reporting -->
+            <!-- sync password -->
+            <div class="form-group">
+                <label for="syncPassword">{{messages.field_label_sync_password}}</label>
+                <input type="checkbox" id="syncPassword" v-model="accountPlan.syncPassword">
+                <div v-if="submitted && errors.has('syncPassword')" class="invalid-feedback d-block">{{ errors.first('syncPassword') }}</div>
+                <p>{{messages.field_label_sync_password_description}}</p>
+            </div>
+            <!-- error reporting -->
+            <div class="form-group" v-if="configs.requireSendMetrics && configs.requireSendMetrics !== true">
+                <label for="sendErrors">{{messages.field_label_send_errors}}</label>
+                <input type="checkbox" id="sendErrors" v-model="accountPlan.sendErrors">
+                <div v-if="submitted && errors.has('sendErrors')" class="invalid-feedback d-block">{{ errors.first('sendErrors') }}</div>
+                <p>{{messages.field_label_send_errors_description}}</p>
+            </div>
+            <!-- metrics reporting -->
             <div class="form-group" v-if="configs.requireSendMetrics && configs.requireSendMetrics !== true">
                 <label for="sendMetrics">{{messages.field_label_send_metrics}}</label>
                 <input type="checkbox" id="sendMetrics" v-model="accountPlan.sendMetrics">
                 <div v-if="submitted && errors.has('sendMetrics')" class="invalid-feedback d-block">{{ errors.first('sendMetrics') }}</div>
+                <p>{{messages.field_label_send_metrics_description}}</p>
             </div>
             <hr/>
 
@@ -336,6 +351,8 @@
                     },
                     sshKey: '',
                     forkHost: '',
+                    syncPassword: true,
+                    sendErrors: true,
                     sendMetrics: true
                 },
                 networkType: 'bubble',
@@ -602,7 +619,11 @@
                                 this.errors.add({field: 'region', msg: this.messages['err_region_notFound']});
                             } else {
                                 if (this.configs.requireSendMetrics) {
+                                    this.accountPlan.sendErrors = true;
                                     this.accountPlan.sendMetrics = true;
+                                } else {
+                                    if (this.accountPlan.sendErrors === null) this.accountPlan.sendErrors = true;
+                                    if (this.accountPlan.sendMetrics === null) this.accountPlan.sendMetrics = true;
                                 }
                                 this.addPlanAndStartNetwork({
                                     userId: this.user.uuid,

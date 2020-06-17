@@ -85,6 +85,7 @@
             ...mapState('system', ['messages'])
         },
         methods: {
+            ...mapActions({ alertSuccess: 'alert/success', alertError: 'alert/error' }),
             ...mapActions('users', ['getUserById', 'getPolicyByUserId', 'changePassword', 'adminChangePassword']),
             ...mapGetters('users', ['loading']),
             changePass (e) {
@@ -116,7 +117,6 @@
                     // should never happen
                     console.warn('Not current user and not admin, API call would fail anyway, not sending');
                 }
-                console.log('changePass called');
             }
         },
         created () {
@@ -139,13 +139,17 @@
                             }
                         }
                     }
-                    console.log('watch.policy: setting requiredExternalAuthContacts = '+JSON.stringify(contacts));
+                    // console.log('watch.policy: setting requiredExternalAuthContacts = '+JSON.stringify(contacts));
                     this.requiredExternalAuthContacts = contacts;
                 }
             },
             changePasswordResponse (r) {
                 if (r) {
-                    console.log('watch.changePasswordResponse: received '+JSON.stringify(r));
+                    if (r.uuid && r.token) {
+                        this.alertSuccess(this.messages['message_change_password_request_sent']);
+                    } else {
+                        this.alertError(this.messages['message_change_password_error']);
+                    }
                 }
             }
         }

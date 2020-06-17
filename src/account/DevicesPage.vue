@@ -103,15 +103,6 @@
             <a href="/api/auth/cacert?deviceType=firefox">{{messages.message_os_firefox}}</a>
             <hr/>
         </div>
-
-        <div v-if="user && user.admin">
-            <h4>{{messages.form_title_mitm}}: {{mitmEnabled ? messages.message_mitm_enabled : messages.message_mitm_disabled}}</h4>
-            <button v-if="mitmEnabled" :disabled="mitmLoading" @click="mitmOff()">{{messages.button_label_mitm_disable}}</button>
-            <button v-else :disabled="mitmLoading" @click="mitmOn()">{{messages.button_label_mitm_enable}}</button>
-            <div v-if="errors.has('mitm')" class="invalid-feedback d-block">{{ errors.first('mitm') }}</div>
-            <hr/>
-        </div>
-
     </div>
 </template>
 
@@ -132,12 +123,10 @@
                 displayVpnConfig: {},
                 displayDeviceHelp: {},
                 config: config,
-                mitmLoading: true,
                 loadingImgSrc: loadingImgSrc
             };
         },
         computed: {
-            ...mapState('apps', ['mitmEnabled']),
             ...mapState('devices', ['deviceTypes', 'devices', 'device', 'qrCodeImageBase64', 'vpnConfBase64']),
             ...mapState('system', ['messages']),
             ...mapGetters('devices', ['loading']),
@@ -146,11 +135,6 @@
             }
         },
         created () {
-            this.getMitmStatus({
-                userId: this.userId,
-                messages: this.messages,
-                errors: this.errors
-            });
             this.getDevicesByUserId({
                 userId: this.userId,
                 messages: this.messages,
@@ -171,7 +155,6 @@
             });
         },
         methods: {
-            ...mapActions('apps', ['getMitmStatus', 'enableMitm', 'disableMitm']),
             ...mapActions('devices', [
                 'getAllDeviceTypesByUserId', 'getDevicesByUserId', 'addDeviceByUserId', 'removeDeviceByUserId',
                 'getDeviceQRcodeById', 'getDeviceVPNconfById'
@@ -223,26 +206,7 @@
                 this.displayDeviceHelp = {};
                 this.displayDeviceHelp[id] = true;
             },
-            hideDeviceHelp () { this.displayDeviceHelp = {}; },
-
-            mitmOn () {
-                this.mitmLoading = true;
-                this.errors.clear();
-                this.enableMitm({
-                    userId: this.user.uuid,
-                    messages: this.messages,
-                    errors: this.errors
-                });
-            },
-            mitmOff () {
-                this.mitmLoading = true;
-                this.errors.clear();
-                this.disableMitm({
-                    userId: this.user.uuid,
-                    messages: this.messages,
-                    errors: this.errors
-                });
-            }
+            hideDeviceHelp () { this.displayDeviceHelp = {}; }
         },
         watch: {
             device(dev) {
@@ -252,9 +216,6 @@
                     this.deviceType = null;
                     if (dev.uuid) this.displayDeviceHelp[dev.uuid] = true;
                 }
-            },
-            mitmEnabled (m) {
-                this.mitmLoading = false;
             }
         }
     };
