@@ -17,6 +17,8 @@ const state = {
         locales: ['en_US'],
         cloudConfigs: {},
         sslPort: null,
+        locked: null,
+        launchLock: null,
         promoCodePolicy: null,
         requireSendMetrics: null
     },
@@ -24,7 +26,6 @@ const state = {
     searchResults: [],
     status: { activating: false, searching: false, creatingEntity: false, modelSetupInProgress: false },
     activated: null,
-    locked: null,
     error: null,
     messages: {
         durationToMillis: function(count, units) {

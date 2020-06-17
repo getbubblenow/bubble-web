@@ -23,7 +23,7 @@
                 <input v-validate="'required'" v-model="totpToken" name="totpToken" class="form-control"/>
                 <div v-if="submitted && errors.has('totpToken')" class="invalid-feedback d-block">{{ errors.first('totpToken') }}</div>
             </div>
-            <div v-if="configs && configs.locked === true" class="form-group">
+            <div v-if="configs && configs.locked === true && (configs.launchLock === null || configs.launchLock)" class="form-group">
                 <label htmlFor="unlockKey">{{messages.field_label_unlock_key}}</label>
                 <input type="password" v-model="unlockKey" name="unlockKey" class="form-control" :class="{ 'is-invalid': submitted && !unlockKey }" />
                 <div v-show="submitted && !unlockKey" class="invalid-feedback">Unlock Key is required</div>
