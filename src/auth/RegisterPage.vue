@@ -4,9 +4,9 @@
         <h2>{{messages.form_title_register}}</h2>
         <form @submit.prevent="handleSubmit">
             <div class="form-group">
-                <label for="name">{{messages.field_label_username}}</label>
-                <input type="text" v-model="user.name" v-validate="'required'" name="name" class="form-control" :class="{ 'is-invalid': submitted && errors.has('name') }" />
-                <div v-if="submitted && errors.has('name')" class="invalid-feedback d-block">{{ errors.first('name') }}</div>
+                <label for="email">{{messages.field_label_email}}</label>
+                <input type="text" v-model="user.email" v-validate="'required'" name="email" class="form-control" :class="{ 'is-invalid': submitted && errors.has('email') }" />
+                <div v-if="submitted && errors.has('email')" class="invalid-feedback d-block">{{ errors.first('email') }}</div>
             </div>
             <div class="form-group">
                 <label htmlFor="password">{{messages.field_label_password}}</label>
@@ -17,11 +17,6 @@
                 <label htmlFor="password">{{messages.field_label_confirm_password}}</label>
                 <input type="password" v-model="confirmPassword" v-validate="{ required: true, min: 6 }" name="confirmPassword" class="form-control" :class="{ 'is-invalid': submitted && errors.has('confirmPassword') }" />
                 <div v-if="submitted && errors.has('confirmPassword')" class="invalid-feedback d-block">{{ errors.first('confirmPassword') }}</div>
-            </div>
-            <div class="form-group">
-                <label for="email">{{messages.field_label_email}}</label>
-                <input type="text" v-model="user.contact.info" v-validate="'required'" name="email" class="form-control" :class="{ 'is-invalid': submitted && errors.has('email') }" />
-                <div v-if="submitted && errors.has('email')" class="invalid-feedback d-block">{{ errors.first('email') }}</div>
             </div>
             <div class="form-group" v-if="promoCodesEnabled">
                 <label for="promoCode">{{messages.field_label_promoCode}}</label>
@@ -57,12 +52,12 @@
             </div>
 
             <div class="form-group">
-                <label for="user.contact.receiveInformationalMessages">{{messages.field_label_receiveInformationalMessages}}</label>
-                <input type="checkbox" id="user.contact.receiveInformationalMessages" v-model="user.contact.receiveInformationalMessages">
+                <label for="user.receiveInformationalMessages">{{messages.field_label_receiveInformationalMessages}}</label>
+                <input type="checkbox" id="user.receiveInformationalMessages" v-model="user.receiveInformationalMessages">
             </div>
             <div class="form-group">
-                <label for="user.contact.receivePromotionalMessages">{{messages.field_label_receivePromotionalMessages}}</label>
-                <input type="checkbox" id="user.contact.receivePromotionalMessages" v-model="user.contact.receivePromotionalMessages">
+                <label for="user.receivePromotionalMessages">{{messages.field_label_receivePromotionalMessages}}</label>
+                <input type="checkbox" id="user.receivePromotionalMessages" v-model="user.receivePromotionalMessages">
             </div>
             <div class="form-group">
                 <label for="user.agreeToTerms" v-html="messages.field_label_agreeToTerms"></label>
@@ -87,14 +82,10 @@ export default {
     data () {
         return {
             user: {
-                name: '',
+                email: '',
                 password: '',
-                contact: {
-                    type: 'email',
-                    info: '',
-                    receiveInformationalMessages: false,
-                    receivePromotionalMessages: false
-                },
+                receiveInformationalMessages: false,
+                receivePromotionalMessages: false,
                 agreeToTerms: null,
                 promoCode: null
             },

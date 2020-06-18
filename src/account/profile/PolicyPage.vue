@@ -242,7 +242,7 @@
                     <span class="sr-only">{{messages.message_true}}</span>
                 </td>
                 <td v-else>
-                    <i @click="contactFlag(contact, 'receiveLoginNotifications', false)" aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
+                    <i @click="contactFlag(contact, 'receiveLoginNotifications', true)" aria-hidden="true" :class="messages.field_label_policy_contact_value_disabled_icon" :title="messages.message_false"></i>
                     <span class="sr-only">{{messages.message_false}}</span>
                 </td>
 
@@ -289,10 +289,11 @@
                 </td>
 
                 <!-- remove contact -->
-                <td>
+                <td v-if="contact.removable">
                     <i @click="removeContact(contact.uuid)" aria-hidden="true" :class="messages.button_label_remove_contact_icon" :title="messages.button_label_remove_contact"></i>
                     <span class="sr-only">{{messages.button_label_remove_contact}}</span>
                 </td>
+                <td v-else></td>
             </tr>
             </tbody>
         </table>
@@ -427,7 +428,7 @@
                 'messages', 'accountDeletionOptions', 'timeDurationOptions', 'timeDurationOptionsReversed',
                 'contactTypes', 'detectedLocale', 'countries'
             ]),
-            ...mapState('users', ['user', 'policy', 'contact', 'authenticator']),
+            ...mapState('users', ['policy', 'contact', 'authenticator']),
             hasAuthenticator() {
                 for (let i=0; i<this.contacts.length; i++) {
                     if (isAuthenticator(this.contacts[i])) return true;
@@ -462,7 +463,8 @@
                 'requestAccountDownload', 'downloadAccount'
             ]),
             ...mapActions('users', [
-                'getPolicyByUserId', 'updatePolicyByUserId', 'addPolicyContactByUserId', 'removePolicyContactByUserId'
+                'getUserById', 'getPolicyByUserId', 'updatePolicyByUserId',
+                'addPolicyContactByUserId', 'removePolicyContactByUserId'
             ]),
             ...mapGetters('users', ['loading']),
             isAuthenticator(val) { return window.isAuthenticator(val); },

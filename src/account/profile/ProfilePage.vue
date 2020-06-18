@@ -23,12 +23,6 @@
         <form @submit.prevent="handleSubmit">
             <div v-if="submitted && errors.has('user')" class="invalid-feedback d-block"><h5>{{ errors.first('user') }}</h5></div>
 
-            <div v-if="newUser !== null && newUser === true && admin === true" class="form-group">
-                <label htmlFor="url">{{messages.field_label_username}}</label>
-                <input type="text" v-model="subject.name" name="name" class="form-control"/>
-                <div v-if="submitted && errors.has('name')" class="invalid-feedback d-block">{{ errors.first('name') }}</div>
-            </div>
-
             <div v-if="newUser === true && admin === true" class="form-group">
                 <label htmlFor="email">{{messages.field_label_email}}</label>
                 <input type="text" v-model="subject.email" name="email" class="form-control"/>
@@ -111,7 +105,6 @@
     import { loadingImgSrc } from '../../_store';
 
     const BLANK_SUBJECT = {
-        name: null,
         email: null,
         sendWelcomeEmail: true,
         password: null,
@@ -158,7 +151,7 @@
                 } else {
                     this.admin = this.currentUser.admin === true;
                     this.getUserById({
-                        userId: this.currentUser.name,
+                        userId: this.currentUser.email,
                         messages: this.messages,
                         errors: this.errors
                     });
@@ -197,7 +190,7 @@
             ...mapGetters('users', ['loading']),
             handleSubmit (e) {
                 const updatedProfile = {
-                    name: this.subject.name,
+                    email: this.subject.email,
                     url: this.subject.url,
                     description: this.subject.description,
                     locale: this.subject.locale,
@@ -210,10 +203,6 @@
                 this.$validator.validate().then(valid => {
                     if (valid) {
                         if (this.newUser) {
-                            updatedProfile.contact = {
-                                type: 'email',
-                                info: this.subject.email
-                            };
                             updatedProfile.sendWelcomeEmail = this.subject.sendWelcomeEmail;
                             updatedProfile.password = this.subject.password;
                             updatedProfile.agreeToTerms = true;

@@ -222,7 +222,6 @@ const mutations = {
 
     getPolicyByUserIdRequest(state) {
         state.loading.policy = true;
-        state.user = { loading: true };
     },
     getPolicyByUserIdSuccess(state, policy) {
         state.loading.policy = false;
