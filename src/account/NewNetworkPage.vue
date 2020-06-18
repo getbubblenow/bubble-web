@@ -501,7 +501,7 @@
             initDefaults() {
                 const currentUser = util.currentUser();
                 const selectedLocale = (currentUser !== null && typeof currentUser.locale !== 'undefined' && currentUser.locale !== null ? currentUser.locale : 'detect');
-                this.accountPlan.name = currentUser.name;
+                this.accountPlan.name = 'bubble-' + currentUser.email.split("@")[0];
                 this.loadMessages('post_auth', selectedLocale);
                 this.loadMessages('apps', selectedLocale);
                 this.getPolicyByUserId({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
