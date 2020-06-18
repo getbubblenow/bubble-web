@@ -2,9 +2,9 @@
 <template>
     <div v-if="network">
         <h4 v-if="network.state === 'running' && configs && configs.networkUuid && network.uuid !== configs.networkUuid">
-            <a :href="'https://'+network.name+'.'+network.domainName">{{network.name}}.{{network.domainName}}</a> - <i>{{messages['msg_network_state_'+network.state]}}</i>
+            <a :href="'https://'+network.name+'.'+network.domainName">{{network.nickname}}</a> - <i>{{messages['msg_network_state_'+network.state]}}</i>
         </h4>
-        <h4 v-else>{{network.name}}.{{network.domainName}} - <i>{{messages['msg_network_state_'+network.state]}}</i></h4>
+        <h4 v-else>{{network.nickname}} - <i>{{messages['msg_network_state_'+network.state]}}</i></h4>
 
         <div v-if="stats && network.state !== 'stopped'">
             <!-- adapted from: https://code-boxx.com/simple-vanilla-javascript-progress-bar/ -->
