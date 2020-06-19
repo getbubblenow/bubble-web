@@ -12,6 +12,7 @@
                 <label htmlFor="password">{{messages.field_label_password}}</label>
                 <input type="password" v-model="user.password" v-validate="{ required: true, min: 6 }" name="password" class="form-control" :class="{ 'is-invalid': submitted && errors.has('password') }" />
                 <div v-if="submitted && errors.has('password')" class="invalid-feedback d-block">{{ errors.first('password') }}</div>
+                <span class="bubble-field-help" v-html="messages.field_label_password_guidance"></span>
             </div>
             <div class="form-group">
                 <label htmlFor="password">{{messages.field_label_confirm_password}}</label>

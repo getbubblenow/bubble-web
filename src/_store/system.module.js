@@ -20,7 +20,8 @@ const state = {
         locked: null,
         launchLock: null,
         promoCodePolicy: null,
-        requireSendMetrics: null
+        requireSendMetrics: null,
+        support: {}
     },
     entityConfigs: {},
     searchResults: [],

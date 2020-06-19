@@ -27,7 +27,7 @@
         </div>
 
         <div v-if="!networks || networks.length === 0">
-            {{messages.message_empty_networks}}
+            <span v-if="verifiedContacts">{{messages.message_empty_networks}}</span>
             <router-view></router-view>
         </div>
 
@@ -39,9 +39,15 @@
     import { util } from '../_helpers';
 
     export default {
+        data() {
+            return {
+                verifiedContacts: null
+            }
+        },
         computed: {
             ...mapState('networks', ['networks']),
-            ...mapState('system', ['messages'])
+            ...mapState('system', ['messages']),
+            ...mapState('users', ['policy'])
         },
         created () {
             const user = util.currentUser();
@@ -49,11 +55,23 @@
             this.getAllNetworks({userId: user.uuid, messages: this.messages, errors: this.errors});
             this.loadMessages('post_auth', selectedLocale);
             this.loadMessages('apps', selectedLocale);
+            this.getPolicyByUserId({userId: user.uuid, messages: this.messages, errors: this.errors});
         },
         methods: {
+            ...mapActions('users', ['getPolicyByUserId']),
             ...mapActions('networks', ['getAllNetworks', 'stopNetwork', 'deleteNetwork']),
             ...mapGetters('networks', ['loading']),
             ...mapActions('system', ['loadMessages']),
+            hasVerifiedContact(policy) {
+                if (policy && policy.accountContacts) {
+                    const contacts = policy.accountContacts;
+                    for (let i=0; i<contacts.length; i++) {
+                        if (contacts[i].verified && isNotAuthenticator(contacts[i])) return true;
+                    }
+                    return false;
+                }
+                return false;
+            }
         },
         watch: {
             networks (nets) {
@@ -64,6 +82,9 @@
                         this.$router.replace({path: '/bubble/' + nets[0].name});
                     }
                 }
+            },
+            policy (p) {
+                this.verifiedContacts = this.hasVerifiedContact(p);
             }
         }
     };

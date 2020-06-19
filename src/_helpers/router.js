@@ -6,6 +6,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 
 import LegalPage from '../app/LegalPage'
+import SupportPage from '../app/SupportPage'
 import ActivationPage from '../auth/ActivationPage'
 import ModelSetupPage from '../admin/ModelSetupPage'
 import RegisterPage from '../auth/RegisterPage'
@@ -67,6 +68,7 @@ export const router = new Router({
     { path: '', component: DashboardPage },
     { path: '/', component: DashboardPage },
     { path: '/legal', component: LegalPage },
+    { path: '/support', component: SupportPage },
 
     { path: '/me', component: ProfilePage },
     { path: '/me/policy', component: PolicyPage },

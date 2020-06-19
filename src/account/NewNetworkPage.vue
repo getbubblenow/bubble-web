@@ -1,7 +1,7 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
     <div>
-        <h2>{{messages.form_title_new_network}}</h2>
+        <h2 v-if="verifiedContacts || user.admin">{{messages.form_title_new_network}}</h2>
 
         <div v-if="inboundAction" :class="`alert ${inboundAction.alertType}`">
             {{messages['message_inbound_'+inboundAction.actionType]}}
@@ -17,27 +17,28 @@
         <div v-else-if="!verifiedContacts && !user.admin">
             <h3>{{messages.message_no_verified_contacts}}</h3>
             {{messages.message_no_verified_contacts_subtext}}
-            <table border="1">
-                <tr>
-                    <td v-if="typeof firstContact.nick !== 'undefined' && firstContact.nick !== null && firstContact.nick !== ''">
-                        {{firstContact.nick}}
-                    </td>
-                    <td>{{messages['field_label_policy_contact_type_'+firstContact.type]}}</td>
-                    <td>{{firstContact.info}}</td>
-                    <td>
-                        <form @submit.prevent="submitVerification()">
-        <label htmlFor="verifyCode">{{messages.field_label_policy_contact_verify_code}}</label>
-        <input :disabled="actionStatus.requesting" :id="'verifyContactCode'" v-validate="'required'" name="verifyCode" type="text" size="8"/>
-        <div v-if="errors.has('approvalToken')" class="invalid-feedback d-block">{{ errors.first('approvalToken') }}</div>
-        <button class="btn btn-primary" :disabled="actionStatus.requesting">{{messages.button_label_submit_verify_code}}</button>
-        <button class="btn btn-primary" :disabled="actionStatus.requesting" @click="resendVerification(firstContact)">{{messages.button_label_resend_verify_code}}</button>
-                        </form>
-                    </td>
-                </tr>
-            </table>
+            <hr/>
+            <button class="btn btn-primary" :disabled="actionStatus.requesting" @click="resendVerification(firstContact)">{{messages.button_label_resend_verify_code}}</button>
         </div>
         <div v-else>
         <form @submit.prevent="handleSubmit">
+
+            <div class="form-group">
+                <button class="btn btn-primary" :disabled="loading() || !isComplete" @click="launchBubble()">{{messages.button_label_create_new_network}}</button>
+                <img v-show="loading()" :src="loadingImgSrc" />
+            </div>
+            <hr/>
+
+            <div v-if="promos && promos.length && promos.length > 0">
+                <h5>{{messages.title_account_promotions}}</h5>
+                <table border="0">
+                    <tr v-for="promo in promos">
+                        <td><b>{{messages['label_promotion_'+promo.name]}}</b>:</td>
+                        <td>{{messages['label_promotion_'+promo.name+'_description']}}</td>
+                    </tr>
+                </table>
+                <hr/>
+            </div>
 
             <div v-if="showAdvanced || showForkOption">
 
@@ -308,17 +309,6 @@
             </div>
 
             <hr/>
-            <div v-if="promos && promos.length && promos.length > 0">
-                <h5>{{messages.title_account_promotions}}</h5>
-                <table border="0">
-                    <tr v-for="promo in promos">
-                        <td><b>{{messages['label_promotion_'+promo.name]}}</b>:</td>
-                        <td>{{messages['label_promotion_'+promo.name+'_description']}}</td>
-                    </tr>
-                </table>
-                <hr/>
-            </div>
-
             <div class="form-group">
                 <button class="btn btn-primary" :disabled="loading() || !isComplete" @click="launchBubble()">{{messages.button_label_create_new_network}}</button>
                 <img v-show="loading()" :src="loadingImgSrc" />

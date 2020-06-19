@@ -32,12 +32,13 @@
         <div class="bubble-footer">
             <a href="https://getbubblenow.com/">getbubblenow.com</a> |
             <router-link to="/legal">{{messages.title_legal_topics}}</router-link>
+            <b v-if="configs.support.site"> | <router-link to="/support">{{messages.title_support}}</router-link></b>
         </div>
     </div>
 </template>
 
 <script>
-import { mapState, mapGetters, mapActions } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import { util } from '../_helpers'
 
 export default {
