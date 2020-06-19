@@ -53,14 +53,6 @@
             </div>
 
             <div class="form-group">
-                <label for="user.receiveInformationalMessages">{{messages.field_label_receiveInformationalMessages}}</label>
-                <input type="checkbox" id="user.receiveInformationalMessages" v-model="user.receiveInformationalMessages">
-            </div>
-            <div class="form-group">
-                <label for="user.receivePromotionalMessages">{{messages.field_label_receivePromotionalMessages}}</label>
-                <input type="checkbox" id="user.receivePromotionalMessages" v-model="user.receivePromotionalMessages">
-            </div>
-            <div class="form-group">
                 <label for="user.agreeToTerms" v-html="messages.field_label_agreeToTerms"></label>
                 <input type="checkbox" id="user.agreeToTerms" v-model="user.agreeToTerms">
                 <div v-if="submitted && errors.has('terms')" class="invalid-feedback d-block">{{ errors.first('terms') }}</div>
@@ -69,6 +61,16 @@
                 <button class="btn btn-primary" :disabled="status.registering">{{messages.button_label_register}}</button>
                 <img v-show="status.registering" :src="loadingImgSrc" />
                 <router-link to="/login" class="btn btn-link">{{messages.button_label_cancel}}</router-link>
+            </div>
+
+            <hr/>
+            <div class="form-group">
+                <label for="user.receiveInformationalMessages">{{messages.field_label_receiveInformationalMessages}}</label>
+                <input type="checkbox" id="user.receiveInformationalMessages" v-model="user.receiveInformationalMessages">
+            </div>
+            <div class="form-group">
+                <label for="user.receivePromotionalMessages">{{messages.field_label_receivePromotionalMessages}}</label>
+                <input type="checkbox" id="user.receivePromotionalMessages" v-model="user.receivePromotionalMessages">
             </div>
         </form>
     </div>
