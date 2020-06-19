@@ -30,7 +30,7 @@
             </div>
         </div>
         <div class="bubble-footer">
-            <a href="https://getbubblenow.com/">getbubblenow.com</a> |
+            <a target="_blank" rel="noopener noreferrer" href="https://getbubblenow.com/">getbubblenow.com</a> |
             <router-link to="/legal">{{messages.title_legal_topics}}</router-link>
             <b v-if="configs.support.site"> | <router-link to="/support">{{messages.title_support}}</router-link></b>
         </div>

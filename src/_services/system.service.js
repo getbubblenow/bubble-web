@@ -16,7 +16,8 @@ export const systemService = {
     loadMessages,
     loadTimezones,
     detectTimezone,
-    detectLocale
+    detectLocale,
+    getAppLinks
 };
 
 function loadIsActivated () {
@@ -107,4 +108,11 @@ function detectLocale () {
     return fetch(`${config.apiUrl}/detect/locale`, requestOptions)
         .then(util.handleBasicResponse)
         .then(locales => { return locales; });
+}
+
+function getAppLinks (locale) {
+    const requestOptions = util.userLoggedIn() ? util.getWithAuth() : { method: 'GET' };
+    return fetch(`${config.apiUrl}/auth/appLinks/${locale}`, requestOptions)
+        .then(util.handleBasicResponse)
+        .then(links => { return links; });
 }

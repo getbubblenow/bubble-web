@@ -21,37 +21,76 @@
             <div v-if="network && network.state === 'running'" v-html="messages.message_launch_success_help_html"></div>
             <div v-else v-html="messages.message_launch_help_html"></div>
             <hr/>
-        </div>
-
-        <div>
-            <div>
-                <div>{{messages.label_field_networks_locale}}: {{messages['locale_'+network.locale] || network.locale}}</div>
-                <div>{{messages.label_field_networks_timezone}}: {{messages['tz_name_'+network.timezone] || network.timezone}}</div>
+            <div v-if="appLinks">
+                <div v-if="network && network.state === 'running'" v-html="messages.message_launch_success_apps"></div>
+                <div v-else v-html="messages.message_launch_help_apps"></div>
+                <br/>
+                <table border="0" width="100%">
+                    <tr>
+                        <td align="center" width="20%">
+                            <a target="_blank" rel="noopener noreferrer" :href="appLinks['ios']">
+                                <i class="fab fa-apple bubble-app-icon"></i><br/>
+                                {{messages.device_type_ios}}
+                            </a>
+                        </td>
+                        <td align="center" width="20%">
+                            <a target="_blank" rel="noopener noreferrer" :href="appLinks['android']">
+                                <i class="fab fa-android bubble-app-icon"></i><br/>
+                                {{messages.device_type_android}}
+                            </a>
+                        </td>
+                        <td align="center" width="20%">
+                            <a target="_blank" rel="noopener noreferrer" :href="appLinks['windows']">
+                                <i class="fab fa-windows bubble-app-icon"></i><br/>
+                                {{messages.device_type_windows}}
+                            </a>
+                        </td>
+                        <td align="center" width="20%">
+                            <a target="_blank" rel="noopener noreferrer" :href="appLinks['macosx']">
+                                <i class="fab fa-apple bubble-app-icon"></i><br/>
+                                {{messages.device_type_macosx}}
+                            </a>
+                        </td>
+                        <td align="center" width="20%">
+                            <a target="_blank" rel="noopener noreferrer" :href="appLinks['linux']">
+                                <i class="fab fa-linux bubble-app-icon"></i><br/>
+                                {{messages.device_type_linux}}
+                            </a>
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
 
-        <div v-if="networkNodes">
-            <table border="1">
-                <thead>
-                <tr>
-                    <th nowrap="nowrap">{{messages.label_field_nodes_name}}</th>
-                    <th nowrap="nowrap">{{messages.label_field_nodes_region}}</th>
-                    <th nowrap="nowrap">{{messages.label_field_nodes_ip4}}</th>
-                    <th nowrap="nowrap">{{messages.label_field_nodes_ip6}}</th>
-                    <th nowrap="nowrap">{{messages.label_field_nodes_state}}</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="node in networkNodes">
-                    <td>{{node.fqdn}}</td>
-                    <td nowrap="nowrap">{{node.region}}</td>
-                    <td>{{node.ip4}}</td>
-                    <td>{{node.ip6}}</td>
-                    <td>{{messages['msg_node_state_'+node.state]}}</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+<!--        <div>-->
+<!--            <div>-->
+<!--                <div>{{messages.label_field_networks_locale}}: {{messages['locale_'+network.locale] || network.locale}}</div>-->
+<!--                <div>{{messages.label_field_networks_timezone}}: {{messages['tz_name_'+network.timezone] || network.timezone}}</div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div v-if="networkNodes">-->
+<!--            <table border="1">-->
+<!--                <thead>-->
+<!--                <tr>-->
+<!--                    <th nowrap="nowrap">{{messages.label_field_nodes_name}}</th>-->
+<!--                    <th nowrap="nowrap">{{messages.label_field_nodes_region}}</th>-->
+<!--                    <th nowrap="nowrap">{{messages.label_field_nodes_ip4}}</th>-->
+<!--                    <th nowrap="nowrap">{{messages.label_field_nodes_ip6}}</th>-->
+<!--                    <th nowrap="nowrap">{{messages.label_field_nodes_state}}</th>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--                <tbody>-->
+<!--                <tr v-for="node in networkNodes">-->
+<!--                    <td>{{node.fqdn}}</td>-->
+<!--                    <td nowrap="nowrap">{{node.region}}</td>-->
+<!--                    <td>{{node.ip4}}</td>-->
+<!--                    <td>{{node.ip6}}</td>-->
+<!--                    <td>{{messages['msg_node_state_'+node.state]}}</td>-->
+<!--                </tr>-->
+<!--                </tbody>-->
+<!--            </table>-->
+<!--        </div>-->
 
         <div v-if="network.state === 'running' && configs.networkUuid && network.uuid === configs.networkUuid">
             <button class="btn btn-secondary" @click="requestRestoreKey()"
@@ -138,7 +177,7 @@
                 'network', 'newNodeNotification', 'networkStatuses', 'networkNodes', 'networkKeysRequested',
                 'deletedNetwork', 'networkKeys', 'loading'
             ]),
-            ...mapState('system', ['messages', 'configs']),
+            ...mapState('system', ['messages', 'configs', 'appLinks']),
             showSetupHelp () {
                 return (this.network !== null && (this.network.state === 'running' || this.network.state === 'starting'));
             }
@@ -148,6 +187,7 @@
                 'getNetworkById', 'deleteNetwork', 'getStatusesByNetworkId', 'getNodesByNetworkId',
                 'stopNetwork', 'deleteNetwork', 'requestNetworkKeys', 'retrieveNetworkKeys'
             ]),
+            ...mapActions('system', ['getAppLinks']),
             refreshStatus (userId) {
                 this.getNetworkById({userId: userId, networkId: this.networkId, messages: this.messages, errors: this.errors});
                 this.getStatusesByNetworkId({
@@ -212,6 +252,7 @@
             this.refreshStatus(user.uuid);
             this.startStatusRefresher(user);
             this.restoreKeyCode = this.$route.query.keys_code;
+            this.getAppLinks(user.locale);
         },
         beforeDestroy () {
             clearInterval(this.refresher);

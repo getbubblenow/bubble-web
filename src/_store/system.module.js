@@ -53,7 +53,8 @@ const state = {
     accountDeletionOptions: [],
     timeDurationOptions: [],
     timeDurationOptionsReversed: [],
-    contactTypes: []
+    contactTypes: [],
+    appLinks: null
 };
 
 const actions = {
@@ -144,6 +145,13 @@ const actions = {
         systemService.detectLocale().then(
             locales => commit('detectLocaleSuccess', locales),
             error => commit('detectLocaleFailure', error)
+        )
+    },
+    getAppLinks({ commit }, locale) {
+        commit('getAppLinksRequest');
+        systemService.getAppLinks(locale).then(
+            links => commit('getAppLinksSuccess', links),
+            error => commit('getAppLinksFailure', error)
         )
     }
 };
@@ -385,6 +393,14 @@ const mutations = {
 
         // keep current value, or assign default if no current value
         if (state.detectedLocale === null && state.locales && state.locales.length > 0) state.detectedLocale = state.locales[0];
+    },
+
+    getAppLinksRequest(state) {},
+    getAppLinksSuccess(state, links) {
+        state.appLinks = links;
+    },
+    getAppLinksFailure(state, error) {
+        state.error = error;
     }
 };
 
