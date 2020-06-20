@@ -60,6 +60,8 @@
                     </tr>
                 </table>
             </div>
+            <hr/>
+            <span v-html="messages.message_launch_support.parseMessage(this)"></span>
         </div>
 
 <!--        <div>-->
