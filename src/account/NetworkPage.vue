@@ -20,7 +20,6 @@
             <h5 v-html="messages.title_launch_help_html"></h5>
             <div v-if="network && network.state === 'running'" v-html="messages.message_launch_success_help_html"></div>
             <div v-else v-html="messages.message_launch_help_html"></div>
-            <hr/>
             <div v-if="appLinks">
                 <div v-if="network && network.state === 'running'" v-html="messages.message_launch_success_apps"></div>
                 <div v-else v-html="messages.message_launch_help_apps"></div>
