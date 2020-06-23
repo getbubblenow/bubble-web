@@ -27,7 +27,7 @@
         </div>
 
         <div v-if="!networks || networks.length === 0">
-            <span v-if="verifiedContacts">{{messages.message_empty_networks}}</span>
+<!--            <span v-if="verifiedContacts">{{messages.message_empty_networks}}</span>-->
             <router-view></router-view>
         </div>
 

@@ -1,7 +1,7 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
     <div>
-        <h2 v-if="verifiedContacts || user.admin">{{messages.form_title_new_network}}</h2>
+<!--        <h2 v-if="verifiedContacts || user.admin">{{messages.form_title_new_network}}</h2>-->
 
         <div v-if="inboundAction" :class="`alert ${inboundAction.alertType}`">
             {{messages['message_inbound_'+inboundAction.actionType]}}
@@ -39,15 +39,14 @@
             <hr/>
 
             <div v-if="promos && promos.length && promos.length > 0">
-                <h4><b>{{messages.messages.payment_first_details_with_promos}}</b></h4>
-                <hr/>
-                <h5>{{messages.title_account_promotions}}</h5>
+                <h4><b>{{messages.payment_first_details_with_promos}}</b></h4>
                 <table border="0">
                     <tr v-for="promo in promos">
                         <td><b>{{messages['label_promotion_'+promo.name]}}</b>:</td>
                         <td>{{messages['label_promotion_'+promo.name+'_description']}}</td>
                     </tr>
                 </table>
+                <hr/>
                 <p>{{messages.payment_first_details_with_promos_details}}</p>
             </div>
             <div v-else>
@@ -56,8 +55,8 @@
             <hr/>
 
             <!-- add a new payment method -->
-            <label htmlFor="paymentMethod">{{messages.field_label_newPaymentMethod}}</label>
-            <div v-if="payMethods.length > 1">
+<!--            <label htmlFor="paymentMethod">{{messages.field_label_newPaymentMethod}}</label>-->
+            <div v-if="payMethods && payMethods.length > 1">
                 <span v-for="pm in payMethods">
                     <button v-if="!pm.driverClass.endsWith('NoopCloud')" class="btn btn-primary" :disabled="loading()" @click="setPaymentMethod(pm)">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
                 </span>
