@@ -26,31 +26,31 @@
                 <small><a :href="messages.message_request_promoCode_link">{{messages.message_request_promoCode}}</a></small>
             </div>
 
-            <div v-if="plan" class="form-group">
-                <label htmlFor="paymentMethod">{{messages.field_label_paymentMethod}}</label>
-                <div v-if="typeof payMethods === 'undefined' || payMethods === null || payMethods.length === 0" class="invalid-feedback d-block">
-                    <h5>{{messages.err_noPaymentMethods}}</h5>
-                </div>
-                <div v-else-if="payMethods.length > 1">
-                        <span v-for="pm in payMethods">
-                            <button v-if="!pm.driverClass.endsWith('NoopCloud')" class="btn btn-primary" :disabled="loading()" @click="setPaymentMethod(pm)">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
-                        </span>
-                </div>
+<!--            <div v-if="plan" class="form-group">-->
+<!--                <label htmlFor="paymentMethod">{{messages.field_label_paymentMethod}}</label>-->
+<!--                <div v-if="typeof payMethods === 'undefined' || payMethods === null || payMethods.length === 0" class="invalid-feedback d-block">-->
+<!--                    <h5>{{messages.err_noPaymentMethods}}</h5>-->
+<!--                </div>-->
+<!--                <div v-else-if="payMethods.length > 1">-->
+<!--                        <span v-for="pm in payMethods">-->
+<!--                            <button v-if="!pm.driverClass.endsWith('NoopCloud')" class="btn btn-primary" :disabled="loading()" @click="setPaymentMethod(pm)">{{messages['payment_description_'+pm.paymentMethodType]}}</button>-->
+<!--                        </span>-->
+<!--                </div>-->
 
-                <div v-for="pm in payMethods">
-                    <div v-if="selectedPaymentMethod !== null && selectedPaymentMethod.driverClass !== null && selectedPaymentMethod.driverClass === pm.driverClass">
-                        <router-view name="pay_stripe" v-if="pm.driverClass.endsWith('StripePaymentDriver')"></router-view>
-                        <router-view name="pay_invite" v-else-if="pm.driverClass.endsWith('CodePaymentDriver')"></router-view>
-                        <router-view name="pay_free" v-else-if="pm.driverClass.endsWith('FreePaymentDriver')"></router-view>
-                        <!-- <router-view name="pay_unknown" v-else></router-view> -->
-                    </div>
-                </div>
-                <div v-if="submitted && errors.has('paymentInfo')" class="invalid-feedback d-block">{{ errors.first('paymentInfo') }}</div>
-                <div v-if="submitted && errors.has('paymentMethod')" class="invalid-feedback d-block">{{ errors.first('paymentMethod') }}</div>
-                <div v-if="submitted && errors.has('paymentMethodInfo')" class="invalid-feedback d-block">{{ errors.first('paymentMethodInfo') }}</div>
-                <div v-if="submitted && errors.has('paymentMethodType')" class="invalid-feedback d-block">{{ errors.first('paymentMethodType') }}</div>
-                <div v-if="submitted && errors.has('paymentMethodService')" class="invalid-feedback d-block">{{ errors.first('paymentMethodService') }}</div>
-            </div>
+<!--                <div v-for="pm in payMethods">-->
+<!--                    <div v-if="selectedPaymentMethod !== null && selectedPaymentMethod.driverClass !== null && selectedPaymentMethod.driverClass === pm.driverClass">-->
+<!--                        <router-view name="pay_stripe" v-if="pm.driverClass.endsWith('StripePaymentDriver')"></router-view>-->
+<!--                        <router-view name="pay_invite" v-else-if="pm.driverClass.endsWith('CodePaymentDriver')"></router-view>-->
+<!--                        <router-view name="pay_free" v-else-if="pm.driverClass.endsWith('FreePaymentDriver')"></router-view>-->
+<!--                        &lt;!&ndash; <router-view name="pay_unknown" v-else></router-view> &ndash;&gt;-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div v-if="submitted && errors.has('paymentInfo')" class="invalid-feedback d-block">{{ errors.first('paymentInfo') }}</div>-->
+<!--                <div v-if="submitted && errors.has('paymentMethod')" class="invalid-feedback d-block">{{ errors.first('paymentMethod') }}</div>-->
+<!--                <div v-if="submitted && errors.has('paymentMethodInfo')" class="invalid-feedback d-block">{{ errors.first('paymentMethodInfo') }}</div>-->
+<!--                <div v-if="submitted && errors.has('paymentMethodType')" class="invalid-feedback d-block">{{ errors.first('paymentMethodType') }}</div>-->
+<!--                <div v-if="submitted && errors.has('paymentMethodService')" class="invalid-feedback d-block">{{ errors.first('paymentMethodService') }}</div>-->
+<!--            </div>-->
 
             <div class="form-group">
                 <label for="user.agreeToTerms" v-html="messages.field_label_agreeToTerms"></label>
@@ -133,15 +133,15 @@ export default {
                         this.errors.add({field: 'confirmPassword', msg: this.messages['err_confirmPassword_mismatch']})
                     } else {
                         if (this.plan !== null) {
-                            if (this.paymentMethodObject === null) {
-                                this.errors.add({field: 'paymentMethod', msg: this.messages['err_paymentMethod_required']});
-                                return;
-                            } else {
+                            // if (this.paymentMethodObject === null) {
+                            //     this.errors.add({field: 'paymentMethod', msg: this.messages['err_paymentMethod_required']});
+                            //     return;
+                            // } else {
                                 console.log('handleSubmit: setting this.user.preferredPlan = '+this.plan.uuid);
                                 this.user.preferredPlan = this.plan.uuid;
-                                this.user.paymentMethodObject = this.paymentMethodObject;
-                                this.user.paymentMethodObject.cloud = this.selectedPaymentMethod.name;
-                            }
+                            //     this.user.paymentMethodObject = this.paymentMethodObject;
+                            //     this.user.paymentMethodObject.cloud = this.selectedPaymentMethod.name;
+                            // }
                         }
                         this.register({
                             user: this.user,

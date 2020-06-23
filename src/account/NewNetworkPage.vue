@@ -39,7 +39,8 @@
             <hr/>
 
             <div v-if="promos && promos.length && promos.length > 0">
-                <p v-html="messages.payment_first_details_with_promos"></p>
+                <h4><b>{{messages.messages.payment_first_details_with_promos}}</b></h4>
+                <hr/>
                 <h5>{{messages.title_account_promotions}}</h5>
                 <table border="0">
                     <tr v-for="promo in promos">
@@ -47,11 +48,12 @@
                         <td>{{messages['label_promotion_'+promo.name+'_description']}}</td>
                     </tr>
                 </table>
-                <hr/>
+                <p>{{messages.payment_first_details_with_promos_details}}</p>
             </div>
             <div v-else>
                 <p v-html="messages.payment_first_details_no_promos"></p>
             </div>
+            <hr/>
 
             <!-- add a new payment method -->
             <label htmlFor="paymentMethod">{{messages.field_label_newPaymentMethod}}</label>
@@ -68,6 +70,8 @@
                     <!-- <router-view name="pay_unknown" v-else></router-view> -->
                 </div>
             </div>
+            <hr/>
+
         </div>
         <div v-else>
         <form @submit.prevent="handleSubmit">
