@@ -28,7 +28,7 @@
             }
         },
         computed: {
-            ...mapState('paymentMethods', ['paymentMethod', 'paymentStatus', 'paymentInfo']),
+            ...mapState('paymentMethods', ['paymentMethod', 'paymentStatus', 'paymentInfo', 'accountPaymentMethods']),
             ...mapState('system', ['messages']),
         },
         created () {
@@ -41,7 +41,7 @@
             this.card.mount(this.$refs.card);
         },
         methods: {
-            ...mapActions('paymentMethods', ['addAccountPaymentMethod']),
+            ...mapActions('paymentMethods', ['addAccountPaymentMethod', 'getAllAccountPaymentMethods']),
             authorizeCard(e) {
                 util.setSkipRegistration();
                 const comp = this;
@@ -65,6 +65,14 @@
                     }
                 });
                 return false;
+            }
+        },
+        watch: {
+            paymentStatus (ps) {
+                if (ps && ps.addedPaymentMethod) {
+                    // refresh account payment methods
+                    this.getAllAccountPaymentMethods({userId: this.user.uuid, messages: this.messages, errors: this.errors})
+                }
             }
         }
     };

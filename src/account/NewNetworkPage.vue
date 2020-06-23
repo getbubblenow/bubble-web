@@ -20,6 +20,55 @@
             <hr/>
             <button class="btn btn-primary" :disabled="actionStatus.requesting" @click="resendVerification(firstContact)">{{messages.button_label_resend_verify_code}}</button>
         </div>
+        <div v-else-if="typeof accountPayMethods !== 'undefined' && accountPayMethods !== null && accountPayMethods.length === 0">
+
+            <!-- plan -->
+            <div>
+                <h3>{{messages.field_label_choose_plan}}</h3>
+                <span v-if="findPlan(defaults.plan) && defaults.plan">{{messages['plan_name_'+defaults.plan]}} - {{messages.price_format.parseExpression({messages: messages, ...findPlan(defaults.plan)})}}</span>
+                <span v-else v-html="messages.message_auto_detecting"></span>
+                <button @click="customize.plan = true">{{messages.button_label_customize}}</button>
+            </div>
+            <div>
+                {{messages['plan_description_'+accountPlan.plan]}}
+                <div v-if="selectedPlan">
+                    <div v-if="typeof selectedPlan.maxAccounts !== 'undefined' && selectedPlan.maxAccounts !== null">&bullet; {{messages.message_plan_max_accounts.parseExpression({max: selectedPlan.maxAccounts})}}</div>
+                    <div v-else>&bullet; {{messages.message_plan_no_max_accounts}}</div>
+                </div>
+            </div>
+            <hr/>
+
+            <div v-if="promos && promos.length && promos.length > 0">
+                <p v-html="messages.payment_first_details_with_promos"></p>
+                <h5>{{messages.title_account_promotions}}</h5>
+                <table border="0">
+                    <tr v-for="promo in promos">
+                        <td><b>{{messages['label_promotion_'+promo.name]}}</b>:</td>
+                        <td>{{messages['label_promotion_'+promo.name+'_description']}}</td>
+                    </tr>
+                </table>
+                <hr/>
+            </div>
+            <div v-else>
+                <p v-html="messages.payment_first_details_no_promos"></p>
+            </div>
+
+            <!-- add a new payment method -->
+            <label htmlFor="paymentMethod">{{messages.field_label_newPaymentMethod}}</label>
+            <div v-if="payMethods.length > 1">
+                <span v-for="pm in payMethods">
+                    <button v-if="!pm.driverClass.endsWith('NoopCloud')" class="btn btn-primary" :disabled="loading()" @click="setPaymentMethod(pm)">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
+                </span>
+            </div>
+            <div v-if="typeof payMethods !== 'undefined' && payMethods !== null || payMethods.length > 0" v-for="pm in payMethods">
+                <div v-if="selectedPaymentMethod !== null && selectedPaymentMethod.driverClass !== null && selectedPaymentMethod.driverClass === pm.driverClass">
+                    <router-view name="pay_stripe" v-if="pm.driverClass.endsWith('StripePaymentDriver')"></router-view>
+                    <router-view name="pay_invite" v-else-if="pm.driverClass.endsWith('CodePaymentDriver')"></router-view>
+                    <router-view name="pay_free" v-else-if="pm.driverClass.endsWith('FreePaymentDriver')"></router-view>
+                    <!-- <router-view name="pay_unknown" v-else></router-view> -->
+                </div>
+            </div>
+        </div>
         <div v-else>
         <form @submit.prevent="handleSubmit">
 
@@ -75,7 +124,7 @@
 
             <!-- plan -->
             <div v-if="customize.plan === true" class="form-group">
-                <label htmlFor="plan">{{messages.field_label_plan}}</label>
+                <label htmlFor="plan">{{messages.field_label_plan}}:</label>
                 <select v-validate="'required'" v-if="planObjects" v-model="accountPlan.plan" name="plan" class="form-control" :class="{ 'is-invalid': submitted && errors.has('plan') }">
                     <option v-for="plan in planObjects" :value="plan.name">{{messages['plan_name_'+plan.name]}} - {{messages.price_format.parseExpression({messages: messages, ...plan})}}</option>
                 </select>
@@ -253,26 +302,6 @@
                         </div>
                         <hr/>
                     </div>
-
-                    <!-- add a new payment method -->
-                    <label htmlFor="paymentMethod">{{messages.field_label_newPaymentMethod}}</label>
-                    <div v-if="typeof payMethods === 'undefined' || payMethods === null || payMethods.length === 0" class="invalid-feedback d-block">
-                        <h5>{{messages.err_noPaymentMethods}}</h5>
-                    </div>
-                    <div v-else-if="payMethods.length > 1">
-                        <span v-for="pm in payMethods">
-                            <button v-if="!pm.driverClass.endsWith('NoopCloud')" class="btn btn-primary" :disabled="loading()" @click="setPaymentMethod(pm)">{{messages['payment_description_'+pm.paymentMethodType]}}</button>
-                        </span>
-                    </div>
-                </div>
-
-                <div v-for="pm in payMethods">
-                    <div v-if="selectedPaymentMethod !== null && selectedPaymentMethod.driverClass !== null && selectedPaymentMethod.driverClass === pm.driverClass">
-                        <router-view name="pay_stripe" v-if="pm.driverClass.endsWith('StripePaymentDriver')"></router-view>
-                        <router-view name="pay_invite" v-else-if="pm.driverClass.endsWith('CodePaymentDriver')"></router-view>
-                        <router-view name="pay_free" v-else-if="pm.driverClass.endsWith('FreePaymentDriver')"></router-view>
-                        <!-- <router-view name="pay_unknown" v-else></router-view> -->
-                    </div>
                 </div>
             </div>
 
@@ -281,7 +310,7 @@
                 <table border="0">
                     <tr>
                         <td>{{messages.field_label_plan}}:</td>
-                        <td>{{selectedPlanName}}</td>
+                        <td>{{selectedPlanName}}<span v-if="messages && selectedPlan && selectedPlan.currency"> - {{messages.price_format.parseExpression({messages: messages, ...selectedPlan})}}</span></td>
                     </tr>
                     <tr>
                         <td>{{messages.field_label_network_name}}:</td>
@@ -742,6 +771,8 @@
         created() {
             this.inboundAction = util.setInboundAction(this.$route);
             this.initDefaults();
+            const vue = this;
+            window.setTimeout(() => { vue.inboundAction = null; }, 5000)
         }
     };
 </script>
