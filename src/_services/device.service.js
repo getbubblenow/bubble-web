@@ -9,6 +9,7 @@ export const deviceService = {
     getDevicesByUserId,
     getAllDevicesByUserId,
     getAllDeviceTypesByUserId,
+    setDeviceSecurityLevel,
     getDeviceQRcodeById,
     getDeviceVPNconfById,
     addDeviceByUserId,
@@ -25,6 +26,10 @@ function getAllDevicesByUserId(userId, messages, errors) {
 
 function getAllDeviceTypesByUserId(userId, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/deviceTypes`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
+}
+
+function setDeviceSecurityLevel(userId, deviceId, securityLevel, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/devices/${deviceId}/securityLevel/${securityLevel}`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
 function getDeviceQRcodeById(userId, deviceId, messages, errors) {

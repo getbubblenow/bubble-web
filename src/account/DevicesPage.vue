@@ -13,6 +13,7 @@
 <!--                    <th nowrap="nowrap">{{messages.label_field_device_enabled}}</th>-->
                     <th>{{messages.label_field_device_vpn_config}}</th>
                     <th nowrap="nowrap">{{messages.label_field_device_certificate}}</th>
+                    <th nowrap="nowrap">{{messages.label_field_security_level}}</th>
 <!--                    <th>{{messages.label_field_device_ctime}}</th>-->
                     <th>{{messages.label_field_device_help}}</th>
                     <th><!-- delete --></th>
@@ -62,6 +63,14 @@
                         <a :href="'/api/auth/cacert?deviceType='+device.deviceType">
                             {{messages.message_download_ca_cert}}
                         </a>
+                    </td>
+                    <td>
+                        <form v-if="configs.securityLevels" @submit.prevent="false">
+                            <input type="hidden" name="deviceId" :value="device.uuid"/>
+                            <select v-model="device.securityLevel" @change="setSecurityLevel($event)">
+                                <option v-for="level in configs.securityLevels" :value="level">{{messages['device_security_level_'+level]}}</option>
+                            </select>
+                        </form>
                     </td>
 <!--                    <td nowrap="nowrap">{{messages.label_device_ctime_format.parseDateMessage(device.ctime, messages)}}</td>-->
                     <td>
@@ -149,7 +158,7 @@
         },
         computed: {
             ...mapState('devices', ['deviceTypes', 'devices', 'device', 'qrCodeImageBase64', 'vpnConfBase64']),
-            ...mapState('system', ['messages', 'appLinks']),
+            ...mapState('system', ['messages', 'appLinks', 'configs']),
             ...mapGetters('devices', ['loading']),
             addDeviceReady: function () {
                 return this.deviceName !== null && this.deviceName !== '' && this.deviceType !== null  && this.deviceType !== '';
@@ -186,6 +195,7 @@
             });
             const user = util.currentUser();
             if (user) this.getAppLinks(user.locale);
+            this.loadSystemConfigs();
         },
         mounted() {
             window.addEventListener('keyup', ev => {
@@ -198,9 +208,9 @@
         methods: {
             ...mapActions('devices', [
                 'getAllDeviceTypesByUserId', 'getDevicesByUserId', 'addDeviceByUserId', 'removeDeviceByUserId',
-                'getDeviceQRcodeById', 'getDeviceVPNconfById'
+                'getDeviceQRcodeById', 'getDeviceVPNconfById', 'setDeviceSecurityLevel'
             ]),
-            ...mapActions('system', ['getAppLinks']),
+            ...mapActions('system', ['getAppLinks', 'loadSystemConfigs']),
             addDevice () {
                 this.errors.clear();
                 this.submitted = true;
@@ -220,6 +230,15 @@
                 this.removeDeviceByUserId({
                     userId: this.userId,
                     deviceId: id,
+                    messages: this.messages,
+                    errors: this.errors
+                });
+            },
+            setSecurityLevel (event) {
+                this.setDeviceSecurityLevel({
+                    userId: this.userId,
+                    deviceId: event.target.form.deviceId.value,
+                    securityLevel: event.target.value,
                     messages: this.messages,
                     errors: this.errors
                 });

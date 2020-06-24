@@ -21,7 +21,8 @@ const state = {
         launchLock: null,
         promoCodePolicy: null,
         requireSendMetrics: null,
-        support: {}
+        support: {},
+        securityLevels: null
     },
     entityConfigs: {},
     searchResults: [],

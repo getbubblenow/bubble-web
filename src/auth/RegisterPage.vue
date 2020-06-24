@@ -132,17 +132,6 @@ export default {
                     if (this.user.password !== this.confirmPassword) {
                         this.errors.add({field: 'confirmPassword', msg: this.messages['err_confirmPassword_mismatch']})
                     } else {
-                        if (this.plan !== null) {
-                            // if (this.paymentMethodObject === null) {
-                            //     this.errors.add({field: 'paymentMethod', msg: this.messages['err_paymentMethod_required']});
-                            //     return;
-                            // } else {
-                                console.log('handleSubmit: setting this.user.preferredPlan = '+this.plan.uuid);
-                                this.user.preferredPlan = this.plan.uuid;
-                            //     this.user.paymentMethodObject = this.paymentMethodObject;
-                            //     this.user.paymentMethodObject.cloud = this.selectedPaymentMethod.name;
-                            // }
-                        }
                         this.register({
                             user: this.user,
                             messages: this.messages,
@@ -173,6 +162,11 @@ export default {
         accountPaymentMethod (apm) {
             if (apm) {
                 this.paymentMethodObject = apm;
+            }
+        },
+        plan (p) {
+            if (p.uuid) {
+                this.user.preferredPlan = p.uuid;
             }
         }
     }

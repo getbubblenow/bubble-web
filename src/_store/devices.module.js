@@ -46,6 +46,15 @@ const actions = {
             );
     },
 
+    setDeviceSecurityLevel({ commit }, {userId, deviceId, securityLevel, messages, errors}) {
+        commit('setDeviceSecurityLevelRequest');
+        deviceService.setDeviceSecurityLevel(userId, deviceId, securityLevel, messages, errors)
+            .then(
+                device => commit('setDeviceSecurityLevelSuccess', device),
+                error => commit('setDeviceSecurityLevelFailure', error)
+            );
+    },
+
     getDeviceQRcodeById({ commit }, {userId, deviceId, messages, errors}) {
         commit('getDeviceQRcodeByIdRequest');
         deviceService.getDeviceQRcodeById(userId, deviceId, messages, errors)
@@ -105,6 +114,17 @@ const mutations = {
     },
     getAllDeviceTypesByUserIdFailure(state, error) {
         state.loading.deviceTypes = false;
+        state.error = error;
+    },
+
+    setDeviceSecurityLevelRequest(state) {
+        state.loading.setSecurityLevel = true;
+    },
+    setDeviceSecurityLevelSuccess(state, device) {
+        state.loading.setSecurityLevel = false;
+    },
+    setDeviceSecurityLevelFailure(state, error) {
+        state.loading.setSecurityLevel = false;
         state.error = error;
     },
 
