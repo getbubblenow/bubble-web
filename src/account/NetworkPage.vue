@@ -20,40 +20,16 @@
             <h5 v-html="messages.title_launch_help_html"></h5>
             <div v-if="network && network.state === 'running'" v-html="messages.message_launch_success_help_html"></div>
             <div v-else v-html="messages.message_launch_help_html"></div>
-            <div v-if="appLinks">
+            <div v-if="appLinks && addableDeviceTypes">
                 <div v-if="network && network.state === 'running'" v-html="messages.message_launch_success_apps"></div>
                 <div v-else v-html="messages.message_launch_help_apps"></div>
                 <br/>
                 <table border="0" width="100%">
                     <tr>
-                        <td align="center" width="20%">
-                            <a target="_blank" rel="noopener noreferrer" :href="appLinks['ios']">
-                                <i class="fab fa-apple bubble-app-icon"></i><br/>
-                                {{messages.device_type_ios}}
-                            </a>
-                        </td>
-                        <td align="center" width="20%">
-                            <a target="_blank" rel="noopener noreferrer" :href="appLinks['android']">
-                                <i class="fab fa-android bubble-app-icon"></i><br/>
-                                {{messages.device_type_android}}
-                            </a>
-                        </td>
-                        <td align="center" width="20%">
-                            <a target="_blank" rel="noopener noreferrer" :href="appLinks['windows']">
-                                <i class="fab fa-windows bubble-app-icon"></i><br/>
-                                {{messages.device_type_windows}}
-                            </a>
-                        </td>
-                        <td align="center" width="20%">
-                            <a target="_blank" rel="noopener noreferrer" :href="appLinks['macosx']">
-                                <i class="fab fa-apple bubble-app-icon"></i><br/>
-                                {{messages.device_type_macosx}}
-                            </a>
-                        </td>
-                        <td align="center" width="20%">
-                            <a target="_blank" rel="noopener noreferrer" :href="appLinks['linux']">
-                                <i class="fab fa-linux bubble-app-icon"></i><br/>
-                                {{messages.device_type_linux}}
+                        <td v-for="deviceType in addableDeviceTypes" align="center" :width="addableDeviceWidth+'%'">
+                            <a target="_blank" rel="noopener noreferrer" :href="appLinks[deviceType]">
+                                <i :class="messages['device_type_icon_'+deviceType]+' bubble-app-icon'"></i><br/>
+                                {{messages['device_type_'+deviceType]}}
                             </a>
                         </td>
                     </tr>
@@ -181,6 +157,15 @@
             ...mapState('system', ['messages', 'configs', 'appLinks']),
             showSetupHelp () {
                 return (this.network !== null && (this.network.state === 'running' || this.network.state === 'starting'));
+            },
+            addableDeviceTypes: function () {
+                if (this.messages && this.messages['!addable_device_types']) {
+                    return this.messages['addable_device_types'].split('|');
+                }
+                return [];
+            },
+            addableDeviceWidth: function () {
+                return 100.0/this.addableDeviceTypes.length
             }
         },
         methods: {

@@ -8,11 +8,12 @@
                 <thead>
                 <tr>
                     <th nowrap="nowrap">{{messages.label_field_device_name}}</th>
-                    <th nowrap="nowrap">{{messages.label_field_device_type}}</th>
+<!--                    <th nowrap="nowrap">{{messages.label_field_device_type}}</th>-->
+                    <th nowrap="nowrap">{{messages.label_field_device_app}}</th>
 <!--                    <th nowrap="nowrap">{{messages.label_field_device_enabled}}</th>-->
                     <th>{{messages.label_field_device_vpn_config}}</th>
                     <th nowrap="nowrap">{{messages.label_field_device_certificate}}</th>
-                    <th>{{messages.label_field_device_ctime}}</th>
+<!--                    <th>{{messages.label_field_device_ctime}}</th>-->
                     <th>{{messages.label_field_device_help}}</th>
                     <th><!-- delete --></th>
                 </tr>
@@ -20,32 +21,49 @@
                 <tbody>
                 <tr v-for="device in devices">
                     <td nowrap="nowrap">{{device.name}}</td>
-                    <td nowrap="nowrap">{{messages['device_type_'+device.deviceType]}}</td>
+<!--                    <td nowrap="nowrap">-->
+<!--                        <i :class="messages['device_type_icon_'+device.deviceType]+' bubble-app-icon'"></i><br/>-->
+<!--                        {{messages['device_type_'+device.deviceType]}}-->
+<!--                    </td>-->
+                    <td align="center">
+                        <a v-if="appLinks" target="_blank" rel="noopener noreferrer" :href="appLinks[device.deviceType]">
+                            <i :class="messages['device_type_icon_'+device.deviceType]+' bubble-app-icon'"></i><br/>
+                            {{messages.message_download_app}}
+                        </a>
+                    </td>
 <!--                    <td>{{messages['message_'+device.enabled]}}</td>-->
                     <td>
                         <div v-if="displayVpnConfig[device.uuid] === true" class="device-vpn-config-div">
                             <h3>{{device.name}}</h3>
                             <hr/>
 
-                            <div v-if="qrCodeImageBase64">
+                            <div v-if="qrCodeImageBase64 && messages['device_type_vpn_'+device.deviceType] === 'show_qr_code'">
                                 <img :src="'data:image/png;base64,'+qrCodeImageBase64"/>
+                                <div v-if="errors.has('deviceQRcode')" class="invalid-feedback d-block">{{ errors.first('deviceQRcode') }}</div>
                             </div>
-                            <div v-if="errors.has('deviceQRcode')" class="invalid-feedback d-block">{{ errors.first('deviceQRcode') }}</div>
-
-                            <hr/>
-
-                            <button v-if="vpnConfBase64" @click="util.downloadURI('data:text/plain;base64,'+vpnConfBase64, 'vpn.conf')">{{messages.message_device_vpn_download_conf}}</button>
-                            <div v-if="errors.has('deviceVpnConf')" class="invalid-feedback d-block">{{ errors.first('deviceVpnConf') }}</div>
-
+                            <div v-else-if="vpnConfBase64 && messages['device_type_vpn_'+device.deviceType] === 'download_conf'">
+                                <button v-if="vpnConfBase64" @click="util.downloadURI('data:text/plain;base64,'+vpnConfBase64, 'vpn.conf')">{{messages.message_device_vpn_download_conf}}</button>
+                                <div v-if="errors.has('deviceVpnConf')" class="invalid-feedback d-block">{{ errors.first('deviceVpnConf') }}</div>
+                            </div>
+                            <div v-else>
+                                <h5>{{messages.message_device_vpn_unavailable}}</h5>
+                            </div>
                             <hr/>
                             <button @click="hideVpnConfig()" class="btn btn-primary">{{messages.button_label_close_device_vpn_config}}</button>
                         </div>
+                        <div v-else-if="messages['!button_label_vpn_config_'+messages['device_type_vpn_'+device.deviceType]]">
+                            <button @click="showVpnConfig(device.uuid)">{{messages['button_label_vpn_config_'+messages['device_type_vpn_'+device.deviceType]]}}</button>
+                        </div>
                         <div v-else>
-                            <button @click="showVpnConfig(device.uuid)">{{messages.message_device_vpn_show_config}}</button>
+                            {{messages.message_device_vpn_unavailable}}
                         </div>
                     </td>
-                    <td nowrap="nowrap"><a v-if="device.deviceType" :href="'/api/auth/cacert?deviceType='+device.deviceType">{{messages['device_type_'+device.deviceType]}}</a></td>
-                    <td nowrap="nowrap">{{messages.label_device_ctime_format.parseDateMessage(device.ctime, messages)}}</td>
+                    <td nowrap="nowrap">
+                        <a :href="'/api/auth/cacert?deviceType='+device.deviceType">
+                            {{messages.message_download_ca_cert}}
+                        </a>
+                    </td>
+<!--                    <td nowrap="nowrap">{{messages.label_device_ctime_format.parseDateMessage(device.ctime, messages)}}</td>-->
                     <td>
                         <div v-if="displayDeviceHelp[device.uuid] === true" class="device-help-div">
                             <div v-html="messages['device_type_'+device.deviceType+'_help_html']"></div>
@@ -76,10 +94,10 @@
                 <div v-if="submitted && errors.has('deviceName')" class="invalid-feedback d-block">{{ errors.first('deviceName') }}</div>
             </div>
 
-            <div class="form-group" v-if="deviceTypes">
+            <div class="form-group" v-if="addableDeviceTypes">
                 <label htmlFor="deviceType">{{messages.label_field_device_type}}</label>
                 <select v-model="deviceType" name="deviceType" class="form-control">
-                    <option v-for="type in deviceTypes" :value="type">{{messages['device_type_'+type]}}</option>
+                    <option v-for="type in addableDeviceTypes" :value="type">{{messages['device_type_'+type]}}</option>
                 </select>
             </div>
 
@@ -92,15 +110,18 @@
 
         <hr/>
 
-        <div>
-            <h4>{{messages.message_download_ca_cert}}</h4>
-            <!-- todo: use a v-for here, don't explicitly list deviceTypes, which may change -->
-            <a href="/api/auth/cacert?deviceType=macosx">{{messages.message_os_macosx}}</a> |
-            <a href="/api/auth/cacert?deviceType=ios">{{messages.message_os_ios}}</a> |
-            <a href="/api/auth/cacert?deviceType=windows">{{messages.message_os_windows}}</a> |
-            <a href="/api/auth/cacert?deviceType=android">{{messages.message_os_android}}</a> |
-            <a href="/api/auth/cacert?deviceType=linux">{{messages.message_os_linux}}</a> |
-            <a href="/api/auth/cacert?deviceType=firefox">{{messages.message_os_firefox}}</a>
+        <div v-if="certDeviceTypes">
+            <table border="0" width="100%">
+                <tr><td colspan="5"><h4>{{messages.message_download_ca_cert}}</h4></td></tr>
+                <tr>
+                    <td v-for="certDevice in certDeviceTypes" align="center" :width="certDeviceWidth+'%'">
+                        <a :href="'/api/auth/cacert?deviceType='+certDevice">
+                            <i :class="messages['device_type_icon_'+certDevice]+' bubble-app-icon'"></i><br/>
+                            {{messages['device_type_'+certDevice]}}
+                        </a>
+                    </td>
+                </tr>
+            </table>
             <hr/>
         </div>
     </div>
@@ -128,10 +149,28 @@
         },
         computed: {
             ...mapState('devices', ['deviceTypes', 'devices', 'device', 'qrCodeImageBase64', 'vpnConfBase64']),
-            ...mapState('system', ['messages']),
+            ...mapState('system', ['messages', 'appLinks']),
             ...mapGetters('devices', ['loading']),
             addDeviceReady: function () {
                 return this.deviceName !== null && this.deviceName !== '' && this.deviceType !== null  && this.deviceType !== '';
+            },
+            addableDeviceTypes: function () {
+                if (this.messages && this.messages['!addable_device_types']) {
+                    return this.messages['addable_device_types'].split('|');
+                }
+                return [];
+            },
+            addableDeviceWidth: function () {
+                return 100.0/this.addableDeviceTypes.length
+            },
+            certDeviceTypes: function () {
+                if (this.messages && this.messages['!cert_device_types']) {
+                    return this.messages['cert_device_types'].split('|');
+                }
+                return [];
+            },
+            certDeviceWidth: function () {
+                return 100.0/this.certDeviceTypes.length
             }
         },
         created () {
@@ -144,7 +183,9 @@
                 userId: this.userId,
                 messages: this.messages,
                 errors: this.errors
-            })
+            });
+            const user = util.currentUser();
+            if (user) this.getAppLinks(user.locale);
         },
         mounted() {
             window.addEventListener('keyup', ev => {
@@ -159,6 +200,7 @@
                 'getAllDeviceTypesByUserId', 'getDevicesByUserId', 'addDeviceByUserId', 'removeDeviceByUserId',
                 'getDeviceQRcodeById', 'getDeviceVPNconfById'
             ]),
+            ...mapActions('system', ['getAppLinks']),
             addDevice () {
                 this.errors.clear();
                 this.submitted = true;
@@ -183,6 +225,7 @@
                 });
             },
             showVpnConfig (id) {
+                this.hideDeviceHelp();
                 const show = {};
                 show[id] = true;
                 this.errors.clear();
@@ -203,6 +246,7 @@
             hideVpnConfig () { this.displayVpnConfig = {}; },
 
             showDeviceHelp (id) {
+                this.hideVpnConfig();
                 this.displayDeviceHelp = {};
                 this.displayDeviceHelp[id] = true;
             },
@@ -214,7 +258,7 @@
                     // after device added, clear device fields
                     this.deviceName = null;
                     this.deviceType = null;
-                    if (dev.uuid) this.displayDeviceHelp[dev.uuid] = true;
+                    if (dev.uuid) this.showVpnConfig(dev.uuid);
                 }
             }
         }
