@@ -23,11 +23,12 @@
         <div v-else-if="typeof accountPayMethods !== 'undefined' && accountPayMethods !== null && accountPayMethods.length === 0">
 
             <!-- plan -->
-            <div>
-                <h3>{{messages.field_label_choose_plan}}</h3>
-                <span v-if="findPlan(defaults.plan) && defaults.plan">{{messages['plan_name_'+defaults.plan]}} - {{messages.price_format.parseExpression({messages: messages, ...findPlan(defaults.plan)})}}</span>
-                <span v-else v-html="messages.message_auto_detecting"></span>
-                <button @click="customize.plan = true">{{messages.button_label_customize}}</button>
+            <div class="form-group">
+                <label htmlFor="plan">{{messages.field_label_choose_plan}}:</label>
+                <select v-validate="'required'" v-if="planObjects" v-model="accountPlan.plan" name="plan" class="form-control" :class="{ 'is-invalid': submitted && errors.has('plan') }">
+                    <option v-for="plan in planObjects" :value="plan.name">{{messages['plan_name_'+plan.name]}} - {{messages.price_format.parseExpression({messages: messages, ...plan})}}</option>
+                </select>
+                <div v-if="submitted && errors.has('plan')" class="invalid-feedback d-block">{{ errors.first('plan') }}</div>
             </div>
             <div>
                 {{messages['plan_description_'+accountPlan.plan]}}
@@ -620,9 +621,10 @@
                 return "(~"+parseInt(region.distance/1000)+" "+this.messages.msg_km_distance_away+")";
             },
             findPlan(name) {
-                if (this.planObjects) {
-                    for (let i=0; i<this.planObjects.length; i++) {
-                        if (this.planObjects[i].name === name) return this.planObjects[i];
+                const plans = this.planObjects;
+                if (plans) {
+                    for (let i=0; i<plans.length; i++) {
+                        if (plans[i].name === name) return plans[i];
                     }
                 }
                 return null;
@@ -768,6 +770,21 @@
                 if (nn && nn.uuid) {
                     this.$router.push({path:'/bubble/'+nn.networkName});
                     this.submitted = false;
+                }
+            },
+            plans (p) {
+                if (p) {
+                    if (this.user && this.user.preferredPlan) {
+                        const plans = this.planObjects;
+                        if (plans) {
+                            for (let i=0; i<plans.length; i++) {
+                                if (plans[i].uuid === this.user.preferredPlan) {
+                                    this.defaults.plan = plans[i].name;
+                                    this.accountPlan.plan = plans[i].name;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         },
