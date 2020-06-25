@@ -41,17 +41,17 @@
                 <div v-if="submitted && errors.has('password')" class="invalid-feedback d-block">{{ errors.first('password') }}</div>
             </div>
 
-            <div class="form-group">
-                <label htmlFor="url">{{messages.field_label_url}}</label>
-                <input type="text" v-model="subject.url" name="url" class="form-control"/>
-                <div v-if="submitted && errors.has('url')" class="invalid-feedback d-block">{{ errors.first('url') }}</div>
-            </div>
+<!--            <div class="form-group">-->
+<!--                <label htmlFor="url">{{messages.field_label_url}}</label>-->
+<!--                <input type="text" v-model="subject.url" name="url" class="form-control"/>-->
+<!--                <div v-if="submitted && errors.has('url')" class="invalid-feedback d-block">{{ errors.first('url') }}</div>-->
+<!--            </div>-->
 
-            <div class="form-group">
-                <label htmlFor="description">{{messages.field_label_description}}</label>
-                <input type="text" v-model="subject.description" name="description" class="form-control"/>
-                <div v-if="submitted && errors.has('description')" class="invalid-feedback d-block">{{ errors.first('description') }}</div>
-            </div>
+<!--            <div class="form-group">-->
+<!--                <label htmlFor="description">{{messages.field_label_description}}</label>-->
+<!--                <input type="text" v-model="subject.description" name="description" class="form-control"/>-->
+<!--                <div v-if="submitted && errors.has('description')" class="invalid-feedback d-block">{{ errors.first('description') }}</div>-->
+<!--            </div>-->
 
             <div v-if="admin === true && currentUser.uuid !== subject.uuid" class="form-group">
                 <label for="admin">{{messages.field_label_administrator}}</label>
