@@ -2,7 +2,7 @@
 <template>
     <div v-if="network">
         <h4 v-if="network.state === 'running' && configs && configs.networkUuid && network.uuid !== configs.networkUuid">
-            <a :href="'https://'+network.name+'.'+network.domainName">{{network.nickname}}</a> - <i>{{messages['msg_network_state_'+network.state]}}</i>
+            <a target="_blank" rel="noopener noreferrer" :href="networkAppLoginUrl">{{network.nickname}}</a> - <i>{{messages['msg_network_state_'+network.state]}}</i>
         </h4>
         <h4 v-else>{{network.nickname}} - <i>{{messages['msg_network_state_'+network.state]}}</i></h4>
 
@@ -166,6 +166,9 @@
             },
             addableDeviceWidth: function () {
                 return 100.0/this.addableDeviceTypes.length
+            },
+            networkAppLoginUrl: function () {
+                return 'https://'+this.network.name+'.'+this.network.domainName+'/appLogin?session='+util.currentUser().token+'&uri=/';
             }
         },
         methods: {
