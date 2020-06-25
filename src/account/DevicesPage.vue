@@ -43,7 +43,7 @@
                                 <div v-if="errors.has('deviceQRcode')" class="invalid-feedback d-block">{{ errors.first('deviceQRcode') }}</div>
                             </div>
                             <div v-else-if="vpnConfBase64 && messages['device_type_vpn_'+device.deviceType] === 'download_conf'">
-                                <button v-if="vpnConfBase64" @click="util.downloadURI('data:text/plain;base64,'+vpnConfBase64, 'vpn.conf')">{{messages.message_device_vpn_download_conf}}</button>
+                                <button v-if="vpnConfBase64" @click="util.downloadURI('data:text/plain;base64,'+vpnConfBase64, vpnConfFileName)">{{messages.message_device_vpn_download_conf}}</button>
                                 <div v-if="errors.has('deviceVpnConf')" class="invalid-feedback d-block">{{ errors.first('deviceVpnConf') }}</div>
                             </div>
                             <div v-else>
@@ -153,13 +153,21 @@
                 displayVpnConfig: {},
                 displayDeviceHelp: {},
                 config: config,
-                loadingImgSrc: loadingImgSrc
+                loadingImgSrc: loadingImgSrc,
+                util: util
             };
         },
         computed: {
             ...mapState('devices', ['deviceTypes', 'devices', 'device', 'qrCodeImageBase64', 'vpnConfBase64']),
             ...mapState('system', ['messages', 'appLinks', 'configs']),
             ...mapGetters('devices', ['loading']),
+            vpnConfFileName: function () {
+                if (this.configs && this.configs.networkUuid) {
+                    return 'bubble-'+this.configs.networkUuid.split('-')[0]+'-vpn.conf';
+                } else {
+                    return 'vpn.conf';
+                }
+            },
             addDeviceReady: function () {
                 return this.deviceName !== null && this.deviceName !== '' && this.deviceType !== null  && this.deviceType !== '';
             },
