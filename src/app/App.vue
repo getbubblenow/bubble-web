@@ -87,7 +87,11 @@ export default {
             } else {
                 const user = util.currentUser();
                 if (user !== null && (typeof user.token !== 'undefined' && user.token !== null)) {
-                    this.checkSession({messages: this.messages, errors: this.errors});
+                    if (this.status.loggingIn || this.status.loggedIn) {
+                        // console.log('activated: this.status.loggingIn='+this.status.loggingIn+', this.status.loggedIn='+this.status.loggedIn+', not checking session');
+                    } else {
+                        this.checkSession({messages: this.messages, errors: this.errors});
+                    }
                 }
             }
         },

@@ -105,7 +105,7 @@
         watch: {
             users (uList) {
                 if (uList !== null && this.lastAction !== null) {
-                    console.log('watch.users: updated, refreshing...');
+                    // console.log('watch.users: updated, refreshing...');
                     this.lastAction = null;
                     this.refreshData()
                 }

@@ -53,6 +53,14 @@
         methods: {
             ...mapActions('account', ['login', 'logout', 'appLogin']),
             ...mapActions('system', ['loadSystemConfigs', 'loadMessages']),
+        },
+        watch: {
+            user (u) {
+                if (u.token) {
+                    this.loadMessages('post_auth', u.locale);
+                    this.loadMessages('apps', u.locale);
+                }
+            }
         }
     };
 </script>

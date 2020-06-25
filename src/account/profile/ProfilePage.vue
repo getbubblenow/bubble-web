@@ -219,9 +219,9 @@
         watch: {
             user (u) {
                 if (u) {
-                    console.log('watch.user: received: '+JSON.stringify(u));
+                    // console.log('watch.user: received: '+JSON.stringify(u));
                     if (this.submitted) {
-                        console.log('watch.user: action was successful, refreshing page');
+                        // console.log('watch.user: action was successful, refreshing page');
                         if (this.me) {
                             this.$router.push('/');
                         } else if (this.admin) {

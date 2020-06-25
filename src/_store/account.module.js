@@ -258,7 +258,10 @@ const mutations = {
         state.user = null;
     },
 
-    appLoginRequest(state) {},
+    appLoginRequest(state) {
+        state.loginError = null;
+        state.status = Object.assign({}, state.status, {loggingIn: true});
+    },
     appLoginSuccess(state, {user, uri}) {
         if (user.token) {
             if (util.currentUser() === null) {
