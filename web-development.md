@@ -67,4 +67,4 @@ If you prefer to use `rsync` instead of `scp`:
 Then reload the page https://remote-server.example.com/ in your web browser to see your changes.
 
 ## Committing and Pushing Changes
-When you would like to save your changes, commit them to git and push them to your branch.
+When you are ready save your changes, commit them to git and then push them to your branch.
