@@ -1,4 +1,4 @@
-# Bubble Design Development
+# Bubble Web Development
 This document describes how to develop on the Bubble web application.
 
 ## Requirements
@@ -11,7 +11,8 @@ Along with expert-level knowledge of HTML, CSS and JavaScript, you'll need at le
  * [SSH](https://www.ssh.com/ssh/)
  * [rsync](https://linux.die.net/man/1/rsync) and/or [scp](https://linux.die.net/man/1/scp) commands
 
-It will be easiest to develop on Linux or Mac OS X.
+It will be easiest to develop on Linux or Mac OS X. If you are comfortable using all the above tools on Windows,
+then there should be no problems developing on Windows.
 
 In order to commit and push your changes to the `bubble-web` git repository, you will need an account on https://git.bubblev.org
 
