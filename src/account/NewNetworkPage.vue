@@ -33,7 +33,8 @@
             <div>
                 {{messages['plan_description_'+accountPlan.plan]}}
                 <div v-if="selectedPlan">
-                    <div v-if="typeof selectedPlan.maxAccounts !== 'undefined' && selectedPlan.maxAccounts !== null">&bullet; {{messages.message_plan_max_accounts.parseExpression({max: selectedPlan.maxAccounts})}}</div>
+                    <div v-if="typeof selectedPlan.maxAccounts !== 'undefined' && selectedPlan.maxAccounts !== null && selectedPlan.maxAccounts === 1">&bullet; {{messages.message_plan_max_accounts_one.parseExpression({max: selectedPlan.maxAccounts})}}</div>
+                    <div v-else-if="typeof selectedPlan.maxAccounts !== 'undefined' && selectedPlan.maxAccounts !== null && selectedPlan.maxAccounts > 1">&bullet; {{messages.message_plan_max_accounts_multiple.parseExpression({max: selectedPlan.maxAccounts})}}</div>
                     <div v-else>&bullet; {{messages.message_plan_no_max_accounts}}</div>
                 </div>
             </div>
