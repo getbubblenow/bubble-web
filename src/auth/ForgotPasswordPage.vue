@@ -4,7 +4,7 @@
         <h2>{{messages.form_title_forgotPassword}}</h2>
         <form @submit.prevent="handleSubmit">
             <div class="form-group">
-                <label for="name">{{messages.field_label_username}}</label>
+                <label for="name">{{messages.field_label_email}}</label>
                 <input type="text" v-model="name" :v-validate="'required'" name="name" class="form-control" :class="{ 'is-invalid': submitted && !name }" />
                 <div v-show="submitted && !name" class="invalid-feedback">Name is required</div>
                 <div v-if="submitted && errors.has('name')" class="invalid-feedback d-block">{{ errors.first('name') }}</div>
