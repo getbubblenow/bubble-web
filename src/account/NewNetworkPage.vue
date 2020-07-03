@@ -10,11 +10,11 @@
             <div v-if="errors.has('request')" class="invalid-feedback d-block">{{ errors.first('request') }}</div>
         </div>
 
-        <div v-if="!anyContacts && !user.admin">
+        <div v-if="anyContacts !== null && !anyContacts && !user.admin">
             <h3>{{messages.message_no_contacts}}</h3>
             <router-link v-if="!anyContacts" to="/me/policy">{{messages.link_label_no_contacts}}</router-link>
         </div>
-        <div v-else-if="!verifiedContacts && !user.admin">
+        <div v-else-if="verifiedContacts !== null && !verifiedContacts && !user.admin">
             <h3>{{messages.message_no_verified_contacts}}</h3>
             {{messages.message_no_verified_contacts_subtext}}
             <hr/>
@@ -51,7 +51,7 @@
                 <hr/>
                 <p>{{messages.payment_first_details_with_promos_details}}</p>
             </div>
-            <div v-else>
+            <div v-else-if="(verifiedContacts || user.admin) && typeof accountPayMethods !== 'undefined' && accountPayMethods !== null && accountPayMethods.length > 0">
                 <p v-html="messages.payment_first_details_no_promos"></p>
             </div>
             <hr/>
@@ -74,7 +74,7 @@
             <hr/>
 
         </div>
-        <div v-else>
+        <div>
         <form @submit.prevent="handleSubmit">
 
             <div class="form-group">
@@ -96,7 +96,12 @@
 
             <div v-if="showAdvanced || showForkOption">
 
-            <div v-if="showForkOption">
+                <div v-if="!showForkOption">
+                    <label for="showAdvanced"><b>{{messages.field_label_show_advanced_plan_options}}</b></label>
+                    <input type="checkbox" name="showAdvanced" v-model="showAdvanced"/>
+                </div>
+
+                <div v-if="showForkOption">
                 <!-- network type -->
                 <div class="form-group">
                     <label for="networkType">{{messages.field_label_network_type}}</label>
@@ -334,7 +339,6 @@
                         <td>{{tzDescription(accountPlan.timezone)}}</td>
                     </tr>
                 </table>
-
             </div>
 
             <div v-if="!showForkOption">
@@ -412,8 +416,8 @@
                 status: {
                     creating: false
                 },
-                verifiedContacts: false,
-                anyContacts: false,
+                verifiedContacts: null,
+                anyContacts: null,
                 firstContact: null,
                 payMethods: null,
                 accountPayMethods: null,
