@@ -299,14 +299,14 @@
             <hr/>
 
             <!-- payment -->
-            <div v-if="configs && configs.paymentsEnabled && payMethods && payMethods.length">
+            <div v-if="configs && configs.paymentsEnabled && payMethods && payMethods.length && payMethods.length > 1 && typeof accountPayMethods !== 'undefined' && accountPayMethods !== null && accountPayMethods.length > 1">
                 <div v-if="submitted && errors.has('purchase')" class="invalid-feedback d-block">{{ errors.first('purchase') }}</div>
 
                 <div class="form-group">
-                    <!-- use existing payment method -->
-                    <div v-if="typeof accountPayMethods !== 'undefined' && accountPayMethods !== null && accountPayMethods.length > 0">
+                    <div>
                         <h5>{{messages.field_label_existingPaymentMethod}}</h5>
                         <div v-for="apm in accountPayMethods">
+                            <!-- show existing payment method as selected -->
                             <button v-if="accountPlan.paymentMethodObject.uuid === apm.uuid" class="btn btn-success" :disabled="loading()">{{messages['payment_method_'+apm.paymentMethodType]}}: {{apm.maskedPaymentInfo}}</button>
                             <button v-else class="btn btn-primary" :disabled="loading()" @click="setAccountPaymentMethod(apm)">{{messages['payment_method_'+apm.paymentMethodType]}}: {{apm.maskedPaymentInfo}}</button>
                         </div>
@@ -344,9 +344,9 @@
             <div v-if="!showForkOption">
                 <label for="showAdvanced"><b>{{messages.field_label_show_advanced_plan_options}}</b></label>
                 <input type="checkbox" name="showAdvanced" v-model="showAdvanced"/>
+                <hr/>
             </div>
 
-            <hr/>
             <div class="form-group">
                 <button class="btn btn-primary" :disabled="loading() || !isComplete" @click="launchBubble()">{{messages.button_label_create_new_network}}</button>
                 <img v-show="loading()" :src="loadingImgSrc" />
