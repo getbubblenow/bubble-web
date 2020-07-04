@@ -74,7 +74,7 @@
             <hr/>
 
         </div>
-        <div>
+        <div v-else>
         <form @submit.prevent="handleSubmit">
 
             <div class="form-group">
