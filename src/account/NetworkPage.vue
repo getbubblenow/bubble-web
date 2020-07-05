@@ -2,7 +2,8 @@
 <template>
     <div v-if="network">
         <h4 v-if="network.state === 'running' && configs && configs.networkUuid && network.uuid !== configs.networkUuid">
-            <a target="_blank" rel="noopener noreferrer" :href="networkAppLoginUrl">{{messages.message_network_connect.parseMessage({bubbleName: network.nickname})}}</a>
+            {{network.nickname}} - <i>{{messages['msg_network_state_'+network.state]}}</i><br/>
+            <h6><button :title="messages.message_network_connect" :onclick="'window.open(\''+networkAppLoginUrl+'\', \'_blank\')'">{{messages.message_network_connect}}</button></h6>
         </h4>
         <h4 v-else>{{network.nickname}} - <i>{{messages['msg_network_state_'+network.state]}}</i></h4>
 
@@ -168,7 +169,7 @@
                 return 100.0/this.addableDeviceTypes.length
             },
             networkAppLoginUrl: function () {
-                return 'https://'+this.network.name+'.'+this.network.domainName+'/appLogin?session='+util.currentUser().token+'&uri=/';
+                return 'https://'+this.network.name+'.'+this.network.domainName+'/appLogin?session='+util.currentUser().token+'&uri=/devices';
             }
         },
         methods: {
