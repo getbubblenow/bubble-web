@@ -2,7 +2,7 @@
 <template>
     <div v-if="network">
         <h4 v-if="network.state === 'running' && configs && configs.networkUuid && network.uuid !== configs.networkUuid">
-            <a target="_blank" rel="noopener noreferrer" :href="networkAppLoginUrl">{{network.nickname}}</a> - <i>{{messages['msg_network_state_'+network.state]}}</i>
+            {{network.nickname}} - <a target="_blank" rel="noopener noreferrer" :href="networkAppLoginUrl">{{messages.message_network_connect.parseMessage({bubbleName: network.nickname})}}</a>
         </h4>
         <h4 v-else>{{network.nickname}} - <i>{{messages['msg_network_state_'+network.state]}}</i></h4>
 

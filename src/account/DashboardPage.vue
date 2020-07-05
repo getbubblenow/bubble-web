@@ -22,7 +22,6 @@
                 users: state => state.users.all
             }),
             ...mapState('account', ['locale']),
-            ...mapState('devices', ['devices']),
             ...mapState('system', ['messages', 'detectedTimezone', 'detectedLocale', 'configs']),
             ...mapGetters('system', ['dashboardApps']),
             queryApp () {
@@ -48,24 +47,13 @@
             }
         },
         methods: {
-            ...mapActions('system', ['loadMessages', 'loadTimezones', 'detectTimezone', 'detectLocale']),
-            ...mapActions('devices', ['getAllDevicesByUserId'])
+            ...mapActions('system', ['loadMessages', 'loadTimezones', 'detectTimezone', 'detectLocale'])
         },
         created () {
             this.loadMessages('post_auth', this.locale);
             this.loadMessages('apps', this.locale);
             this.detectLocale();
             this.detectTimezone();
-            this.getAllDevicesByUserId({userId: util.currentUser().uuid, messages: this.messages, errors: this.errors});
-        },
-        watch: {
-            devices (devs) {
-                if (this.configs && this.configs.bubbleNode === true && devs && typeof devs.length !== 'undefined') {
-                    if (devs.length === 0) {
-                        this.$router.push('/devices');
-                    }
-                }
-            }
         }
     };
 </script>

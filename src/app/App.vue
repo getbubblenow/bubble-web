@@ -4,13 +4,13 @@
         <totp-modal/>
 
         <table v-if="status.loggedIn && activated && path && path !== '' && path !== '/'" class="dash-icon-panel">
-            <tr align="center"><td align="center">
-                <router-link to="/" class="icon-dash-cell">
+            <tr class="icon-dash-row"><td>
+                <router-link to="/">
                     <span class="icon-dash-title"><i aria-hidden="true" :class="'icon-dash-app '+messages.label_menu_dashboard_icon" :title="messages.label_menu_dashboard"></i><br/>{{messages.label_menu_dashboard}}</span>
                 </router-link>
             </td></tr>
-            <tr v-for="app in dashApps" align="center"><td align="center">
-                <router-link :to="app.href" class="icon-dash-cell">
+            <tr v-for="app in dashApps" class="icon-dash-row"><td>
+                <router-link :to="app.href">
                     <span class="icon-dash-title"><i aria-hidden="true" :class="'icon-dash-app '+app.icon" :title="app.title"></i><br/>{{app.title}}</span>
                 </router-link>
             </td></tr>
