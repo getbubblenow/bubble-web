@@ -3,9 +3,18 @@
     <div class="jumbotron">
         <totp-modal/>
 
-        <router-link v-if="status.loggedIn && activated && path && path !== '' && path !== '/'" to="/" class="icon-dash-cell">
-            <div class="icon-dash-title"><i aria-hidden="true" :class="'icon-dash-app '+messages.label_menu_dashboard_icon" :title="messages.label_menu_dashboard"></i><br/>{{messages.label_menu_dashboard}}</div>
-        </router-link>
+        <table v-if="status.loggedIn && activated && path && path !== '' && path !== '/'" class="dash-icon-panel">
+            <tr align="center"><td align="center">
+                <router-link to="/" class="icon-dash-cell">
+                    <span class="icon-dash-title"><i aria-hidden="true" :class="'icon-dash-app '+messages.label_menu_dashboard_icon" :title="messages.label_menu_dashboard"></i><br/>{{messages.label_menu_dashboard}}</span>
+                </router-link>
+            </td></tr>
+            <tr v-for="app in dashApps" align="center"><td align="center">
+                <router-link :to="app.href" class="icon-dash-cell">
+                    <span class="icon-dash-title"><i aria-hidden="true" :class="'icon-dash-app '+app.icon" :title="app.title"></i><br/>{{app.title}}</span>
+                </router-link>
+            </td></tr>
+        </table>
 
         <div class="container">
             <div class="row">
@@ -38,7 +47,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+    import {mapState, mapActions, mapGetters} from 'vuex'
 import { util } from '../_helpers'
 
 export default {
@@ -55,6 +64,28 @@ export default {
         ...mapState({
             alert: state => state.alert
         }),
+        ...mapGetters('system', ['dashboardApps']),
+        queryApp () {
+            if (typeof this.$route.query.app !== 'undefined' && this.$route.query.app !== null && this.$route.query.app !== '') {
+                return this.$route.query.app;
+            }
+            return null;
+        },
+        dashApps () {
+            let appView = this.dashboardApps;
+            const qApp = this.queryApp;
+            if (qApp !== null) {
+                const appPath = this.$route.query.app;
+                for (let i=0; i<appView.length; i++) {
+                    const app = appView[i];
+                    if (app.href === '/?app='+appPath) {
+                        appView = app.apps;
+                        break;
+                    }
+                }
+            }
+            return appView;
+        },
         locales () { return this.configs.locales; },
         path () { return this.$route.path; }
     },

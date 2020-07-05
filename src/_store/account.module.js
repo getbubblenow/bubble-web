@@ -67,9 +67,11 @@ const actions = {
                         }
                         const landing = util.getLandingPage();
                         if (landing === null) {
-                            console.log('account.login: no landing page, systemConfigs.bubbleNode=='+systemConfigs.bubbleNode);
-                            if (systemConfigs.bubbleNode === false) {
+                            console.log('account.login: no landing page, systemConfigs.bubbleNode=='+systemConfigs.bubbleNode+', systemConfigs.sageLauncher=='+systemConfigs.sageLauncher);
+                            if (systemConfigs.bubbleNode === false || systemConfigs.sageLauncher === true) {
                                 router.replace('/bubbles');
+                            } else if (systemConfigs.bubbleNode === true) {
+                                router.replace('/devices');
                             } else {
                                 router.replace('/');
                             }
