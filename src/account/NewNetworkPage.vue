@@ -74,7 +74,7 @@
             <hr/>
 
         </div>
-        <div v-else>
+        <div v-else-if="typeof accountPayMethods !== 'undefined' && accountPayMethods !== null && accountPayMethods.length > 0">
         <form @submit.prevent="handleSubmit">
 
             <div class="form-group">
