@@ -7,7 +7,7 @@
         </h4>
         <h4 v-else>{{network.nickname}} - <i>{{messages['msg_network_state_'+network.state]}}</i></h4>
 
-        <div v-if="stats && network.state !== 'stopped'">
+        <div v-if="stats && (network.state === 'starting' || network.state === 'restoring')">
             <!-- adapted from: https://code-boxx.com/simple-vanilla-javascript-progress-bar/ -->
             <div class="progress-wrap">
                 <div class="progress-bar" :style="'width: '+stats.percent+'%'" :id="'progressBar_'+networkId"></div>
@@ -114,6 +114,7 @@
                 networkUuid: null,
                 stats: null,
                 refresher: null,
+                stopRefresher: null,
                 restoreKeyCode: null,
                 restoreKeyPassword: null,
                 loadingImgSrc: loadingImgSrc
@@ -126,7 +127,7 @@
             ]),
             ...mapState('system', ['messages', 'configs', 'appLinks']),
             showSetupHelp () {
-                return (this.network !== null && (this.network.state === 'running' || this.network.state === 'starting'));
+                return (this.network !== null && (this.network.state === 'running' || this.network.state === 'starting' || this.network.state === 'restoring'));
             },
             addableDeviceTypes: function () {
                 if (this.messages && this.messages['!addable_device_types']) {
@@ -167,6 +168,10 @@
                 // todo: separate refresher for network -- after "stop" we should refresh the status to show it is stopped
                 this.refresher = setInterval(() => this.refreshStatus(user.uuid), 5000);
             },
+
+            stopRefreshStatus (userId) {
+                this.getNetworkById({userId: userId, networkId: this.networkId, messages: this.messages, errors: this.errors});
+            },
             stopNet () {
                 if (this.networkUuid === null) {
                     alert(this.messages.network_action_stop_not_ready);
@@ -179,6 +184,9 @@
                             messages: this.messages,
                             errors: this.errors
                         });
+                        clearInterval(this.refresher);
+                        this.refresher = null;
+                        this.stopRefresher = setInterval(() => this.stopRefreshStatus(this.user.uuid), 5000);
                     }
                 }
             },
@@ -222,13 +230,19 @@
             this.getAppLinks(user.locale);
         },
         beforeDestroy () {
-            clearInterval(this.refresher);
+            if (this.refresher !== null) clearInterval(this.refresher);
+            if (this.stopRefresher !== null) clearInterval(this.stopRefresher);
         },
         watch: {
             network (net) {
                 if (net) {
-                    if (net.state === 'running' || net.state === 'stopped' || net.state === 'error_stopping' || net.uuid === 'Not Found') {
+                    if (net.state !== 'starting' && net.state !== 'restoring' && this.refresher !== null) {
                         clearInterval(this.refresher);
+                        this.refresher = null;
+                    }
+                    if (net.state === 'stopped' && this.stopRefresher !== null) {
+                        clearInterval(this.stopRefresher);
+                        this.stopRefresher = null;
                     }
                     if (net.uuid === 'Not Found') {
                         this.$router.replace({path: '/bubbles'});
@@ -246,12 +260,14 @@
                             this.stats = stats[i];
                             if (this.stats.percent === 100) {
                                 clearInterval(this.refresher);
+                                this.refresher = null;
                             }
                             return;
                         }
                     }
                     // status not found for our network
                     clearInterval(this.refresher);
+                    this.refresher = null;
                 }
             },
             deletedNetworkUuid (uuid) {
