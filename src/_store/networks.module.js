@@ -90,7 +90,7 @@ const actions = {
         commit('stopNetworkRequest', networkId);
         networkService.stopNetwork(userId, networkId, messages, errors)
             .then(
-                network => commit('stopNetworkSuccess', network),
+                ok => commit('stopNetworkSuccess', {networkId, ok}),
                 error => commit('stopNetworkFailure', { networkId, error: error.toString() })
             );
     },
@@ -204,8 +204,11 @@ const mutations = {
     stopNetworkRequest(state, id) {
         state.loading.stopping = true;
     },
-    stopNetworkSuccess(state, id) {
+    stopNetworkSuccess(state, { networkId, ok }) {
         state.loading.stopping = false;
+        if (state.network && state.network.uuid && state.network.uuid === networkId) {
+            state.network.state = 'stopping';
+        }
     },
     stopNetworkFailure(state, { id, error }) {
         state.loading.stopping = false;

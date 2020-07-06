@@ -168,20 +168,22 @@
                 this.refresher = setInterval(() => this.refreshStatus(user.uuid), 5000);
             },
             stopNet () {
-                const vue = this;
-                if (confirm(vue.messages.confirmation_network_action_stop)) {
-                    this.errors.clear();
-                    this.stopNetwork({
-                        userId: this.user.uuid,
-                        networkId: this.networkId,
-                        messages: this.messages,
-                        errors: this.errors
-                    });
+                if (this.networkUuid === null) {
+                    alert(this.messages.network_action_stop_not_ready);
+                } else {
+                    if (confirm(this.messages.confirmation_network_action_stop)) {
+                        this.errors.clear();
+                        this.stopNetwork({
+                            userId: this.user.uuid,
+                            networkId: this.networkUuid,
+                            messages: this.messages,
+                            errors: this.errors
+                        });
+                    }
                 }
             },
             deleteNet () {
-                const vue = this;
-                if (confirm(vue.messages.confirmation_network_action_delete)) {
+                if (confirm(this.messages.confirmation_network_action_delete)) {
                     this.errors.clear();
                     this.deleteNetwork({
                         userId: this.user.uuid,
