@@ -40,36 +40,6 @@
             <span v-html="messages.message_launch_support.parseMessage(this)"></span>
         </div>
 
-<!--        <div>-->
-<!--            <div>-->
-<!--                <div>{{messages.label_field_networks_locale}}: {{messages['locale_'+network.locale] || network.locale}}</div>-->
-<!--                <div>{{messages.label_field_networks_timezone}}: {{messages['tz_name_'+network.timezone] || network.timezone}}</div>-->
-<!--            </div>-->
-<!--        </div>-->
-
-<!--        <div v-if="networkNodes">-->
-<!--            <table border="1">-->
-<!--                <thead>-->
-<!--                <tr>-->
-<!--                    <th nowrap="nowrap">{{messages.label_field_nodes_name}}</th>-->
-<!--                    <th nowrap="nowrap">{{messages.label_field_nodes_region}}</th>-->
-<!--                    <th nowrap="nowrap">{{messages.label_field_nodes_ip4}}</th>-->
-<!--                    <th nowrap="nowrap">{{messages.label_field_nodes_ip6}}</th>-->
-<!--                    <th nowrap="nowrap">{{messages.label_field_nodes_state}}</th>-->
-<!--                </tr>-->
-<!--                </thead>-->
-<!--                <tbody>-->
-<!--                <tr v-for="node in networkNodes">-->
-<!--                    <td>{{node.fqdn}}</td>-->
-<!--                    <td nowrap="nowrap">{{node.region}}</td>-->
-<!--                    <td>{{node.ip4}}</td>-->
-<!--                    <td>{{node.ip6}}</td>-->
-<!--                    <td>{{messages['msg_node_state_'+node.state]}}</td>-->
-<!--                </tr>-->
-<!--                </tbody>-->
-<!--            </table>-->
-<!--        </div>-->
-
         <div v-if="network.state === 'running' && configs.networkUuid && network.uuid === configs.networkUuid">
             <button class="btn btn-secondary" @click="requestRestoreKey()"
                     :disabled="loading && loading.requestNetworkKeys">
@@ -118,13 +88,11 @@
             <div v-if="errors.has('node')" class="invalid-feedback d-block">{{ errors.first('node') }}</div>
             <div v-if="errors.has('accountPlan')" class="invalid-feedback d-block">{{ errors.first('accountPlan') }}</div>
             <div v-if="network.state === 'running' || network.state === 'starting'" style="border: 2px solid #000;">
-                <hr/>
                 <button @click="stopNet()" class="btn btn-danger">{{messages.link_network_action_stop}}</button>
                 {{messages.link_network_action_stop_description}}
             </div>
-            <div v-else></div>
             <hr/>
-            <div v-if="network.state === 'stopped' || network.state === 'error_stopping'" style="border: 2px solid #000;">
+            <div style="border: 2px solid #000;">
                 <button @click="deleteNet()" class="btn btn-danger">{{messages.link_network_action_delete}}</button>
                 {{messages.link_network_action_delete_description}}
             </div>
@@ -143,6 +111,7 @@
             return {
                 user: util.currentUser(),
                 networkId: this.$route.params.id,
+                networkUuid: null,
                 stats: null,
                 refresher: null,
                 restoreKeyCode: null,
@@ -153,7 +122,7 @@
         computed: {
             ...mapState('networks', [
                 'network', 'newNodeNotification', 'networkStatuses', 'networkNodes', 'networkKeysRequested',
-                'deletedNetwork', 'networkKeys', 'loading'
+                'deletedNetworkUuid', 'networkKeys', 'loading'
             ]),
             ...mapState('system', ['messages', 'configs', 'appLinks']),
             showSetupHelp () {
@@ -199,22 +168,28 @@
                 this.refresher = setInterval(() => this.refreshStatus(user.uuid), 5000);
             },
             stopNet () {
-                this.errors.clear();
-                this.stopNetwork({
-                    userId: this.user.uuid,
-                    networkId: this.networkId,
-                    messages: this.messages,
-                    errors: this.errors
-                });
+                const vue = this;
+                if (confirm(vue.messages.confirmation_network_action_stop)) {
+                    this.errors.clear();
+                    this.stopNetwork({
+                        userId: this.user.uuid,
+                        networkId: this.networkId,
+                        messages: this.messages,
+                        errors: this.errors
+                    });
+                }
             },
             deleteNet () {
-                this.errors.clear();
-                this.deleteNetwork({
-                    userId: this.user.uuid,
-                    networkId: this.networkId,
-                    messages: this.messages,
-                    errors: this.errors
-                });
+                const vue = this;
+                if (confirm(vue.messages.confirmation_network_action_delete)) {
+                    this.errors.clear();
+                    this.deleteNetwork({
+                        userId: this.user.uuid,
+                        networkId: this.networkId,
+                        messages: this.messages,
+                        errors: this.errors
+                    });
+                }
             },
             requestRestoreKey () {
                 this.errors.clear();
@@ -256,6 +231,7 @@
                     if (net.uuid === 'Not Found') {
                         this.$router.replace({path: '/bubbles'});
                     }
+                    this.networkUuid = net.uuid;
                 }
             },
             networkNodes (nodes) {
@@ -276,8 +252,8 @@
                     clearInterval(this.refresher);
                 }
             },
-            deletedNetwork (network) {
-                if (network && (network.name === this.networkId || network.uuid === this.networkId)) {
+            deletedNetworkUuid (uuid) {
+                if (uuid && this.networkUuid && (uuid === this.networkUuid)) {
                     this.$router.replace({path: '/bubbles'});
                 }
             }

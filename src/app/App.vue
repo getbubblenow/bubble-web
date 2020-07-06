@@ -3,7 +3,7 @@
     <div class="jumbotron">
         <totp-modal/>
 
-        <table v-if="status.loggedIn && activated && path && path !== '' && path !== '/'" class="dash-icon-panel">
+        <table v-if="this.user !== null && status.loggedIn && activated && path && path !== '' && path !== '/'" class="dash-icon-panel">
             <tr class="icon-dash-row"><td>
                 <router-link to="/">
                     <span class="icon-dash-title"><i aria-hidden="true" :class="'icon-dash-app '+messages.label_menu_dashboard_icon" :title="messages.label_menu_dashboard"></i><br/>{{messages.label_menu_dashboard}}</span>

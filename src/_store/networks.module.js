@@ -20,7 +20,7 @@ const state = {
     newNodeNotification: null,
     networkStatuses: [],
     networkNodes: null,
-    deletedNetwork: null,
+    deletedNetworkUuid: null,
     networkKeysRequested: null,
     networkKeys: null
 };
@@ -99,7 +99,7 @@ const actions = {
         commit('deleteNetworkRequest', networkId);
         networkService.deleteNetwork(userId, networkId, messages, errors)
             .then(
-                network => commit('deleteNetworkSuccess', network),
+                plan => commit('deleteNetworkSuccess', plan),
                 error => commit('deleteNetworkFailure', { networkId, error: error.toString() })
             );
     },
@@ -215,13 +215,14 @@ const mutations = {
     deleteNetworkRequest(state, id) {
         state.loading.deleting = true;
     },
-    deleteNetworkSuccess(state, deletedNet) {
+    deleteNetworkSuccess(state, deletedPlan) {
         state.loading.deleting = false;
+        const deletedNet = deletedPlan.deletedNetwork;
         // remove deleted network from state
         if (state.networks) {
-            state.networks = state.networks.filter(network => (network.uuid !== deletedNet.uuid && network.name !== deletedNet.name))
+            state.networks = state.networks.filter(network => network.uuid !== deletedNet)
         }
-        state.deletedNetwork = deletedNet;
+        state.deletedNetworkUuid = deletedNet;
     },
     deleteNetworkFailure(state, { net, error }) {
         state.loading.deleting = false;
