@@ -151,7 +151,8 @@
                 {{messages['plan_description_'+accountPlan.plan]}}
                 <div v-if="networkType === 'fork'"><hr/>{{messages.message_plan_fork_apps}}</div>
                 <div v-else-if="selectedPlan && selectedPlan.apps && selectedPlan.apps.length > 0">
-                    <div v-if="typeof selectedPlan.maxAccounts !== 'undefined' && selectedPlan.maxAccounts !== null">&bullet; {{messages.message_plan_max_accounts.parseExpression({max: selectedPlan.maxAccounts})}}</div>
+                    <div v-if="typeof selectedPlan.maxAccounts !== 'undefined' && selectedPlan.maxAccounts !== null && selectedPlan.maxAccounts === 1">&bullet; {{messages.message_plan_max_accounts_one}}</div>
+                    <div v-else-if="typeof selectedPlan.maxAccounts !== 'undefined' && selectedPlan.maxAccounts !== null && selectedPlan.maxAccounts > 1">&bullet; {{messages.message_plan_max_accounts_multiple.parseExpression({max: selectedPlan.maxAccounts})}}</div>
                     <div v-else>&bullet; {{messages.message_plan_no_max_accounts}}</div>
                     &bullet; {{messages.message_plan_node_apps}}
                     <div v-for="app in selectedPlan.apps">
