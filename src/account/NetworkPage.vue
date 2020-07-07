@@ -114,14 +114,12 @@
 
         </div>
 
-        <div v-if="configs.sageLauncher && (network.state === 'running' || network.state === 'starting' || network.state === 'restoring' || network.state === 'stopped' || network.state === 'error_stopping')">
-            <hr/>
+        <div v-if="configs.sageLauncher">
             <div class="text-danger"><h4>{{messages.title_network_danger_zone}}</h4></div>
             <div v-if="errors.has('node')" class="invalid-feedback d-block">{{ errors.first('node') }}</div>
             <div v-if="errors.has('accountPlan')" class="invalid-feedback d-block">{{ errors.first('accountPlan') }}</div>
 
-            <div v-if="network.state === 'running' || network.state === 'starting' || network.state === 'restoring'"
-                 style="border: 2px solid #000;">
+            <div v-if="network.state !== 'stopping' && backups && backups.length > 0" style="border: 2px solid #000;">
                 <button @click="stopNet()" class="btn btn-danger" :disabled="loading && loading.stopping">
                     {{messages.link_network_action_stop}}
                 </button>
@@ -131,8 +129,8 @@
                 <!-- the next condition is to prevent this info shown twice on this page -->
                 <span v-if="!isSelfNetAndRunning" v-html="latestBackupInfoHtml"></span>
             </div>
-            <div v-else-if="network.state === 'stopped' || network.state === 'error_stopping'"
-                 style="border: 2px solid #000;">
+            <br/>
+            <div style="border: 2px solid #000;">
                 <button @click="deleteNet()" class="btn btn-danger" :disabled="loading && loading.deleting">
                     {{messages.link_network_action_delete}}
                 </button>
