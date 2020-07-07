@@ -10,6 +10,7 @@ const user = util.currentUser();
 const defaultStatus = {
     loggingIn: false,
     loggedIn: false,
+    restoring: false,
     registering: false,
     updating: false,
     settingLocale: false,
@@ -109,6 +110,17 @@ const actions = {
             .then(
                 ok => commit('logoutSuccess'),
                 error => commit('logoutFailure', error)
+            );
+    },
+    restore({ dispatch, commit }, { shortKey, longKey, password, systemConfigs, messages, errors }) {
+        commit('restoreRequest');
+        userService.restore(shortKey, longKey, password, messages, errors)
+            .then(
+                ok => {
+                    commit('restoreSuccess');
+                    systemConfigs.isWaitingRestoring = false;
+                },
+                error => commit('restoreFailure', error)
             );
     },
     forgotPassword({ commit }, {username, messages, errors}) {
@@ -291,6 +303,17 @@ const mutations = {
     },
     logoutFailure(state, error) {
         console.log('logout failed: '+JSON.stringify(error));
+    },
+
+    restoreRequest(state) {
+        state.status = Object.assign({}, state.status, {restoring: true});
+    },
+    restoreSuccess(state) {
+        state.status = Object.assign({}, state.status, {restoring: false});
+    },
+    restoreFailure(state, error) {
+        state.status = Object.assign({}, state.status, {restoring: false});
+        console.log('restore failed: ' + JSON.stringify(error));
     },
 
     forgotPasswordRequest(state) {

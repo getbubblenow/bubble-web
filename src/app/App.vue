@@ -1,6 +1,8 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
-    <div class="jumbotron">
+    <div v-if="!configs"><img :src="loadingImgSrc" /></div>
+
+    <div v-else class="jumbotron">
         <totp-modal/>
 
         <table v-if="this.user !== null && status.loggedIn && activated && path && path !== '' && path !== '/'" class="dash-icon-panel">
@@ -49,13 +51,15 @@
 <script>
     import {mapState, mapActions, mapGetters} from 'vuex'
 import { util } from '../_helpers'
+import { loadingImgSrc } from '../_store';
 
 export default {
     name: 'app',
     data() {
         return {
             showLocaleSelector: false,
-            selectedLocale: 'detect'
+            selectedLocale: 'detect',
+            loadingImgSrc: loadingImgSrc
         }
     },
     computed: {
@@ -87,7 +91,8 @@ export default {
             return appView;
         },
         locales () { return this.configs.locales; },
-        path () { return this.$route.path; }
+        path () { return this.$route.path; },
+        isInRestoringMode () { return this.configs ? this.configs.isWaitingRestoring : undefined; }
     },
     methods: {
         ...mapActions({ clearAlert: 'alert/clear' }),
@@ -136,6 +141,9 @@ export default {
         locale (loc) {
             this.selectedLocale = loc;
             this.reloadMessages()
+        },
+        isInRestoringMode (restoringMode) {
+            if (restoringMode === true && this.path !== '/restore') this.$router.replace('/restore');
         }
     },
     created() {

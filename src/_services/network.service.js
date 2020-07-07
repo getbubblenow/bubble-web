@@ -10,13 +10,16 @@ export const networkService = {
     getNetworkById,
     getNearestRegions,
     startNetwork,
+    queueBackup,
     forkNetwork,
     getStatusesByNetworkId,
     getNodesByNetworkId,
     stopNetwork,
+    restoreNetwork,
     deleteNetwork,
     requestNetworkKeys,
-    retrieveNetworkKeys
+    retrieveNetworkKeys,
+    getNetworkBackups
 };
 
 function getAllNetworks(userId, messages, errors) {
@@ -58,6 +61,16 @@ function stopNetwork(userId, networkId, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}/actions/stop`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
+function queueBackup(userId, networkId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}/backups/user_requested`, util.putWithAuth())
+            .then(util.handleCrudResponse(messages, errors));
+}
+
+function restoreNetwork(userId, networkId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}/actions/restore`,
+                 util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
+}
+
 // deleting network is not allowed via API, instead we delete the AccountPlan, which in turn deletes the network
 function deleteNetwork(userId, networkId, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/plans/${networkId}`, util.deleteWithAuth()).then(util.handleCrudResponse(messages, errors));
@@ -69,4 +82,9 @@ function requestNetworkKeys(userId, networkId, messages, errors) {
 
 function retrieveNetworkKeys(userId, networkId, code, password, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}/actions/keys/${code}`, util.postWithAuth({name: 'password', value: password})).then(util.handleCrudResponse(messages, errors));
+}
+
+function getNetworkBackups(userId, networkId, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}/backups`, util.getWithAuth())
+            .then(util.handleCrudResponse(messages, errors));
 }

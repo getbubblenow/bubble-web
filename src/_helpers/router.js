@@ -15,6 +15,7 @@ import LogoutPage from '../auth/LogoutPage'
 import ForgotPasswordPage from '../auth/ForgotPasswordPage'
 import MultifactorAuthPage from '../auth/MultifactorAuthPage'
 import AppLoginPage from '../auth/AppLoginPage'
+import RestorePage from "../auth/RestorePage"
 import DashboardPage from '../account/DashboardPage'
 import ProfilePage from '../account/profile/ProfilePage'
 import ActionPage from '../account/profile/ActionPage'
@@ -111,6 +112,7 @@ export const router = new Router({
     { path: '/logout', component: LogoutPage },
     { path: '/forgotPassword', component: ForgotPasswordPage },
     { path: '/appLogin', component: AppLoginPage },
+    { path: '/restore', component: RestorePage },
 
     { path: '/admin/accounts', component: AccountsPage },
     { path: '/admin/new_account', component: ProfilePage },
@@ -128,7 +130,7 @@ export const router = new Router({
 });
 
 const publicPages = [
-  '/login', '/logout', '/register', '/appLogin',
+  '/login', '/logout', '/register', '/appLogin', '/restore',
   '/forgotPassword', '/resetPassword',
   '/action', '/auth',
   '/activate', '/legal'

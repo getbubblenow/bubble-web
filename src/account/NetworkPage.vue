@@ -1,11 +1,17 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
     <div v-if="network">
-        <h4 v-if="network.state === 'running' && configs && configs.networkUuid && network.uuid !== configs.networkUuid">
-            {{network.nickname}} - <i>{{messages['msg_network_state_'+network.state]}}</i><br/>
-            <h6><button :title="messages.message_network_connect" :onclick="'window.open(\''+networkAppLoginUrl+'\', \'_blank\')'">{{messages.message_network_connect}}</button></h6>
-        </h4>
-        <h4 v-else>{{network.nickname}} - <i>{{messages['msg_network_state_'+network.state]}}</i></h4>
+        <h4>{{ network.nickname }} - <i>{{ messages['msg_network_state_'+network.state] }}</i></h4>
+        <h6 v-if="this.isNotSelfNet && (isInReadyToRestoreState || this.network.state === 'running')">
+            <button v-if="this.network.state === 'running'" :title="messages.message_network_connect"
+                    :onclick="'window.open(\'' + networkAppLoginUrl + '\', \'_blank\')'">
+                {{messages.message_network_connect}}
+            </button>
+            <button v-else :title="messages.message_network_restore"
+                    :onclick="'window.open(\'' + nodeRestoreUrl + '\', \'_blank\')'">
+                {{ messages.message_network_restore }}
+            </button>
+        </h6>
 
         <div v-if="stats && (network.state === 'starting' || network.state === 'restoring')">
             <!-- adapted from: https://code-boxx.com/simple-vanilla-javascript-progress-bar/ -->
@@ -40,7 +46,7 @@
             <span v-html="messages.message_launch_support.parseMessage(this)"></span>
         </div>
 
-        <div v-if="network.state === 'running' && configs.networkUuid && network.uuid === configs.networkUuid">
+        <div v-if="isSelfNetAndRunning">
             <button class="btn btn-secondary" @click="requestRestoreKey()"
                     :disabled="loading && loading.requestNetworkKeys">
                 {{messages.link_network_action_request_keys}}
@@ -75,25 +81,62 @@
                           readonly="true" />
                 {{ messages.message_network_keys_description }}
             </div>
-        </div>
 
-        <hr/>
+            <span v-html="latestBackupInfoHtml"></span>
+
+            <span v-if="allowQueueBackup">
+                <br/>
+                <button @click="queueBckup()" class="btn btn-secondary" :disabled="loading && loading.queueBackup">
+                    {{ messages.link_backup_network }}
+                </button>
+            </span>
+        </div>
 
         <div v-if="network.state === 'stopped'">
-            <!-- todo: add button to restart network in restore mode -->
+            <hr/>
+            <div v-if="errors.has('networkRestore')" class="invalid-feedback d-block">
+                {{ errors.first('networkRestore') }}
+            </div>
+
+            <div v-if="networkNodes && networkNodes.length === 0">
+                <div v-if="restoreKey" class="alert alert-success">
+                    {{ messages.restore_key_label }} {{ restoreKey }}
+                </div>
+                <div v-else>
+                    <button @click="restoreNet()" class="btn btn-primary" :disabled="loading && loading.restoring">
+                        {{ messages.button_label_restore }}
+                    </button>
+                    <img v-show="loading && loading.restoring" :src="loadingImgSrc" />
+                </div>
+                {{ messages.button_description_restore }}
+            </div>
+            <div v-else v-html="messages.restore_not_possible_nodes_exist_html" />
+
         </div>
 
-        <div v-if="network.state === 'running' || network.state === 'starting' || network.state === 'stopped' || network.state === 'error_stopping'">
+        <div v-if="configs.sageLauncher && (network.state === 'running' || network.state === 'starting' || network.state === 'restoring' || network.state === 'stopped' || network.state === 'error_stopping')">
+            <hr/>
             <div class="text-danger"><h4>{{messages.title_network_danger_zone}}</h4></div>
             <div v-if="errors.has('node')" class="invalid-feedback d-block">{{ errors.first('node') }}</div>
             <div v-if="errors.has('accountPlan')" class="invalid-feedback d-block">{{ errors.first('accountPlan') }}</div>
-            <div v-if="network.state === 'running' || network.state === 'starting'" style="border: 2px solid #000;">
-                <button @click="stopNet()" class="btn btn-danger">{{messages.link_network_action_stop}}</button>
+
+            <div v-if="network.state === 'running' || network.state === 'starting' || network.state === 'restoring'"
+                 style="border: 2px solid #000;">
+                <button @click="stopNet()" class="btn btn-danger" :disabled="loading && loading.stopping">
+                    {{messages.link_network_action_stop}}
+                </button>
+                <img v-show="loading && loading.stopping" :src="loadingImgSrc" />
                 {{messages.link_network_action_stop_description}}
+
+                <!-- the next condition is to prevent this info shown twice on this page -->
+                <span v-if="!isSelfNetAndRunning" v-html="latestBackupInfoHtml"></span>
             </div>
-            <hr/>
-            <div style="border: 2px solid #000;">
-                <button @click="deleteNet()" class="btn btn-danger">{{messages.link_network_action_delete}}</button>
+            <div v-else-if="network.state === 'stopped' || network.state === 'error_stopping'"
+                 style="border: 2px solid #000;">
+                <button @click="deleteNet()" class="btn btn-danger" :disabled="loading && loading.deleting">
+                    {{messages.link_network_action_delete}}
+                </button>
+                <img v-show="loading && loading.deleting" :src="loadingImgSrc" />
                 {{messages.link_network_action_delete_description}}
             </div>
         </div>
@@ -123,11 +166,13 @@
         computed: {
             ...mapState('networks', [
                 'network', 'newNodeNotification', 'networkStatuses', 'networkNodes', 'networkKeysRequested',
-                'deletedNetworkUuid', 'networkKeys', 'loading'
+                'deletedNetworkUuid', 'networkKeys', 'loading', 'restoreKey', 'backups'
             ]),
             ...mapState('system', ['messages', 'configs', 'appLinks']),
             showSetupHelp () {
-                return (this.network !== null && (this.network.state === 'running' || this.network.state === 'starting' || this.network.state === 'restoring'));
+                return (this.network !== null && this.network.uuid !== this.configs.networkUuid
+                        && (this.network.state === 'running' || this.network.state === 'starting'
+                            || this.network.state === 'restoring'));
             },
             addableDeviceTypes: function () {
                 if (this.messages && this.messages['!addable_device_types']) {
@@ -140,12 +185,48 @@
             },
             networkAppLoginUrl: function () {
                 return 'https://'+this.network.name+'.'+this.network.domainName+'/appLogin?session='+util.currentUser().token+'&uri=/devices';
+            },
+            nodeRestoreUrl: function () {
+                return 'https://' + this.networkNodes[0].fqdn + ':' + this.networkNodes[0].sslPort + '/restore';
+            },
+            allowQueueBackup: function () {
+                if (this.backups === null) return false;
+                if (this.backups.length === 0) return true;
+
+                let lastBackupStatus = this.backups[0].status;
+                return lastBackupStatus !== 'queued' && lastBackupStatus !==  'backup_in_progress';
+            },
+            latestBackupInfoHtml: function() {
+                if (this.backups === null) {
+                    return '<hr/>' + this.messages.label_latest_backup + '<img src="' + loadingImgSrc + '" />';
+                } else if (this.backups.length === 0) {
+                    return '<hr/>' + this.messages.label_no_latest_backup;
+                } else {
+                    let lastBackup = this.backups[0];
+                    return '<hr/>' + this.messages.label_latest_backup
+                           + " " + lastBackup.label + " <i>" + lastBackup.status + "</i> "
+                           + this.messages.date_format_app_data_epoch_time.parseDateMessage(lastBackup.creationTime,
+                                                                                            this.messages);
+                }
+            },
+            isSelfNetAndRunning: function() {
+                return this.network && this.network.state === 'running'
+                       && this.configs && this.configs.networkUuid && this.network.uuid === this.configs.networkUuid;
+            },
+            isNotSelfNet: function() {
+                return this.configs && this.configs.networkUuid
+                       && this.network && this.network.uuid !== this.configs.networkUuid
+            },
+            isInReadyToRestoreState: function() {
+                return this.network && this.network.state === 'restoring' && (!this.stats || this.stats.percent === 100)
+                       && this.networkNodes && this.networkNodes.length === 1
             }
         },
         methods: {
             ...mapActions('networks', [
                 'getNetworkById', 'deleteNetwork', 'getStatusesByNetworkId', 'getNodesByNetworkId',
-                'stopNetwork', 'deleteNetwork', 'requestNetworkKeys', 'retrieveNetworkKeys'
+                'stopNetwork', 'queueBackup', 'restoreNetwork', 'deleteNetwork', 'requestNetworkKeys',
+                'retrieveNetworkKeys', 'getBackups'
             ]),
             ...mapActions('system', ['getAppLinks']),
             refreshStatus (userId) {
@@ -163,12 +244,23 @@
                     messages: this.messages,
                     errors: this.errors
                 });
+                if (this.backups === null || this.refresher === null) {
+                    // note about the second part of the condition above: if refreshes is turned on, then fetch backups
+                    // from BE only once
+                    this.getBackups({ userId: userId, networkId: this.networkId,
+                                      messages: this.messages, errors: this.errors });
+                }
             },
             startStatusRefresher (user) {
                 // todo: separate refresher for network -- after "stop" we should refresh the status to show it is stopped
                 this.refresher = setInterval(() => this.refreshStatus(user.uuid), 5000);
             },
-
+            clearRefresherInterval (refresherId) {
+                if (refresherId !== null) {
+                    clearInterval(refresherId);
+                    refresherId = null;
+                }
+            },
             stopRefreshStatus (userId) {
                 this.getNetworkById({userId: userId, networkId: this.networkId, messages: this.messages, errors: this.errors});
             },
@@ -184,11 +276,28 @@
                             messages: this.messages,
                             errors: this.errors
                         });
-                        clearInterval(this.refresher);
-                        this.refresher = null;
+                        clearRefresherInterval(this.refresher);
                         this.stopRefresher = setInterval(() => this.stopRefreshStatus(this.user.uuid), 5000);
                     }
                 }
+            },
+            queueBckup () {
+                this.errors.clear();
+                this.queueBackup({
+                    userId: this.user.uuid,
+                    networkId: this.networkId,
+                    messages: this.messages,
+                    errors: this.errors
+                });
+            },
+            restoreNet () {
+                this.errors.clear();
+                this.restoreNetwork({
+                    userId: this.user.uuid,
+                    networkId: this.networkId,
+                    messages: this.messages,
+                    errors: this.errors
+                });
             },
             deleteNet () {
                 if (confirm(this.messages.confirmation_network_action_delete)) {
@@ -230,24 +339,19 @@
             this.getAppLinks(user.locale);
         },
         beforeDestroy () {
-            if (this.refresher !== null) clearInterval(this.refresher);
-            if (this.stopRefresher !== null) clearInterval(this.stopRefresher);
+            this.clearRefresherInterval(this.refresher);
+            this.clearRefresherInterval(this.stopRefresher);
         },
         watch: {
             network (net) {
                 if (net) {
-                    if (net.state !== 'starting' && net.state !== 'restoring' && this.refresher !== null) {
-                        clearInterval(this.refresher);
-                        this.refresher = null;
-                    }
-                    if (net.state === 'stopped' && this.stopRefresher !== null) {
-                        clearInterval(this.stopRefresher);
-                        this.stopRefresher = null;
-                    }
-                    if (net.uuid === 'Not Found') {
-                        this.$router.replace({path: '/bubbles'});
-                    }
+                    if (net.uuid === 'Not Found') this.$router.replace({path: '/bubbles'});
                     this.networkUuid = net.uuid;
+
+                    if (net.state !== 'starting' && net.state !== 'restoring') {
+                        this.clearRefresherInterval(this.refresher);
+                    }
+                    if (net.state !== 'stopping') this.clearRefresherInterval(this.stopRefresher);
                 }
             },
             networkNodes (nodes) {
@@ -255,19 +359,20 @@
             },
             networkStatuses (stats) {
                 if (this.network && stats && stats.length && stats.length > 0) {
+                    let latestStats = null;
                     for (let i=0; i<stats.length; i++) {
-                        if (stats[i].network === this.network.uuid) {
-                            this.stats = stats[i];
-                            if (this.stats.percent === 100) {
-                                clearInterval(this.refresher);
-                                this.refresher = null;
-                            }
-                            return;
+                        if (stats[i].network === this.network.uuid
+                                && (latestStats === null || stats[i].ctime > latestStats.ctime)) {
+                            latestStats = stats[i];
                         }
                     }
-                    // status not found for our network
-                    clearInterval(this.refresher);
-                    this.refresher = null;
+                    if (latestStats !== null) {
+                        this.stats = latestStats;
+                        if (this.stats.percent === 100) this.clearRefresherInterval(this.refresher);
+                    } else {
+                        // status not found for our network
+                        this.clearRefresherInterval(this.refresher);
+                    }
                 }
             },
             deletedNetworkUuid (uuid) {

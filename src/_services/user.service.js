@@ -9,6 +9,7 @@ export const userService = {
     login,
     appLogin,
     logout,
+    restore,
     forgotPassword,
     register,
     searchAccounts,
@@ -64,6 +65,16 @@ function appLogin(session, messages, errors) {
     return fetch(`${config.apiUrl}/auth/appLogin/${session}`, requestOptions)
         .then(handleAuthResponse(messages, errors))
         .then(setSessionUser);
+}
+
+function restore(shortKey, longKey, password, messages, errors) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 'data': longKey, 'password': password })
+    };
+    return fetch(`${config.apiUrl}/auth/restore/${shortKey}`, requestOptions)
+        .then(handleAuthResponse(messages, errors));
 }
 
 function logout(messages, errors) {

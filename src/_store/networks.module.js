@@ -8,9 +8,9 @@ import { util } from '../_helpers';
 
 const state = {
     loading: {
-        networks: false, network: false, deleting: false,
+        networks: false, network: false, stopping: false, restoring: false, deleting: false,
         nearestRegions: false, startingNetwork: false, networkStatuses: false, networkNodes: false,
-        requestNetworkKeys: false, retrieveNetworkKeys: false
+        requestNetworkKeys: false, retrieveNetworkKeys: false, queueBackup: false
     },
     creating: null,
     error: null,
@@ -22,7 +22,9 @@ const state = {
     networkNodes: null,
     deletedNetworkUuid: null,
     networkKeysRequested: null,
-    networkKeys: null
+    networkKeys: null,
+    restoreKey: null,
+    backups: null,
 };
 
 const actions = {
@@ -35,13 +37,18 @@ const actions = {
             );
     },
 
+    getBackups({ commit }, { userId, networkId, messages, errors }) {
+        commit('getNetworkBackupsRequest');
+        networkService.getNetworkBackups(userId, networkId, messages, errors)
+                      .then(backups => commit('getNetworkBackupsSuccess', backups),
+                            error => commit('getNetworkBackupsFailure', error));
+    },
+
     getNetworkById({ commit }, {userId, networkId, messages, errors}) {
         commit('getNetworkByIdRequest');
         networkService.getNetworkById(userId, networkId, messages, errors)
-            .then(
-                network => commit('getNetworkByIdSuccess', network),
-                error => commit('getNetworkByIdFailure', error)
-            );
+                      .then(network => commit('getNetworkByIdSuccess', network),
+                            error => commit('getNetworkByIdFailure', error));
     },
 
     addPlanAndStartNetwork({ commit }, {userId, accountPlan, cloud, region, messages, errors}) {
@@ -92,6 +99,25 @@ const actions = {
             .then(
                 ok => commit('stopNetworkSuccess', {networkId, ok}),
                 error => commit('stopNetworkFailure', { networkId, error: error.toString() })
+            );
+    },
+
+    queueBackup({ commit, dispatch }, { userId, networkId, messages, errors }) {
+        commit('queueBackupRequest', networkId);
+        networkService.queueBackup(userId, networkId, messages, errors)
+                      .then(backup => commit('queueBackupSuccess', backup),
+                            error => commit('queueBackupFailure', { networkId, error: error.toString() }))
+                      .then(r => dispatch('getBackups',
+                            { userId: userId, networkId: networkId,
+                              messages: messages, errors: errors }));
+},
+
+    restoreNetwork({ commit }, { userId, networkId, messages, errors }) {
+        commit('restoreNetworkRequest', networkId);
+        networkService.restoreNetwork(userId, networkId, messages, errors)
+            .then(
+                network => commit('restoreNetworkSuccess', network),
+                error => commit('restoreNetworkFailure', { networkId, error: error.toString() })
             );
     },
 
@@ -215,6 +241,31 @@ const mutations = {
         state.error = error;
     },
 
+    queueBackupRequest(state, id) {
+        state.loading.queueBackup = true;
+    },
+    queueBackupSuccess(state, id) {
+        // noop - state.loading.queueBackup will be set to false only after backup info is loaded to prevent allowing
+        // another backup in queue before this one i really processed.
+    },
+    queueBackupFailure(state, { id, error }) {
+        state.loading.queueBackup = false;
+        state.error = error;
+    },
+
+    restoreNetworkRequest(state, networkId) {
+        state.loading.restoring = true;
+        state.restoreKey = null;
+    },
+    restoreNetworkSuccess(state, restoreNodeNotification) {
+        state.restoreKey = restoreNodeNotification.restoreKey;
+        state.loading.restoring = false;
+    },
+    restoreNetworkFailure(state, { restoreNodeNotification, error }) {
+        state.loading.restoring = false;
+        state.error = error;
+    },
+
     deleteNetworkRequest(state, id) {
         state.loading.deleting = true;
     },
@@ -270,6 +321,18 @@ const mutations = {
     },
     retrieveNetworkKeysFailure(state, error) {
         state.loading.retrieveNetworkKeys = false;
+        state.error = { error };
+    },
+    getNetworkBackupsRequest(state, backups) {
+        state.backups = null;
+    },
+    getNetworkBackupsSuccess(state, backups) {
+        state.backups = backups;
+        state.loading.queueBackup = false;
+    },
+    getNetworkBackupsFailure(state, error) {
+        state.backups = null;
+        state.loading.queueBackup = false;
         state.error = { error };
     }
 };

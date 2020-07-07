@@ -46,10 +46,12 @@
         },
         computed: {
             ...mapState('networks', ['networks']),
-            ...mapState('system', ['messages']),
+            ...mapState('system', ['messages', 'configs']),
             ...mapState('users', ['policy'])
         },
         created () {
+            if (!this.configs.sageLauncher) { this.$router.replace({ path: '/bubble/' + this.configs.networkUuid }); }
+
             const user = util.currentUser();
             const selectedLocale = (user !== null && typeof user.locale !== 'undefined' && user.locale !== null ? user.locale : 'detect');
             this.getAllNetworks({userId: user.uuid, messages: this.messages, errors: this.errors});

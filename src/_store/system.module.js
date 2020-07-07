@@ -21,6 +21,7 @@ const state = {
         launchLock: null,
         promoCodePolicy: null,
         requireSendMetrics: null,
+        isWaitingRestoring: false,
         support: {},
         securityLevels: null
     },
@@ -177,6 +178,14 @@ const getters = {
                 index: 1
             });
         } else {
+            if (isAdmin) {
+                dashApps.push({
+                    href: '/bubble/' + configs.networkUuid,
+                    title: messages.label_menu_network,
+                    icon: messages.label_menu_networks_icon,
+                    index: 1
+                });
+            }
             dashApps.push({
                 href: '/devices',
                 title: messages.label_menu_devices,
