@@ -119,17 +119,19 @@
             <div v-if="errors.has('node')" class="invalid-feedback d-block">{{ errors.first('node') }}</div>
             <div v-if="errors.has('accountPlan')" class="invalid-feedback d-block">{{ errors.first('accountPlan') }}</div>
 
-            <div v-if="network.state !== 'stopping' && backups && backups.length > 0" style="border: 2px solid #000;">
-                <button @click="stopNet()" class="btn btn-danger" :disabled="loading && loading.stopping">
-                    {{messages.link_network_action_stop}}
-                </button>
-                <img v-show="loading && loading.stopping" :src="loadingImgSrc" />
-                {{messages.link_network_action_stop_description}}
+            <span v-if="network.state !== 'stopping' && network.state !== 'stopped' && backups && backups.length > 0">
+                <div style="border: 2px solid #000;">
+                    <button @click="stopNet()" class="btn btn-danger" :disabled="loading && loading.stopping">
+                        {{messages.link_network_action_stop}}
+                    </button>
+                    <img v-show="loading && loading.stopping" :src="loadingImgSrc" />
+                    {{messages.link_network_action_stop_description}}
 
-                <!-- the next condition is to prevent this info shown twice on this page -->
-                <span v-if="!isSelfNetAndRunning" v-html="latestBackupInfoHtml"></span>
-            </div>
-            <br/>
+                    <!-- the next condition is to prevent this info shown twice on this page -->
+                    <span v-if="!isSelfNetAndRunning" v-html="latestBackupInfoHtml"></span>
+                </div>
+                <br/>
+            </span>
             <div style="border: 2px solid #000;">
                 <button @click="deleteNet()" class="btn btn-danger" :disabled="loading && loading.deleting">
                     {{messages.link_network_action_delete}}
@@ -203,7 +205,7 @@
                     let lastBackup = this.backups[0];
                     return '<hr/>' + this.messages.label_latest_backup
                            + " " + lastBackup.label + " <i>" + lastBackup.status + "</i> "
-                           + this.messages.date_format_app_data_epoch_time.parseDateMessage(lastBackup.creationTime,
+                           + this.messages.date_format_app_data_epoch_time.parseDateMessage(lastBackup.ctime,
                                                                                             this.messages);
                 }
             },
@@ -339,6 +341,7 @@
         beforeDestroy () {
             this.clearRefresherInterval(this.refresher);
             this.clearRefresherInterval(this.stopRefresher);
+            this.restoreKey = null;
         },
         watch: {
             network (net) {

@@ -21,7 +21,7 @@ const state = {
         launchLock: null,
         promoCodePolicy: null,
         requireSendMetrics: null,
-        isWaitingRestoring: false,
+        awaitingRestore: false,
         support: {},
         securityLevels: null
     },

@@ -92,7 +92,7 @@ export default {
         },
         locales () { return this.configs.locales; },
         path () { return this.$route.path; },
-        isInRestoringMode () { return this.configs ? this.configs.isWaitingRestoring : undefined; }
+        isInRestoringMode () { return this.configs ? this.configs.awaitingRestore : undefined; }
     },
     methods: {
         ...mapActions({ clearAlert: 'alert/clear' }),

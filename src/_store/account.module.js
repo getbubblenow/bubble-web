@@ -118,7 +118,7 @@ const actions = {
             .then(
                 ok => {
                     commit('restoreSuccess');
-                    systemConfigs.isWaitingRestoring = false;
+                    systemConfigs.awaitingRestore = false;
                 },
                 error => commit('restoreFailure', error)
             );
