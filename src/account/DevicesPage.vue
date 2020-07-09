@@ -13,7 +13,8 @@
 <!--                    <th nowrap="nowrap">{{messages.label_field_device_enabled}}</th>-->
                     <th>{{messages.label_field_device_vpn_config}}</th>
                     <th nowrap="nowrap">{{messages.label_field_device_certificate}}</th>
-                    <th nowrap="nowrap">{{messages.label_field_security_level}}</th>
+                    <th nowrap="nowrap">{{messages.label_field_device_security_level}}</th>
+                    <th nowrap="nowrap">{{messages.label_field_device_connection}}</th>
 <!--                    <th>{{messages.label_field_device_ctime}}</th>-->
                     <th>{{messages.label_field_device_help}}</th>
                     <th><!-- delete --></th>
@@ -59,7 +60,7 @@
                             {{messages.message_device_vpn_unavailable}}
                         </div>
                     </td>
-                    <td nowrap="nowrap">
+                    <td>
                         <a :href="'/api/auth/cacert?deviceType='+device.deviceType">
                             {{messages.message_download_ca_cert}}
                         </a>
@@ -71,6 +72,38 @@
                                 <option v-for="level in configs.securityLevels" :value="level">{{messages['device_security_level_'+level]}}</option>
                             </select>
                         </form>
+                    </td>
+                    <td>
+                        <div v-if="device.status.ip">
+                            {{device.status.ip}}
+                            <div v-if="device.status.location">
+                                <hr/>
+                                <span v-if="device.status.location.city && device.status.location.region && device.status.location.country">{{device.status.location.city}}, {{device.status.location.region}}, {{messages['country_'+device.status.location.country]}}</span>
+                                <span v-else-if="device.status.location.region && device.status.location.country">{{device.status.location.region}}, {{messages['country_'+device.status.location.country]}}</span>
+                                <span v-else-if="device.status.location.city && device.status.location.country">{{device.status.location.city}}, {{messages['country_'+device.status.location.country]}}</span>
+                                <span v-else-if="device.status.location.country">{{messages['country_'+device.status.location.country]}}</span>
+                                <span v-else-if="device.status.location.city && device.status.location.region">{{device.status.location.city}}, {{device.status.location.region}}</span>
+                                <span v-else-if="device.status.location.region">{{device.status.location.region}}</span>
+                                <span v-else-if="device.status.location.city">{{device.status.location.city}}</span>
+                            </div>
+                        </div>
+                        <div v-if="device.status.bytesSent || device.status.bytesReceived">
+                            <hr/>
+                            <div v-if="device.status.bytesSent">
+                                {{device.status.bytesSent}}{{device.status.sentUnits}} {{messages.label_field_device_transfer_sent}}
+                            </div>
+                            <div v-if="device.status.bytesReceived">
+                                {{device.status.bytesReceived}}{{device.status.receivedUnits}} {{messages.label_field_device_transfer_received}}
+                            </div>
+                        </div>
+                        <div v-if="device.status.lastHandshakeTime">
+                            <hr/>
+                            {{messages.label_field_device_connection_handshake}}:
+                            <span v-if="device.status.lastHandshakeMinutes && device.status.lastHandshakeSeconds">{{device.status.lastHandshakeMinutes}}{{messages.units_minutes_short}}, {{device.status.lastHandshakeSeconds}}{{messages.units_seconds_short}}</span>
+                            <span v-else-if="device.status.lastHandshakeMinutes">{{device.status.lastHandshakeMinutes}}{{messages.units_minutes_short}}</span>
+                            <span v-else-if="device.status.lastHandshakeSeconds">{{device.status.lastHandshakeSeconds}}{{messages.units_seconds_short}}</span>
+                            {{messages.label_field_device_connection_handshake_ago}}
+                        </div>
                     </td>
 <!--                    <td nowrap="nowrap">{{messages.label_device_ctime_format.parseDateMessage(device.ctime, messages)}}</td>-->
                     <td>
