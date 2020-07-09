@@ -73,7 +73,7 @@
                             </select>
                         </form>
                     </td>
-                    <td>
+                    <td class="device-connection-status">
                         <div v-if="device.status.ip">
                             {{device.status.ip}}
                             <div v-if="device.status.location">
