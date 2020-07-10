@@ -5,7 +5,7 @@
 
         <div v-if="!configs"><img :src="loadingImgSrc" /></div>
 
-        <div v-else-if="!configs.awaitingRestore" class="alert alert-info">
+        <div v-else-if="configs.restoreInProgress" class="alert alert-info">
             {{ messages.message_restore_not_applicable }}<hr/>
             <a href="/">{{ messages.message_back_to_root }}</a>
         </div>

@@ -22,6 +22,7 @@ const state = {
         promoCodePolicy: null,
         requireSendMetrics: null,
         awaitingRestore: false,
+        restoreInProgress: false,
         support: {},
         securityLevels: null,
         jarVersion: null,

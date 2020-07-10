@@ -226,7 +226,7 @@
             ...mapActions('networks', [
                 'getNetworkById', 'deleteNetwork', 'getStatusesByNetworkId', 'getNodesByNetworkId',
                 'stopNetwork', 'queueBackup', 'restoreNetwork', 'deleteNetwork', 'requestNetworkKeys',
-                'retrieveNetworkKeys', 'getBackups'
+                'retrieveNetworkKeys', 'getBackups', 'resetRestoreKey'
             ]),
             ...mapActions('system', ['getAppLinks']),
             refreshStatus (userId) {
@@ -276,7 +276,7 @@
                             messages: this.messages,
                             errors: this.errors
                         });
-                        clearRefresherInterval(this.refresher);
+                        this.clearRefresherInterval(this.refresher);
                         this.stopRefresher = setInterval(() => this.stopRefreshStatus(this.user.uuid), 5000);
                     }
                 }
@@ -341,7 +341,7 @@
         beforeDestroy () {
             this.clearRefresherInterval(this.refresher);
             this.clearRefresherInterval(this.stopRefresher);
-            this.restoreKey = null;
+            this.resetRestoreKey();
         },
         watch: {
             network (net) {

@@ -110,7 +110,7 @@ const actions = {
                       .then(r => dispatch('getBackups',
                             { userId: userId, networkId: networkId,
                               messages: messages, errors: errors }));
-},
+    },
 
     restoreNetwork({ commit }, { userId, networkId, messages, errors }) {
         commit('restoreNetworkRequest', networkId);
@@ -155,7 +155,9 @@ const actions = {
                 keys => commit('retrieveNetworkKeysSuccess', keys),
                 error => commit('retrieveNetworkKeysFailure', error)
             );
-    }
+    },
+
+    resetRestoreKey({ commit }) { commit('resetRestoreKey'); }
 };
 
 const mutations = {
@@ -264,6 +266,9 @@ const mutations = {
     restoreNetworkFailure(state, { restoreNodeNotification, error }) {
         state.loading.restoring = false;
         state.error = error;
+    },
+    resetRestoreKey(state) {
+        state.restoreKey = null;
     },
 
     deleteNetworkRequest(state, id) {

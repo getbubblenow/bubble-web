@@ -112,16 +112,11 @@ const actions = {
                 error => commit('logoutFailure', error)
             );
     },
-    restore({ dispatch, commit }, { shortKey, longKey, password, systemConfigs, messages, errors }) {
-        commit('restoreRequest');
+    restore({ commit }, { shortKey, longKey, password, systemConfigs, messages, errors }) {
+        commit('restoreRequest', systemConfigs);
         userService.restore(shortKey, longKey, password, messages, errors)
-            .then(
-                ok => {
-                    commit('restoreSuccess');
-                    systemConfigs.awaitingRestore = false;
-                },
-                error => commit('restoreFailure', error)
-            );
+                   .then(ok => commit('restoreSuccess', systemConfigs),
+                         error => commit('restoreFailure', systemConfigs, error));
     },
     forgotPassword({ commit }, {username, messages, errors}) {
         commit('forgotPasswordRequest');
@@ -305,14 +300,17 @@ const mutations = {
         console.log('logout failed: '+JSON.stringify(error));
     },
 
-    restoreRequest(state) {
+    restoreRequest(state, systemConfigs) {
         state.status = Object.assign({}, state.status, {restoring: true});
+        systemConfigs.restoreInProgress = true;
     },
-    restoreSuccess(state) {
+    restoreSuccess(state, systemConfigs) {
         state.status = Object.assign({}, state.status, {restoring: false});
+        systemConfigs.awaitingRestore = false;
     },
-    restoreFailure(state, error) {
+    restoreFailure(state, systemConfigs, error) {
         state.status = Object.assign({}, state.status, {restoring: false});
+        systemConfigs.restoreInProgress = false;
         console.log('restore failed: ' + JSON.stringify(error));
     },
 
