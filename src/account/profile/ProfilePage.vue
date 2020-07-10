@@ -20,6 +20,17 @@
             </div>
         </div>
 
+        <div v-if="admin === true && configs && configs.jarVersion && configs.jarUpgradeAvailable && configs.jarUpgradeAvailable.version">
+            <hr/>
+            <h2>{{messages.message_jar_upgrade_available}}</h2>
+            <p>{{messages.message_jar_upgrade_version}} {{configs.jarUpgradeAvailable.version}}</p>
+            <p>{{messages.message_jar_current_version}} {{configs.jarVersion}}</p>
+            <button v-if="!upgrading" :disabled="loading()" @click="doUpgradeJar()">{{messages.button_label_jar_upgrade}}</button>
+            <button v-else-if="upgrading" :disabled="true">{{messages.button_label_jar_upgrading}}</button>
+            <p v-if="upgrading">{{messages.message_jar_upgrading}}</p>
+            <hr/>
+        </div>
+
         <form @submit.prevent="handleSubmit">
             <div v-if="submitted && errors.has('user')" class="invalid-feedback d-block"><h5>{{ errors.first('user') }}</h5></div>
 
@@ -131,15 +142,18 @@
                 newUser: null,
                 submitted: false,
                 subject: Object.assign({}, BLANK_SUBJECT),
-                loadingImgSrc: loadingImgSrc
+                loadingImgSrc: loadingImgSrc,
+                upgrading: false,
+                upgradeRefresher: null
             };
         },
         computed: {
             ...mapState('users', ['user']),
-            ...mapState('system', ['messages', 'configs'])
+            ...mapState('system', ['messages', 'configs', 'status'])
         },
         created () {
             this.me = this.$route.path === '/me' || this.$route.path.startsWith('/me/');
+            this.loadSystemConfigs();
             if (this.me) {
                 this.linkPrefix = '/me';
                 if (this.currentUser === null) {
@@ -186,6 +200,7 @@
             next();
         },
         methods: {
+            ...mapActions('system', ['loadSystemConfigs', 'upgradeJar']),
             ...mapActions('users', ['createUser', 'updateUser', 'updateSelf', 'getUserById']),
             ...mapGetters('users', ['loading']),
             handleSubmit (e) {
@@ -214,6 +229,10 @@
                         console.log('invalid!');
                     }
                 });
+            },
+            doUpgradeJar () {
+                this.upgrading = true;
+                this.upgradeJar();
             }
         },
         watch: {
@@ -231,6 +250,28 @@
                         }
                     } else {
                         this.subject = u;
+                    }
+                }
+            },
+            configs (c) {
+                if (c) {
+                    console.log('watch.configs received: '+JSON.stringify(c));
+                    if (this.upgradeRefresher !== null) {
+                        // does the new server version match our version?
+                        if (c.jarVersion && c.jarUpgradeAvailable && c.jarUpgradeAvailable.version && c.jarVersion === c.jarUpgradeAvailable.version) {
+                            window.clearInterval(this.upgradeRefresher);
+                        }
+                    }
+                }
+            },
+            status (s) {
+                if (s) {
+                    console.log('watch.status received: '+JSON.stringify(s));
+                    if (s.upgrading && this.upgradeRefresher === null) {
+                        const vue = this;
+                        this.upgradeRefresher = window.setInterval(() => {
+                            vue.loadSystemConfigs();
+                        }, 5000);
                     }
                 }
             }

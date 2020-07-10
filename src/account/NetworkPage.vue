@@ -13,7 +13,7 @@
             </button>
         </h6>
 
-        <div v-if="stats && (network.state === 'starting' || network.state === 'restoring')">
+        <div v-if="stats && (network.state === 'created' || network.state === 'starting' || network.state === 'restoring')">
             <!-- adapted from: https://code-boxx.com/simple-vanilla-javascript-progress-bar/ -->
             <div class="progress-wrap">
                 <div class="progress-bar" :style="'width: '+stats.percent+'%'" :id="'progressBar_'+networkId"></div>
@@ -349,7 +349,7 @@
                     if (net.uuid === 'Not Found') this.$router.replace({path: '/bubbles'});
                     this.networkUuid = net.uuid;
 
-                    if (net.state !== 'starting' && net.state !== 'restoring') {
+                    if (net.state !== 'created' && net.state !== 'starting' && net.state !== 'restoring') {
                         this.clearRefresherInterval(this.refresher);
                     }
                     if (net.state !== 'stopping') this.clearRefresherInterval(this.stopRefresher);

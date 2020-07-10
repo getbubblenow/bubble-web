@@ -23,11 +23,13 @@ const state = {
         requireSendMetrics: null,
         awaitingRestore: false,
         support: {},
-        securityLevels: null
+        securityLevels: null,
+        jarVersion: null,
+        jarUpgradeAvailable: null
     },
     entityConfigs: {},
     searchResults: [],
-    status: { activating: false, searching: false, creatingEntity: false, modelSetupInProgress: false },
+    status: { activating: false, searching: false, creatingEntity: false, modelSetupInProgress: false, upgrading: false },
     activated: null,
     error: null,
     messages: {
@@ -154,6 +156,13 @@ const actions = {
         systemService.getAppLinks(locale).then(
             links => commit('getAppLinksSuccess', links),
             error => commit('getAppLinksFailure', error)
+        )
+    },
+    upgradeJar({ commit }) {
+        commit('upgradeJarRequest');
+        systemService.upgradeJar(locale).then(
+            configs => commit('upgradeJarSuccess', configs),
+            error => commit('upgradeJarFailure', error)
         )
     }
 };
@@ -410,6 +419,15 @@ const mutations = {
         state.appLinks = links;
     },
     getAppLinksFailure(state, error) {
+        state.error = error;
+    },
+
+    upgradeJarRequest(state) {},
+    upgradeJarSuccess(state, configs) {
+        state.configs = configs;
+        state.status = Object.assign(state.status, {upgrading: true});
+    },
+    upgradeJarFailure(state, error) {
         state.error = error;
     }
 };
