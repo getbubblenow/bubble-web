@@ -48,12 +48,12 @@
 
         <div v-if="isSelfNetAndRunning">
 
-            <div v-if="user.admin === true && configs && configs.jarVersion && configs.jarUpgradeAvailable && configs.jarUpgradeAvailable.version">
+            <div v-if="user.admin === true && checkingForUpgrade !== null && configs && configs.jarVersion && configs.jarUpgradeAvailable && configs.jarUpgradeAvailable.version">
                 <hr/>
                 <h4>{{messages.message_jar_upgrade_available}}</h4>
                 <p>
-                    {{messages.message_jar_upgrade_version}} {{configs.jarUpgradeAvailable.version}}<br/>
-                    {{messages.message_jar_current_version}} {{configs.jarVersion}}
+                    {{messages.message_jar_current_version}} <b>{{configs.jarVersion}}</b><br/>
+                    {{messages.message_jar_upgrade_version}} <b>{{configs.jarUpgradeAvailable.version}}</b>
                 </p>
                 <button v-if="!upgrading" :disabled="upgrading" @click="doUpgrade()">{{messages.button_label_jar_upgrade}}</button>
                 <button v-else-if="upgrading" :disabled="true">{{messages.button_label_jar_upgrading}}</button>
@@ -62,7 +62,7 @@
             </div>
             <div v-else-if="user.admin === true && configs && configs.jarVersion">
                 <hr/>
-                <h6>{{messages.message_jar_current_version}} {{configs.jarVersion}}</h6>
+                <h6>{{messages.message_jar_current_version}} <b>{{configs.jarVersion}}</b></h6>
                 <p v-if="checkingForUpgrade">{{messages.message_jar_checking_for_upgrade}}</p>
                 <hr/>
             </div>
@@ -181,7 +181,7 @@
                 restoreKeyCode: null,
                 restoreKeyPassword: null,
                 loadingImgSrc: loadingImgSrc,
-                checkingForUpgrade: false,
+                checkingForUpgrade: null,
                 upgradeRefresher: null
             };
         },
@@ -421,12 +421,10 @@
                                 // window.clearInterval(this.upgradeRefresher);
                             }
 
-                        } else if (c.jarVersion && c.jarUpgradeAvailable === null) {
+                        } else if (c.jarVersion) {
                             this.checkingForUpgrade = true;
                             console.log('watch.configs: checking for upgrade...')
                             this.checkForUpgrade();
-                        } else {
-                            console.log('watch.config: no need to check for upgrade, sage version info already present');
                         }
                     } else {
                         console.log('watch.configs: user is not admin, not checking for upgrade');
@@ -453,6 +451,7 @@
                     window.setTimeout(() => {
                         console.log('reloading system configs in response to upgrade check')
                         vue.loadSystemConfigs();
+                        this.checkingForUpgrade = false;
                     }, 10000);
                 }
             }

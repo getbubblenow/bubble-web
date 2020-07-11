@@ -162,14 +162,14 @@ const actions = {
         )
     },
     checkForUpgrade({ commit }) {
-        if (this.state.upgradeCheck === null) {
+        if (state.upgradeCheck === null) {
             commit('checkForUpgradeRequest');
             systemService.checkForUpgrade().then(
                 configs => commit('checkForUpgradeSuccess', configs),
                 error => commit('checkForUpgradeFailure', error)
             );
         } else {
-            console.log('checkForUpgrade: already checked, not checking again');
+            console.log('checkForUpgrade: already checked ('+state.upgradeCheck+'), not checking again');
         }
     },
     upgrade({ commit }) {
@@ -442,6 +442,7 @@ const mutations = {
 
     checkForUpgradeRequest(state) {},
     checkForUpgradeSuccess(state, ok) {
+        console.log('checkForUpgradeSuccess: ok');
         state.upgradeCheck = true;
     },
     checkForUpgradeFailure(state, error) {
