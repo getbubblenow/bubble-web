@@ -30,7 +30,7 @@ const state = {
     },
     entityConfigs: {},
     searchResults: [],
-    status: { activating: false, searching: false, creatingEntity: false, modelSetupInProgress: false, upgrading: false },
+    status: { activating: false, searching: false, creatingEntity: false, modelSetupInProgress: false },
     activated: null,
     error: null,
     messages: {
@@ -59,7 +59,9 @@ const state = {
     timeDurationOptions: [],
     timeDurationOptionsReversed: [],
     contactTypes: [],
-    appLinks: null
+    appLinks: null,
+    upgradeCheck: null,
+    upgrading: null
 };
 
 const actions = {
@@ -159,12 +161,27 @@ const actions = {
             error => commit('getAppLinksFailure', error)
         )
     },
-    upgradeJar({ commit }) {
-        commit('upgradeJarRequest');
-        systemService.upgradeJar(locale).then(
-            configs => commit('upgradeJarSuccess', configs),
-            error => commit('upgradeJarFailure', error)
+    checkForUpgrade({ commit }) {
+        if (this.state.upgradeCheck === null) {
+            commit('checkForUpgradeRequest');
+            systemService.checkForUpgrade().then(
+                configs => commit('checkForUpgradeSuccess', configs),
+                error => commit('checkForUpgradeFailure', error)
+            );
+        } else {
+            console.log('checkForUpgrade: already checked, not checking again');
+        }
+    },
+    upgrade({ commit }) {
+        commit('upgradeRequest');
+        systemService.upgrade().then(
+            configs => commit('upgradeSuccess', configs),
+            error => commit('upgradeFailure', error)
         )
+    },
+    upgradeComplete({ commit }) {
+        commit('upgradeCompleteRequest');
+        commit('upgradeCompleteSuccess');
     }
 };
 
@@ -423,12 +440,29 @@ const mutations = {
         state.error = error;
     },
 
-    upgradeJarRequest(state) {},
-    upgradeJarSuccess(state, configs) {
-        state.configs = configs;
-        state.status = Object.assign(state.status, {upgrading: true});
+    checkForUpgradeRequest(state) {},
+    checkForUpgradeSuccess(state, ok) {
+        state.upgradeCheck = true;
     },
-    upgradeJarFailure(state, error) {
+    checkForUpgradeFailure(state, error) {
+        state.error = error;
+    },
+
+    upgradeRequest(state) {},
+    upgradeSuccess(state, configs) {
+        state.configs = configs;
+        state.upgrading = true;
+    },
+    upgradeFailure(state, error) {
+        state.error = error;
+    },
+
+    upgradeCompleteRequest(state) {},
+    upgradeCompleteSuccess(state) {
+        state.upgrading = false;
+    },
+    upgradeCompleteFailure(state, error) {
+        state.upgrading = false;
         state.error = error;
     }
 };

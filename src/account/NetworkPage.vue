@@ -47,6 +47,26 @@
         </div>
 
         <div v-if="isSelfNetAndRunning">
+
+            <div v-if="user.admin === true && configs && configs.jarVersion && configs.jarUpgradeAvailable && configs.jarUpgradeAvailable.version">
+                <hr/>
+                <h4>{{messages.message_jar_upgrade_available}}</h4>
+                <p>
+                    {{messages.message_jar_upgrade_version}} {{configs.jarUpgradeAvailable.version}}<br/>
+                    {{messages.message_jar_current_version}} {{configs.jarVersion}}
+                </p>
+                <button v-if="!upgrading" :disabled="upgrading" @click="doUpgrade()">{{messages.button_label_jar_upgrade}}</button>
+                <button v-else-if="upgrading" :disabled="true">{{messages.button_label_jar_upgrading}}</button>
+                <p v-if="upgrading">{{messages.message_jar_upgrading}}</p>
+                <hr/>
+            </div>
+            <div v-else-if="user.admin === true && configs && configs.jarVersion">
+                <hr/>
+                <h6>{{messages.message_jar_current_version}} {{configs.jarVersion}}</h6>
+                <p v-if="checkingForUpgrade">{{messages.message_jar_checking_for_upgrade}}</p>
+                <hr/>
+            </div>
+
             <button class="btn btn-secondary" @click="requestRestoreKey()"
                     :disabled="loading && loading.requestNetworkKeys">
                 {{messages.link_network_action_request_keys}}
@@ -145,7 +165,7 @@
 </template>
 
 <script>
-    import { mapState, mapActions, mapGetters } from 'vuex';
+    import { mapState, mapActions } from 'vuex';
     import { util } from '../_helpers';
     import { loadingImgSrc } from '../_store';
 
@@ -160,7 +180,9 @@
                 stopRefresher: null,
                 restoreKeyCode: null,
                 restoreKeyPassword: null,
-                loadingImgSrc: loadingImgSrc
+                loadingImgSrc: loadingImgSrc,
+                checkingForUpgrade: false,
+                upgradeRefresher: null
             };
         },
         computed: {
@@ -168,7 +190,7 @@
                 'network', 'newNodeNotification', 'networkStatuses', 'networkNodes', 'networkKeysRequested',
                 'deletedNetworkUuid', 'networkKeys', 'loading', 'restoreKey', 'backups'
             ]),
-            ...mapState('system', ['messages', 'configs', 'appLinks']),
+            ...mapState('system', ['messages', 'configs', 'appLinks', 'upgradeCheck', 'upgrading']),
             showSetupHelp () {
                 return (this.network !== null && this.network.uuid !== this.configs.networkUuid
                         && (this.network.state === 'running' || this.network.state === 'starting'
@@ -228,7 +250,7 @@
                 'stopNetwork', 'queueBackup', 'restoreNetwork', 'deleteNetwork', 'requestNetworkKeys',
                 'retrieveNetworkKeys', 'getBackups', 'resetRestoreKey'
             ]),
-            ...mapActions('system', ['getAppLinks']),
+            ...mapActions('system', ['getAppLinks', 'loadSystemConfigs', 'checkForUpgrade', 'upgrade']),
             refreshStatus (userId) {
                 this.getNetworkById({userId: userId, networkId: this.networkId, messages: this.messages, errors: this.errors});
                 this.getStatusesByNetworkId({
@@ -329,6 +351,9 @@
                     messages: this.messages,
                     errors: this.errors
                 });
+            },
+            doUpgrade () {
+                this.upgrade();
             }
         },
         created () {
@@ -337,6 +362,7 @@
             this.startStatusRefresher(user);
             this.restoreKeyCode = this.$route.query.keys_code;
             this.getAppLinks(user.locale);
+            this.loadSystemConfigs();
         },
         beforeDestroy () {
             this.clearRefresherInterval(this.refresher);
@@ -379,6 +405,55 @@
             deletedNetworkUuid (uuid) {
                 if (uuid && this.networkUuid && (uuid === this.networkUuid)) {
                     this.$router.replace({path: '/bubbles'});
+                }
+            },
+            configs (c) {
+                if (c) {
+                    // console.log('watch.configs received: '+JSON.stringify(c));
+                    if (this.user.admin) {
+                        if (this.upgradeRefresher !== null) {
+                            this.checkingForUpgrade = false;
+                            console.log('watch.configs: found c.jarVersion=' + c.jarVersion + ', c.jarUpgradeAvailable=' + JSON.stringify(c.jarUpgradeAvailable));
+                            // if there is no longer an upgrade available, then the upgrade succeeded
+                            if (c.jarUpgradeAvailable === null) {
+                                console.log('watch.configs: upgraded, reloading...');
+                                window.location.reload();
+                                // window.clearInterval(this.upgradeRefresher);
+                            }
+
+                        } else if (c.jarVersion && c.jarUpgradeAvailable === null) {
+                            this.checkingForUpgrade = true;
+                            console.log('watch.configs: checking for upgrade...')
+                            this.checkForUpgrade();
+                        } else {
+                            console.log('watch.config: no need to check for upgrade, sage version info already present');
+                        }
+                    } else {
+                        console.log('watch.configs: user is not admin, not checking for upgrade');
+                    }
+                }
+            },
+            upgrading (u) {
+                console.log('watch.upgrading received: '+JSON.stringify(u));
+                if (u) {
+                    if (u && this.upgradeRefresher === null) {
+                        console.log('watch.upgrading: starting refresher');
+                        const vue = this;
+                        this.upgradeRefresher = window.setInterval(() => {
+                            vue.loadSystemConfigs();
+                        }, 5000);
+                    }
+                }
+            },
+            upgradeCheck (u) {
+                if (u) {
+                    console.log('watch.upgradeCheck received: '+JSON.stringify(u)+', setting checkingForUpgrade = true');
+                    this.checkingForUpgrade = true;
+                    const vue = this;
+                    window.setTimeout(() => {
+                        console.log('reloading system configs in response to upgrade check')
+                        vue.loadSystemConfigs();
+                    }, 10000);
                 }
             }
         }

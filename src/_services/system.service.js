@@ -18,7 +18,8 @@ export const systemService = {
     detectTimezone,
     detectLocale,
     getAppLinks,
-    upgradeJar
+    checkForUpgrade,
+    upgrade
 };
 
 function loadIsActivated () {
@@ -118,8 +119,15 @@ function getAppLinks (locale) {
         .then(links => { return links; });
 }
 
-function upgradeJar() {
-    const requestOptions =util.postWithAuth();
+function checkForUpgrade() {
+    const requestOptions = util.getWithAuth();
+    return fetch(`${config.apiUrl}/me/upgrade`, requestOptions)
+        .then(util.handleBasicResponse)
+        .then(ok => { return true; });
+}
+
+function upgrade() {
+    const requestOptions = util.postWithAuth();
     return fetch(`${config.apiUrl}/me/upgrade`, requestOptions)
         .then(util.handleBasicResponse)
         .then(configs => { return configs; });
