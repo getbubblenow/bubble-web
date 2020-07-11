@@ -421,7 +421,7 @@
                                 // window.clearInterval(this.upgradeRefresher);
                             }
 
-                        } else if (c.jarVersion) {
+                        } else if (c.jarVersion && this.checkingForUpgrade === null) {
                             this.checkingForUpgrade = true;
                             console.log('watch.configs: checking for upgrade...')
                             this.checkForUpgrade();
