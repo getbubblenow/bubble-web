@@ -359,11 +359,11 @@
 
 <script>
     import { mapState, mapActions, mapGetters } from 'vuex'
-    import { util } from '../_helpers'
-    import { loadingImgSrc } from '../_store';
+    import { util } from '~/_helpers'
+    import { loadingImgSrc } from '~/_store';
 
     // convenience methods
-    import { isAuthenticator, isNotAuthenticator } from '../_store/users.module';
+    import { isAuthenticator, isNotAuthenticator } from '~/_store/users.module';
     window.isAuthenticator = isAuthenticator;
     window.isNotAuthenticator = isNotAuthenticator;
 

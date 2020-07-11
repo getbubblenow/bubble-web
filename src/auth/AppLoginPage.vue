@@ -7,7 +7,7 @@
 
 <script>
     import { mapState, mapGetters, mapActions } from 'vuex'
-    import { util } from '../_helpers'
+    import { util } from '~/_helpers'
 
     export default {
         computed: {

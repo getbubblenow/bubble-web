@@ -89,8 +89,8 @@
 
 <script>
     import { mapState, mapActions, mapGetters } from 'vuex';
-    import { util } from '../_helpers';
-    import { safeEval } from '../_store';
+    import { util } from '~/_helpers';
+    import { safeEval } from '~/_store';
 
     export default {
         data () {

@@ -37,7 +37,7 @@
 
 <script>
     import { mapState, mapActions } from 'vuex';
-    import { util } from '../_helpers'
+    import { util } from '~/_helpers'
 
     export default {
         props: {

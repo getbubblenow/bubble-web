@@ -165,9 +165,9 @@
 </template>
 
 <script>
-    import { mapState, mapActions } from 'vuex';
-    import { util } from '../_helpers';
-    import { loadingImgSrc } from '../_store';
+    import { mapState, mapActions, mapGetters } from 'vuex';
+    import { util } from '~/_helpers';
+    import { loadingImgSrc } from '~/_store';
 
     export default {
         data() {

@@ -61,7 +61,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
-import { loadingImgSrc } from '../_store';
+import { loadingImgSrc } from '~/_store';
 
 export default {
     data () {

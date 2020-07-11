@@ -16,7 +16,7 @@ import { Datetime } from 'vue-datetime';
 import 'vue-select/dist/vue-select.css';
 
 import { store } from './_store';
-import { router } from './_helpers';
+import { router } from './_router';
 import TotpModal from './_components/TotpModal';
 import FieldDisplay from './_components/FieldDisplay';
 import FormField from "./_components/FormField";

@@ -2,8 +2,8 @@
  * Copyright (c) 2020 Bubble, Inc.  All rights reserved.
  * For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/
  */
-import { paymentMethodService } from '../_services';
-import { util } from '../_helpers';
+import { paymentMethodService } from '~/_services';
+import { util } from '~/_helpers';
 
 const state = {
     loading: {

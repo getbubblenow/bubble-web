@@ -20,7 +20,7 @@
 
 <script>
     import {mapActions, mapState} from 'vuex'
-    import { util } from '../../_helpers'
+    import { util } from '~/_helpers'
 
     export default {
         data() {

@@ -34,10 +34,10 @@
 
 <script>
     import { mapState, mapActions } from 'vuex'
-    import { util } from '../_helpers';
+    import { util } from '~/_helpers';
 
     // convenience methods
-    import { isAuthenticator, isNotAuthenticator } from '../_store/users.module';
+    import { isAuthenticator, isNotAuthenticator } from '~/_store/users.module';
     window.isAuthenticator = isAuthenticator;
     window.isNotAuthenticator = isNotAuthenticator;
 

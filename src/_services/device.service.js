@@ -3,7 +3,7 @@
  * For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/
  */
 import config from 'config';
-import { util } from '../_helpers';
+import { util } from '~/_helpers';
 
 export const deviceService = {
     getDevicesByUserId,

@@ -119,7 +119,7 @@
 
 <script>
     import { mapState, mapActions, mapGetters } from 'vuex';
-    import { util } from '../../_helpers';
+    import { util } from '~/_helpers';
 
     export default {
         data() {

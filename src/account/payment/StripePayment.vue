@@ -15,8 +15,8 @@
 
 <script>
     import { mapState, mapActions } from 'vuex';
-    import { paymentMethods } from "../../_store/paymentMethods.module";
-    import { util } from '../../_helpers';
+    import { paymentMethods } from "~/_store/paymentMethods.module";
+    import { util } from '~/_helpers';
 
     export default {
         data() {

@@ -171,9 +171,9 @@
 
 <script>
     import { mapState, mapActions, mapGetters } from 'vuex';
-    import { util } from '../_helpers';
+    import { util } from '~/_helpers';
     import config from 'config';
-    import { loadingImgSrc } from '../_store';
+    import { loadingImgSrc } from '~/_store';
 
     export default {
         data () {
