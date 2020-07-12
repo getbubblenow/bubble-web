@@ -57,7 +57,7 @@ const actions = {
             .then(
                 plan => {
                     if (accountPlan.forkHost && accountPlan.forkHost !== '') {
-                        networkService.forkNetwork(userId, plan.name, accountPlan.forkHost, cloud, exactRegion, region, messages, errors)
+                        networkService.forkNetwork(userId, plan.name, accountPlan.forkHost, cloud, region, exactRegion, messages, errors)
                             .then(
                                 newNodeNotification => commit('addPlanAndStartNetworkSuccess', newNodeNotification),
                                 error => commit('addPlanSuccessStartNetworkFailure', error)
