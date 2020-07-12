@@ -35,17 +35,17 @@ function getNearestRegions(footprint, messages, errors) {
     return fetch(`${config.apiUrl}/me/regions/closest${footprintParam}`, util.getWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
-function getCloudAndRegion(cloud, region) {
-    return (typeof cloud === 'undefined' || typeof region === 'undefined' || cloud === null || region === null) ? "" : `?cloud=${cloud}&region=${region}`;
+function getCloudAndRegion(cloud, region, exactRegion) {
+    return `?cloud=${cloud}&region=${region}&exactRegion=${exactRegion}`;
 }
 
-function startNetwork(userId, planId, cloud, region, messages, errors) {
-    const cloudAndRegion = getCloudAndRegion(cloud, region);
+function startNetwork(userId, planId, cloud, region, exactRegion, messages, errors) {
+    const cloudAndRegion = getCloudAndRegion(cloud, region, exactRegion);
     return fetch(`${config.apiUrl}/users/${userId}/networks/${planId}/actions/start${cloudAndRegion}`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
-function forkNetwork(userId, planId, forkHost, cloud, region, messages, errors) {
-    const cloudAndRegion = getCloudAndRegion(cloud, region);
+function forkNetwork(userId, planId, forkHost, cloud, region, exactRegion, messages, errors) {
+    const cloudAndRegion = getCloudAndRegion(cloud, region, exactRegion);
     return fetch(`${config.apiUrl}/users/${userId}/networks/${planId}/actions/fork/${forkHost}${cloudAndRegion}`, util.putWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 

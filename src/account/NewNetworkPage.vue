@@ -188,6 +188,12 @@
                 <select name="region" v-validate="'required'" v-model="cloudRegionUuid" v-if="regions" class="form-control" :class="{ 'is-invalid': submitted && errors.has('region') }">
                     <option v-for="region in regions" :value="region.uuid">{{region.name}} {{regionDistance(region.uuid)}}</option>
                 </select>
+
+                <label for="flexRegion"><b>{{messages.field_label_flex_region}}</b></label>
+                <input type="checkbox" name="exactRegion" v-model="flexRegion"/>
+                <p v-if="flexRegion">{{messages.field_label_flex_region_description}}</p>
+                <p v-else>{{messages.field_label_exact_region_description}}</p>
+
                 <div v-if="submitted && errors.has('region')" class="invalid-feedback d-block">{{ errors.first('region') }}</div>
                 <button @click="customize.region = false">{{messages.button_label_use_default}}</button>
             </div>
@@ -413,6 +419,7 @@
                     region: '',
                     sshKey: ''
                 },
+                flexRegion: true,
                 submitted: false,
                 status: {
                     creating: false
@@ -668,6 +675,7 @@
                                     accountPlan: this.accountPlan,
                                     cloud: cloudRegion.cloud,
                                     region: cloudRegion.internalName,
+                                    exactRegion: !this.flexRegion,
                                     messages: this.messages,
                                     errors: this.errors
                                 });

@@ -2,6 +2,9 @@
 <template>
     <div v-if="network">
         <h4>{{ network.nickname }} - <i>{{ messages['msg_network_state_'+network.state] }}</i></h4>
+
+        <h6 class="alert-danger" v-if="stats && statsError">{{messages[stats.messageKey]}}</h6>
+
         <h6 v-if="this.isNotSelfNet && (isInReadyToRestoreState || this.network.state === 'running')">
             <button v-if="this.network.state === 'running'" :title="messages.message_network_connect"
                     :onclick="'window.open(\'' + networkAppLoginUrl + '\', \'_blank\')'">
@@ -15,11 +18,11 @@
 
         <div v-if="stats && (network.state === 'created' || network.state === 'starting' || network.state === 'restoring')">
             <!-- adapted from: https://code-boxx.com/simple-vanilla-javascript-progress-bar/ -->
-            <div class="progress-wrap">
+            <div v-if="stats.percent" class="progress-wrap">
                 <div class="progress-bar" :style="'width: '+stats.percent+'%'" :id="'progressBar_'+networkId"></div>
                 <div class="progress-text">{{messages.label_percent.parseMessage(this, {percent: stats.percent})}}</div>
             </div>
-            <div :id="'progressBar_details_'+networkId">{{messages[stats.messageKey]}}</div>
+            <div v-if="!statsError" :id="'progressBar_details_'+networkId">{{messages[stats.messageKey]}}</div>
             <hr/>
         </div>
 
@@ -130,8 +133,7 @@
                 </div>
                 {{ messages.button_description_restore }}
             </div>
-            <div v-else v-html="messages.restore_not_possible_nodes_exist_html" />
-
+            <div v-else-if="this.statsError === null" v-html="messages.restore_not_possible_nodes_exist_html" />
         </div>
 
         <div v-if="configs.sageLauncher">
@@ -176,6 +178,9 @@
                 networkId: this.$route.params.id,
                 networkUuid: null,
                 stats: null,
+                statsError: false,
+                statsCompleted: false,
+                statsErrorRetry: false,
                 refresher: null,
                 stopRefresher: null,
                 restoreKeyCode: null,
@@ -374,8 +379,7 @@
                 if (net) {
                     if (net.uuid === 'Not Found') this.$router.replace({path: '/bubbles'});
                     this.networkUuid = net.uuid;
-
-                    if (net.state !== 'created' && net.state !== 'starting' && net.state !== 'restoring') {
+                    if ((this.statsError && !this.statsErrorRetry) || this.statsCompleted) {
                         this.clearRefresherInterval(this.refresher);
                     }
                     if (net.state !== 'stopping') this.clearRefresherInterval(this.stopRefresher);
@@ -385,6 +389,7 @@
                 // console.log('watch.networkNodes: received: '+JSON.stringify(nodes));
             },
             networkStatuses (stats) {
+                // console.log('watch.networkStatuses received: '+JSON.stringify(stats));
                 if (this.network && stats && stats.length && stats.length > 0) {
                     let latestStats = null;
                     for (let i=0; i<stats.length; i++) {
@@ -395,7 +400,9 @@
                     }
                     if (latestStats !== null) {
                         this.stats = latestStats;
-                        if (this.stats.percent === 100) this.clearRefresherInterval(this.refresher);
+                        this.statsError = this.stats.messageKey.startsWith('meter_error_');
+                        this.statsErrorRetry = this.stats.messageKey.startsWith('meter_error_retry_');
+                        this.statsCompleted = (this.stats.percent === 100) || this.stats.messageKey.startsWith('meter_completed_');
                     } else {
                         // status not found for our network
                         this.clearRefresherInterval(this.refresher);
@@ -413,29 +420,27 @@
                     if (this.user.admin) {
                         if (this.upgradeRefresher !== null) {
                             this.checkingForUpgrade = false;
-                            console.log('watch.configs: found c.jarVersion=' + c.jarVersion + ', c.jarUpgradeAvailable=' + JSON.stringify(c.jarUpgradeAvailable));
+                            // console.log('watch.configs: found c.jarVersion=' + c.jarVersion + ', c.jarUpgradeAvailable=' + JSON.stringify(c.jarUpgradeAvailable));
                             // if there is no longer an upgrade available, then the upgrade succeeded
                             if (c.jarUpgradeAvailable === null) {
                                 console.log('watch.configs: upgraded, reloading...');
                                 window.location.reload();
-                                // window.clearInterval(this.upgradeRefresher);
                             }
 
                         } else if (c.jarVersion && this.checkingForUpgrade === null) {
                             this.checkingForUpgrade = true;
-                            console.log('watch.configs: checking for upgrade...')
                             this.checkForUpgrade();
                         }
                     } else {
-                        console.log('watch.configs: user is not admin, not checking for upgrade');
+                        // console.log('watch.configs: user is not admin, not checking for upgrade');
                     }
                 }
             },
             upgrading (u) {
-                console.log('watch.upgrading received: '+JSON.stringify(u));
+                // console.log('watch.upgrading received: '+JSON.stringify(u));
                 if (u) {
                     if (u && this.upgradeRefresher === null) {
-                        console.log('watch.upgrading: starting refresher');
+                        // console.log('watch.upgrading: starting refresher');
                         const vue = this;
                         this.upgradeRefresher = window.setInterval(() => {
                             vue.loadSystemConfigs();
@@ -445,11 +450,11 @@
             },
             upgradeCheck (u) {
                 if (u) {
-                    console.log('watch.upgradeCheck received: '+JSON.stringify(u)+', setting checkingForUpgrade = true');
+                    // console.log('watch.upgradeCheck received: '+JSON.stringify(u)+', setting checkingForUpgrade = true');
                     this.checkingForUpgrade = true;
                     const vue = this;
                     window.setTimeout(() => {
-                        console.log('reloading system configs in response to upgrade check')
+                        // console.log('reloading system configs in response to upgrade check')
                         vue.loadSystemConfigs();
                         this.checkingForUpgrade = false;
                     }, 10000);
