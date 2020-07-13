@@ -34,6 +34,14 @@ module.exports = {
         test: /\.s[ac]ss$/i,
         use: ['style-loader', 'css-loader', 'sass-loader'],
       },
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+          },
+        ],
+      },
     ],
   },
   plugins: [
@@ -44,9 +52,6 @@ module.exports = {
   ],
   devServer: {
     historyApiFallback: true,
-    // proxy: {
-    //     '/api': 'http://beta.bubv.net:8888'
-    // }
   },
   externals: {
     // global app config object
