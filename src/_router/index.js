@@ -66,6 +66,35 @@ const newNetworkChildren = [
 export const router = new Router({
   mode: 'history',
   routes: [
+    // new Pages & lazy loading
+    {
+      path: '/new_pages',
+      component: () => import('~/_pages/Layout'),
+      children: [
+        {
+          path: '',
+          component: () => import('~/_pages/auth/Layout'),
+          children: [
+            {
+              path: 'login',
+              component: () => import('~/_pages/auth/Login'),
+            },
+          ],
+        },
+        {
+          path: '',
+          component: () => import('~/_pages/main/Layout'),
+          children: [
+            {
+              path: 'test',
+              component: () => import('~/_pages/main/Test'),
+            },
+          ],
+        },
+      ],
+    },
+
+    // existing pages
     { path: '', component: DashboardPage },
     { path: '/', component: DashboardPage },
     { path: '/legal', component: LegalPage },
@@ -166,6 +195,9 @@ const publicPages = [
   '/auth',
   '/activate',
   '/legal',
+
+  // new Pages
+  '/new_pages',
 ];
 
 router.beforeEach((to, from, next) => {
@@ -174,6 +206,7 @@ router.beforeEach((to, from, next) => {
     publicPages.filter((p) => to.path.startsWith(p)).length === 0;
   const user = util.currentUser();
 
+  console.log('test', to.path, authRequired);
   if (authRequired) {
     // redirect to login page if not logged in and trying to access a restricted page
     if (!user) {
@@ -184,5 +217,6 @@ router.beforeEach((to, from, next) => {
     // redirect to home page if not admin and trying to access an admin page
     if (to.path.startsWith('/admin') && user.admin !== true) return next('/');
   }
+  console.log('next');
   next();
 });

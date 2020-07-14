@@ -7,6 +7,7 @@
         "rootPathSuffix": "./src",
         "rootPathPrefix": "~/"
       }
-    ]
+    ],
+    ["babel-plugin-syntax-dynamic-import"]
   ]
 }

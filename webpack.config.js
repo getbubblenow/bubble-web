@@ -52,6 +52,10 @@ module.exports = {
   ],
   devServer: {
     historyApiFallback: true,
+    publicPath: '/',
+  },
+  output: {
+    publicPath: '/',
   },
   externals: {
     // global app config object
