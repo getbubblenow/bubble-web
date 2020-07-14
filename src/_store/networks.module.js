@@ -22,7 +22,6 @@ const state = {
     networkNodes: null,
     deletedNetworkUuid: null,
     networkKeysRequested: null,
-    networkKeys: null,
     restoreKey: null,
     backups: null,
 };
@@ -151,10 +150,8 @@ const actions = {
     retrieveNetworkKeys({ commit }, {userId, networkId, code, password, messages, errors}) {
         commit('retrieveNetworkKeysRequest');
         networkService.retrieveNetworkKeys(userId, networkId, code, password, messages, errors)
-            .then(
-                keys => commit('retrieveNetworkKeysSuccess', keys),
-                error => commit('retrieveNetworkKeysFailure', error)
-            );
+                      .then(ok => commit('retrieveNetworkKeysSuccess'),
+                            error => commit('retrieveNetworkKeysFailure', error));
     },
 
     resetRestoreKey({ commit }) { commit('resetRestoreKey'); }
@@ -304,7 +301,6 @@ const mutations = {
     requestNetworkKeysRequest(state) {
         state.loading.requestNetworkKeys = true;
         state.networkKeysRequested = null;
-        state.networkKeys = null;
     },
     requestNetworkKeysSuccess(state, networkId) {
         state.loading.requestNetworkKeys = false;
@@ -318,11 +314,9 @@ const mutations = {
     retrieveNetworkKeysRequest(state) {
         state.loading.retrieveNetworkKeys = true;
         state.networkKeysRequested = null;
-        state.networkKeys = null;
     },
-    retrieveNetworkKeysSuccess(state, keys) {
+    retrieveNetworkKeysSuccess(state) {
         state.loading.retrieveNetworkKeys = false;
-        state.networkKeys = keys;
     },
     retrieveNetworkKeysFailure(state, error) {
         state.loading.retrieveNetworkKeys = false;

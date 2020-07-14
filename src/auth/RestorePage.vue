@@ -25,9 +25,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label htmlFor="restoreLongNetworkKey">{{messages.field_label_restore_long_key}}</label>
-                    <textarea v-model="restoreLongNetworkKey" name="restoreLongNetworkKey" class="form-control"
-                                :class="{ 'is-invalid': submitted && !restoreLongNetworkKey }" />
+                    <label htmlFor="restoreLongNetworkKeyFile">{{ messages.field_label_restore_long_key }}</label>
+                    <input type="file" ref="restoreLongNetworkKeyFile" @change="readUploadedKeyFile"
+                           class="form-control" :class="{ 'is-invalid': submitted && !restoreLongNetworkKey }" />
                     <div v-show="submitted && !restoreLongNetworkKey" class="invalid-feedback">
                         {{ messages.err_restoreLongNetworkKey_required }}
                     </div>
@@ -85,12 +85,18 @@ export default {
         ...mapActions('system', [ 'loadSystemConfigs' ]),
         handleSubmit (e) {
             this.errors.clear();
+            const { restoreShortKey, password } = this;
             this.submitted = true;
-            const { restoreShortKey, restoreLongNetworkKey, password } = this;
             this.restore({
-                shortKey: restoreShortKey, longKey: restoreLongNetworkKey, password: password,
+                shortKey: restoreShortKey, longKey: this.restoreLongNetworkKey, password: password,
                 systemConfigs: this.configs, messages: this.messages, errors: this.errors
             });
+        },
+        readUploadedKeyFile() {
+            var uploadedFile = this.$refs.restoreLongNetworkKeyFile.files[0];
+            var reader = new FileReader();
+            reader.onload = (event) => this.restoreLongNetworkKey = event.target.result;
+            reader.readAsText(uploadedFile);
         }
     }
 };

@@ -97,13 +97,6 @@
                 </button>
                 <img v-show="loading && loading.retrieveNetworkKeys" :src="loadingImgSrc" />
             </form>
-            <div v-if="networkKeys">
-                <hr />
-                <h4><b>{{ messages.message_network_keys }}</b></h4>
-                <textarea v-model="networkKeys.data" name="networkKeys" class="form-control" cols="50"
-                          readonly="true" />
-                {{ messages.message_network_keys_description }}
-            </div>
 
             <span v-html="latestBackupInfoHtml"></span>
 
@@ -193,7 +186,7 @@
         computed: {
             ...mapState('networks', [
                 'network', 'newNodeNotification', 'networkStatuses', 'networkNodes', 'networkKeysRequested',
-                'deletedNetworkUuid', 'networkKeys', 'loading', 'restoreKey', 'backups'
+                'deletedNetworkUuid', 'loading', 'restoreKey', 'backups'
             ]),
             ...mapState('system', ['messages', 'configs', 'appLinks', 'upgradeCheck', 'upgrading']),
             showSetupHelp () {

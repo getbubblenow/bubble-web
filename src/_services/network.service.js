@@ -81,7 +81,11 @@ function requestNetworkKeys(userId, networkId, messages, errors) {
 }
 
 function retrieveNetworkKeys(userId, networkId, code, password, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}/actions/keys/${code}`, util.postWithAuth({name: 'password', value: password})).then(util.handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}/actions/keys/${code}`,
+                 util.postWithAuth({ name: 'password', value: password }))
+            .then(util.handleCrudResponse(messages, errors))
+            .then(netKeyObj => netKeyObj.data)
+            .then(util.handleDataToDownloadAsFile('restore.' + networkId + '.key', 'text/plain'));
 }
 
 function getNetworkBackups(userId, networkId, messages, errors) {
