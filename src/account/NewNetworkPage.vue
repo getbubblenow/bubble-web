@@ -425,6 +425,7 @@
                     creating: false
                 },
                 verifiedContacts: null,
+                verifiedContactRefresher: null,
                 anyContacts: null,
                 firstContact: null,
                 payMethods: null,
@@ -774,6 +775,20 @@
                 this.anyContacts = this.hasAnyContacts(p);
                 this.verifiedContacts = this.hasVerifiedContact(p);
                 this.firstContact = this.getFirstContact(p);
+                if (!this.verifiedContacts) {
+                    if (this.verifiedContactRefresher === null) {
+                        const vue = this;
+                        const currentUser = util.currentUser();
+                        this.verifiedContactRefresher = window.setInterval(() => {
+                            vue.getPolicyByUserId({userId: currentUser.uuid, messages: vue.messages, errors: vue.errors});
+                        }, 5000);
+                    }
+                } else {
+                    if (this.verifiedContactRefresher !== null) {
+                        window.clearInterval(this.verifiedContactRefresher);
+                        this.verifiedContactRefresher = null;
+                    }
+                }
             },
             actionStatus (status) {
                 if (status.success) {
