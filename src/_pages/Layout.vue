@@ -1,6 +1,5 @@
 <template>
-  <div>
-    default Layout
+  <div class="w-100 h-100">
     <router-view></router-view>
   </div>
 </template>

@@ -8,6 +8,7 @@
       [`color-${color}`]: color,
       link: link,
     }"
+    :style="cssVars"
     class="app-btn"
   >
     <span class="btn--text">
@@ -25,7 +26,8 @@
   transition: all 300ms ease 0ms;
 
   max-height: 100%;
-  height: 60px;
+  height: var(--height);
+  width: var(--width);
   cursor: pointer;
   border: none;
 
@@ -42,6 +44,7 @@
   }
 
   .btn--text {
+    text-transform: uppercase;
     padding: 5px 20px;
   }
 
@@ -50,7 +53,7 @@
     color: #737373;
 
     .btn--text {
-      padding: 0 5px;
+      padding: 0 10px;
     }
   }
 
@@ -81,10 +84,31 @@ export default {
       type: String,
       default: '',
     },
+    width: {
+      type: String | Number,
+      default: 0,
+    },
+    height: {
+      type: String | Number,
+      default: 60,
+    },
   },
+
   data() {
     return {};
   },
+
+  computed: {
+    cssVars() {
+      return {
+        '--height': `${this.height}px`.replace('pxpx', 'px'),
+        '--width': this.width
+          ? `${this.width}px`.replace('pxpx', 'px')
+          : '100%',
+      };
+    },
+  },
+
   methods: {
     click(event) {
       this.$emit('click', event);

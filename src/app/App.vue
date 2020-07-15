@@ -1,6 +1,6 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
-  <div v-if="isNewPage">
+  <div v-if="isNewPage" class="page-container">
     <router-view></router-view>
   </div>
   <div v-else>
@@ -104,6 +104,16 @@
     </div>
   </div>
 </template>
+
+<style lang="scss">
+@import '../_scss/base';
+
+.page-container {
+  width: 100vw;
+  height: 100vh;
+  background-color: $background-color;
+}
+</style>
 
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex';
