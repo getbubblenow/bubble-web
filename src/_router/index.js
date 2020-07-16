@@ -79,6 +79,10 @@ export const router = new Router({
               path: 'login',
               component: () => import('~/_pages/auth/Login'),
             },
+            {
+              path: 'forgot-password',
+              component: () => import('~/_pages/auth/ForgotPassword'),
+            },
           ],
         },
         {

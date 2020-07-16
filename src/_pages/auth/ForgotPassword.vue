@@ -1,10 +1,10 @@
 <template>
   <div class="wrapper">
     <h1 class="text-center white-text form-title">
-      {{ messages.login_title }}
+      {{ messages.form_title_forgotPassword }}
     </h1>
     <h4 class="text-center white-text form-sub-title">
-      {{ messages.login_blurb }}
+      {{ messages.forgot_password_blurb }}
     </h4>
 
     <form class="login-form">
@@ -15,36 +15,28 @@
           :placeholder="messages.field_email_hint"
         />
       </div>
-      <div class="form-group">
-        <Input
-          class="form-control"
-          v-model="password"
-          :placeholder="messages.field_label_password"
-        />
-      </div>
-      <router-link to="/new_pages/forgot-password">
-        {{ messages.button_label_forgotPassword }}
-      </router-link>
       <Button color="default" class="login-btn">
-        {{ messages.button_label_sign_in }}
+        {{ messages.button_label_forgot_password }}
       </Button>
-      <p
-        class="text-center privacy-description"
-        v-html="messages.message_login_agreeToTerms"
-      ></p>
+      <p class="text-center mt-3">
+        <router-link to="/sign-in">
+          {{ messages.forgot_password_login_link }}
+        </router-link>
+      </p>
     </form>
-    <p class="text-center mt-4">
-      {{ messages.registration_label }}
-      <router-link to="/sign-up">
-        {{ messages.button_label_sign_up }}
-      </router-link>
-    </p>
   </div>
 </template>
 
 <style lang="scss" scoped>
 @import '../../_scss/components/form';
 
+.title {
+  margin-top: 80px;
+}
+
+.sub-title {
+  margin-top: 16px;
+}
 
 .login-form {
   background-color: white;
