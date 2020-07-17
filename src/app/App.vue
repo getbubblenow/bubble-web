@@ -109,9 +109,8 @@
 @import '../_scss/base';
 
 .page-container {
-  width: 100vw;
   height: 100vh;
-  background-color: $background-color;
+  background: linear-gradient(180deg, #f3f3fb 10%, #ededed 50%, #ffffff 80%);
 }
 </style>
 
@@ -177,7 +176,6 @@ export default {
     },
     isNewPage() {
       const newPages = ['/new_pages'];
-      console.log(this.$route);
       return (
         newPages.includes(this.$route.path) ||
         newPages.filter((p) => this.$route.path.startsWith(p)).length

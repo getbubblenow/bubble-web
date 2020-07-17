@@ -7,7 +7,7 @@
       {{ messages.forgot_password_blurb }}
     </h4>
 
-    <form class="login-form">
+    <form class="auth-form">
       <div class="form-group">
         <Input
           class="form-control"
@@ -15,7 +15,7 @@
           :placeholder="messages.field_email_hint"
         />
       </div>
-      <Button color="default" class="login-btn">
+      <Button color="default" class="auth-form-submit">
         {{ messages.button_label_forgot_password }}
       </Button>
       <p class="text-center mt-3">
@@ -38,19 +38,7 @@
   margin-top: 16px;
 }
 
-.login-form {
-  background-color: white;
-  box-shadow: $form-box-shadow;
-
-  width: 450px;
-  max-width: 90%;
-  margin: 80px auto 0;
-  padding: 40px 36px;
-
-  border-radius: $form-border-radius;
-}
-
-.login-btn {
+.forgot-password-btn {
   margin-top: 55px;
 }
 

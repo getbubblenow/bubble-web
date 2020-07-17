@@ -29,7 +29,11 @@
   height: var(--height);
   width: var(--width);
   cursor: pointer;
-  border: none;
+  border: 1px solid $border-color;
+
+  &:focus {
+    outline: none;
+  }
 
   // &:hover {
   //   box-shadow: 0px 5px 5px 0px rgba(0, 0, 0, 0.2);
@@ -50,6 +54,7 @@
 
   &.link {
     background-color: transparent;
+    border: none;
     color: #737373;
 
     .btn--text {
@@ -61,6 +66,11 @@
   &.color-default {
     background: linear-gradient(300deg, #b838c9 -5%, #ee2f8e 95%);
     color: white;
+  }
+
+  &.color-outline {
+    background: white;
+    color: $vivid-pink;
   }
 }
 </style>

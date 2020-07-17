@@ -8,62 +8,79 @@ import { router } from '~/_router';
 
 import { account } from './account.module';
 
+import staticMessages from '~/_assets/messages.json';
+
 const state = {
-    configs: {
-        networkUuid: null,
-        allowRegistration: false,
-        paymentsEnabled: false,
-        sageLauncher: false,
-        bubbleNode: null,
-        entityClasses: [],
-        locales: ['en_US'],
-        cloudConfigs: {},
-        sslPort: null,
-        locked: null,
-        launchLock: null,
-        promoCodePolicy: null,
-        requireSendMetrics: null,
-        awaitingRestore: false,
-        restoreInProgress: false,
-        support: {},
-        securityLevels: null,
-        jarVersion: null,
-        jarUpgradeAvailable: null
+  configs: {
+    networkUuid: null,
+    allowRegistration: false,
+    paymentsEnabled: false,
+    sageLauncher: false,
+    bubbleNode: null,
+    entityClasses: [],
+    locales: ['en_US'],
+    cloudConfigs: {},
+    sslPort: null,
+    locked: null,
+    launchLock: null,
+    promoCodePolicy: null,
+    requireSendMetrics: null,
+    awaitingRestore: false,
+    restoreInProgress: false,
+    support: {},
+    securityLevels: null,
+    jarVersion: null,
+    jarUpgradeAvailable: null,
+  },
+  entityConfigs: {},
+  searchResults: [],
+  status: {
+    activating: false,
+    searching: false,
+    creatingEntity: false,
+    modelSetupInProgress: false,
+  },
+  activated: null,
+  error: null,
+  messages: {
+    durationToMillis: function(count, units) {
+      if (typeof count === 'undefined' || count === null || count === '')
+        return null;
+      return (
+        parseInt(count) *
+        parseInt(state.messages['time_duration_' + units + '_factor'])
+      );
     },
-    entityConfigs: {},
-    searchResults: [],
-    status: { activating: false, searching: false, creatingEntity: false, modelSetupInProgress: false },
-    activated: null,
-    error: null,
-    messages: {
-        durationToMillis: function(count, units) {
-            if (typeof count === 'undefined' || count === null || count === '') return null;
-            return parseInt(count) * parseInt(state.messages['time_duration_'+units+'_factor']);
-        },
-        millisToDuration: function (ms) {
-            const durations = state.timeDurationOptionsReversed;
-            for (let i=0; i<durations.length; i++) {
-                const durationMillis = parseInt(state.messages['time_duration_'+durations[i]+'_factor']);
-                if (ms >= durationMillis && ((ms % durationMillis) === 0 || i === durations.length-1)) {
-                    return {count: parseInt(ms) / durationMillis, units: durations[i]};
-                }
-            }
-            return {count: parseInt(ms), units: ''};
+    millisToDuration: function(ms) {
+      const durations = state.timeDurationOptionsReversed;
+      for (let i = 0; i < durations.length; i++) {
+        const durationMillis = parseInt(
+          state.messages['time_duration_' + durations[i] + '_factor']
+        );
+        if (
+          ms >= durationMillis &&
+          (ms % durationMillis === 0 || i === durations.length - 1)
+        ) {
+          return { count: parseInt(ms) / durationMillis, units: durations[i] };
         }
+      }
+      return { count: parseInt(ms), units: '' };
     },
-    messageGroupsLoaded: [],
-    countries: [],
-    locales: [],
-    timezones: [],
-    detectedTimezone: null,
-    detectedLocale: null,
-    accountDeletionOptions: [],
-    timeDurationOptions: [],
-    timeDurationOptionsReversed: [],
-    contactTypes: [],
-    appLinks: null,
-    upgradeCheck: null,
-    upgrading: null
+    ...staticMessages,
+  },
+  messageGroupsLoaded: [],
+  countries: [],
+  locales: [],
+  timezones: [],
+  detectedTimezone: null,
+  detectedLocale: null,
+  accountDeletionOptions: [],
+  timeDurationOptions: [],
+  timeDurationOptionsReversed: [],
+  contactTypes: [],
+  appLinks: null,
+  upgradeCheck: null,
+  upgrading: null,
 };
 
 const actions = {
@@ -87,104 +104,126 @@ const actions = {
     );
   },
 
-    loadSystemConfigs({ commit }) {
-        commit('loadSystemConfigsRequest');
-        systemService.loadSystemConfigs()
-            .then(
-                configs => commit('loadSystemConfigsSuccess', configs),
-                error => commit('loadSystemConfigsFailure', error)
-            );
-    },
-    loadEntityConfigs({ commit }) {
-        commit('loadEntityConfigsRequest');
-        systemService.loadEntityConfigs()
-            .then(
-                configs => commit('loadEntityConfigsSuccess', configs),
-                error => commit('loadEntityConfigsFailure', error)
-            );
-    },
-    search({ commit }, type, query) {
-        commit('searchRequest');
-        systemService.search(type, query)
-            .then(
-                results => commit('searchSuccess', {type, query, results}),
-                error => commit('searchFailure', error)
-            );
-    },
-    createEntity({ commit }, {entityConfig, json, messages, errors}) {
-        commit('createEntityRequest');
-        systemService.createEntity(entityConfig, json, messages, errors)
-            .then(
-                entity => commit('createEntitySuccess', entity),
-                error => commit('createEntityFailure', error)
-            );
-    },
-    modelSetup({ commit }, {file, messages, errors}) {
-        commit('modelSetupRequest');
-        systemService.modelSetup(file, messages, errors)
-            .then(
-                ok => commit('modelSetupSuccess'),
-                errors => commit('modelSetupFailure', errors)
-            );
-    },
-    loadMessages({ commit }, group, locale) {
-        commit('loadMessagesRequest');
-        systemService.loadMessages(group, locale)
-            .then(
-                messages => commit('loadMessagesSuccess', {group, messages}),
-                error => commit('loadMessagesFailure', error)
-            );
-    },
-    loadTimezones({ commit }) {
-        commit('loadTimezonesRequest');
-        systemService.loadTimezones().then(
-            timezones => commit('loadTimezonesSuccess', timezones),
-            error => commit('loadTimezonesFailure', error)
-        )
-    },
-    detectTimezone({ commit }) {
-        commit('detectTimezoneRequest');
-        systemService.detectTimezone().then(
-            timezone => commit('detectTimezoneSuccess', timezone),
-            error => commit('detectTimezoneFailure', error)
-        )
-    },
-    detectLocale({ commit }) {
-        commit('detectLocaleRequest');
-        systemService.detectLocale().then(
-            locales => commit('detectLocaleSuccess', locales),
-            error => commit('detectLocaleFailure', error)
-        )
-    },
-    getAppLinks({ commit }, locale) {
-        commit('getAppLinksRequest');
-        systemService.getAppLinks(locale).then(
-            links => commit('getAppLinksSuccess', links),
-            error => commit('getAppLinksFailure', error)
-        )
-    },
-    checkForUpgrade({ commit }) {
-        if (state.upgradeCheck === null) {
-            commit('checkForUpgradeRequest');
-            systemService.checkForUpgrade().then(
-                configs => commit('checkForUpgradeSuccess', configs),
-                error => commit('checkForUpgradeFailure', error)
-            );
-        } else {
-            console.log('checkForUpgrade: already checked ('+state.upgradeCheck+'), not checking again');
-        }
-    },
-    upgrade({ commit }) {
-        commit('upgradeRequest');
-        systemService.upgrade().then(
-            configs => commit('upgradeSuccess', configs),
-            error => commit('upgradeFailure', error)
-        )
-    },
-    upgradeComplete({ commit }) {
-        commit('upgradeCompleteRequest');
-        commit('upgradeCompleteSuccess');
+  loadSystemConfigs({ commit }) {
+    commit('loadSystemConfigsRequest');
+    systemService
+      .loadSystemConfigs()
+      .then(
+        (configs) => commit('loadSystemConfigsSuccess', configs),
+        (error) => commit('loadSystemConfigsFailure', error)
+      );
+  },
+  loadEntityConfigs({ commit }) {
+    commit('loadEntityConfigsRequest');
+    systemService
+      .loadEntityConfigs()
+      .then(
+        (configs) => commit('loadEntityConfigsSuccess', configs),
+        (error) => commit('loadEntityConfigsFailure', error)
+      );
+  },
+  search({ commit }, type, query) {
+    commit('searchRequest');
+    systemService
+      .search(type, query)
+      .then(
+        (results) => commit('searchSuccess', { type, query, results }),
+        (error) => commit('searchFailure', error)
+      );
+  },
+  createEntity({ commit }, { entityConfig, json, messages, errors }) {
+    commit('createEntityRequest');
+    systemService
+      .createEntity(entityConfig, json, messages, errors)
+      .then(
+        (entity) => commit('createEntitySuccess', entity),
+        (error) => commit('createEntityFailure', error)
+      );
+  },
+  modelSetup({ commit }, { file, messages, errors }) {
+    commit('modelSetupRequest');
+    systemService
+      .modelSetup(file, messages, errors)
+      .then(
+        (ok) => commit('modelSetupSuccess'),
+        (errors) => commit('modelSetupFailure', errors)
+      );
+  },
+  loadMessages({ commit }, group, locale) {
+    commit('loadMessagesRequest');
+    systemService
+      .loadMessages(group, locale)
+      .then(
+        (messages) => commit('loadMessagesSuccess', { group, messages }),
+        (error) => commit('loadMessagesFailure', error)
+      );
+  },
+  loadTimezones({ commit }) {
+    commit('loadTimezonesRequest');
+    systemService
+      .loadTimezones()
+      .then(
+        (timezones) => commit('loadTimezonesSuccess', timezones),
+        (error) => commit('loadTimezonesFailure', error)
+      );
+  },
+  detectTimezone({ commit }) {
+    commit('detectTimezoneRequest');
+    systemService
+      .detectTimezone()
+      .then(
+        (timezone) => commit('detectTimezoneSuccess', timezone),
+        (error) => commit('detectTimezoneFailure', error)
+      );
+  },
+  detectLocale({ commit }) {
+    commit('detectLocaleRequest');
+    systemService
+      .detectLocale()
+      .then(
+        (locales) => commit('detectLocaleSuccess', locales),
+        (error) => commit('detectLocaleFailure', error)
+      );
+  },
+  getAppLinks({ commit }, locale) {
+    commit('getAppLinksRequest');
+    systemService
+      .getAppLinks(locale)
+      .then(
+        (links) => commit('getAppLinksSuccess', links),
+        (error) => commit('getAppLinksFailure', error)
+      );
+  },
+  checkForUpgrade({ commit }) {
+    if (state.upgradeCheck === null) {
+      commit('checkForUpgradeRequest');
+      systemService
+        .checkForUpgrade()
+        .then(
+          (configs) => commit('checkForUpgradeSuccess', configs),
+          (error) => commit('checkForUpgradeFailure', error)
+        );
+    } else {
+      console.log(
+        'checkForUpgrade: already checked (' +
+          state.upgradeCheck +
+          '), not checking again'
+      );
     }
+  },
+  upgrade({ commit }) {
+    commit('upgradeRequest');
+    systemService
+      .upgrade()
+      .then(
+        (configs) => commit('upgradeSuccess', configs),
+        (error) => commit('upgradeFailure', error)
+      );
+  },
+  upgradeComplete({ commit }) {
+    commit('upgradeCompleteRequest');
+    commit('upgradeCompleteSuccess');
+  },
 };
 
 const getters = {
@@ -480,32 +519,32 @@ const mutations = {
     state.error = error;
   },
 
-    checkForUpgradeRequest(state) {},
-    checkForUpgradeSuccess(state, ok) {
-        console.log('checkForUpgradeSuccess: ok');
-        state.upgradeCheck = true;
-    },
-    checkForUpgradeFailure(state, error) {
-        state.error = error;
-    },
+  checkForUpgradeRequest(state) {},
+  checkForUpgradeSuccess(state, ok) {
+    console.log('checkForUpgradeSuccess: ok');
+    state.upgradeCheck = true;
+  },
+  checkForUpgradeFailure(state, error) {
+    state.error = error;
+  },
 
-    upgradeRequest(state) {},
-    upgradeSuccess(state, configs) {
-        state.configs = configs;
-        state.upgrading = true;
-    },
-    upgradeFailure(state, error) {
-        state.error = error;
-    },
+  upgradeRequest(state) {},
+  upgradeSuccess(state, configs) {
+    state.configs = configs;
+    state.upgrading = true;
+  },
+  upgradeFailure(state, error) {
+    state.error = error;
+  },
 
-    upgradeCompleteRequest(state) {},
-    upgradeCompleteSuccess(state) {
-        state.upgrading = false;
-    },
-    upgradeCompleteFailure(state, error) {
-        state.upgrading = false;
-        state.error = error;
-    }
+  upgradeCompleteRequest(state) {},
+  upgradeCompleteSuccess(state) {
+    state.upgrading = false;
+  },
+  upgradeCompleteFailure(state, error) {
+    state.upgrading = false;
+    state.error = error;
+  },
 };
 
 export const system = {
