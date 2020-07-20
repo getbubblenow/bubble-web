@@ -74,20 +74,12 @@
             <div>
                 <h3>{{messages.field_label_auto_update_policy}}</h3>
                 <div class="form-group">
-                    <label for="autoUpdatePolicy.driverUpdates">{{messages.field_label_auto_update_drivers}}</label>
-                    <input type="checkbox" id="autoUpdatePolicy.driverUpdates" v-model="subject.autoUpdatePolicy.driverUpdates">
+                    <label for="autoUpdatePolicy.jarUpdates">{{messages.field_label_auto_update_jar}}</label>
+                    <input type="checkbox" id="autoUpdatePolicy.jarUpdates" v-model="subject.autoUpdatePolicy.jarUpdates">
                 </div>
                 <div class="form-group">
                     <label for="autoUpdatePolicy.appUpdates">{{messages.field_label_auto_update_apps}}</label>
                     <input type="checkbox" id="autoUpdatePolicy.appUpdates" v-model="subject.autoUpdatePolicy.appUpdates">
-                </div>
-                <div class="form-group">
-                    <label for="autoUpdatePolicy.dataUpdates">{{messages.field_label_auto_update_app_data}}</label>
-                    <input type="checkbox" id="autoUpdatePolicy.dataUpdates" v-model="subject.autoUpdatePolicy.dataUpdates">
-                </div>
-                <div class="form-group">
-                    <label for="autoUpdatePolicy.newStuff">{{messages.field_label_auto_update_new_drivers_and_apps}}</label>
-                    <input type="checkbox" id="autoUpdatePolicy.newStuff" v-model="subject.autoUpdatePolicy.newStuff">
                 </div>
             </div>
             <div class="form-group">
@@ -114,10 +106,8 @@
         admin: null,
         suspended: null,
         autoUpdatePolicy: {
-            driverUpdates: true,
-            appUpdates: true,
-            dataUpdates: true,
-            newStuff: true
+            jarUpdates: true,
+            appUpdates: true
         }
     };
 
