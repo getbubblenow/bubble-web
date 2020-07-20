@@ -8,12 +8,19 @@
 </template>
 
 <style lang="scss" scoped>
+@import '../../_scss/breakpoints';
+
 .content {
   background-repeat: no-repeat;
   background-size: 100% auto;
   background-position-x: center;
 
   padding: 80px;
+
+  @include respond-below(sm) {
+    background-size: 200%, auto;
+    padding: 20px;
+  }
 }
 
 .background1 {

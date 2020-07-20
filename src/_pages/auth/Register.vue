@@ -83,7 +83,7 @@
     <h2 class="covered-section-title text-center">
       {{ messages.marketing_message_got_you_covered_title }}
     </h2>
-    <div class="row">
+    <div class="row" v-if="messages">
       <div
         v-for="(item, index) in messages.marketing_message_topics.split(',')"
         :key="index"

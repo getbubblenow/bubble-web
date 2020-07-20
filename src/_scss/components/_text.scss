@@ -1,8 +1,27 @@
+@import '../breakpoints';
+
 .white-text {
   color: white;
 }
 
-a {
+a,
+a:hover {
   color: $vivid-navy;
   text-decoration: none;
+}
+
+html {
+  font-size: 16px;
+
+  @include respond-below(sm) {
+    font-size: 10px;
+  }
+}
+
+body {
+  font-size: 16px;
+
+  @include respond-below(sm) {
+    font-size: 14px;
+  }
 }
