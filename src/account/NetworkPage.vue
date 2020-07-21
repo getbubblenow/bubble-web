@@ -87,7 +87,7 @@
                 </div>
                 <div class="form-group">
                     <label for="restoreKeyPassword">{{messages.field_network_key_download_password}}</label>
-                    <input type="text" v-model="restoreKeyPassword" v-validate="'required'" name="restoreKeyPassword"
+                    <input type="password" v-model="restoreKeyPassword" v-validate="'required'" name="restoreKeyPassword"
                            class="form-control" :class="{ 'is-invalid': errors.has('password') }"
                            :autofocus="this.$route.query.hasOwnProperty('keys_code')"/>
                     <div v-if="errors.has('password')" class="invalid-feedback">{{ errors.first('password') }}</div>
