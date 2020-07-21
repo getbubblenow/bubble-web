@@ -214,7 +214,6 @@ router.beforeEach((to, from, next) => {
     publicPages.filter((p) => to.path.startsWith(p)).length === 0;
   const user = util.currentUser();
 
-  console.log('test', to.path, authRequired);
   if (authRequired) {
     // redirect to login page if not logged in and trying to access a restricted page
     if (!user) {
@@ -225,6 +224,5 @@ router.beforeEach((to, from, next) => {
     // redirect to home page if not admin and trying to access an admin page
     if (to.path.startsWith('/admin') && user.admin !== true) return next('/');
   }
-  console.log('next');
   next();
 });

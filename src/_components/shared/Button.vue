@@ -1,7 +1,6 @@
 <template>
   <button
     v-bind="$attrs"
-    @click="click($event)"
     :class="{
       round: round,
       block: block,
@@ -116,12 +115,6 @@ export default {
           ? `${this.width}px`.replace('pxpx', 'px')
           : '100%',
       };
-    },
-  },
-
-  methods: {
-    click(event) {
-      this.$emit('click', event);
     },
   },
 };
