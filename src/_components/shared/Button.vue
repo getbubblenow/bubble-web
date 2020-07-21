@@ -6,7 +6,9 @@
       block: block,
       [`color-${color}`]: color,
       link: link,
+      disabled: disabled
     }"
+    :disabled="disabled"
     :style="cssVars"
     class="app-btn"
   >
@@ -71,6 +73,11 @@
     background: white;
     color: $vivid-pink;
   }
+
+  &.disabled {
+    opacity: 0.8;
+    cursor: not-allowed;
+  }
 }
 </style>
 
@@ -86,6 +93,10 @@ export default {
       default: false,
     },
     link: {
+      type: Boolean,
+      default: false,
+    },
+    disabled: {
       type: Boolean,
       default: false,
     },

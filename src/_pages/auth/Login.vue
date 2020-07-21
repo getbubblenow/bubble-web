@@ -1,7 +1,9 @@
 <template>
   <div class="wrapper">
     <h1 class="text-center white-text form-title">
-      {{ messages.login_title }}
+      {{
+        configs.sageLauncher ? messages.login_title_sage : messages.login_title
+      }}
     </h1>
     <h4 class="text-center white-text form-sub-title">
       {{ messages.login_blurb }}
@@ -53,7 +55,7 @@
           }"
           v-model="password"
           @input="$v.password.$touch()"
-          :placeholder="messages.field_label_password"
+          :placeholder="messages.field_label_enter_password"
         />
         <span
           class="form-error"
@@ -127,9 +129,15 @@
       <router-link to="/new_pages/forgot-password">
         {{ messages.button_label_forgotPassword }}
       </router-link>
-      <Button color="default" class="auth-form-submit" @click="submit">
+      <Button
+        color="default"
+        class="auth-form-submit"
+        @click="submit"
+        :disabled="status.loggingIn"
+      >
         {{ messages.button_label_sign_in }}
       </Button>
+
       <p
         class="text-center description"
         v-html="messages.message_login_agreeToTerms"
