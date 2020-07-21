@@ -238,6 +238,7 @@ export default {
         this.selectedLocale = u.locale;
         this.reloadMessages();
         this.loadMessages('post_auth', this.selectedLocale);
+        this.loadMessages('apps', this.selectedLocale);
       }
     },
     locale(loc) {
