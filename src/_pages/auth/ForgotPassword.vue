@@ -7,15 +7,32 @@
       {{ messages.forgot_password_blurb }}
     </h4>
 
-    <form class="auth-form">
+    <form class="auth-form" @submit.prevent="handleSubmit">
       <div class="form-group">
         <Input
           class="form-control"
           v-model="email"
           :placeholder="messages.field_email_hint"
         />
+        <span
+          class="form-error"
+          v-if="submitted && emailErrors && emailErrors.length"
+        >
+          {{ emailErrors.join(', ') }}
+        </span>
+        <div
+          v-if="submitted && errors.has('name')"
+          class="invalid-feedback d-block"
+        >
+          {{ errors.first('name') }}
+        </div>
       </div>
-      <Button color="default" class="auth-form-submit">
+      <Button
+        color="default"
+        class="auth-form-submit"
+        @click="handleSubmit"
+        :disabled="status.sendingResetPasswordMessage"
+      >
         {{ messages.button_label_forgot_password }}
       </Button>
       <p class="text-center mt-3">
@@ -50,7 +67,9 @@
 </style>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
+import { validationMixin } from 'vuelidate';
+import { required, email, minLength } from 'vuelidate/lib/validators';
 
 import { Button, Input } from '~/_components/shared';
 
@@ -60,15 +79,50 @@ export default {
     Input,
   },
 
+  mixins: [validationMixin],
+  validations: {
+    email: { required, email },
+  },
+
   data() {
     return {
       email: '',
-      password: '',
+      submitted: false,
     };
   },
 
   computed: {
-    ...mapState('system', ['messages']),
+    ...mapState('system', ['configs', 'messages']),
+    ...mapState('account', ['status', 'resetPasswordMessageSent']),
+
+    emailErrors() {
+      const errors = [];
+      if (!this.$v.email.$dirty) return errors;
+      !this.$v.email.email && errors.push(this.messages['err.email.invalid']);
+      !this.$v.email.required &&
+        errors.push(this.messages['err.email.required']);
+      return errors;
+    },
+  },
+  methods: {
+    ...mapActions('account', ['forgotPassword']),
+    handleSubmit(e) {
+      this.errors.clear();
+      this.$v.$touch();
+      this.submitted = true;
+      if (!this.$v.$invalid) {
+        this.forgotPassword({
+          username: this.email,
+          messages: this.messages,
+          errors: this.errors,
+        });
+      }
+    },
+  },
+  watch: {
+    resetPasswordMessageSent(m) {
+      if (m === true) this.$router.push('/login');
+    },
   },
 };
 </script>

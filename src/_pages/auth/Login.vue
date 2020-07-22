@@ -206,9 +206,9 @@ export default {
     emailErrors() {
       const errors = [];
       if (!this.$v.email.$dirty) return errors;
-      !this.$v.email.email && errors.push(this.messages['err.email.invalid']);
+      !this.$v.email.email && errors.push(this.messages['err_email_invalid']);
       !this.$v.email.required &&
-        errors.push(this.messages['err.email.required']);
+        errors.push(this.messages['err_email_required']);
       return errors;
     },
 
@@ -216,9 +216,9 @@ export default {
       const errors = [];
       if (!this.$v.password.$dirty) return errors;
       !this.$v.password.minLength &&
-        errors.push(this.messages['err.password.tooShort']);
+        errors.push(this.messages['err_password_tooShort']);
       !this.$v.password.required &&
-        errors.push(this.messages['err.password.required']);
+        errors.push(this.messages['err_password_required']);
       return errors;
     },
 
@@ -226,7 +226,7 @@ export default {
       const errors = [];
       if (!this.$v.totpToken.$dirty) return errors;
       !this.$v.totpToken.required &&
-        errors.push(this.messages['err.totpToken.invalid']);
+        errors.push(this.messages['err_totpToken_invalid']);
       return errors;
     },
 
@@ -234,7 +234,7 @@ export default {
       const errors = [];
       if (!this.$v.unlockKey.$dirty) return errors;
       !this.$v.unlockKey.required &&
-        errors.push(this.messages['err.unlock.required']);
+        errors.push(this.messages['err_unlock_required']);
       return errors;
     },
   },
