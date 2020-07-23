@@ -89,36 +89,6 @@ export const router = new Router({
       ],
     },
 
-    {
-      path: '',
-      component: () => import('~/_pages/Layout'),
-      children: [
-        {
-          path: '',
-          component: () => import('~/_pages/auth/Layout'),
-          children: [
-            {
-              path: 'login',
-              component: () => import('~/_pages/auth/Login'),
-            },
-            {
-              path: 'forgotPassword',
-              component: () => import('~/_pages/auth/ForgotPassword'),
-            },
-            {
-              path: 'register',
-              component: () => import('~/_pages/auth/Register'),
-            },
-          ],
-        },
-        {
-          path: '',
-          component: () => import('~/_pages/main/Layout'),
-          children: [],
-        },
-      ],
-    },
-
     // existing pages
     { path: '', component: DashboardPage },
     { path: '/', component: DashboardPage },
@@ -202,6 +172,37 @@ export const router = new Router({
       children: paymentMethodsChildren,
     },
     { path: '/admin/model', component: ModelSetupPage },
+
+    // new route
+    {
+      path: '',
+      component: () => import('~/_pages/Layout'),
+      children: [
+        {
+          path: '',
+          component: () => import('~/_pages/auth/Layout'),
+          children: [
+            {
+              path: 'login',
+              component: () => import('~/_pages/auth/Login'),
+            },
+            {
+              path: 'forgotPassword',
+              component: () => import('~/_pages/auth/ForgotPassword'),
+            },
+            {
+              path: 'register',
+              component: () => import('~/_pages/auth/Register'),
+            },
+          ],
+        },
+        {
+          path: '',
+          component: () => import('~/_pages/main/Layout'),
+          children: [],
+        },
+      ],
+    },
 
     // otherwise redirect to dashboard
     { path: '*', redirect: '/' },
