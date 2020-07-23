@@ -24,11 +24,7 @@ module.exports = {
       },
       {
         test: /\.(css|less)$/,
-        use: [
-          {
-            loader: 'css-loader', // translates CSS into CommonJS
-          },
-        ],
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.s[ac]ss$/i,

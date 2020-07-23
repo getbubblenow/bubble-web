@@ -28,6 +28,9 @@ Vue.component('field-display', FieldDisplay);
 Vue.component('form-field', FormField);
 Vue.config.productionTip = false;
 
+// plugins
+import './_plugins/snotify';
+
 // not sure what the best way is to include these icons, we reference them programmatically via string resource/messages
 // Vue.component('font-awesome-icon', FontAwesomeIcon);
 

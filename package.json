@@ -22,6 +22,7 @@
     "vue-datetime": "^1.0.0-beta.11",
     "vue-router": "^3.0.6",
     "vue-select": "^3.4.0",
+    "vue-snotify": "^3.2.1",
     "vue-spinner": "^1.0.4",
     "vuelidate": "^0.7.5",
     "vuex": "^3.1.1"
@@ -39,6 +40,7 @@
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^3.2.0",
     "path": "^0.12.7",
+    "style-loader": "^1.2.1",
     "vue-loader": "^14.2.3",
     "vue-template-compiler": "^2.6.10",
     "webpack": "^4.39.3",

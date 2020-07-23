@@ -2,6 +2,7 @@
 <template>
   <div v-if="isNewPage" class="page-container">
     <router-view></router-view>
+    <vue-snotify></vue-snotify>
   </div>
   <div v-else>
     <div v-if="!configs"><img :src="loadingImgSrc" /></div>
@@ -175,7 +176,7 @@ export default {
       return this.configs ? this.configs.awaitingRestore : undefined;
     },
     isNewPage() {
-      const newPages = ['/new_pages'];
+      const newPages = ['/new_pages', '/login', '/forgotPassword', '/register'];
       return (
         newPages.includes(this.$route.path) ||
         newPages.filter((p) => this.$route.path.startsWith(p)).length

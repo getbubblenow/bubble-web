@@ -9,10 +9,10 @@ import LegalPage from '~/app/LegalPage';
 import SupportPage from '~/app/SupportPage';
 import ActivationPage from '~/auth/ActivationPage';
 import ModelSetupPage from '~/admin/ModelSetupPage';
-import RegisterPage from '~/auth/RegisterPage';
-import LoginPage from '~/auth/LoginPage';
+// import RegisterPage from '~/auth/RegisterPage';
+// import LoginPage from '~/auth/LoginPage';
 import LogoutPage from '~/auth/LogoutPage';
-import ForgotPasswordPage from '~/auth/ForgotPasswordPage';
+// import ForgotPasswordPage from '~/auth/ForgotPasswordPage';
 import MultifactorAuthPage from '~/auth/MultifactorAuthPage';
 import AppLoginPage from '~/auth/AppLoginPage';
 import RestorePage from '~/auth/RestorePage';
@@ -74,13 +74,35 @@ export const router = new Router({
         {
           path: '',
           component: () => import('~/_pages/auth/Layout'),
+          children: [],
+        },
+        {
+          path: '',
+          component: () => import('~/_pages/main/Layout'),
+          children: [
+            {
+              path: 'test',
+              component: () => import('~/_pages/main/Test'),
+            },
+          ],
+        },
+      ],
+    },
+
+    {
+      path: '',
+      component: () => import('~/_pages/Layout'),
+      children: [
+        {
+          path: '',
+          component: () => import('~/_pages/auth/Layout'),
           children: [
             {
               path: 'login',
               component: () => import('~/_pages/auth/Login'),
             },
             {
-              path: 'forgot-password',
+              path: 'forgotPassword',
               component: () => import('~/_pages/auth/ForgotPassword'),
             },
             {
@@ -92,12 +114,7 @@ export const router = new Router({
         {
           path: '',
           component: () => import('~/_pages/main/Layout'),
-          children: [
-            {
-              path: 'test',
-              component: () => import('~/_pages/main/Test'),
-            },
-          ],
+          children: [],
         },
       ],
     },
@@ -157,15 +174,15 @@ export const router = new Router({
     { path: '/resetPassword/:code', component: SetPasswordPage },
 
     { path: '/activate', component: ActivationPage },
-    {
-      path: '/register',
-      component: RegisterPage,
-      children: paymentMethodsChildren,
-    },
+    // {
+    //   path: '/register',
+    //   component: RegisterPage,
+    //   children: paymentMethodsChildren,
+    // },
     { path: '/auth', component: MultifactorAuthPage },
-    { path: '/login', component: LoginPage },
+    // { path: '/login', component: LoginPage },
     { path: '/logout', component: LogoutPage },
-    { path: '/forgotPassword', component: ForgotPasswordPage },
+    // { path: '/forgotPassword', component: ForgotPasswordPage },
     { path: '/appLogin', component: AppLoginPage },
     { path: '/restore', component: RestorePage },
 

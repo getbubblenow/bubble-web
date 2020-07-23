@@ -113,7 +113,7 @@
         class="form-group mt-4 d-flex justify-content-center align-items-center"
       >
         <div class="flex-grow-1 pr-2">
-          <router-link to="/new_pages/login">
+          <router-link to="/login">
             <Button block color="outline">
               {{ messages.button_label_cancel }}
             </Button>

@@ -126,7 +126,7 @@
         </div>
       </div>
 
-      <router-link to="/new_pages/forgot-password">
+      <router-link to="/forgotPassword">
         {{ messages.button_label_forgotPassword }}
       </router-link>
       <Button

@@ -115,7 +115,13 @@ export default {
           username: this.email,
           messages: this.messages,
           errors: this.errors,
-        });
+        })
+          .then(() => {
+            this.$snotify.success(this.messages.message_resetPassword_sent);
+          })
+          .catch((err) => {
+            this.$snotify.error(this.messages.message_resetPassword_sent);
+          });
       }
     },
   },

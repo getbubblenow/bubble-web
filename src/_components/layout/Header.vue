@@ -8,17 +8,17 @@
       >
         <router-link to="/help" class="d-flex align-items-center">
           <Button link>
-            {{ messages.button_label_help || 'Help' }}
+            {{ messages.button_label_help }}
           </Button>
         </router-link>
-        <router-link to="/sign-up" class="d-flex align-items-center">
+        <router-link to="/register" class="d-flex align-items-center">
           <Button link>
-            {{ messages.button_label_sign_up || 'Sign Up' }}
+            {{ messages.button_label_sign_up }}
           </Button>
         </router-link>
-        <router-link to="/help" class="d-flex align-items-center">
+        <router-link to="/login" class="d-flex align-items-center">
           <Button color="default" width="118" height="48">
-            {{ messages.button_label_sign_in || 'Sign In' }}
+            {{ messages.button_label_sign_in }}
           </Button>
         </router-link>
       </div>
@@ -33,13 +33,13 @@
       v-click-outside="hide"
     >
       <router-link class="dropdown-item" to="#">
-        Help
+        {{ messages.button_label_help }}
       </router-link>
-      <router-link class="dropdown-item" to="/new_pages/login">
-        Sign In
+      <router-link class="dropdown-item" to="/register">
+        {{ messages.button_label_sign_up }}
       </router-link>
-      <router-link class="dropdown-item" to="/new_pages/logout">
-        Sign Out
+      <router-link class="dropdown-item" to="/login">
+        {{ messages.button_label_sign_in }}
       </router-link>
     </div>
   </div>
