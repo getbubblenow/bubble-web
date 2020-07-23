@@ -319,6 +319,11 @@
                     this.deviceName = null;
                     this.deviceType = null;
                     if (dev.uuid) this.showVpnConfig(dev.uuid);
+                    this.getDevicesByUserId({
+                        userId: this.userId,
+                        messages: this.messages,
+                        errors: this.errors
+                    });
                 }
             }
         }

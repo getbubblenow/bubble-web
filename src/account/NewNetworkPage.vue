@@ -276,19 +276,19 @@
             <hr/>
 
             <!-- sync password -->
-            <div class="form-group">
-                <label for="syncPassword">{{messages.field_label_sync_password}}</label>
-                <input type="checkbox" id="syncPassword" v-model="accountPlan.syncPassword">
-                <div v-if="submitted && errors.has('syncPassword')" class="invalid-feedback d-block">{{ errors.first('syncPassword') }}</div>
-                <p>{{messages.field_label_sync_password_description}}</p>
-            </div>
+<!--            <div class="form-group">-->
+<!--                <label for="syncPassword">{{messages.field_label_sync_password}}</label>-->
+<!--                <input type="checkbox" id="syncPassword" v-model="accountPlan.syncPassword">-->
+<!--                <div v-if="submitted && errors.has('syncPassword')" class="invalid-feedback d-block">{{ errors.first('syncPassword') }}</div>-->
+<!--                <p>{{messages.field_label_sync_password_description}}</p>-->
+<!--            </div>-->
             <!-- launch lock -->
-            <div class="form-group" v-if="networkType !== 'fork'">
-                <label for="launchLock">{{messages.field_label_launch_lock}}</label>
-                <input type="checkbox" id="launchLock" v-model="accountPlan.launchLock">
-                <div v-if="submitted && errors.has('launchLock')" class="invalid-feedback d-block">{{ errors.first('launchLock') }}</div>
-                <p>{{messages.field_label_launch_lock_description}}</p>
-            </div>
+<!--            <div class="form-group" v-if="networkType !== 'fork'">-->
+<!--                <label for="launchLock">{{messages.field_label_launch_lock}}</label>-->
+<!--                <input type="checkbox" id="launchLock" v-model="accountPlan.launchLock">-->
+<!--                <div v-if="submitted && errors.has('launchLock')" class="invalid-feedback d-block">{{ errors.first('launchLock') }}</div>-->
+<!--                <p>{{messages.field_label_launch_lock_description}}</p>-->
+<!--            </div>-->
             <!-- error reporting -->
             <div class="form-group" v-if="configs.requireSendMetrics && configs.requireSendMetrics !== true">
                 <label for="sendErrors">{{messages.field_label_send_errors}}</label>

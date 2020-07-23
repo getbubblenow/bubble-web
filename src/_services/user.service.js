@@ -211,7 +211,7 @@ function createUser(user, messages, errors) {
 }
 
 function updateUser(user, messages, errors) {
-    return fetch(`${config.apiUrl}/users/${user.name}`, util.postWithAuth(user)).then(util.handleCrudResponse(messages, errors));
+    return fetch(`${config.apiUrl}/users/${user.email}`, util.postWithAuth(user)).then(util.handleCrudResponse(messages, errors));
 }
 
 function deleteUser(userId, messages, errors) {

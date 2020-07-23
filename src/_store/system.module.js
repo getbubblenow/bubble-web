@@ -31,6 +31,7 @@ const state = {
     securityLevels: null,
     jarVersion: null,
     jarUpgradeAvailable: null,
+    maxUsers: null
   },
   entityConfigs: {},
   searchResults: [],
@@ -310,7 +311,7 @@ const getters = {
         index: 4,
         apps: adminApps,
       });
-    } else if (isAdmin) {
+    } else if (isAdmin && configs.maxUsers > 1) {
       dashApps.push({
         href: '/admin/accounts',
         title: messages.label_menu_admin_users,

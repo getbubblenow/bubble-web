@@ -71,9 +71,17 @@
                 <span>{{messages.field_label_suspended}}: {{messages['message_'+subject.suspended]}}</span>
             </div>
 
+            <!-- sync password -->
+            <div v-if="admin === true && currentUser.uuid === subject.uuid" class="form-group">
+                <label for="syncPassword">{{messages.field_label_sync_password}}</label>
+                <input type="checkbox" id="syncPassword" v-model="subject.syncPassword">
+                <div v-if="submitted && errors.has('syncPassword')" class="invalid-feedback d-block">{{ errors.first('syncPassword') }}</div>
+                <p>{{messages.field_label_sync_password_description}}</p>
+            </div>
+
             <div>
                 <h3>{{messages.field_label_auto_update_policy}}</h3>
-                <div class="form-group">
+                <div v-if="admin === true && currentUser.uuid === subject.uuid" class="form-group">
                     <label for="autoUpdatePolicy.jarUpdates">{{messages.field_label_auto_update_jar}}</label>
                     <input type="checkbox" id="autoUpdatePolicy.jarUpdates" v-model="subject.autoUpdatePolicy.jarUpdates">
                 </div>
@@ -105,6 +113,7 @@
         locale: null,
         admin: null,
         suspended: null,
+        syncPassword: null,
         autoUpdatePolicy: {
             jarUpdates: true,
             appUpdates: true
@@ -188,6 +197,7 @@
                     locale: this.subject.locale,
                     admin: this.subject.admin,
                     suspended: this.subject.suspended,
+                    syncPassword: this.subject.syncPassword,
                     autoUpdatePolicy: this.subject.autoUpdatePolicy
                 };
                 this.submitted = true;
