@@ -12,7 +12,7 @@
             </button>
             <button v-else :title="messages.message_network_restore"
                     :onclick="'window.open(\'' + nodeRestoreUrl + '\', \'_blank\')'">
-                {{ messages.message_network_restore }}
+                {{messages.message_network_restore}}
             </button>
         </h6>
 
