@@ -31,7 +31,8 @@ const state = {
     securityLevels: null,
     jarVersion: null,
     jarUpgradeAvailable: null,
-    maxUsers: null
+    maxUsers: null,
+    loaded: false,
   },
   entityConfigs: {},
   searchResults: [],
@@ -336,6 +337,9 @@ const getters = {
   promoCodeRequired: function() {
     return state.promoCodePolicy === 'required';
   },
+  configs: function () {
+    return state.configs.loaded === true ? state.configs : {};
+  }
 };
 
 const mutations = {
@@ -364,7 +368,7 @@ const mutations = {
 
   loadSystemConfigsRequest(state) {},
   loadSystemConfigsSuccess(state, configs) {
-    state.configs = configs;
+    state.configs = {...configs, loaded: true};
   },
   loadSystemConfigsFailure(state, error) {
     state.error = error;

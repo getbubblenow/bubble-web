@@ -1,10 +1,13 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
   <div v-if="isNewPage" class="page-container">
+    <Header></Header>
+
     <router-view></router-view>
     <vue-snotify></vue-snotify>
   </div>
   <div v-else>
+    <Header></Header>
     <div v-if="!configs"><img :src="loadingImgSrc" /></div>
 
     <div v-else class="jumbotron">
@@ -119,9 +122,13 @@
 import { mapState, mapActions, mapGetters } from 'vuex';
 import { util } from '~/_helpers';
 import { loadingImgSrc } from '~/_store';
+import { Header } from '~/_components/layout';
 
 export default {
   name: 'app',
+  components: {
+    Header,
+  },
   data() {
     return {
       showLocaleSelector: false,

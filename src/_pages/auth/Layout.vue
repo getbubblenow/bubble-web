@@ -1,9 +1,9 @@
 <template>
-  <div class="auth-layout h-100 d-flex flex-column">
-    <Header></Header>
-    <div :class="backgroundClass" class="content flex-grow-1">
-      <router-view></router-view>
-    </div>
+  <div
+    :class="backgroundClass"
+    class="auth-layout d-flex flex-column content"
+  >
+    <router-view></router-view>
   </div>
 </template>
 

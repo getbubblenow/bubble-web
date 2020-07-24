@@ -36,7 +36,7 @@
         {{ messages.button_label_forgot_password }}
       </Button>
       <p class="text-center mt-3">
-        <router-link to="/sign-in">
+        <router-link to="/login">
           {{ messages.forgot_password_login_link }}
         </router-link>
       </p>

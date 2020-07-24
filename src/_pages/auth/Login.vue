@@ -143,9 +143,9 @@
         v-html="messages.message_login_agreeToTerms"
       ></p>
     </form>
-    <p class="text-center mt-4">
+    <p class="text-center mt-4" v-if="configs.allowRegistration === true">
       {{ messages.registration_label }}
-      <router-link to="/sign-up">
+      <router-link to="/register">
         {{ messages.button_label_sign_up }}
       </router-link>
     </p>
@@ -189,10 +189,6 @@ export default {
       showTotp: false,
       submitted: false,
     };
-  },
-
-  created() {
-    this.loadSystemConfigs();
   },
 
   computed: {
@@ -241,7 +237,6 @@ export default {
 
   methods: {
     ...mapActions('account', ['login', 'logout']),
-    ...mapActions('system', ['loadSystemConfigs']),
 
     submit() {
       this.errors.clear();

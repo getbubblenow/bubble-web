@@ -5,8 +5,9 @@
       round: round,
       block: block,
       [`color-${color}`]: color,
+      'header-link': headerLink,
       link: link,
-      disabled: disabled
+      disabled: disabled,
     }"
     :disabled="disabled"
     :style="cssVars"
@@ -31,6 +32,7 @@
   width: var(--width);
   cursor: pointer;
   border: 1px solid $border-color;
+  display: inline-block;
 
   &:focus {
     outline: none;
@@ -53,10 +55,19 @@
     padding: 5px 20px;
   }
 
-  &.link {
+  &.header-link {
     background-color: transparent;
     border: none;
     color: #737373;
+
+    .btn--text {
+      padding: 0 10px;
+    }
+  }
+
+  &.link {
+    background-color: transparent;
+    border: none;
 
     .btn--text {
       padding: 0 10px;
@@ -92,6 +103,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    headerLink: {
+      type: Boolean,
+      default: false,
+    },
     link: {
       type: Boolean,
       default: false,
@@ -124,7 +139,7 @@ export default {
         '--height': `${this.height}px`.replace('pxpx', 'px'),
         '--width': this.width
           ? `${this.width}px`.replace('pxpx', 'px')
-          : '100%',
+          : '',
       };
     },
   },
