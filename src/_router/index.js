@@ -73,18 +73,22 @@ export const router = new Router({
       children: [
         {
           path: '',
-          component: () => import('~/_pages/auth/Layout'),
-          children: [
-            {
-              path: 'verify-email',
-              component: () => import('~/_pages/auth/VerifyEmail'),
-            },
-          ],
-        },
-        {
-          path: '',
           component: () => import('~/_pages/main/Layout'),
           children: [
+            {
+              path: '',
+              component: () => import('~/_pages/main/account/Layout'),
+              children: [
+                {
+                  path: 'verify-email',
+                  component: () => import('~/_pages/main/account/VerifyEmail'),
+                },
+                {
+                  path: 'payment',
+                  component: () => import('~/_pages/main/account/Payment'),
+                },
+              ],
+            },
             {
               path: 'test',
               component: () => import('~/_pages/main/Test'),

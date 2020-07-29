@@ -49,10 +49,12 @@
 
   &.block {
     display: block;
+    width: 100%;
   }
 
   .btn--text {
     text-transform: uppercase;
+    white-space: nowrap;
     padding: 5px 20px;
   }
 

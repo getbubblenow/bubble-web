@@ -1,6 +1,6 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
-  <div class="card-container h-100">
+  <div class="card-container" :class="{ 'rounded-corner': roundCorner }">
     <slot></slot>
   </div>
 </template>
@@ -9,8 +9,11 @@
 .card-container {
   background-color: white;
   padding: 40px;
-  border-radius: 10px;
   box-shadow: 0px 10px 50px #dee1ec;
+
+  &.rounded-corner {
+    border-radius: 10px;
+  }
 }
 
 .card-content {
@@ -47,5 +50,12 @@
 </style>
 
 <script>
-export default {};
+export default {
+  props: {
+    roundCorner: {
+      type: Boolean,
+      default: true,
+    },
+  },
+};
 </script>

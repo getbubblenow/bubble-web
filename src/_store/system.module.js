@@ -8,7 +8,8 @@ import { router } from '~/_router';
 
 import { account } from './account.module';
 
-import staticMessages from '~/_assets/messages.json';
+import preAuthStaticMessages from '~/_assets/pre_auth_messages.json';
+import postAuthStaticMessages from '~/_assets/post_auth_messages.json';
 
 const state = {
   configs: {
@@ -68,7 +69,8 @@ const state = {
       }
       return { count: parseInt(ms), units: '' };
     },
-    ...staticMessages,
+    ...preAuthStaticMessages,
+    ...postAuthStaticMessages,
   },
   messageGroupsLoaded: [],
   countries: [],
@@ -337,9 +339,9 @@ const getters = {
   promoCodeRequired: function() {
     return state.promoCodePolicy === 'required';
   },
-  configs: function () {
+  configs: function() {
     return state.configs.loaded === true ? state.configs : {};
-  }
+  },
 };
 
 const mutations = {
@@ -368,7 +370,7 @@ const mutations = {
 
   loadSystemConfigsRequest(state) {},
   loadSystemConfigsSuccess(state, configs) {
-    state.configs = {...configs, loaded: true};
+    state.configs = { ...configs, loaded: true };
   },
   loadSystemConfigsFailure(state, error) {
     state.error = error;

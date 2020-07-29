@@ -8,7 +8,7 @@
       {{ messages.forgot_password_blurb }}
     </h4>
 
-    <form class="auth-form" @submit.prevent="handleSubmit">
+    <form class="bubble-form" @submit.prevent="handleSubmit">
       <div class="form-group">
         <Input
           class="form-control"
@@ -30,7 +30,7 @@
       </div>
       <Button
         color="default"
-        class="auth-form-submit"
+        class="bubble-form-submit"
         @click="handleSubmit"
         :disabled="status.sendingResetPasswordMessage"
       >

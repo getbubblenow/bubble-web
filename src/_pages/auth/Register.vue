@@ -8,7 +8,7 @@
       {{ messages.register_blurb }}
     </h4>
 
-    <form class="auth-form" @submit.prevent="handleSubmit">
+    <form class="bubble-form" @submit.prevent="handleSubmit">
       <div class="form-group">
         <Input
           class="form-control"
@@ -157,43 +157,6 @@
     >
       {{ messages.marketing_pricing_title }}
     </a>
-    <!-- <div class="row px-5 mx-5">
-      <div class="col-12 d-flex">
-        <div
-          class="plan flex-grow-1"
-          v-for="(plan, index) in messages.marketing_pricing_options.split(',')"
-          :key="index"
-        >
-          <p class="plan-name">
-            {{ messages[`marketing_pricing_${plan}_title`] }}
-          </p>
-          <p class="plan-users">
-            {{ messages[`marketing_pricing_${plan}_users`] }}
-          </p>
-          <p class="plan-pricing">
-            {{ messages[`marketing_pricing_${plan}_users`] }}
-          </p>
-          <p
-            class="plan-common-features"
-            v-for="option in messages[`marketing_pricing_common_options`].split(
-              ','
-            )"
-            :key="option"
-          >
-            {{ option }}
-          </p>
-          <p
-            class="plan-features"
-            v-for="option in messages[
-              `marketing_pricing_${plan}_options`
-            ].split(',')"
-            :key="option"
-          >
-            {{ option }}
-          </p>
-        </div>
-      </div>
-    </div> -->
   </div>
 </template>
 

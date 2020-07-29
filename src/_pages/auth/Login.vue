@@ -10,7 +10,7 @@
       {{ messages.login_blurb }}
     </h4>
 
-    <form class="auth-form" @submit.prevent="submit">
+    <form class="bubble-form" @submit.prevent="submit">
       <h4
         v-if="submitted && errors.has('approvalToken')"
         class="invalid-feedback d-block"
@@ -131,8 +131,9 @@
         {{ messages.button_label_forgotPassword }}
       </router-link>
       <Button
+        block
         color="default"
-        class="auth-form-submit"
+        class="bubble-form-submit"
         @click="submit"
         :disabled="status.loggingIn"
       >

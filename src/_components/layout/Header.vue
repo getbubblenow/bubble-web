@@ -7,7 +7,7 @@
       <div class="navbar d-none d-md-flex">
         <!--- If not logged in --->
         <div
-          v-if="status.loggedIn === false"
+          v-if="status.loggedIn !== true"
           class="d-flex justify-content-center align-items-center"
         >
           <router-link to="/help" class="d-flex align-items-center">
@@ -146,11 +146,9 @@ export default {
 
   methods: {
     toggleNavbar() {
-      console.log('toggleNavbar');
       this.menuVisible = !this.prevVisibleState;
     },
     hide() {
-      console.log('hide');
       this.prevVisibleState = this.menuVisible;
       this.menuVisible = false;
     },

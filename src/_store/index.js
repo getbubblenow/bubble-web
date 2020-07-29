@@ -106,3 +106,12 @@ String.prototype.parseDateMessage = function (millis, messages) {
         return evalInContext(context, expression)
     }) : '';
 };
+
+String.prototype.parsePrice = function () {
+    const price = +this;
+    if (price % 100 === 0) {
+        return (price / 100).toString();
+    } else {
+        return (price / 100).toFixed(2);
+    }
+}

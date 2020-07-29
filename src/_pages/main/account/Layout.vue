@@ -1,15 +1,11 @@
-<!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
-  <div
-    :class="backgroundClass"
-    class="auth-layout d-flex flex-column content"
-  >
+  <div :class="backgroundClass" class="auth-layout d-flex flex-column content">
     <router-view></router-view>
   </div>
 </template>
 
 <style lang="scss" scoped>
-@import '../../_scss/breakpoints';
+@import '../../../_scss/breakpoints';
 
 .content {
   background-repeat: no-repeat;
@@ -43,15 +39,13 @@ export default {
     backgroundClass() {
       const urlNodes = this.$route.fullPath.split('/');
       switch (urlNodes[1]) {
-        case 'login':
-        case 'forgotPassword':
+        case 'payment':
           return 'background1';
       }
 
       // new pages in progress
       switch (urlNodes[2]) {
-        case 'login':
-        case 'forgotPassword':
+        case 'payment':
           return 'background1';
       }
 

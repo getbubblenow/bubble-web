@@ -11,7 +11,7 @@
         :key="index"
         class="col-lg-3 col-md-6 col-sm-12 my-4 px-3"
       >
-        <Card>
+        <Card class="h-100">
           <div class="card-content">
             <span
               class="card-icon"
