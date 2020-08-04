@@ -30,6 +30,8 @@ Vue.config.productionTip = false;
 
 // plugins
 import './_plugins/snotify';
+import './_plugins/modal';
+import './_plugins/select';
 
 // not sure what the best way is to include these icons, we reference them programmatically via string resource/messages
 // Vue.component('font-awesome-icon', FontAwesomeIcon);

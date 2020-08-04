@@ -141,7 +141,9 @@ export default {
       return {
         '--height': `${this.height}px`.replace('pxpx', 'px'),
         '--width': this.width
-          ? `${this.width}px`.replace('pxpx', 'px')
+          ? this.width.endsWith('%')
+            ? this.width
+            : `${this.width}px`.replace('pxpx', 'px')
           : '',
       };
     },

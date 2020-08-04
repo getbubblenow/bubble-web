@@ -90,6 +90,10 @@ export const router = new Router({
               ],
             },
             {
+              path: 'launch-bubble',
+              component: () => import('~/_pages/main/bubble/LaunchBubble'),
+            },
+            {
               path: 'test',
               component: () => import('~/_pages/main/Test'),
             },

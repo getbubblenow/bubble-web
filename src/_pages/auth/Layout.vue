@@ -1,10 +1,12 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
-  <div
-    :class="backgroundClass"
-    class="auth-layout d-flex flex-column content"
-  >
-    <router-view></router-view>
+  <div class="background w-100 h-100">
+    <div
+      :class="backgroundClass"
+      class="auth-layout d-flex flex-column content"
+    >
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
@@ -15,7 +17,6 @@
   background-repeat: no-repeat;
   background-size: 100% auto;
   background-position-x: center;
-
   padding: 80px;
 
   @include respond-below(sm) {
@@ -30,6 +31,10 @@
 
 .background2 {
   background-image: url('/background2.svg');
+}
+
+.background {
+  background: linear-gradient(180deg, #f3f3fb 10%, #ededed 50%, #ffffff 80%);
 }
 </style>
 

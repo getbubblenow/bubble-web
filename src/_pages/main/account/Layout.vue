@@ -1,6 +1,11 @@
 <template>
-  <div :class="backgroundClass" class="auth-layout d-flex flex-column content">
-    <router-view></router-view>
+  <div class="background">
+    <div
+      :class="backgroundClass"
+      class="auth-layout d-flex flex-column content"
+    >
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
@@ -26,6 +31,10 @@
 
 .background2 {
   background-image: url('/background2.svg');
+}
+
+.background {
+  background: linear-gradient(180deg, #f3f3fb 10%, #ededed 50%, #ffffff 80%);
 }
 </style>
 

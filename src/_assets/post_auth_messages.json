@@ -3,5 +3,13 @@
   "payment_page_sub_title": "We need a CC card to secure your place in the Bubblesphere.",
 
   "label_bubble_free_title": "Bubble is free for 30 days.",
-  "label_bubble_free_description": "We think you'll love the security of being in your Bubble.<br/> If for any reason you want to cancel, that's easy too!"
+  "label_bubble_free_description": "We think you'll love the security of being in your Bubble.<br/> If for any reason you want to cancel, that's easy too!",
+  "label_welcome_message": "Welcome, {{user.name}}",
+  "label_time_to_launch_bubble": "It's time to launch your Bubble.",
+  "button_label_launch_bubble": "Launch Bubble",
+  "button_label_advanced_bubble_settings": "Launch with Advanced Settings",
+
+  "how_it_works_title": "How does it work?",
+
+  "field_label_bubble_name": "Custom Bubble Name"
 }

@@ -114,7 +114,6 @@
 
 .page-container {
   height: 100vh;
-  background: linear-gradient(180deg, #f3f3fb 10%, #ededed 50%, #ffffff 80%);
 }
 </style>
 

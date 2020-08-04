@@ -2,12 +2,12 @@
 @import 'variables';
 
 @import 'components/text';
+@import 'components/select';
 
 // html,
 // body {
 //   font-family: 'Lato';
 // }
-
 p {
   color: $default-text-color;
 }

@@ -1,0 +1,19 @@
+.v-select {
+  .vs__dropdown-toggle {
+    border: 1px solid #ced4da;
+  }
+
+  .vs__dropdown-menu {
+    box-shadow: 0px 10px 25px rgba(17, 17, 0, 0.17);
+    border-radius: 4px;
+    margin-top: 4px;
+    border: none;
+  }
+
+  &.vs--open {
+    .vs__dropdown-toggle {
+      border: 1px solid #e3e3e3;
+      border-radius: 3px;
+    }
+  }
+}
