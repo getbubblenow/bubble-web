@@ -10,7 +10,7 @@ const state = {
     loading: {
         networks: false, network: false, stopping: false, restoring: false, deleting: false,
         nearestRegions: false, startingNetwork: false, networkStatuses: false, networkNodes: false,
-        requestNetworkKeys: false, retrieveNetworkKeys: false, queueBackup: false
+        requestNetworkKeys: false, retrieveNetworkKeys: false, queueBackup: false, managingLogFlag: false
     },
     creating: null,
     error: null,
@@ -24,6 +24,7 @@ const state = {
     networkKeysRequested: null,
     restoreKey: null,
     backups: null,
+    logFlag: null
 };
 
 const actions = {
@@ -152,6 +153,24 @@ const actions = {
         networkService.retrieveNetworkKeys(userId, networkId, code, password, messages, errors)
                       .then(ok => commit('retrieveNetworkKeysSuccess'),
                             error => commit('retrieveNetworkKeysFailure', error));
+    },
+
+    getLogFlag({ commit }, { messages, errors }) {
+        commit('getLogFlagRequest');
+        networkService.getLogFlag(messages, errors)
+                      .then(logFlag => commit('getLogFlagSuccess', logFlag),
+                            error => commit('getLogFlagFailure', error));
+    },
+    disableLog({ commit }, { messages, errors }) {
+        commit('disableLogRequest');
+        networkService.disableLog(messages, errors)
+                      .then((ok) => commit('disableLogSuccess'), (error) => commit('disableLogFailure', error));
+    },
+    enableLog({ commit, dispatch }, { disableInDays, messages, errors }) {
+        commit('enableLogRequest');
+        networkService.enableLog(disableInDays, messages, errors)
+                      .then((ok) => commit('enableLogSuccess'), (error) => commit('enableLogFailure', error))
+                      .then((r) => dispatch('getLogFlag', { messages: messages, errors: errors }));
     },
 
     resetRestoreKey({ commit }) { commit('resetRestoreKey'); }
@@ -332,6 +351,41 @@ const mutations = {
     getNetworkBackupsFailure(state, error) {
         state.backups = null;
         state.loading.queueBackup = false;
+        state.error = { error };
+    },
+    getLogFlagRequest(state) {
+        state.logFlag = null;
+        state.loading.managingLogFlag = true;
+    },
+    getLogFlagSuccess(state, logFlag) {
+        state.logFlag = logFlag;
+        state.loading.managingLogFlag = false;
+    },
+    getLogFlagFailure(state, error) {
+        state.logFlag = null;
+        state.loading.managingLogFlag = false;
+        state.error = { error };
+    },
+    disableLogRequest(state) {
+        state.loading.managingLogFlag = true;
+    },
+    disableLogSuccess(state) {
+        state.logFlag = {flag: false}; // no need to reload this now
+        state.loading.managingLogFlag = false;
+    },
+    disableLogFailure(state, error) {
+        state.loading.managingLogFlag = false;
+        state.error = { error };
+    },
+    enableLogRequest(state) {
+        state.loading.managingLogFlag = true;
+    },
+    enableLogSuccess(state) {
+        state.logFlag = null;
+        state.loading.managingLogFlag = false;
+    },
+    enableLogFailure(state, error) {
+        state.loading.managingLogFlag = false;
         state.error = { error };
     }
 };

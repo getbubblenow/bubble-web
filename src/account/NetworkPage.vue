@@ -5,7 +5,7 @@
 
         <h6 class="alert-danger" v-if="stats && statsError">{{messages[stats.messageKey]}}</h6>
 
-        <h6 v-if="this.isNotSelfNet && (isInReadyToRestoreState || this.network.state === 'running')">
+        <h6 v-if="!this.isSelfNet && (isInReadyToRestoreState || this.network.state === 'running')">
             <button v-if="this.network.state === 'running'" :title="messages.message_network_connect"
                     :onclick="'window.open(\'' + networkAppLoginUrl + '\', \'_blank\')'">
                 {{messages.message_network_connect}}
@@ -49,7 +49,7 @@
             <span v-html="messages.message_launch_support.parseMessage(this)"></span>
         </div>
 
-        <div v-if="isSelfNetAndRunning">
+        <div v-if="this.isSelfNet && this.network.state === 'running'">
 
             <div v-if="user.admin === true && checkingForUpgrade !== null && configs && configs.jarVersion && configs.jarUpgradeAvailable && configs.jarUpgradeAvailable.version">
                 <hr/>
@@ -129,6 +129,40 @@
             <div v-else-if="this.statsError === null" v-html="messages.restore_not_possible_nodes_exist_html" />
         </div>
 
+        <hr/>
+        <div v-if="loading && loading.managingLogFlag"><img :src="loadingImgSrc" /></div>
+        <div else>
+            <div v-if="logFlag && logFlag.flag">
+                {{ messages.node_logs_enabled }} {{ messages.node_logs_until }}
+                {{ messages.date_format_app_data_epoch_time.parseDateMessage(logFlag.expireAt, messages) }}
+                <div v-if="this.isSelfNet">
+                    <button @click="disableLogs()" class="btn btn-primary"
+                            :disabled="loading && loading.managingLogFlag">
+                        {{ messages.button_node_logs_disable }}
+                    </button>
+                    <br/><br/>
+                    <label for="logsExpirationDays">{{ messages.node_logs_disable_after }}</label>
+                    <select v-model="logsExpirationDays" name="logsExpirationDays" class="form-control"
+                              style="display: unset; width: unset;">
+                        <option v-for="day in this.logsExpirationDaysMax" :value="day">{{ day }}</option>
+                    </select> {{ messages.node_logs_days }}
+                    <button @click="enableLogs(logsExpirationDays)" class="btn btn-primary"
+                            :disabled="loading && loading.managingLogFlag">
+                        {{ messages.button_node_logs_set_disable_after }}
+                    </button>
+                </div>
+            </div>
+            <div v-else>
+                {{ messages.node_logs_disabled }}
+                <div v-if="this.isSelfNet">
+                    <button @click="enableLogs()" class="btn btn-primary"
+                            :disabled="loading && loading.managingLogFlag">
+                        {{ messages.button_node_logs_enable }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div v-if="configs.sageLauncher">
             <div class="text-danger"><h4>{{messages.title_network_danger_zone}}</h4></div>
             <div v-if="errors.has('node')" class="invalid-feedback d-block">{{ errors.first('node') }}</div>
@@ -143,7 +177,8 @@
                     {{messages.link_network_action_stop_description}}
 
                     <!-- the next condition is to prevent this info shown twice on this page -->
-                    <span v-if="!isSelfNetAndRunning" v-html="latestBackupInfoHtml"></span>
+                    <span v-if="!(this.isSelfNet && this.network.state === 'running')" v-html="latestBackupInfoHtml">
+                    </span>
                 </div>
                 <br/>
             </span>
@@ -180,13 +215,14 @@
                 restoreKeyPassword: null,
                 loadingImgSrc: loadingImgSrc,
                 checkingForUpgrade: null,
-                upgradeRefresher: null
+                upgradeRefresher: null,
+                logsExpirationDays: null
             };
         },
         computed: {
             ...mapState('networks', [
                 'network', 'newNodeNotification', 'networkStatuses', 'networkNodes', 'networkKeysRequested',
-                'deletedNetworkUuid', 'loading', 'restoreKey', 'backups'
+                'deletedNetworkUuid', 'loading', 'restoreKey', 'backups', 'logFlag'
             ]),
             ...mapState('system', ['messages', 'configs', 'appLinks', 'upgradeCheck', 'upgrading']),
             showSetupHelp () {
@@ -229,24 +265,23 @@
                                                                                             this.messages);
                 }
             },
-            isSelfNetAndRunning: function() {
-                return this.network && this.network.state === 'running'
-                       && this.configs && this.configs.networkUuid && this.network.uuid === this.configs.networkUuid;
-            },
-            isNotSelfNet: function() {
+            isSelfNet: function() {
                 return this.configs && this.configs.networkUuid
-                       && this.network && this.network.uuid !== this.configs.networkUuid
+                       && this.network && this.network.uuid === this.configs.networkUuid
             },
             isInReadyToRestoreState: function() {
                 return this.network && this.network.state === 'restoring' && (!this.stats || this.stats.percent === 100)
                        && this.networkNodes && this.networkNodes.length === 1
+            },
+            logsExpirationDaysMax: function() {
+                return 7;
             }
         },
         methods: {
             ...mapActions('networks', [
                 'getNetworkById', 'deleteNetwork', 'getStatusesByNetworkId', 'getNodesByNetworkId',
                 'stopNetwork', 'queueBackup', 'restoreNetwork', 'deleteNetwork', 'requestNetworkKeys',
-                'retrieveNetworkKeys', 'getBackups', 'resetRestoreKey'
+                'retrieveNetworkKeys', 'getBackups', 'resetRestoreKey', 'getLogFlag', 'disableLog', 'enableLog'
             ]),
             ...mapActions('system', ['getAppLinks', 'loadSystemConfigs', 'checkForUpgrade', 'upgrade']),
             refreshStatus (userId) {
@@ -264,6 +299,10 @@
                     messages: this.messages,
                     errors: this.errors
                 });
+
+                if (this.logFlag === null || this.refresher === null) {
+                    this.getLogFlag({ userId: userId, messages: this.messages, errors: this.errors });
+                }
                 if (this.backups === null || this.refresher === null) {
                     // note about the second part of the condition above: if refreshes is turned on, then fetch backups
                     // from BE only once
@@ -349,6 +388,14 @@
                     messages: this.messages,
                     errors: this.errors
                 });
+            },
+            disableLogs () {
+                this.errors.clear();
+                this.disableLog({messages: this.messages, errors: this.errors});
+            },
+            enableLogs (expirationDays) {
+                this.errors.clear();
+                this.enableLog({disableInDays: expirationDays, messages: this.messages, errors: this.errors});
             },
             doUpgrade () {
                 this.upgrade();

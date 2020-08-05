@@ -19,7 +19,8 @@ export const networkService = {
     deleteNetwork,
     requestNetworkKeys,
     retrieveNetworkKeys,
-    getNetworkBackups
+    getNetworkBackups,
+    getLogFlag, enableLog, disableLog
 };
 
 function getAllNetworks(userId, messages, errors) {
@@ -91,4 +92,18 @@ function retrieveNetworkKeys(userId, networkId, code, password, messages, errors
 function getNetworkBackups(userId, networkId, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}/backups`, util.getWithAuth())
             .then(util.handleCrudResponse(messages, errors));
+}
+
+function getLogFlag(messages, errors) {
+    return fetch(`${config.apiUrl}/me/nodes/logs/status`, util.getWithAuth())
+            .then(util.handleCrudResponse(messages, errors));
+}
+function disableLog(messages, errors) {
+    return fetch(`${config.apiUrl}/me/nodes/logs/stop`, util.postWithAuth())
+            .then(util.handlePlaintextResponse(messages, errors));
+}
+function enableLog(disableInDays, messages, errors) {
+    const ttlDaysParam = disableInDays ? '?ttlDays=' + disableInDays : '';
+    return fetch(`${config.apiUrl}/me/nodes/logs/start` + ttlDaysParam, util.postWithAuth())
+            .then(util.handlePlaintextResponse(messages, errors));
 }
