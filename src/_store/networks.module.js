@@ -155,22 +155,23 @@ const actions = {
                             error => commit('retrieveNetworkKeysFailure', error));
     },
 
-    getLogFlag({ commit }, { messages, errors }) {
+    getLogFlag({ commit }, { networkId, messages, errors }) {
         commit('getLogFlagRequest');
-        networkService.getLogFlag(messages, errors)
+        networkService.getLogFlag(networkId, messages, errors)
                       .then(logFlag => commit('getLogFlagSuccess', logFlag),
                             error => commit('getLogFlagFailure', error));
     },
-    disableLog({ commit }, { messages, errors }) {
+    disableLog({ commit }, { networkId, messages, errors }) {
         commit('disableLogRequest');
-        networkService.disableLog(messages, errors)
+        networkService.disableLog(networkId, messages, errors)
                       .then((ok) => commit('disableLogSuccess'), (error) => commit('disableLogFailure', error));
     },
-    enableLog({ commit, dispatch }, { disableInDays, messages, errors }) {
+    enableLog({ commit, dispatch }, { disableInDays, networkId, messages, errors }) {
         commit('enableLogRequest');
-        networkService.enableLog(disableInDays, messages, errors)
+        networkService.enableLog(disableInDays, networkId, messages, errors)
                       .then((ok) => commit('enableLogSuccess'), (error) => commit('enableLogFailure', error))
-                      .then((r) => dispatch('getLogFlag', { messages: messages, errors: errors }));
+                      .then((r) => dispatch('getLogFlag',
+                                            { networkId: networkId, messages: messages, errors: errors }));
     },
 
     resetRestoreKey({ commit }) { commit('resetRestoreKey'); }

@@ -130,12 +130,14 @@
         </div>
 
         <hr/>
-        <div v-if="loading && loading.managingLogFlag"><img :src="loadingImgSrc" /></div>
-        <div else>
-            <div v-if="logFlag && logFlag.flag">
-                {{ messages.node_logs_enabled }} {{ messages.node_logs_until }}
-                {{ messages.date_format_app_data_epoch_time.parseDateMessage(logFlag.expireAt, messages) }}
-                <div v-if="this.isSelfNet">
+
+        <div v-if="this.isSelfNet">
+            <div v-if="loading && loading.managingLogFlag"><img :src="loadingImgSrc" /></div>
+            <div else>
+                <div v-if="logFlag && logFlag.flag">
+                    {{ messages.node_logs_enabled }} {{ messages.node_logs_until }}
+                    {{ messages.date_format_app_data_epoch_time.parseDateMessage(logFlag.expireAt, messages) }}
+
                     <button @click="disableLogs()" class="btn btn-primary"
                             :disabled="loading && loading.managingLogFlag">
                         {{ messages.button_node_logs_disable }}
@@ -143,7 +145,7 @@
                     <br/><br/>
                     <label for="logsExpirationDays">{{ messages.node_logs_disable_after }}</label>
                     <select v-model="logsExpirationDays" name="logsExpirationDays" class="form-control"
-                              style="display: unset; width: unset;">
+                                style="display: unset; width: unset;">
                         <option v-for="day in this.logsExpirationDaysMax" :value="day">{{ day }}</option>
                     </select> {{ messages.node_logs_days }}
                     <button @click="enableLogs(logsExpirationDays)" class="btn btn-primary"
@@ -151,10 +153,8 @@
                         {{ messages.button_node_logs_set_disable_after }}
                     </button>
                 </div>
-            </div>
-            <div v-else>
-                {{ messages.node_logs_disabled }}
-                <div v-if="this.isSelfNet">
+                <div v-else>
+                    {{ messages.node_logs_disabled }}
                     <button @click="enableLogs()" class="btn btn-primary"
                             :disabled="loading && loading.managingLogFlag">
                         {{ messages.button_node_logs_enable }}
@@ -301,7 +301,7 @@
                 });
 
                 if (this.logFlag === null || this.refresher === null) {
-                    this.getLogFlag({ userId: userId, messages: this.messages, errors: this.errors });
+                    this.getLogFlag({ networkId: this.networkId, messages: this.messages, errors: this.errors });
                 }
                 if (this.backups === null || this.refresher === null) {
                     // note about the second part of the condition above: if refreshes is turned on, then fetch backups
@@ -391,11 +391,12 @@
             },
             disableLogs () {
                 this.errors.clear();
-                this.disableLog({messages: this.messages, errors: this.errors});
+                this.disableLog({ networkId: this.networkId, messages: this.messages, errors: this.errors });
             },
             enableLogs (expirationDays) {
                 this.errors.clear();
-                this.enableLog({disableInDays: expirationDays, messages: this.messages, errors: this.errors});
+                this.enableLog({ disableInDays: expirationDays, networkId: this.networkId,
+                                 messages: this.messages, errors: this.errors });
             },
             doUpgrade () {
                 this.upgrade();

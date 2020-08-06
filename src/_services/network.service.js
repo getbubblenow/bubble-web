@@ -94,16 +94,16 @@ function getNetworkBackups(userId, networkId, messages, errors) {
             .then(util.handleCrudResponse(messages, errors));
 }
 
-function getLogFlag(messages, errors) {
-    return fetch(`${config.apiUrl}/me/nodes/logs/status`, util.getWithAuth())
+function getLogFlag(networkId, messages, errors) {
+    return fetch(`${config.apiUrl}/me/networks/${networkId}/logs/status`, util.getWithAuth())
             .then(util.handleCrudResponse(messages, errors));
 }
-function disableLog(messages, errors) {
-    return fetch(`${config.apiUrl}/me/nodes/logs/stop`, util.postWithAuth())
+function disableLog(networkId, messages, errors) {
+    return fetch(`${config.apiUrl}/me/networks/${networkId}/logs/stop`, util.postWithAuth())
             .then(util.handlePlaintextResponse(messages, errors));
 }
-function enableLog(disableInDays, messages, errors) {
+function enableLog(disableInDays, networkId, messages, errors) {
     const ttlDaysParam = disableInDays ? '?ttlDays=' + disableInDays : '';
-    return fetch(`${config.apiUrl}/me/nodes/logs/start` + ttlDaysParam, util.postWithAuth())
+    return fetch(`${config.apiUrl}/me/networks/${networkId}/logs/start` + ttlDaysParam, util.postWithAuth())
             .then(util.handlePlaintextResponse(messages, errors));
 }
