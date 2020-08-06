@@ -309,6 +309,7 @@ const mutations = {
   },
   checkSessionRequest(state) {},
   checkSessionSuccess(state, user) {
+    console.log('checkSessionSuccess', state.user.preferredPlan, user.preferredPlan);
     if (user.token) {
       if (util.currentUser() === null) {
         // we must have logged out while this request was in flight... do nothing

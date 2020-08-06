@@ -6,5 +6,14 @@
 </template>
 
 <script>
-export default {};
+import { mapActions } from 'vuex';
+
+export default {
+  methods: {
+    ...mapActions('account', ['checkSession']),
+  },
+  mounted() {
+    this.checkSession({ messages: this.messages, errors: this.errors });
+  },
+};
 </script>

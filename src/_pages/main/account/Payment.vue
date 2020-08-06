@@ -323,6 +323,7 @@ export default {
       'getAllAccountPaymentMethods',
     ]),
     ...mapActions('plans', ['getAllPlans']),
+    ...mapActions('account', ['checkSession']),
 
     setUpStripe() {
       if (window.Stripe === undefined) {
@@ -416,9 +417,15 @@ export default {
             paymentMethod: {
               paymentMethodType: 'credit',
               paymentInfo: result.token.id,
+              preferredPlan: this.bubblePlan,
             },
             messages: this.messages,
             errors: this.errors,
+          }).then(() => {
+            this.checkSession({
+              messages: this.messages,
+              errors: this.errors,
+            });
           });
         }
       });

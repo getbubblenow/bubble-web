@@ -75,7 +75,7 @@ const actions = {
 
     addAccountPaymentMethod({ commit }, {userId, paymentMethod, messages, errors}) {
         commit('addAccountPaymentMethodRequest');
-        paymentMethodService.addAccountPaymentMethod(userId, paymentMethod, messages, errors)
+        return paymentMethodService.addAccountPaymentMethod(userId, paymentMethod, messages, errors)
             .then(
                 pm => commit('addAccountPaymentMethodSuccess', {paymentMethod: pm, originalPaymentMethod: paymentMethod}),
                 errors => commit('addAccountPaymentMethodFailure', errors)
