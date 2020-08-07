@@ -19,22 +19,35 @@
         <Input
           class="form-control"
           :placeholder="messages.field_label_bubble_name"
+          v-model="accountPlan.name"
         />
       </div>
       <div class="form-group" v-if="domains">
         <v-select
           :placeholder="messages.field_label_network_domain"
           :options="domains"
+          v-model="accountPlan.domain"
           label="name"
         >
+          <template v-slot:selected-option="option">
+            <span>Domain: {{ option.name }}</span>
+          </template>
         </v-select>
       </div>
       <div class="form-group" v-if="nearestRegions">
         <v-select
           :placeholder="messages.field_label_region"
           :options="nearestRegions"
+          v-model="cloudRegionUuid"
           label="name"
+          :reduce="(region) => region.uuid"
         >
+          <template v-slot:selected-option="option">
+            <span>
+              Location: {{ option.name }}
+              {{ regionDistance(option.uuid) }}
+            </span>
+          </template>
           <template v-slot:option="option">
             {{ option.name }} {{ regionDistance(option.uuid) }}
           </template>
@@ -44,8 +57,13 @@
         <v-select
           :placeholder="messages.field_label_locale"
           :options="localeTexts"
+          v-model="accountPlan.locale"
+          :reduce="(locale) => locale.name"
           label="label"
         >
+          <template v-slot:selected-option="option">
+            <span>Language: {{ option.label }}</span>
+          </template>
         </v-select>
       </div>
       <div class="form-group" v-if="timezoneObjects">
@@ -54,21 +72,34 @@
           :options="timezoneObjects"
           :reduce="(tz) => tz.timezoneId"
           label="timezoneDescription"
+          v-model="accountPlan.timezone"
           type="text"
           name="timezone"
-        ></v-select>
+        >
+          <template v-slot:selected-option="option">
+            <span>Time Zone: {{ option.timezoneDescription }}</span>
+          </template>
+        </v-select>
       </div>
       <div class="form-group" v-if="footprintObjects">
         <v-select
           :placeholder="messages.field_label_footprint"
           :options="footprintObjects"
+          v-model="accountPlan.footprint"
+          :reduce="(options) => options.uuid"
           label="localName"
-        ></v-select>
+        >
+          <template v-slot:selected-option="option">
+            <span>Footprint: {{ option.localName }}</span>
+          </template>
+        </v-select>
       </div>
       <div class="form-group">
-        <v-select
-          :placeholder="messages.field_label_network_ssh_key"
-        ></v-select>
+        <v-select :placeholder="messages.field_label_network_ssh_key">
+          <template v-slot:selected-option="option">
+            <span>SSH Key: {{ option.name }}</span>
+          </template>
+        </v-select>
       </div>
       <div class="form-group">
         <Button color="outline" height="34">
@@ -141,7 +172,27 @@ export default {
     Checkbox,
   },
 
-  data: () => ({}),
+  data: () => ({
+    accountPlan: {
+      name: '',
+      domain: '',
+      locale: util.currentUser().locale,
+      timezone: '',
+      plan: 'bubble',
+      footprint: 'Worldwide',
+      sshKey: '',
+    },
+    defaults: {
+      domain: '',
+      locale: 'en_US',
+      timezone: '',
+      plan: 'bubble',
+      footprint: 'Worldwide',
+      region: '',
+      sshKey: '',
+    },
+    cloudRegionUuid: '',
+  }),
 
   computed: {
     ...mapState('system', ['configs', 'messages', 'locales', 'timezones']),
@@ -163,7 +214,7 @@ export default {
     localeTexts: function() {
       return this.locales
         ? this.locales.map((locale) => ({
-            ...locale,
+            name: locale.localeCode,
             label: this.messages['locale_' + locale.localeCode],
           }))
         : [];
@@ -256,6 +307,98 @@ export default {
     this.show();
   },
 
-  watch: {},
+  watch: {
+    domains(doms) {
+      if (doms && doms[0]) {
+        if (this.accountPlan.domain == null || this.accountPlan.domain === '')
+          this.accountPlan.domain = doms[0].name;
+        this.defaults.domain = doms[0].name;
+      }
+    },
+    detectedTimezone(tz) {
+      if (tz && tz.timeZoneId) {
+        if (
+          this.accountPlan.timezone == null ||
+          this.accountPlan.timezone === ''
+        )
+          this.accountPlan.timezone = tz.timeZoneId;
+        if (this.defaults.timezone == null || this.defaults.timezone === '')
+          this.defaults.timezone = tz.timeZoneId;
+      }
+    },
+    detectedLocale(loc) {
+      if (loc) {
+        if (this.accountPlan.locale === null || this.accountPlan.locale === '')
+          this.accountPlan.locale = loc;
+        this.defaults.locale = loc;
+      }
+    },
+    nearestRegions(regions) {
+      if (regions) {
+        this.regions = regions;
+        if (
+          this.cloudRegionUuid === null ||
+          typeof regions.find((r) => r.uuid === this.cloudRegionUuid) ===
+            'undefined'
+        ) {
+          this.cloudRegionUuid = regions[0].uuid;
+        }
+        if (
+          this.defaults.region === '' ||
+          typeof regions.find((r) => r.uuid === this.defaults.region.uuid) ===
+            'undefined'
+        ) {
+          this.defaults.region = regions[0];
+        }
+      }
+    },
+  },
+
+  watch: {
+    domains(doms) {
+      if (doms && doms[0]) {
+        if (this.accountPlan.domain == null || this.accountPlan.domain === '')
+          this.accountPlan.domain = doms[0].name;
+        this.defaults.domain = doms[0].name;
+      }
+    },
+    detectedTimezone(tz) {
+      if (tz && tz.timeZoneId) {
+        if (
+          this.accountPlan.timezone == null ||
+          this.accountPlan.timezone === ''
+        )
+          this.accountPlan.timezone = tz.timeZoneId;
+        if (this.defaults.timezone == null || this.defaults.timezone === '')
+          this.defaults.timezone = tz.timeZoneId;
+      }
+    },
+    detectedLocale(loc) {
+      if (loc) {
+        if (this.accountPlan.locale === null || this.accountPlan.locale === '')
+          this.accountPlan.locale = loc;
+        this.defaults.locale = loc;
+      }
+    },
+    nearestRegions(regions) {
+      if (regions) {
+        this.regions = regions;
+        if (
+          this.cloudRegionUuid === null ||
+          typeof regions.find((r) => r.uuid === this.cloudRegionUuid) ===
+            'undefined'
+        ) {
+          this.cloudRegionUuid = regions[0].uuid;
+        }
+        if (
+          this.defaults.region === '' ||
+          typeof regions.find((r) => r.uuid === this.defaults.region.uuid) ===
+            'undefined'
+        ) {
+          this.defaults.region = regions[0];
+        }
+      }
+    },
+  },
 };
 </script>
