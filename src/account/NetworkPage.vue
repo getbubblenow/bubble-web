@@ -207,8 +207,6 @@
                 networkUuid: null,
                 stats: null,
                 statsError: false,
-                statsCompleted: false,
-                statsErrorRetry: false,
                 refresher: null,
                 stopRefresher: null,
                 restoreKeyCode: null,
@@ -420,9 +418,6 @@
                 if (net) {
                     if (net.uuid === 'Not Found') this.$router.replace({path: '/bubbles'});
                     this.networkUuid = net.uuid;
-                    if ((this.statsError && !this.statsErrorRetry) || this.statsCompleted) {
-                        this.clearRefresherInterval(this.refresher);
-                    }
                     if (net.state !== 'stopping') this.clearRefresherInterval(this.stopRefresher);
                 }
             },
@@ -431,23 +426,28 @@
             },
             networkStatuses (stats) {
                 // console.log('watch.networkStatuses received: '+JSON.stringify(stats));
+                let latestStats = null;
                 if (this.network && stats && stats.length && stats.length > 0) {
-                    let latestStats = null;
-                    for (let i=0; i<stats.length; i++) {
-                        if (stats[i].network === this.network.uuid
-                                && (latestStats === null || stats[i].ctime > latestStats.ctime)) {
+                    for (let i = 0; i < stats.length; i++) {
+                        if (stats[i].network === this.network.uuid && (latestStats === null
+                                                                       || stats[i].ctime > latestStats.ctime)) {
                             latestStats = stats[i];
                         }
                     }
-                    if (latestStats !== null) {
-                        this.stats = latestStats;
-                        this.statsError = this.stats.messageKey.startsWith('meter_error_');
-                        this.statsErrorRetry = this.stats.messageKey.startsWith('meter_error_retry_');
-                        this.statsCompleted = (this.stats.percent === 100) || this.stats.messageKey.startsWith('meter_completed_');
-                    } else {
-                        // status not found for our network
+                }
+                if (latestStats !== null) {
+                    this.stats = latestStats;
+                    this.statsError = this.stats.messageKey.startsWith('meter_error_');
+
+                    let isStatsErrorRetry = this.stats.messageKey.startsWith('meter_error_retry_');
+                    let isStatsCompleted = this.stats.percent === 100
+                                           || this.stats.messageKey.startsWith('meter_completed_');
+                    if ((this.statsError && !isStatsErrorRetry) || isStatsCompleted) {
                         this.clearRefresherInterval(this.refresher);
                     }
+                } else {
+                    // status not found for our network
+                    this.clearRefresherInterval(this.refresher);
                 }
             },
             deletedNetworkUuid (uuid) {
