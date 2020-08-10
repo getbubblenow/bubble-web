@@ -12,7 +12,9 @@
     }"
     :disabled="disabled"
     :style="cssVars"
+    @click="onClick"
     class="app-btn"
+    type="button"
   >
     <span class="btn--text">
       <slot></slot>
@@ -146,6 +148,12 @@ export default {
             : `${this.width}px`.replace('pxpx', 'px')
           : '',
       };
+    },
+  },
+
+  methods: {
+    onClick(e) {
+      this.$emit('click', e);
     },
   },
 };

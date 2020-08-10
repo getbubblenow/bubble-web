@@ -18,6 +18,11 @@ export default {
       content: this.value,
     };
   },
+  watch: {
+    value(v) {
+      this.content = v;
+    }
+  },
   methods: {
     handleInput(e) {
       this.$emit('input', this.content);

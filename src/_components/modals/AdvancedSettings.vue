@@ -95,14 +95,29 @@
         </v-select>
       </div>
       <div class="form-group">
-        <v-select :placeholder="messages.field_label_network_ssh_key">
+        <v-select
+          :placeholder="messages.field_label_network_ssh_key"
+          :options="sshKeys"
+        >
           <template v-slot:selected-option="option">
             <span>SSH Key: {{ option.name }}</span>
+          </template>
+          <template v-slot:option="option">
+            {{ option.name }}
+            (
+            <span v-if="option.expiration">{{
+              messages.date_format_ssh_key_expiration.parseDateMessage(
+                option.expiration,
+                messages
+              )
+            }}</span>
+            <span v-else>{{ messages.message_ssh_key_no_expiration }}</span>
+            )
           </template>
         </v-select>
       </div>
       <div class="form-group">
-        <Button color="outline" height="34">
+        <Button color="outline" height="34" @click="addSSHKey">
           {{ messages.form_title_add_ssh_key }}
         </Button>
         <p class="description text-left ml-0 mt-2">
@@ -118,7 +133,7 @@
         class="form-group mt-4 d-flex justify-content-center align-items-center"
       >
         <div class="flex-grow-1 pr-2">
-          <Button block color="outline">
+          <Button block color="outline" @click="hide">
             {{ messages.button_label_cancel }}
           </Button>
         </div>
@@ -129,6 +144,7 @@
         </div>
       </div>
     </form>
+    <AddSSHKeyModal ref="sshKeyModal" @updateSsh="onUpdateSSH" />
   </modal>
 </template>
 
@@ -165,11 +181,14 @@ import { util } from '~/_helpers';
 
 import { Button, Input, Checkbox } from '../shared';
 
+import AddSSHKeyModal from './AddSshKey';
+
 export default {
   components: {
     Button,
     Input,
     Checkbox,
+    AddSSHKeyModal,
   },
 
   data: () => ({
@@ -199,6 +218,7 @@ export default {
     ...mapState('domains', ['domains']),
     ...mapState('networks', ['nearestRegions']),
     ...mapState('footprints', ['footprints']),
+    ...mapState('users', ['sshKeys']),
 
     timezoneObjects: function() {
       const tz_objects = [];
@@ -237,12 +257,17 @@ export default {
     ...mapActions('domains', ['getAllDomains']),
     ...mapActions('networks', ['getNearestRegions']),
     ...mapActions('footprints', ['getAllFootprints']),
+    ...mapActions('users', ['listSshKeysByUserId']),
 
     show() {
       this.$modal.show('advanced-settings');
     },
     hide() {
       this.$modal.hide('advanced-settings');
+    },
+
+    addSSHKey() {
+      this.$refs.sshKeyModal.show();
     },
 
     initDefaults() {
@@ -263,6 +288,7 @@ export default {
         messages: this.messages,
         errors: this.errors,
       });
+      this.onUpdateSSH();
     },
 
     findRegion(uuid) {
@@ -300,11 +326,19 @@ export default {
         this.messages['tz_description_' + tz]
       );
     },
+
+    onUpdateSSH() {
+      const currentUser = util.currentUser();
+      this.listSshKeysByUserId({
+        userId: currentUser.uuid,
+        messages: this.messages,
+        errors: this.errors,
+      });
+    },
   },
 
   mounted() {
     this.initDefaults();
-    this.show();
   },
 
   watch: {
@@ -352,9 +386,7 @@ export default {
         }
       }
     },
-  },
 
-  watch: {
     domains(doms) {
       if (doms && doms[0]) {
         if (this.accountPlan.domain == null || this.accountPlan.domain === '')

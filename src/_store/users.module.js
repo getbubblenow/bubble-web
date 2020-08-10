@@ -141,7 +141,7 @@ const actions = {
 
     addSshKeyByUserId({ commit }, {userId, sshKey, messages, errors}) {
         commit('addSshKeyByUserIdRequest');
-        userService.addSshKeyByUserId(userId, sshKey, messages, errors)
+        return userService.addSshKeyByUserId(userId, sshKey, messages, errors)
             .then(
                 key => commit('addSshKeyByUserIdSuccess', key),
                 error => commit('addSshKeyByUserIdFailure', error)

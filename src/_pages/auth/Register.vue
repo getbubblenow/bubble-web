@@ -168,6 +168,10 @@
   font-size: 36px;
   margin-top: 25px;
 }
+
+.description {
+  max-width: 290px;
+}
 </style>
 
 <script>

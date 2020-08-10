@@ -31,6 +31,7 @@
       <Button
         color="default"
         class="bubble-form-submit"
+        block
         @click="handleSubmit"
         :disabled="status.sendingResetPasswordMessage"
       >
