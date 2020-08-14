@@ -94,6 +94,10 @@ export const router = new Router({
               component: () => import('~/_pages/main/bubble/LaunchBubble'),
             },
             {
+              path: 'launching-bubble',
+              component: () => import('~/_pages/main/bubble/LaunchingBubble'),
+            },
+            {
               path: 'test',
               component: () => import('~/_pages/main/Test'),
             },
