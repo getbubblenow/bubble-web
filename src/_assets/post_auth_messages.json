@@ -11,5 +11,18 @@
 
   "how_it_works_title": "How does it work?",
 
-  "field_label_bubble_name": "Custom Bubble Name"
+  "field_label_bubble_name": "Custom Bubble Name",
+
+  "button_label_launch": "Launch",
+
+  "label_launching_bubble_title": "Your Bubble is Launching!",
+  "label_launching_bubble_description": "Once ready, use your Bubble by adding the app to your devices",
+  "button_cancel_lauch_bubble": "Cancel Launch",
+
+  "label_get_bubble_for_devices": "Get the Bubble Apps for Your Devices!",
+  "available_devices": "iphone,android,mac_computer,windows_computer",
+  "label_device_iphone": "iPhone",
+  "label_device_android": "Android",
+  "label_device_mac_computer": "Mac Computer",
+  "label_device_windows_computer": "Windows Computer"
 }

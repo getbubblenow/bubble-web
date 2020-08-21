@@ -18,12 +18,14 @@
       <div class="form-group">
         <Input
           class="form-control"
+          v-validate="'required'"
           :placeholder="messages.field_label_bubble_name"
           v-model="accountPlan.name"
         />
       </div>
       <div class="form-group" v-if="domains">
         <v-select
+          v-validate="'required'"
           :placeholder="messages.field_label_network_domain"
           :options="domains"
           v-model="accountPlan.domain"
@@ -36,6 +38,7 @@
       </div>
       <div class="form-group" v-if="nearestRegions">
         <v-select
+          v-validate="'required'"
           :placeholder="messages.field_label_region"
           :options="nearestRegions"
           v-model="cloudRegionUuid"
@@ -55,6 +58,7 @@
       </div>
       <div class="form-group" v-if="localeTexts">
         <v-select
+          v-validate="'required'"
           :placeholder="messages.field_label_locale"
           :options="localeTexts"
           v-model="accountPlan.locale"
@@ -68,6 +72,7 @@
       </div>
       <div class="form-group" v-if="timezoneObjects">
         <v-select
+          v-validate="'required'"
           :placeholder="messages.field_label_timezone"
           :options="timezoneObjects"
           :reduce="(tz) => tz.timezoneId"
@@ -83,6 +88,7 @@
       </div>
       <div class="form-group" v-if="footprintObjects">
         <v-select
+          v-validate="'required'"
           :placeholder="messages.field_label_footprint"
           :options="footprintObjects"
           v-model="accountPlan.footprint"
@@ -125,8 +131,38 @@
         </p>
       </div>
 
-      <div class="form-group my-4">
-        <Checkbox :label="messages.field_label_sendInformation" />
+      <div
+        class="form-group"
+        v-if="configs.requireSendMetrics && configs.requireSendMetrics !== true"
+      >
+        <Checkbox
+          :label="messages.field_label_send_errors"
+          v-model="accountPlan.sendErrors"
+        />
+        <div
+          v-if="submitted && errors.has('sendErrors')"
+          class="invalid-feedback d-block"
+        >
+          {{ errors.first('sendErrors') }}
+        </div>
+        <p>{{ messages.field_label_send_errors_description }}</p>
+      </div>
+      <!-- metrics reporting -->
+      <div
+        class="form-group"
+        v-if="configs.requireSendMetrics && configs.requireSendMetrics !== true"
+      >
+        <Checkbox
+          :label="messages.field_label_send_metrics"
+          v-model="accountPlan.sendMetrics"
+        />
+        <div
+          v-if="submitted && errors.has('sendMetrics')"
+          class="invalid-feedback d-block"
+        >
+          {{ errors.first('sendMetrics') }}
+        </div>
+        <p>{{ messages.field_label_send_metrics_description }}</p>
       </div>
 
       <div
@@ -138,8 +174,13 @@
           </Button>
         </div>
         <div class="flex-grow-1 pl-2">
-          <Button block color="default">
-            {{ messages.button_label_register }}
+          <Button
+            block
+            color="default"
+            @click="launchBubble"
+            :disabled="loading() || !isComplete"
+          >
+            {{ messages.button_label_launch }}
           </Button>
         </div>
       </div>
@@ -176,7 +217,7 @@
 </style>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapGetters } from 'vuex';
 import { util } from '~/_helpers';
 
 import { Button, Input, Checkbox } from '../shared';
@@ -192,6 +233,7 @@ export default {
   },
 
   data: () => ({
+    user: util.currentUser(),
     accountPlan: {
       name: '',
       domain: '',
@@ -200,6 +242,13 @@ export default {
       plan: 'bubble',
       footprint: 'Worldwide',
       sshKey: '',
+      paymentMethodObject: {
+        uuid: null,
+        paymentMethodType: null,
+        paymentInfo: null,
+      },
+      sendErrors: true,
+      sendMetrics: true,
     },
     defaults: {
       domain: '',
@@ -216,9 +265,10 @@ export default {
   computed: {
     ...mapState('system', ['configs', 'messages', 'locales', 'timezones']),
     ...mapState('domains', ['domains']),
-    ...mapState('networks', ['nearestRegions']),
+    ...mapState('networks', ['nearestRegions', 'newNodeNotification']),
     ...mapState('footprints', ['footprints']),
     ...mapState('users', ['sshKeys']),
+    ...mapState('paymentMethods', ['accountPaymentMethods']),
 
     timezoneObjects: function() {
       const tz_objects = [];
@@ -229,6 +279,20 @@ export default {
         });
       }
       return tz_objects;
+    },
+
+    isComplete() {
+      return (
+        (this.accountPlan.name !== '' || this.accountPlan.forkHost !== '') &&
+        this.accountPlan.domain !== '' &&
+        this.accountPlan.locale !== '' &&
+        this.accountPlan.timezone !== '' &&
+        this.accountPlan.plan !== '' &&
+        this.accountPlan.footprint !== '' &&
+        ((this.accountPlan.paymentMethodObject.paymentMethodType != null &&
+          this.accountPlan.paymentMethodObject.paymentInfo != null) ||
+          this.accountPlan.paymentMethodObject.uuid != null)
+      );
     },
 
     localeTexts: function() {
@@ -255,9 +319,19 @@ export default {
 
   methods: {
     ...mapActions('domains', ['getAllDomains']),
-    ...mapActions('networks', ['getNearestRegions']),
+    ...mapActions('networks', ['getNearestRegions', 'addPlanAndStartNetwork']),
     ...mapActions('footprints', ['getAllFootprints']),
     ...mapActions('users', ['listSshKeysByUserId']),
+    ...mapGetters('networks', ['loading']),
+
+    setAccountPaymentMethod(apm) {
+      this.accountPlan.paymentMethodObject = {
+        uuid: apm.uuid,
+        paymentMethodType: null,
+        paymentInfo: null,
+      };
+      return false;
+    },
 
     show() {
       this.$modal.show('advanced-settings');
@@ -335,6 +409,43 @@ export default {
         errors: this.errors,
       });
     },
+
+    launchBubble() {
+      this.submitted = true;
+      this.errors.clear();
+      this.$validator.validate().then((valid) => {
+        if (valid) {
+          if (this.paymentInfo || this.accountPlan.paymentMethodObject.uuid) {
+            const cloudRegion = this.findRegion(this.cloudRegionUuid);
+            if (cloudRegion === null) {
+              this.errors.add({
+                field: 'region',
+                msg: this.messages['err_region_notFound'],
+              });
+            } else {
+              if (this.configs.requireSendMetrics) {
+                this.accountPlan.sendErrors = true;
+                this.accountPlan.sendMetrics = true;
+              } else {
+                if (this.accountPlan.sendErrors === null)
+                  this.accountPlan.sendErrors = true;
+                if (this.accountPlan.sendMetrics === null)
+                  this.accountPlan.sendMetrics = true;
+              }
+              this.addPlanAndStartNetwork({
+                userId: this.user.uuid,
+                accountPlan: this.accountPlan,
+                cloud: cloudRegion.cloud,
+                region: cloudRegion.internalName,
+                exactRegion: !this.flexRegion,
+                messages: this.messages,
+                errors: this.errors,
+              });
+            }
+          }
+        }
+      });
+    },
   },
 
   mounted() {
@@ -367,6 +478,12 @@ export default {
         this.defaults.locale = loc;
       }
     },
+    newNodeNotification(nn) {
+      if (nn && nn.uuid) {
+        this.$router.push({ path: '/bubble/' + nn.networkName });
+        this.submitted = false;
+      }
+    },
     nearestRegions(regions) {
       if (regions) {
         this.regions = regions;
@@ -428,6 +545,29 @@ export default {
             'undefined'
         ) {
           this.defaults.region = regions[0];
+        }
+      }
+    },
+    accountPaymentMethods(pms) {
+      if (pms) {
+        const payMethods = [];
+        for (let i = 0; i < pms.length; i++) {
+          const pm = pms[i];
+          if (
+            (typeof pm.promotion === 'undefined' ||
+              pm.promotion === null ||
+              !pm.promotion) &&
+            (typeof pm.deleted === 'undefined' || pm.deleted === null)
+          ) {
+            payMethods.push(pm);
+          }
+        }
+        this.accountPayMethods = payMethods;
+        if (
+          this.accountPlan.paymentMethodObject.uuid === null &&
+          payMethods.length > 0
+        ) {
+          this.setAccountPaymentMethod(payMethods[0]);
         }
       }
     },
