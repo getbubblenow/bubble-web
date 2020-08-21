@@ -99,7 +99,9 @@
                         <div v-if="device.status.lastHandshakeTime">
                             <hr/>
                             {{messages.label_field_device_connection_handshake}}:
-                            <span v-if="device.status.lastHandshakeMinutes && device.status.lastHandshakeSeconds">{{device.status.lastHandshakeMinutes}}{{messages.units_minutes_short}}, {{device.status.lastHandshakeSeconds}}{{messages.units_seconds_short}}</span>
+                            <span v-if="device.status.lastHandshakeHours && device.status.lastHandshakeMinutes">{{device.status.lastHandshakeHours}}{{messages.units_hours_short}}, {{device.status.lastHandshakeMinutes}}{{messages.units_minutes_short}}</span>
+                            <span v-else-if="device.status.lastHandshakeHours">{{device.status.lastHandshakeHours}}{{messages.units_hours_short}}</span>
+                            <span v-else-if="device.status.lastHandshakeMinutes && device.status.lastHandshakeSeconds">{{device.status.lastHandshakeMinutes}}{{messages.units_minutes_short}}, {{device.status.lastHandshakeSeconds}}{{messages.units_seconds_short}}</span>
                             <span v-else-if="device.status.lastHandshakeMinutes">{{device.status.lastHandshakeMinutes}}{{messages.units_minutes_short}}</span>
                             <span v-else-if="device.status.lastHandshakeSeconds">{{device.status.lastHandshakeSeconds}}{{messages.units_seconds_short}}</span>
                             {{messages.label_field_device_connection_handshake_ago}}
