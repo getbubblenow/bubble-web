@@ -87,6 +87,23 @@ export const router = new Router({
                   path: 'payment',
                   component: () => import('~/_pages/main/account/Payment'),
                 },
+                {
+                  path: 'me',
+                  exact: true,
+                  component: () => import('~/_pages/main/account/MyAccount'),
+                },
+                {
+                  path: 'me/change-password',
+                  component: () => import('~/_pages/main/account/ChangePassword'),
+                },
+                {
+                  path: 'me/set-password/:code',
+                  component: () => import('~/_pages/main/account/SetPassword'),
+                },
+                {
+                  path: 'me/keys',
+                  component: () => import('~/_pages/main/account/ManageSSH'),
+                },
               ],
             },
             {
@@ -94,7 +111,7 @@ export const router = new Router({
               component: () => import('~/_pages/main/bubble/LaunchBubble'),
             },
             {
-              path: 'launching-bubble',
+              path: 'launching-bubble/:id',
               component: () => import('~/_pages/main/bubble/LaunchingBubble'),
             },
             {

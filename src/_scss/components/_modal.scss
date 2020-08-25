@@ -1,0 +1,14 @@
+.vm--container {
+  .vm--overlay {
+    background-color: #6f28abcc;
+  }
+  .vm--modal {
+    border-radius: 10px;
+    padding: 40px;
+    position: relative;
+
+    @include respond-below(sm) {
+      padding: 40px 20px;
+    }
+  }
+}

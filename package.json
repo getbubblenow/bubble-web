@@ -7,8 +7,7 @@
   },
   "license": "LicenseRef-LICENSE.md",
   "scripts": {
-    "start": "webpack-dev-server --open",
-    "dev": "webpack-dev-server --open --config webpack.config.dev.js"
+    "start": "webpack-dev-server --open --env.server=$BUBBLE_API"
   },
   "dependencies": {
     "lottie-web": "^5.7.1",

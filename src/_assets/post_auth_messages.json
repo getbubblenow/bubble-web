@@ -24,5 +24,20 @@
   "label_device_iphone": "iPhone",
   "label_device_android": "Android",
   "label_device_mac_computer": "Mac Computer",
-  "label_device_windows_computer": "Windows Computer"
+  "label_device_windows_computer": "Windows Computer",
+
+  "title_my_account": "My Account",
+  "manage_account_actions": "change_password,account_data,billing,manage_ssh,payment,delete_backup",
+  "manage_account_change_password_title": "Change Password",
+  "manage_account_account_data_title": "Account Data",
+  "manage_account_billing_title": "Billing",
+  "manage_account_manage_ssh_title": "Manage SSH Keys",
+  "manage_account_payment_title": "Payment Methods and Credits",
+  "manage_account_delete_backup_title": "Delete or Backup Bubble",
+  "manage_account_change_password_link": "/me/change_password",
+  "manage_account_account_data_link": "/me/policy",
+  "manage_account_billing_link": "/me/bills",
+  "manage_account_manage_ssh_link": "/me/keys",
+  "manage_account_payment_link": "/me/payment",
+  "manage_account_delete_backup_link": "/me/policy"
 }

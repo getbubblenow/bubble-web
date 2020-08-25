@@ -34,6 +34,13 @@
   background-image: url('/background2.svg');
 }
 
+.background3 {
+  background-image: url('/background3.png');
+
+  background-position: 85% 200px;
+  background-size: auto;
+}
+
 .background {
   background: linear-gradient(180deg, #f3f3fb 10%, #ededed 50%, #ffffff 80%);
 }
@@ -51,12 +58,28 @@ export default {
       switch (urlNodes[1]) {
         case 'payment':
           return 'background1';
+        case 'me': {
+          switch (urlNodes[2]) {
+            case '':
+              return 'background3';
+            default:
+              return 'background1';
+          }
+        }
       }
 
       // new pages in progress
       switch (urlNodes[2]) {
         case 'payment':
           return 'background1';
+        case 'me': {
+          switch (urlNodes[3]) {
+            case '':
+              return 'background3';
+            default:
+              return 'background1';
+          }
+        }
       }
 
       return 'background2';

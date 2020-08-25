@@ -5,7 +5,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-module.exports = {
+module.exports = (env) => ({
   mode: 'development',
   resolve: {
     extensions: ['.js', '.vue'],
@@ -49,6 +49,9 @@ module.exports = {
   devServer: {
     historyApiFallback: true,
     publicPath: '/',
+    proxy: env && !!env.server && {
+      '/api': env.server,
+    },
   },
   output: {
     publicPath: '/',
@@ -60,4 +63,4 @@ module.exports = {
       apiUrl: '/api',
     }),
   },
-};
+});

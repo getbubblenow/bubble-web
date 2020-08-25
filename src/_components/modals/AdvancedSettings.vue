@@ -191,22 +191,8 @@
 
 <style lang="scss">
 @import '../../_scss/components/form';
+@import '../../_scss/components/modal';
 @import '../../_scss/breakpoints';
-
-.vm--container {
-  .vm--overlay {
-    background-color: #6f28abcc;
-  }
-  .vm--modal {
-    border-radius: 10px;
-    padding: 40px;
-    position: relative;
-
-    @include respond-below(sm) {
-      padding: 40px 20px;
-    }
-  }
-}
 
 .close-btn {
   position: absolute;
@@ -480,7 +466,7 @@ export default {
     },
     newNodeNotification(nn) {
       if (nn && nn.uuid) {
-        this.$router.push({ path: '/bubble/' + nn.networkName });
+        this.$router.push({ path: '/new_pages/launching-bubble/' + nn.networkName });
         this.submitted = false;
       }
     },

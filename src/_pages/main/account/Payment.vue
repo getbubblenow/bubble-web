@@ -34,14 +34,7 @@
         </option>
       </select>
 
-      <div id="card-number" class="form-control mt-3" />
-
-      <div class="mt-3 d-flex">
-        <div id="card-expiry" class="form-control mr-1" />
-        <div id="card-cvc" class="form-control" />
-        <div class="flex-grow-1"></div>
-        <div id="card-zip" class="form-control" />
-      </div>
+      <stripe-element ref="stripeElement" />
 
       <p class="text-center mt-3">
         <small>
@@ -49,9 +42,6 @@
         </small>
       </p>
 
-      <p v-if="stripeError" class="invalid-feedback d-block">
-        {{ stripeError }}
-      </p>
       <div
         v-if="submitted && errors.has('purchase')"
         class="invalid-feedback d-block"
@@ -187,12 +177,6 @@
   }
 }
 
-#card-expiry,
-#card-cvc,
-#card-zip {
-  max-width: 25%;
-}
-
 .plan {
   display: flex;
   flex-direction: column;
@@ -256,31 +240,20 @@
 import { mapState, mapActions } from 'vuex';
 import { util } from '~/_helpers';
 
-import { Button, Card } from '~/_components/shared';
+import { Button, Card, StripeElement } from '~/_components/shared';
 
 export default {
   components: {
     Button,
     Card,
+    StripeElement,
   },
 
   data() {
     return {
       user: util.currentUser(),
       bubblePlan: '',
-      card: {
-        cvc: '',
-        number: '',
-        expiry: '',
-        zip: '',
-      },
-      cardNumber: '',
-      cardExpiry: '',
-      cardCvc: '',
-      cardZip: '',
       brand: '',
-      stripe: null,
-      stripeError: '',
       submitted: false,
     };
   },
@@ -326,78 +299,6 @@ export default {
     ...mapActions('plans', ['getAllPlans']),
     ...mapActions('account', ['checkSession']),
 
-    setUpStripe() {
-      if (window.Stripe === undefined) {
-        alert('Stripe V3 library not loaded!');
-      } else {
-        const stripe = window.Stripe(
-          this.paymentMethods[0].driverConfig.publicApiKey
-        );
-        this.stripe = stripe;
-
-        const style = {
-          base: {
-            padding: '.375rem .75rem',
-            fontSize: '1rem',
-            fontWeight: '400',
-            lineHeight: '1.5',
-            color: '#495057',
-          },
-        };
-
-        const elements = stripe.elements();
-        this.cardCvc = elements.create('cardCvc', { style });
-        this.cardExpiry = elements.create('cardExpiry', { style });
-        this.cardNumber = elements.create('cardNumber', { style });
-        this.cardZip = elements.create('postalCode', {
-          placeholder: 'Zip',
-          style,
-        });
-        this.cardNumber.update({
-          placeholder: 'CC Card #',
-          showIcon: true,
-        });
-
-        this.cardCvc.mount('#card-cvc');
-        this.cardExpiry.mount('#card-expiry');
-        this.cardNumber.mount('#card-number');
-        this.cardZip.mount('#card-zip');
-
-        this.listenForErrors();
-      }
-    },
-
-    listenForErrors() {
-      this.cardNumber.addEventListener('change', (event) => {
-        this.toggleError(event);
-        this.cardNumberError = '';
-        this.card.number = event.complete ? true : false;
-        if (this.card.number) {
-          this.brand = event.brand;
-        }
-      });
-
-      this.cardExpiry.addEventListener('change', (event) => {
-        this.toggleError(event);
-        this.cardExpiryError = '';
-        this.card.expiry = event.complete ? true : false;
-      });
-
-      this.cardCvc.addEventListener('change', (event) => {
-        this.toggleError(event);
-        this.cardCvcError = '';
-        this.card.cvc = event.complete ? true : false;
-      });
-    },
-
-    toggleError(event) {
-      if (event.error) {
-        this.stripeError = event.error.message;
-      } else {
-        this.stripeError = '';
-      }
-    },
-
     initDefaults() {
       this.getAllPlans(this.messages, this.errors);
       this.getAllPaymentMethods(this.messages, this.errors);
@@ -408,7 +309,7 @@ export default {
 
       this.errors.clear();
 
-      this.stripe.createToken(this.cardNumber).then((result) => {
+      this.$refs.stripeElement.verifyCard().then((result) => {
         if (result.error) {
           this.$snotify.error(result.error.message);
         } else {
@@ -436,7 +337,7 @@ export default {
 
   watch: {
     paymentMethods() {
-      this.setUpStripe();
+      this.$refs.stripeElement.setUpStripe(this.paymentMethods[0].driverConfig.publicApiKey);
     },
 
     paymentStatus(ps) {

@@ -14,7 +14,7 @@
       class="d-flex flex-column align-items-center justify-content-center mt-5 mx-auto launch-bubble-wrapper"
     >
       <div ref="lottie" class="lottie"></div>
-      <Button color="default" width="80%" height="60">
+      <Button color="default" width="80%" height="60" @click="launchBubble">
         {{ messages.button_label_launch_bubble }}
       </Button>
 
@@ -72,7 +72,9 @@ export default {
   },
 
   data() {
-    return {};
+    return {
+      lottie: null,
+    };
   },
 
   computed: {
@@ -81,21 +83,23 @@ export default {
   },
 
   mounted() {
-    Lottie.loadAnimation({
+    this.lottie = Lottie.loadAnimation({
       container: this.$refs.lottie,
       renderer: '',
       loop: true,
       autoplay: true,
       path: '/rocket-launch.json',
     });
-
-    console.log(this.user);
   },
 
   methods: {
     openSettingsModal(ev) {
       ev.preventDefault();
       this.$refs.settingsModal.show();
+    },
+
+    launchBubble() {
+      
     },
   },
 

@@ -90,7 +90,11 @@
   </modal>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
+@import '../../_scss/components/form';
+@import '../../_scss/components/modal';
+@import '../../_scss/breakpoints';
+
 .public-ssh {
   font-size: 14px;
 }
