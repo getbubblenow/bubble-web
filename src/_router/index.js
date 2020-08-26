@@ -104,6 +104,10 @@ export const router = new Router({
                   path: 'me/keys',
                   component: () => import('~/_pages/main/account/ManageSSH'),
                 },
+                {
+                  path: 'me/payment',
+                  component: () => import('~/_pages/main/account/PaymentMethods'),
+                },
               ],
             },
             {
