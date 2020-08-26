@@ -33,6 +33,7 @@ const state = {
     jarVersion: null,
     jarUpgradeAvailable: null,
     maxUsers: null,
+    showBlockStatsSupported: null,
     loaded: false,
   },
   entityConfigs: {},

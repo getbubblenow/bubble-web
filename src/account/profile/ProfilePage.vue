@@ -53,6 +53,12 @@
 <!--                <div v-if="submitted && errors.has('description')" class="invalid-feedback d-block">{{ errors.first('description') }}</div>-->
 <!--            </div>-->
 
+            <div v-if="configs.showBlockStatsSupported" class="form-group">
+                <label for="admin">{{messages.field_label_show_block_stats}}</label>
+                <input type="checkbox" id="showBlockStats" v-model="subject.showBlockStats">
+                <div v-if="submitted && errors.has('showBlockStats')" class="invalid-feedback d-block">{{ errors.first('showBlockStats') }}</div>
+            </div>
+
             <div v-if="admin === true && currentUser.uuid !== subject.uuid" class="form-group">
                 <label for="admin">{{messages.field_label_administrator}}</label>
                 <input type="checkbox" id="admin" v-model="subject.admin">
@@ -114,6 +120,7 @@
         admin: null,
         suspended: null,
         syncPassword: null,
+        showBlockStats: null,
         autoUpdatePolicy: {
             jarUpdates: true,
             appUpdates: true
