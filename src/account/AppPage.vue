@@ -94,7 +94,7 @@
         },
         computed: {
             ...mapState('apps', ['app', 'sites', 'site']),
-            ...mapState('system', ['messages'])
+            ...mapState('system', ['messages', 'configs'])
         },
         created () {
             this.appId = this.$route.params.app;
@@ -140,6 +140,15 @@
                     messages: this.messages,
                     errors: this.errors
                 });
+            },
+            viewIsAvailable(view) {
+                if (typeof view.when === 'undefined' || view.when === null) return true;
+                try {
+                    return safeEval(view.when, {'configs': this.configs}) === true;
+                } catch (e) {
+                    console.log('viewIsAvailable: error evaluating when='+view.when+': '+e);
+                    return false;
+                }
             }
         },
         watch: {
@@ -162,7 +171,9 @@
                     const appConfigViews = [];
                     for (let i=0; i<allConfigViews.length; i++) {
                         if (typeof allConfigViews[i].root !== 'undefined' && allConfigViews[i].root !== null && allConfigViews[i].root === true) {
-                            appConfigViews.push(allConfigViews[i]);
+                            if (this.viewIsAvailable(allConfigViews[i])) {
+                                appConfigViews.push(allConfigViews[i]);
+                            }
                         }
                     }
                     this.appConfigViews = appConfigViews;
