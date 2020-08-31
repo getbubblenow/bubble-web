@@ -108,6 +108,14 @@ export const router = new Router({
                   path: 'me/payment',
                   component: () => import('~/_pages/main/account/PaymentMethods'),
                 },
+                {
+                  path: 'me/bills',
+                  component: () => import('~/_pages/main/account/Bills'),
+                },
+                {
+                  path: 'me/policy',
+                  component: () => import('~/_pages/main/account/Policy'),
+                },
               ],
             },
             {

@@ -32,7 +32,7 @@
           label="name"
         >
           <template v-slot:selected-option="option">
-            <span>Domain: {{ option.name }}</span>
+            <span>{{messages.field_label_network_domain}}: {{ option.name }}</span>
           </template>
         </v-select>
       </div>
@@ -47,7 +47,7 @@
         >
           <template v-slot:selected-option="option">
             <span>
-              Location: {{ option.name }}
+              {{messages.field_label_region}}: {{ option.name }}
               {{ regionDistance(option.uuid) }}
             </span>
           </template>
@@ -66,7 +66,7 @@
           label="label"
         >
           <template v-slot:selected-option="option">
-            <span>Language: {{ option.label }}</span>
+            <span>{{messages.field_label_locale}}: {{ option.label }}</span>
           </template>
         </v-select>
       </div>
@@ -82,7 +82,7 @@
           name="timezone"
         >
           <template v-slot:selected-option="option">
-            <span>Time Zone: {{ option.timezoneDescription }}</span>
+            <span>{{messages.field_label_timezone}}: {{ option.timezoneDescription }}</span>
           </template>
         </v-select>
       </div>
@@ -96,7 +96,7 @@
           label="localName"
         >
           <template v-slot:selected-option="option">
-            <span>Footprint: {{ option.localName }}</span>
+            <span>{{messages.field_label_footprint}}: {{ option.localName }}</span>
           </template>
         </v-select>
       </div>
@@ -106,7 +106,7 @@
           :options="sshKeys"
         >
           <template v-slot:selected-option="option">
-            <span>SSH Key: {{ option.name }}</span>
+            <span>{{messages.field_label_network_ssh_key}}: {{ option.name }}</span>
           </template>
           <template v-slot:option="option">
             {{ option.name }}

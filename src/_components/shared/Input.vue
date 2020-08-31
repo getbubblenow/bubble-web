@@ -1,6 +1,11 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
-  <input v-bind="$attrs" v-model="content" @input="handleInput()" class="form-input"/>
+  <input
+    v-bind="$attrs"
+    v-model="content"
+    @input="handleInput()"
+    class="form-input"
+  />
 </template>
 
 <style lang="scss" scoped></style>
@@ -9,7 +14,7 @@
 export default {
   props: {
     value: {
-      type: String,
+      type: String | Number,
       default: '',
     },
   },
@@ -21,7 +26,7 @@ export default {
   watch: {
     value(v) {
       this.content = v;
-    }
+    },
   },
   methods: {
     handleInput(e) {

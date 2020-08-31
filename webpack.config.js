@@ -51,7 +51,7 @@ module.exports = (env) => ({
     publicPath: '/',
     proxy: env && !!env.server && {
       '/api': env.server,
-    },
+    } || null,
   },
   output: {
     publicPath: '/',
