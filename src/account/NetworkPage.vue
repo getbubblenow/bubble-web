@@ -70,7 +70,7 @@
                 <hr/>
             </div>
 
-            <button class="btn btn-secondary" @click="requestRestoreKey()"
+            <button class="btn btn-primary" @click="requestRestoreKey()"
                     :disabled="loading && loading.requestNetworkKeys">
                 {{messages.link_network_action_request_keys}}
             </button>
@@ -79,30 +79,37 @@
             <div v-if="networkKeysRequested && networkKeysRequested === networkId">{{messages.message_network_action_keys_requested}}</div>
             <hr />
             <h5>{{messages.message_network_action_retrieve_keys}}</h5>
-            <form @submit.prevent="retrieveRestoreKey()">
-                <div class="form-group">
-                    <label for="restoreKeyCode">{{messages.field_network_key_download_code}}</label>
-                    <input type="text" v-model="restoreKeyCode" v-validate="'required'" name="restoreKeyCode" class="form-control" :class="{ 'is-invalid': errors.has('retrieveNetworkKeys') }" />
-                    <div v-if="errors.has('retrieveNetworkKeys')" class="invalid-feedback">{{ errors.first('retrieveNetworkKeys') }}</div>
-                </div>
-                <div class="form-group">
-                    <label for="restoreKeyPassword">{{messages.field_network_key_download_password}}</label>
-                    <input type="password" v-model="restoreKeyPassword" v-validate="'required'" name="restoreKeyPassword"
-                           class="form-control" :class="{ 'is-invalid': errors.has('password') }"
-                           :autofocus="this.$route.query.hasOwnProperty('keys_code')"/>
-                    <div v-if="errors.has('password')" class="invalid-feedback">{{ errors.first('password') }}</div>
-                </div>
-                <button class="btn btn-secondary" :disabled="loading && loading.retrieveNetworkKeys">
-                    {{ messages.button_label_retrieve_keys }}
+            <div class="form-group">
+                <label for="restoreKeyCode">{{messages.field_network_key_download_code}}</label>
+                <input type="text" v-model="restoreKeyCode" v-validate="'required'" name="restoreKeyCode" class="form-control" :class="{ 'is-invalid': errors.has('retrieveNetworkKeys') }" />
+                <div v-if="errors.has('retrieveNetworkKeys')" class="invalid-feedback">{{ errors.first('retrieveNetworkKeys') }}</div>
+            </div>
+            <div class="form-group">
+                <label for="restoreKeyPassword">{{messages.field_network_key_download_password}}</label>
+                <input type="password" v-model="restoreKeyPassword" v-validate="'required'" name="restoreKeyPassword"
+                        class="form-control" :class="{ 'is-invalid': errors.has('password') }"
+                        :autofocus="this.$route.query.hasOwnProperty('keys_code')"/>
+                <div v-if="errors.has('password')" class="invalid-feedback">{{ errors.first('password') }}</div>
+            </div>
+            <button @click="retrieveRestoreKey()" class="btn btn-primary"
+                    :disabled="loading && loading.retrieveNetworkKeys">
+                {{ messages.button_label_retrieve_keys }}
+            </button>
+            <span v-if="backups && backups.length > 0">
+                {{ messages.label_or }}
+                <button @click="fullyPrepareBackupPackage()" class="btn btn-primary"
+                        :disabled="loading && loading.retrieveNetworkKeys">
+                    {{ messages.button_label_download_backup }}
                 </button>
-                <img v-show="loading && loading.retrieveNetworkKeys" :src="loadingImgSrc" />
-            </form>
+            </span>
+            <img v-show="loading && loading.retrieveNetworkKeys" :src="loadingImgSrc" />
+            <br/><small v-if="loading && preparingLatestBackup">{{ messages.label_download_backup_note }}</small>
 
             <span v-html="latestBackupInfoHtml"></span>
 
             <span v-if="allowQueueBackup">
                 <br/>
-                <button @click="queueBckup()" class="btn btn-secondary" :disabled="loading && loading.queueBackup">
+                <button @click="queueBckup()" class="btn btn-primary" :disabled="loading && loading.queueBackup">
                     {{ messages.link_backup_network }}
                 </button>
             </span>
@@ -214,7 +221,8 @@
                 loadingImgSrc: loadingImgSrc,
                 checkingForUpgrade: null,
                 upgradeRefresher: null,
-                logsExpirationDays: null
+                logsExpirationDays: null,
+                backupDownloadRefresher: null
             };
         },
         computed: {
@@ -273,13 +281,17 @@
             },
             logsExpirationDaysMax: function() {
                 return 7;
+            },
+            preparingLatestBackup: function() {
+                return this.loading.preparingLatestBackup;
             }
         },
         methods: {
             ...mapActions('networks', [
                 'getNetworkById', 'deleteNetwork', 'getStatusesByNetworkId', 'getNodesByNetworkId',
                 'stopNetwork', 'queueBackup', 'restoreNetwork', 'deleteNetwork', 'requestNetworkKeys',
-                'retrieveNetworkKeys', 'getBackups', 'resetRestoreKey', 'getLogFlag', 'disableLog', 'enableLog'
+                'retrieveNetworkKeys', 'getBackups', 'resetRestoreKey', 'getLogFlag', 'disableLog', 'enableLog',
+                'buildLatestBackupPackage', 'latestBackupBuildingStatus', 'latestBackupDownload'
             ]),
             ...mapActions('system', ['getAppLinks', 'loadSystemConfigs', 'checkForUpgrade', 'upgrade']),
             refreshStatus (userId) {
@@ -387,6 +399,24 @@
                     errors: this.errors
                 });
             },
+            retrieveBackupPackageBuildingStatus () {
+                this.errors.clear();
+                this.latestBackupBuildingStatus({ userId: this.user.uuid, networkId: this.networkId,
+                                                  code: this.restoreKeyCode, messages: this.messages,
+                                                  errors: this.errors });
+            },
+            fullyPrepareBackupPackage () {
+                this.errors.clear();
+                this.buildLatestBackupPackage({ userId: this.user.uuid, networkId: this.networkId,
+                                                code: this.restoreKeyCode, password: this.restoreKeyPassword});
+                this.backupDownloadRefresher = setInterval(this.retrieveBackupPackageBuildingStatus, 5000);
+            },
+            retrieveBackupPackage () {
+                this.errors.clear();
+                this.latestBackupDownload({ userId: this.user.uuid, networkId: this.networkId,
+                                            code: this.restoreKeyCode, messages: this.messages, errors: this.errors });
+            },
+
             disableLogs () {
                 this.errors.clear();
                 this.disableLog({ networkId: this.networkId, messages: this.messages, errors: this.errors });
@@ -411,6 +441,7 @@
         beforeDestroy () {
             this.clearRefresherInterval(this.refresher);
             this.clearRefresherInterval(this.stopRefresher);
+            this.clearRefresherInterval(this.backupDownloadRefresher);
             this.resetRestoreKey();
         },
         watch: {
@@ -499,6 +530,12 @@
                         vue.loadSystemConfigs();
                         this.checkingForUpgrade = false;
                     }, 10000);
+                }
+            },
+            preparingLatestBackup (isStillPreparing) {
+                if (this.backupDownloadRefresher && isStillPreparing === false) {
+                    this.clearRefresherInterval(this.backupDownloadRefresher);
+                    this.retrieveBackupPackage();
                 }
             }
         }

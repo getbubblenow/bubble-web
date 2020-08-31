@@ -184,19 +184,35 @@ export const util = {
         }
     },
 
+    handleResponseToDownloadAsFile: function(fileName) {
+        return function(response) {
+            return response.blob().then(blob => {
+                if (!response.ok || response.status != 200) {
+                    console.log("handleResponseToDownloadAsFile: download failes or not ready yet");
+                    return Promise.reject(response.statusText);
+                }
+                return util.downloadBlob(blob, fileName);
+            });
+        };
+    },
+
     handleDataToDownloadAsFile: function(fileName, mimeType) {
         return function(data) {
-            // Original taken from: https://javascript.info/blob#blob-as-url
-            const uri = URL.createObjectURL(new Blob([data], {type: mimeType}));
-            try {
-                util.downloadURI(uri, fileName);
-            } catch(err) {
-                return Promise.reject(err);
-            } finally {
-                URL.revokeObjectURL(uri);
-            }
-            return 'ok';
+            return util.downloadBlob(new Blob([data], {type: mimeType}), fileName);
         };
+    },
+
+    downloadBlob: function(blob, fileName) {
+        // Original taken from: https://javascript.info/blob#blob-as-url
+        const uri = URL.createObjectURL(blob);
+        try {
+            util.downloadURI(uri, fileName);
+        } catch(err) {
+            return Promise.reject(err);
+        } finally {
+            URL.revokeObjectURL(uri);
+        }
+        return 'ok';
     },
 
     downloadURI: function(uri, name) {

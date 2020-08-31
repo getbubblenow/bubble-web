@@ -19,6 +19,9 @@ export const networkService = {
     deleteNetwork,
     requestNetworkKeys,
     retrieveNetworkKeys,
+    startBackupPackageDownload,
+    backupPackageStatus,
+    backupPackageDownload,
     getNetworkBackups,
     getLogFlag, enableLog, disableLog
 };
@@ -87,6 +90,24 @@ function retrieveNetworkKeys(userId, networkId, code, password, messages, errors
             .then(util.handleCrudResponse(messages, errors))
             .then(netKeyObj => netKeyObj.data)
             .then(util.handleDataToDownloadAsFile('restore.' + networkId + '.key', 'text/plain'));
+}
+function startBackupPackageDownload(userId, networkId, code, password, backupId) {
+    return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}/actions/keys/${code}/backups/start?backupId=${backupId}`,
+                 util.postWithAuth({ name: 'password', value: password }))
+            .then(util.handleBasicResponse);
+}
+function backupPackageStatus(userId, networkId, code, messages, errors) {
+    return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}/actions/keys/${code}/backups/status`,
+                 util.getWithAuth())
+            .then(util.handleCrudResponse(messages, errors));
+}
+function backupPackageDownload(userId, networkId, code, messages, errors) {
+    const getWithAuth = util.getWithAuth();
+    getWithAuth.responseType = 'blob';
+    return fetch(`${config.apiUrl}/users/${userId}/networks/${networkId}/actions/keys/${code}/backups/download`,
+                 getWithAuth)
+            .then(util.handleResponseToDownloadAsFile(`backup.${networkId}.tgz.enc`),
+                  util.handleCrudResponse(messages, errors));
 }
 
 function getNetworkBackups(userId, networkId, messages, errors) {

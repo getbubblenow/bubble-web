@@ -10,7 +10,8 @@ const state = {
     loading: {
         networks: false, network: false, stopping: false, restoring: false, deleting: false,
         nearestRegions: false, startingNetwork: false, networkStatuses: false, networkNodes: false,
-        requestNetworkKeys: false, retrieveNetworkKeys: false, queueBackup: false, managingLogFlag: false
+        requestNetworkKeys: false, retrieveNetworkKeys: false, queueBackup: false, managingLogFlag: false,
+        preparingLatestBackup: false
     },
     creating: null,
     error: null,
@@ -153,6 +154,25 @@ const actions = {
         networkService.retrieveNetworkKeys(userId, networkId, code, password, messages, errors)
                       .then(ok => commit('retrieveNetworkKeysSuccess'),
                             error => commit('retrieveNetworkKeysFailure', error));
+    },
+
+    buildLatestBackupPackage({ commit }, {userId, networkId, code, password}) {
+        commit('buildLatestBackupPackageRequest');
+        networkService.startBackupPackageDownload(userId, networkId, code, password, state.backups[0].uuid)
+                .then(ok => commit('buildLatestBackupPackageSuccess'),
+                      error => commit('buildLatestBackupPackageFailure', error));
+    },
+    latestBackupBuildingStatus({ commit }, { userId, networkId, code, messages, errors }) {
+        commit('latestBackupBuildingStatusRequest');
+        networkService.backupPackageStatus(userId, networkId, code, messages, errors)
+                      .then(status => commit('latestBackupBuildingStatusSuccess', status),
+                            error => commit('latestBackupBuildingStatusFailure', error));
+    },
+    latestBackupDownload({ commit }, { userId, networkId, code, messages, errors }) {
+        commit('latestBackupDownloadRequest');
+        networkService.backupPackageDownload(userId, networkId, code, messages, errors)
+                      .then(ok => commit('latestBackupDownloadSuccess'),
+                            error => commit('latestBackupDownloadFailure', error));
     },
 
     getLogFlag({ commit }, { networkId, messages, errors }) {
@@ -330,7 +350,6 @@ const mutations = {
         state.loading.requestNetworkKeys = false;
         state.error = { error };
     },
-
     retrieveNetworkKeysRequest(state) {
         state.loading.retrieveNetworkKeys = true;
         state.networkKeysRequested = null;
@@ -342,6 +361,48 @@ const mutations = {
         state.loading.retrieveNetworkKeys = false;
         state.error = { error };
     },
+
+    buildLatestBackupPackageRequest(state) {
+        state.loading.retrieveNetworkKeys = true;
+        state.loading.preparingLatestBackup = true;
+        state.networkKeysRequested = null;
+    },
+    buildLatestBackupPackageSuccess(state) {
+        // noop
+    },
+    buildLatestBackupPackageFailure(state, error) {
+        state.loading.retrieveNetworkKeys = false;
+        state.loading.preparingLatestBackup = false;
+        state.error = { error };
+    },
+    latestBackupBuildingStatusRequest(state) {
+        state.loading.retrieveNetworkKeys = true;
+        state.loading.preparingLatestBackup = true;
+    },
+    latestBackupBuildingStatusSuccess(state, packageBuildingStatus) {
+        if (packageBuildingStatus && packageBuildingStatus.done === true) {
+            if (packageBuildingStatus.error) {
+                return latestBackupBuildingStatusFailure(state, packageBuildingStatus.error);
+            }
+            state.loading.preparingLatestBackup = false;
+        }
+    },
+    latestBackupBuildingStatusFailure(state, error) {
+        state.loading.retrieveNetworkKeys = false;
+        state.loading.preparingLatestBackup = false;
+        state.error = { error };
+    },
+    latestBackupDownloadRequest(state) {
+        // noop
+    },
+    latestBackupDownloadSuccess(state) {
+        state.loading.retrieveNetworkKeys = false;
+    },
+    latestBackupDownloadFailure(state, error) {
+        state.loading.retrieveNetworkKeys = false;
+        state.error = { error };
+    },
+
     getNetworkBackupsRequest(state, backups) {
         state.backups = null;
     },
