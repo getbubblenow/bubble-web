@@ -94,7 +94,8 @@ export const router = new Router({
                 },
                 {
                   path: 'me/change-password',
-                  component: () => import('~/_pages/main/account/ChangePassword'),
+                  component: () =>
+                    import('~/_pages/main/account/ChangePassword'),
                 },
                 {
                   path: 'me/set-password/:code',
@@ -106,7 +107,8 @@ export const router = new Router({
                 },
                 {
                   path: 'me/payment',
-                  component: () => import('~/_pages/main/account/PaymentMethods'),
+                  component: () =>
+                    import('~/_pages/main/account/PaymentMethods'),
                 },
                 {
                   path: 'me/bills',
@@ -115,6 +117,11 @@ export const router = new Router({
                 {
                   path: 'me/policy',
                   component: () => import('~/_pages/main/account/Policy'),
+                },
+
+                {
+                  path: 'devices',
+                  component: () => import('~/_pages/main/account/Devices'),
                 },
               ],
             },
