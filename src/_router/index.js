@@ -123,6 +123,11 @@ export const router = new Router({
                   path: 'devices',
                   component: () => import('~/_pages/main/account/Devices'),
                 },
+
+                {
+                  path: 'bubble/:id',
+                  component: () => import('~/_pages/main/bubble/Network'),
+                },
               ],
             },
             {

@@ -8,7 +8,8 @@ module.exports = webpackMerge.merge(require('./webpack.config.js'), {
   mode: 'development',
   devServer: {
     proxy: {
-    '/api': 'http://beta.bubv.net:8888',
+    // '/api': 'http://beta.bubv.net:8888',
+    '/api': 'http://shent-ih538-8m85f-rj97o.bubv.net'
     // '/api': 'https://beta.bubv.net/',
     },
   },
