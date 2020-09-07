@@ -11,7 +11,7 @@ const user = util.currentUser();
 const defaultStatus = {
   loggingIn: false,
   loggedIn: false,
-  restoring: false,
+  uploadingRestoreRequestData: false,
   registering: false,
   updating: false,
   settingLocale: false,
@@ -163,6 +163,12 @@ const actions = {
         (ok) => commit('restoreSuccess', systemConfigs),
         (error) => commit('restoreFailure', systemConfigs, error)
       );
+  },
+  restoreFromPackage({ commit }, { shortKey, backupFileRef, password, systemConfigs, messages, errors }) {
+    commit('restoreRequest', systemConfigs);
+    userService.restoreFromPackage(shortKey, backupFileRef, password, messages, errors)
+               .then(ok => commit('restoreSuccess', systemConfigs),
+                     error => commit('restoreFailure', systemConfigs, error));
   },
   forgotPassword({ commit }, { username, messages, errors }) {
     commit('forgotPasswordRequest');
@@ -404,15 +410,15 @@ const mutations = {
   },
 
   restoreRequest(state, systemConfigs) {
-    state.status = Object.assign({}, state.status, { restoring: true });
-    systemConfigs.restoreInProgress = true;
+    state.status = Object.assign({}, state.status, { uploadingRestoreRequestData: true });
   },
   restoreSuccess(state, systemConfigs) {
-    state.status = Object.assign({}, state.status, { restoring: false });
+    state.status = Object.assign({}, state.status, { uploadingRestoreRequestData: false });
+    systemConfigs.restoreInProgress = true;
     systemConfigs.awaitingRestore = false;
   },
   restoreFailure(state, systemConfigs, error) {
-    state.status = Object.assign({}, state.status, { restoring: false });
+    state.status = Object.assign({}, state.status, { uploadingRestoreRequestData: false });
     systemConfigs.restoreInProgress = false;
     console.log('restore failed: ' + JSON.stringify(error));
   },

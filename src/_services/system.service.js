@@ -78,7 +78,7 @@ function modelSetup(file, messages, errors) {
     let formData = new FormData();
     formData.append('file', file);
     formData.append('name', file.name);
-    return fetch(`${config.apiUrl}/me/model`, util.postFileWithAuth(formData))
+    return fetch(`${config.apiUrl}/me/model`, util.postFormDataWithAuth(formData))
         .then(util.handleCrudResponse(messages, errors))
         .then(entity => { return entity; });
 }

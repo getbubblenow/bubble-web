@@ -10,6 +10,7 @@ export const userService = {
     appLogin,
     logout,
     restore,
+    restoreFromPackage,
     forgotPassword,
     register,
     searchAccounts,
@@ -68,12 +69,16 @@ function appLogin(session, messages, errors) {
 }
 
 function restore(shortKey, longKey, password, messages, errors) {
-    const requestOptions = {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 'data': longKey, 'password': password })
-    };
-    return fetch(`${config.apiUrl}/auth/restore/${shortKey}`, requestOptions)
+    return fetch(`${config.apiUrl}/auth/restore/${shortKey}`,
+                 util.postWithAuth({ 'data': longKey, 'password': password }))
+        .then(handleAuthResponse(messages, errors));
+}
+
+function restoreFromPackage(shortKey, backupFileRef, password, messages, errors) {
+    let formData = new FormData();
+    formData.append('file', backupFileRef);
+    formData.append('password', password);
+    return fetch(`${config.apiUrl}/auth/restore/apply/${shortKey}`, util.postFormDataWithAuth(formData))
         .then(handleAuthResponse(messages, errors));
 }
 
