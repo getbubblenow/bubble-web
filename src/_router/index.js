@@ -20,7 +20,7 @@ import DashboardPage from '~/account/DashboardPage';
 import ProfilePage from '~/account/profile/ProfilePage';
 import ActionPage from '~/account/profile/ActionPage';
 import PolicyPage from '~/account/profile/PolicyPage';
-import DevicesPage from '~/account/DevicesPage';
+// import DevicesPage from '~/account/DevicesPage';
 import AppsPage from '~/account/AppsPage';
 import AppPage from '~/account/AppPage';
 import BillsPage from '~/account/payment/BillsPage';
@@ -148,8 +148,8 @@ export const router = new Router({
     { path: '/legal', component: LegalPage },
     { path: '/support', component: SupportPage },
 
-    { path: '/me', component: ProfilePage },
-    { path: '/me/policy', component: PolicyPage },
+    // { path: '/me', component: ProfilePage },
+    // { path: '/me/policy', component: PolicyPage },
     {
       path: '/me/download/:uuid',
       redirect: (r) => ({
@@ -158,16 +158,16 @@ export const router = new Router({
       }),
     },
     { path: '/me/action', component: ActionPage },
-    { path: '/me/changePassword', component: ChangePasswordPage },
-    { path: '/me/setPassword/:code', component: SetPasswordPage },
-    { path: '/me/keys', component: SshKeysPage },
-    { path: '/me/bills', component: BillsPage },
-    {
-      path: '/me/payment',
-      component: PaymentMethodsPage,
-      children: paymentMethodsChildren,
-    },
-    { path: '/devices', component: DevicesPage },
+    // { path: '/me/changePassword', component: ChangePasswordPage },
+    // { path: '/me/setPassword/:code', component: SetPasswordPage },
+    // { path: '/me/keys', component: SshKeysPage },
+    // { path: '/me/bills', component: BillsPage },
+    // {
+    //   path: '/me/payment',
+    //   component: PaymentMethodsPage,
+    //   children: paymentMethodsChildren,
+    // },
+    // { path: '/devices', component: DevicesPage },
     { path: '/apps', component: AppsPage },
     { path: '/app/:app', component: AppPage },
     { path: '/app/:app/config/:view', component: AppConfigPage },
@@ -252,7 +252,66 @@ export const router = new Router({
         {
           path: '',
           component: () => import('~/_pages/main/Layout'),
-          children: [],
+          children: [
+            {
+              path: '',
+              component: () => import('~/_pages/main/account/Layout'),
+              children: [
+                {
+                  path: 'verify-email',
+                  component: () => import('~/_pages/main/account/VerifyEmail'),
+                },
+                {
+                  path: 'payment',
+                  component: () => import('~/_pages/main/account/Payment'),
+                },
+                {
+                  path: 'me',
+                  exact: true,
+                  component: () => import('~/_pages/main/account/MyAccount'),
+                },
+                {
+                  path: 'me/change-password',
+                  component: () =>
+                    import('~/_pages/main/account/ChangePassword'),
+                },
+                {
+                  path: 'me/set-password/:code',
+                  component: () => import('~/_pages/main/account/SetPassword'),
+                },
+                {
+                  path: 'me/keys',
+                  component: () => import('~/_pages/main/account/ManageSSH'),
+                },
+                {
+                  path: 'me/payment',
+                  component: () =>
+                    import('~/_pages/main/account/PaymentMethods'),
+                },
+                {
+                  path: 'me/bills',
+                  component: () => import('~/_pages/main/account/Bills'),
+                },
+                {
+                  path: 'me/policy',
+                  component: () => import('~/_pages/main/account/Policy'),
+                },
+
+                {
+                  path: 'devices',
+                  component: () => import('~/_pages/main/account/Devices'),
+                },
+              ],
+            },
+            {
+              path: 'launch-bubble',
+              component: () => import('~/_pages/main/bubble/LaunchBubble'),
+            },
+            {
+              path: 'launching-bubble/:id',
+              component: () => import('~/_pages/main/bubble/LaunchingBubble'),
+            },
+          ],
         },
       ],
     },
