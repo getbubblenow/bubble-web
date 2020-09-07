@@ -37,3 +37,4 @@ typings
 dist
 *~
 .DS_Store
+webpack.config.dev.js
