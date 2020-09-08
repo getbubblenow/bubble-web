@@ -26,7 +26,7 @@ export default {
       },
       sshKey: '',
       forkHost: '',
-      syncPassword: true,
+      syncAccount: true,
       launchLock: false,
       sendErrors: true,
       sendMetrics: true,

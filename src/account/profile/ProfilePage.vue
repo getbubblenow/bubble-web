@@ -79,10 +79,12 @@
 
             <!-- sync password -->
             <div v-if="admin === true && currentUser.uuid === subject.uuid" class="form-group">
-                <label for="syncPassword">{{messages.field_label_sync_password}}</label>
-                <input type="checkbox" id="syncPassword" v-model="subject.syncPassword">
-                <div v-if="submitted && errors.has('syncPassword')" class="invalid-feedback d-block">{{ errors.first('syncPassword') }}</div>
-                <p>{{messages.field_label_sync_password_description}}</p>
+                <label for="sync">{{ messages.field_label_sync_account }}</label>
+                <input type="checkbox" id="sync" v-model="subject.sync">
+                <div v-if="submitted && errors.has('sync')" class="invalid-feedback d-block">
+                    {{ errors.first('sync') }}
+                </div>
+                <p>{{ messages.field_label_sync_account_description }}</p>
             </div>
 
             <div>
@@ -119,7 +121,7 @@
         locale: null,
         admin: null,
         suspended: null,
-        syncPassword: null,
+        sync: null,
         showBlockStats: null,
         autoUpdatePolicy: {
             jarUpdates: true,
@@ -204,7 +206,7 @@
                     locale: this.subject.locale,
                     admin: this.subject.admin,
                     suspended: this.subject.suspended,
-                    syncPassword: this.subject.syncPassword,
+                    sync: this.subject.sync,
                     autoUpdatePolicy: this.subject.autoUpdatePolicy
                 };
                 this.submitted = true;

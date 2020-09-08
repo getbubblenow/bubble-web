@@ -277,10 +277,10 @@
 
             <!-- sync password -->
 <!--            <div class="form-group">-->
-<!--                <label for="syncPassword">{{messages.field_label_sync_password}}</label>-->
-<!--                <input type="checkbox" id="syncPassword" v-model="accountPlan.syncPassword">-->
-<!--                <div v-if="submitted && errors.has('syncPassword')" class="invalid-feedback d-block">{{ errors.first('syncPassword') }}</div>-->
-<!--                <p>{{messages.field_label_sync_password_description}}</p>-->
+<!--                <label for="syncAccount">{{messages.field_label_sync_account}}</label>-->
+<!--                <input type="checkbox" id="syncAccount" v-model="accountPlan.syncAccount">-->
+<!--                <div v-if="submitted && errors.has('syncAccount')" class="invalid-feedback d-block">{{ errors.first('syncAccount') }}</div>-->
+<!--                <p>{{messages.field_label_sync_account_description}}</p>-->
 <!--            </div>-->
             <!-- launch lock -->
 <!--            <div class="form-group" v-if="networkType !== 'fork'">-->
@@ -393,7 +393,7 @@
                     },
                     sshKey: '',
                     forkHost: '',
-                    syncPassword: true,
+                    syncAccount: true,
                     launchLock: false,
                     sendErrors: true,
                     sendMetrics: true
