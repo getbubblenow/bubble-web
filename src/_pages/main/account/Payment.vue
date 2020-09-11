@@ -337,7 +337,11 @@ export default {
 
   watch: {
     paymentMethods() {
-      this.$refs.stripeElement.setUpStripe(this.paymentMethods[0].driverConfig.publicApiKey);
+      if (this.paymentMethods[0]) {
+        this.$refs.stripeElement.setUpStripe(
+          this.paymentMethods[0].driverConfig.publicApiKey
+        );
+      }
     },
 
     paymentStatus(ps) {

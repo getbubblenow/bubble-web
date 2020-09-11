@@ -182,7 +182,7 @@ export default {
       return this.configs ? this.configs.awaitingRestore : undefined;
     },
     isNewPage() {
-      const newPages = ['/new_pages', '/login', '/forgotPassword', '/register', '/me', '/devices', '/launch-bubble', '/launching-bubble'];
+      const newPages = ['/new_pages', '/login', '/forgotPassword', '/register', '/me', '/devices', '/launch-bubble', '/launching-bubble', '/payment', '/verify-email'];
       return (
         newPages.includes(this.$route.path) ||
         newPages.filter((p) => this.$route.path.startsWith(p)).length

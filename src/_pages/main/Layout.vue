@@ -75,23 +75,23 @@ export default {
     },
 
     navigateToVerifyEmail() {
-      if (this.$route.path !== '/new_pages/verify-email') {
-        this.$router.push('/new_pages/verify-email');
+      if (this.$route.path !== '/verify-email') {
+        this.$router.push('/verify-email');
       }
     },
 
     navigateToPaymentPage() {
-      if (this.$route.path !== '/new_pages/payment') {
-        this.$router.push('/new_pages/payment');
+      if (this.$route.path !== '/payment') {
+        this.$router.push('/payment');
       }
     },
 
     navigateToDashboard() {
       if (
-        this.$route.path === '/new_pages/payment' ||
-        this.$route.path === '/new_pages/verify-email'
+        this.$route.path === '/payment' ||
+        this.$route.path === '/verify-email'
       ) {
-        this.$router.push('/new_pages/test');
+        this.$router.push('/');
       }
     },
   },
@@ -113,7 +113,6 @@ export default {
           }, 5000);
         }
       } else {
-        console.log('hasVerified Contact');
         const currentUser = util.currentUser();
         this.getAllAccountPaymentMethods({
           userId: currentUser.uuid,
@@ -127,7 +126,7 @@ export default {
       }
     },
 
-    accountPaymentMethods(pms) {
+    accountPaymentMethods(pms, oldpms) {
       if (pms) {
         const payMethods = [];
         for (let i = 0; i < pms.length; i++) {
@@ -141,6 +140,7 @@ export default {
             payMethods.push(pm);
           }
         }
+
         if (
           this.accountPlan.paymentMethodObject.uuid === null &&
           payMethods.length > 0

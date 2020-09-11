@@ -49,6 +49,7 @@ export default {
       const urlNodes = this.$route.fullPath.split('/');
       switch (urlNodes[1]) {
         case 'login':
+        case 'appLogin':
         case 'forgotPassword':
           return 'background1';
       }
@@ -56,6 +57,7 @@ export default {
       // new pages in progress
       switch (urlNodes[2]) {
         case 'login':
+        case 'appLogin':
         case 'forgotPassword':
           return 'background1';
       }

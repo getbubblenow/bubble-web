@@ -73,6 +73,16 @@ export const router = new Router({
       children: [
         {
           path: '',
+          component: () => import('~/_pages/auth/Layout'),
+          children: [
+            {
+              path: 'appLogin',
+              component: () => import('~/_pages/auth/AppLogin'),
+            },
+          ],
+        },
+        {
+          path: '',
           component: () => import('~/_pages/main/Layout'),
           children: [
             {
@@ -82,6 +92,14 @@ export const router = new Router({
                 {
                   path: 'bubble/:id',
                   component: () => import('~/_pages/main/bubble/Network'),
+                },
+                {
+                  path: 'restore',
+                  component: () => import('~/_pages/main/bubble/Restore'),
+                },
+                {
+                  path: 'legal',
+                  component: () => import('~/_pages/main/account/Legal'),
                 },
                 {
                   path: 'restore',
