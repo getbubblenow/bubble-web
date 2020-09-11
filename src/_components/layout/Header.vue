@@ -4,7 +4,7 @@
     <div class="d-flex justify-content-center align-items-center container ">
       <img src="/small-BubbleLogo-Horizontal-BlackText.png" height="40" />
       <div class="flex-grow-1"></div>
-      <div class="navbar d-none d-md-flex">
+      <div class="navbar d-none d-lg-flex">
         <!--- If not logged in --->
         <div
           v-if="status.loggedIn !== true"
@@ -41,6 +41,38 @@
               {{ messages.label_menu_network }}
             </Button>
           </router-link>
+          <router-link
+            to="/devices"
+            class="d-flex align-items-center"
+            v-if="!configs.sageLauncher"
+          >
+            <Button headerLink>
+              {{ messages.label_menu_devices }}
+            </Button>
+          </router-link>
+          <router-link
+            to="/apps"
+            class="d-flex align-items-center"
+            v-if="!configs.sageLauncher"
+          >
+            <Button headerLink>
+              {{ messages.label_menu_apps }}
+            </Button>
+          </router-link>
+          <router-link
+            to="/admin/accounts"
+            class="d-flex align-items-center"
+            v-if="!configs.sageLauncher"
+          >
+            <Button headerLink>
+              {{ messages.label_menu_admin_users }}
+            </Button>
+          </router-link>
+          <router-link to="/me" class="d-flex align-items-center">
+            <Button headerLink>
+              {{ messages.label_menu_account }}
+            </Button>
+          </router-link>
           <router-link to="/help" class="d-flex align-items-center">
             <Button headerLink>
               {{ messages.button_label_help }}
@@ -53,14 +85,14 @@
           </router-link>
         </div>
       </div>
-      <div class="navbar d-md-none" @click="toggleNavbar()">
+      <div class="navbar d-lg-none" @click="toggleNavbar()">
         <i class="fas fa-bars"></i>
       </div>
     </div>
 
     <div
-      class="dropdown-menu dropdown-menu-right d-md-none w-100 my-0"
       :class="{ show: menuVisible }"
+      class="dropdown-menu dropdown-menu-right w-100 my-0"
       v-click-outside="hide"
     >
       <div v-if="status.loggedIn === false">
@@ -80,6 +112,30 @@
         </router-link>
         <router-link class="dropdown-item" to="/bubbles">
           {{ messages.label_menu_network }}
+        </router-link>
+        <router-link
+          to="/devices"
+          class="dropdown-item"
+          v-if="!configs.sageLauncher"
+        >
+          {{ messages.label_menu_devices }}
+        </router-link>
+        <router-link
+          to="/apps"
+          class="dropdown-item"
+          v-if="!configs.sageLauncher"
+        >
+          {{ messages.label_menu_apps }}
+        </router-link>
+        <router-link
+          to="/admin/accounts"
+          class="dropdown-item"
+          v-if="!configs.sageLauncher"
+        >
+          {{ messages.label_menu_admin_users }}
+        </router-link>
+        <router-link to="/me" class="dropdown-item">
+          {{ messages.label_menu_account }}
         </router-link>
         <router-link class="dropdown-item" to="/help">
           {{ messages.button_label_help }}
@@ -135,7 +191,7 @@ export default {
   data() {
     return {
       menuVisible: false,
-      prevVisibleState: false
+      timerId: null,
     };
   },
 
@@ -146,11 +202,15 @@ export default {
 
   methods: {
     toggleNavbar() {
-      this.menuVisible = !this.prevVisibleState;
+      this.menuVisible = !this.menuVisible;
+      this.timerId = setTimeout(() => {
+        this.timerId = null;
+      }, 100);
     },
     hide() {
-      this.prevVisibleState = this.menuVisible;
-      this.menuVisible = false;
+      if (!this.timerId) {
+        this.menuVisible = false;
+      }
     },
   },
 };

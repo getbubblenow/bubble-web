@@ -80,63 +80,14 @@ export const router = new Router({
               component: () => import('~/_pages/main/account/Layout'),
               children: [
                 {
-                  path: 'verify-email',
-                  component: () => import('~/_pages/main/account/VerifyEmail'),
-                },
-                {
-                  path: 'payment',
-                  component: () => import('~/_pages/main/account/Payment'),
-                },
-                {
-                  path: 'me',
-                  exact: true,
-                  component: () => import('~/_pages/main/account/MyAccount'),
-                },
-                {
-                  path: 'me/change-password',
-                  component: () =>
-                    import('~/_pages/main/account/ChangePassword'),
-                },
-                {
-                  path: 'me/set-password/:code',
-                  component: () => import('~/_pages/main/account/SetPassword'),
-                },
-                {
-                  path: 'me/keys',
-                  component: () => import('~/_pages/main/account/ManageSSH'),
-                },
-                {
-                  path: 'me/payment',
-                  component: () =>
-                    import('~/_pages/main/account/PaymentMethods'),
-                },
-                {
-                  path: 'me/bills',
-                  component: () => import('~/_pages/main/account/Bills'),
-                },
-                {
-                  path: 'me/policy',
-                  component: () => import('~/_pages/main/account/Policy'),
-                },
-
-                {
-                  path: 'devices',
-                  component: () => import('~/_pages/main/account/Devices'),
-                },
-
-                {
                   path: 'bubble/:id',
                   component: () => import('~/_pages/main/bubble/Network'),
                 },
+                {
+                  path: 'restore',
+                  component: () => import('~/_pages/main/bubble/Restore'),
+                },
               ],
-            },
-            {
-              path: 'launch-bubble',
-              component: () => import('~/_pages/main/bubble/LaunchBubble'),
-            },
-            {
-              path: 'launching-bubble/:id',
-              component: () => import('~/_pages/main/bubble/LaunchingBubble'),
             },
             {
               path: 'test',
