@@ -5,8 +5,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 
-import LegalPage from '~/app/LegalPage';
-import SupportPage from '~/app/SupportPage';
 import ActivationPage from '~/auth/ActivationPage';
 import ModelSetupPage from '~/admin/ModelSetupPage';
 // import RegisterPage from '~/auth/RegisterPage';
@@ -14,8 +12,6 @@ import ModelSetupPage from '~/admin/ModelSetupPage';
 import LogoutPage from '~/auth/LogoutPage';
 // import ForgotPasswordPage from '~/auth/ForgotPasswordPage';
 import MultifactorAuthPage from '~/auth/MultifactorAuthPage';
-import AppLoginPage from '~/auth/AppLoginPage';
-import RestorePage from '~/auth/RestorePage';
 import DashboardPage from '~/account/DashboardPage';
 import ProfilePage from '~/account/profile/ProfilePage';
 import ActionPage from '~/account/profile/ActionPage';
@@ -102,8 +98,8 @@ export const router = new Router({
                   component: () => import('~/_pages/main/account/Legal'),
                 },
                 {
-                  path: 'restore',
-                  component: () => import('~/_pages/main/bubble/Restore'),
+                  path: 'support',
+                  component: () => import('~/_pages/main/account/Support'),
                 },
               ],
             },
@@ -119,8 +115,8 @@ export const router = new Router({
     // existing pages
     { path: '', component: DashboardPage },
     { path: '/', component: DashboardPage },
-    { path: '/legal', component: LegalPage },
-    { path: '/support', component: SupportPage },
+    // { path: '/legal', component: LegalPage },
+    // { path: '/support', component: SupportPage },
 
     // { path: '/me', component: ProfilePage },
     // { path: '/me/policy', component: PolicyPage },
@@ -180,8 +176,8 @@ export const router = new Router({
     // { path: '/login', component: LoginPage },
     { path: '/logout', component: LogoutPage },
     // { path: '/forgotPassword', component: ForgotPasswordPage },
-    { path: '/appLogin', component: AppLoginPage },
-    { path: '/restore', component: RestorePage },
+    // { path: '/appLogin', component: AppLoginPage },
+    // { path: '/restore', component: RestorePage },
 
     { path: '/admin/accounts', component: AccountsPage },
     { path: '/admin/new_account', component: ProfilePage },
@@ -274,6 +270,23 @@ export const router = new Router({
                 {
                   path: 'devices',
                   component: () => import('~/_pages/main/account/Devices'),
+                },
+
+                {
+                  path: 'bubble/:id',
+                  component: () => import('~/_pages/main/bubble/Network'),
+                },
+                {
+                  path: 'restore',
+                  component: () => import('~/_pages/main/bubble/Restore'),
+                },
+                {
+                  path: 'legal',
+                  component: () => import('~/_pages/main/account/Legal'),
+                },
+                {
+                  path: 'support',
+                  component: () => import('~/_pages/main/account/Support'),
                 },
               ],
             },

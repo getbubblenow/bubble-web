@@ -37,6 +37,7 @@ export default {
   computed: {
     ...mapState('users', ['policy']),
     ...mapState('paymentMethods', ['accountPaymentMethods']),
+    ...mapSTate('system', ['configs']),
   },
 
   mounted() {
@@ -127,7 +128,7 @@ export default {
     },
 
     accountPaymentMethods(pms, oldpms) {
-      if (pms) {
+      if (pms && this.configs.paymentsEnabled) {
         const payMethods = [];
         for (let i = 0; i < pms.length; i++) {
           const pm = pms[i];
