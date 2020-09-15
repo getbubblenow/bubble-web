@@ -56,11 +56,13 @@ export default {
         currentUser.locale !== null
           ? currentUser.locale
           : 'detect';
-      this.getPolicyByUserId({
-        userId: currentUser.uuid,
-        messages: this.messages,
-        errors: this.errors,
-      });
+      if (!currentUser.admin) {
+        this.getPolicyByUserId({
+          userId: currentUser.uuid,
+          messages: this.messages,
+          errors: this.errors,
+        });
+      }
     },
 
     hasVerifiedContact(policy) {
