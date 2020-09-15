@@ -62,55 +62,6 @@ const newNetworkChildren = [
 export const router = new Router({
   mode: 'history',
   routes: [
-    // new Pages & lazy loading
-    {
-      path: '/new_pages',
-      component: () => import('~/_pages/Layout'),
-      children: [
-        {
-          path: '',
-          component: () => import('~/_pages/auth/Layout'),
-          children: [
-            {
-              path: 'appLogin',
-              component: () => import('~/_pages/auth/AppLogin'),
-            },
-          ],
-        },
-        {
-          path: '',
-          component: () => import('~/_pages/main/Layout'),
-          children: [
-            {
-              path: '',
-              component: () => import('~/_pages/main/account/Layout'),
-              children: [
-                {
-                  path: 'bubble/:id',
-                  component: () => import('~/_pages/main/bubble/Network'),
-                },
-                {
-                  path: 'restore',
-                  component: () => import('~/_pages/main/bubble/Restore'),
-                },
-                {
-                  path: 'legal',
-                  component: () => import('~/_pages/main/account/Legal'),
-                },
-                {
-                  path: 'support',
-                  component: () => import('~/_pages/main/account/Support'),
-                },
-              ],
-            },
-            {
-              path: 'test',
-              component: () => import('~/_pages/main/Test'),
-            },
-          ],
-        },
-      ],
-    },
 
     // existing pages
     { path: '', component: DashboardPage },
@@ -217,6 +168,10 @@ export const router = new Router({
               path: 'register',
               component: () => import('~/_pages/auth/Register'),
             },
+            {
+              path: 'appLogin',
+              component: () => import('~/_pages/auth/AppLogin'),
+            },
           ],
         },
         {
@@ -228,7 +183,7 @@ export const router = new Router({
               component: () => import('~/_pages/main/account/Layout'),
               children: [
                 {
-                  path: 'verify-email',
+                  path: 'verifyEmail',
                   component: () => import('~/_pages/main/account/VerifyEmail'),
                 },
                 {
@@ -241,12 +196,12 @@ export const router = new Router({
                   component: () => import('~/_pages/main/account/MyAccount'),
                 },
                 {
-                  path: 'me/change-password',
+                  path: 'me/changePassword',
                   component: () =>
                     import('~/_pages/main/account/ChangePassword'),
                 },
                 {
-                  path: 'me/set-password/:code',
+                  path: 'me/setPassword/:code',
                   component: () => import('~/_pages/main/account/SetPassword'),
                 },
                 {

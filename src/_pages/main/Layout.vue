@@ -37,7 +37,7 @@ export default {
   computed: {
     ...mapState('users', ['policy']),
     ...mapState('paymentMethods', ['accountPaymentMethods']),
-    ...mapSTate('system', ['configs']),
+    ...mapState('system', ['configs']),
   },
 
   mounted() {
@@ -76,8 +76,8 @@ export default {
     },
 
     navigateToVerifyEmail() {
-      if (this.$route.path !== '/verify-email') {
-        this.$router.push('/verify-email');
+      if (this.$route.path !== '/verifyEmail') {
+        this.$router.push('/verifyEmail');
       }
     },
 
@@ -90,7 +90,7 @@ export default {
     navigateToDashboard() {
       if (
         this.$route.path === '/payment' ||
-        this.$route.path === '/verify-email'
+        this.$route.path === '/verifyEmail'
       ) {
         this.$router.push('/');
       }

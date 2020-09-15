@@ -183,21 +183,21 @@ export default {
     },
     isNewPage() {
       const newPages = [
-        '/new_pages',
         '/login',
         '/forgotPassword',
         '/register',
+        '/appLogin',
+        '/verifyEmail',
+        '/payment',
         '/me',
         '/devices',
         '/launch-bubble',
         '/launching-bubble',
-        '/payment',
-        '/verify-email',
         '/restore',
         '/support',
-        'legal',
-        '/appLogin',
+        '/legal',
       ];
+      
       return (
         newPages.includes(this.$route.path) ||
         newPages.filter((p) => this.$route.path.startsWith(p)).length
