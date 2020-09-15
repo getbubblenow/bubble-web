@@ -100,7 +100,8 @@ export default {
   watch: {
     policy(p) {
       this.verifiedContacts = this.hasVerifiedContact(p);
-      if (!this.verifiedContacts) {
+      const currentUser = util.currentUser();
+      if (!this.verifiedContacts && !currentUser.admin) {
         this.navigateToVerifyEmail();
         if (this.verifiedContactRefresher === null) {
           const vue = this;
