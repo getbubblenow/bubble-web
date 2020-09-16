@@ -10,7 +10,7 @@ const state = {
     loading: {
         users: false, user: false, creating: false, updating: false, deleting: false, changingPassword: false,
         policy: false, updatingPolicy: false, addPolicyContact: false, removePolicyContact: false,
-        listSshKeys: false, addSshKey: false, removeSshKey: false
+        listSshKeys: false, addSshKey: false, removeSshKey: false, sendingDeleteRequest: false
     },
     errors: {},
     users: null,
@@ -20,7 +20,8 @@ const state = {
     authenticator: {},
     sshKey: null,
     sshKeys: [],
-    changePasswordResponse: null
+    changePasswordResponse: null,
+    deleteRequestSent: false
 };
 
 export const CONTACT_TYPE_AUTHENTICATOR = 'authenticator';
@@ -173,6 +174,15 @@ const actions = {
                 id => commit('deleteSuccess', id),
                 error => commit('deleteFailure', { userId, error: error.toString() })
             );
+    },
+
+    requestUserDeletion({ commit }, { userId, messages, errors }) {
+        commit("requestUserDeletionRequest", userId);
+        userService.requestUserDeletion(userId, messages, errors)
+                   .then((id) => commit("requestUserDeletionSuccess", id),
+                         (error) => commit("requestUserDeletionFailure",
+                                           { userId, error: error.toString() })
+                   );
     },
 
     changePassword({ commit }, {request, messages, errors}) {
@@ -362,6 +372,20 @@ const mutations = {
     deleteFailure(state, { id, error }) {
         state.loading.deleting = false;
         state.errors.deleteUser = error;
+    },
+
+    requestUserDeletionRequest(state, id) {
+        state.loading.sendingDeleteRequest = true;
+        state.deleteRequestSent = false;
+    },
+    requestUserDeletionSuccess(state, id) {
+        state.loading.sendingDeleteRequest = false;
+        state.deleteRequestSent = true;
+    },
+    requestUserDeletionFailure(state, { id, error }) {
+        state.loading.sendingDeleteRequest = false;
+        state.deleteRequestSent = false;
+        state.errors.requestUserDeletion = error;
     },
 
     changePasswordRequest(state, id) {

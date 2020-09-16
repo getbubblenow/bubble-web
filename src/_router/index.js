@@ -221,6 +221,10 @@ export const router = new Router({
                   path: 'me/policy',
                   component: () => import('~/_pages/main/account/Policy'),
                 },
+                {
+                  path: 'me/delete',
+                  component: () => import('~/_pages/main/account/Delete'),
+                },
 
                 {
                   path: 'devices',

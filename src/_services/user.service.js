@@ -29,6 +29,7 @@ export const userService = {
     createUser,
     updateUser,
     deleteUser,
+    requestUserDeletion,
     changePassword,
     adminChangePassword,
     approveAction,
@@ -221,6 +222,13 @@ function updateUser(user, messages, errors) {
 
 function deleteUser(userId, messages, errors) {
     return fetch(`${config.apiUrl}/users/${userId}`, util.deleteWithAuth()).then(util.handleCrudResponse(messages, errors));
+}
+
+function requestUserDeletion(userId, messages, errors) {
+    return fetch(
+      `${config.apiUrl}/users/${userId}/request`,
+      util.deleteWithAuth())
+    .then(util.handleCrudResponse(messages, errors));
 }
 
 function changePassword(request, messages, errors) {
