@@ -2,7 +2,9 @@
 <template>
   <div class="header d-flex align-items-center justify-content-center">
     <div class="d-flex justify-content-center align-items-center container ">
-      <img src="/small-BubbleLogo-Horizontal-BlackText.png" height="40" />
+      <router-link to="/">
+        <img src="/small-BubbleLogo-Horizontal-BlackText.png" height="40" />
+      </router-link>
       <div class="flex-grow-1"></div>
       <div class="navbar d-none d-lg-flex">
         <!--- If not logged in --->
@@ -31,11 +33,6 @@
           </router-link>
         </div>
         <div v-else class="d-flex justify-content-center align-items-center">
-          <router-link to="/" class="d-flex align-items-center">
-            <Button headerLink>
-              {{ messages.label_menu_dashboard }}
-            </Button>
-          </router-link>
           <router-link to="/bubbles" class="d-flex align-items-center">
             <Button headerLink>
               {{ messages.label_menu_network }}
@@ -107,9 +104,6 @@
         </router-link>
       </div>
       <div v-else>
-        <router-link class="dropdown-item" to="/">
-          {{ messages.label_menu_dashboard }}
-        </router-link>
         <router-link class="dropdown-item" to="/bubbles">
           {{ messages.label_menu_network }}
         </router-link>

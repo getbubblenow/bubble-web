@@ -314,7 +314,7 @@ export const util = {
     },
 
     validateAccount: function (vue)  {
-        vue.me = vue.$route.path.startsWith('/me/') || vue.$route.path.startsWith('/new_pages/me/');
+        vue.me = vue.$route.path.startsWith('/me/');
         if (vue.me) {
             vue.linkPrefix = '/me';
             if (vue.currentUser === null) {

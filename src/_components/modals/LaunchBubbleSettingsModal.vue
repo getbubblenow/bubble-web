@@ -15,16 +15,76 @@
       <h3 class="text-center mb-5">
         {{ messages.field_label_show_advanced_plan_options }}
       </h3>
-      <div class="form-group">
+
+      <div v-if="showForkOption">
+        <!-- network type -->
+        <div class="form-group">
+          <v-select
+            :clearable="false"
+            v-validate="'required'"
+            :placeholder="messages.field_label_network_type"
+            :options="networkTypeOptions"
+            v-model="networkType"
+            label="name"
+            :reduce="(option) => option.value"
+          >
+            <template v-slot:selected-option="option">
+              <span>
+                {{ messages.field_label_network_type }}: {{ option.name }}
+              </span>
+            </template>
+          </v-select>
+        </div>
+      </div>
+      <!-- fork host -->
+      <div v-if="showForkOption && networkType === 'fork'" class="form-group">
         <Input
+          type="text"
+          v-model="accountPlan.forkHost"
+          name="forkHost"
+          :placeholder="messages.field_label_network_fork_host"
           class="form-control"
-          v-validate="'required'"
-          :placeholder="messages.field_label_bubble_name"
-          v-model="accountPlan.name"
+          :class="{ 'is-invalid': submitted && errors.has('forkHost') }"
+        />
+        <div
+          v-if="submitted && errors.has('forkHost')"
+          class="invalid-feedback d-block"
+        >
+          {{ errors.first('forkHost') }}
+        </div>
+        <div
+          v-if="submitted && errors.has('fqdn')"
+          class="invalid-feedback d-block"
+        >
+          {{ errors.first('fqdn') }}
+        </div>
+        <p
+          class="text-center description"
+          v-html="messages.field_description_network_fork_host"
         />
       </div>
+      <!-- OR, name -->
+      <div v-else class="form-group">
+        <Input
+          type="text"
+          v-model="accountPlan.name"
+          :placeholder="messages.field_label_network_name"
+          v-validate="'required'"
+          name="name"
+          class="form-control"
+          :class="{ 'is-invalid': submitted && errors.has('name') }"
+        />
+        <div
+          v-if="submitted && errors.has('name')"
+          class="invalid-feedback d-block"
+        >
+          {{ errors.first('name') }}
+        </div>
+      </div>
+
       <div class="form-group" v-if="domains">
         <v-select
+          :clearable="false"
           v-validate="'required'"
           :placeholder="messages.field_label_network_domain"
           :options="domains"
@@ -32,12 +92,16 @@
           label="name"
         >
           <template v-slot:selected-option="option">
-            <span>{{messages.field_label_network_domain}}: {{ option.name }}</span>
+            <span
+              >{{ messages.field_label_network_domain }}:
+              {{ option.name }}</span
+            >
           </template>
         </v-select>
       </div>
       <div class="form-group" v-if="nearestRegions">
         <v-select
+          :clearable="false"
           v-validate="'required'"
           :placeholder="messages.field_label_region"
           :options="nearestRegions"
@@ -47,7 +111,7 @@
         >
           <template v-slot:selected-option="option">
             <span>
-              {{messages.field_label_region}}: {{ option.name }}
+              {{ messages.field_label_region }}: {{ option.name }}
               {{ regionDistance(option.uuid) }}
             </span>
           </template>
@@ -56,8 +120,23 @@
           </template>
         </v-select>
       </div>
+      <div class="form-group">
+        <Checkbox
+          :label="messages.field_label_flex_region"
+          v-model="flexRegion"
+        />
+        <p class="description">
+          {{
+            flexRegion
+              ? messages.field_label_flex_region_description
+              : messages.field_label_exact_region_description
+          }}
+        </p>
+      </div>
+
       <div class="form-group" v-if="localeTexts">
         <v-select
+          :clearable="false"
           v-validate="'required'"
           :placeholder="messages.field_label_locale"
           :options="localeTexts"
@@ -66,12 +145,13 @@
           label="label"
         >
           <template v-slot:selected-option="option">
-            <span>{{messages.field_label_locale}}: {{ option.label }}</span>
+            <span>{{ messages.field_label_locale }}: {{ option.label }}</span>
           </template>
         </v-select>
       </div>
       <div class="form-group" v-if="timezoneObjects">
         <v-select
+          :clearable="false"
           v-validate="'required'"
           :placeholder="messages.field_label_timezone"
           :options="timezoneObjects"
@@ -82,12 +162,16 @@
           name="timezone"
         >
           <template v-slot:selected-option="option">
-            <span>{{messages.field_label_timezone}}: {{ option.timezoneDescription }}</span>
+            <span>
+              {{ messages.field_label_timezone }}:
+              {{ option.timezoneDescription }}
+            </span>
           </template>
         </v-select>
       </div>
       <div class="form-group" v-if="footprintObjects">
         <v-select
+          :clearable="false"
           v-validate="'required'"
           :placeholder="messages.field_label_footprint"
           :options="footprintObjects"
@@ -96,28 +180,39 @@
           label="localName"
         >
           <template v-slot:selected-option="option">
-            <span>{{messages.field_label_footprint}}: {{ option.localName }}</span>
+            <span>
+              {{ messages.field_label_footprint }}:
+              {{ option.localName }}
+            </span>
           </template>
         </v-select>
       </div>
       <div class="form-group">
         <v-select
+          :clearable="false"
           :placeholder="messages.field_label_network_ssh_key"
           :options="sshKeys"
         >
           <template v-slot:selected-option="option">
-            <span>{{messages.field_label_network_ssh_key}}: {{ option.name }}</span>
+            <span>
+              {{ messages.field_label_network_ssh_key }}:
+              {{ option.name }}
+            </span>
           </template>
           <template v-slot:option="option">
             {{ option.name }}
             (
-            <span v-if="option.expiration">{{
-              messages.date_format_ssh_key_expiration.parseDateMessage(
-                option.expiration,
-                messages
-              )
-            }}</span>
-            <span v-else>{{ messages.message_ssh_key_no_expiration }}</span>
+            <span v-if="option.expiration">
+              {{
+                messages.date_format_ssh_key_expiration.parseDateMessage(
+                  option.expiration,
+                  messages
+                )
+              }}
+            </span>
+            <span v-else>
+              {{ messages.message_ssh_key_no_expiration }}
+            </span>
             )
           </template>
         </v-select>
@@ -233,6 +328,9 @@ export default {
         paymentMethodType: null,
         paymentInfo: null,
       },
+      forkHost: '',
+      syncAccount: true,
+      launchLock: false,
       sendErrors: true,
       sendMetrics: true,
     },
@@ -245,11 +343,20 @@ export default {
       region: '',
       sshKey: '',
     },
+    flexRegion: true,
     cloudRegionUuid: '',
+    networkType: 'bubble',
+    submitted: false,
   }),
 
   computed: {
-    ...mapState('system', ['configs', 'messages', 'locales', 'timezones']),
+    ...mapState('system', [
+      'configs',
+      'messages',
+      'locales',
+      'timezones',
+      'detectedTimezone',
+    ]),
     ...mapState('domains', ['domains']),
     ...mapState('networks', ['nearestRegions', 'newNodeNotification']),
     ...mapState('footprints', ['footprints']),
@@ -265,6 +372,19 @@ export default {
         });
       }
       return tz_objects;
+    },
+
+    networkTypeOptions: function() {
+      return [
+        {
+          name: this.messages.field_label_network_type_regular,
+          value: 'bubble',
+        },
+        {
+          name: this.messages.field_label_network_type_fork,
+          value: 'fork',
+        },
+      ];
     },
 
     isComplete() {
@@ -301,6 +421,16 @@ export default {
           }))
         : [];
     },
+
+    showForkOption() {
+      return (
+        this.configs &&
+        this.configs.sageLauncher &&
+        this.configs.sageLauncher === true &&
+        this.user &&
+        this.user.admin === true
+      );
+    },
   },
 
   methods: {
@@ -309,6 +439,7 @@ export default {
     ...mapActions('footprints', ['getAllFootprints']),
     ...mapActions('users', ['listSshKeysByUserId']),
     ...mapGetters('networks', ['loading']),
+    ...mapActions('paymentMethods', ['getAllAccountPaymentMethods']),
 
     setAccountPaymentMethod(apm) {
       this.accountPlan.paymentMethodObject = {
@@ -344,6 +475,11 @@ export default {
         errors: this.errors,
       });
       this.getAllFootprints({
+        userId: currentUser.uuid,
+        messages: this.messages,
+        errors: this.errors,
+      });
+      this.getAllAccountPaymentMethods({
         userId: currentUser.uuid,
         messages: this.messages,
         errors: this.errors,
@@ -446,6 +582,7 @@ export default {
         this.defaults.domain = doms[0].name;
       }
     },
+
     detectedTimezone(tz) {
       if (tz && tz.timeZoneId) {
         if (
@@ -457,6 +594,7 @@ export default {
           this.defaults.timezone = tz.timeZoneId;
       }
     },
+
     detectedLocale(loc) {
       if (loc) {
         if (this.accountPlan.locale === null || this.accountPlan.locale === '')
@@ -464,12 +602,16 @@ export default {
         this.defaults.locale = loc;
       }
     },
+
     newNodeNotification(nn) {
       if (nn && nn.uuid) {
-        this.$router.push({ path: '/new_pages/launching-bubble/' + nn.networkName });
+        this.$router.push({
+          path: '/launching-bubble/' + nn.networkName,
+        });
         this.submitted = false;
       }
     },
+
     nearestRegions(regions) {
       if (regions) {
         this.regions = regions;
@@ -490,50 +632,6 @@ export default {
       }
     },
 
-    domains(doms) {
-      if (doms && doms[0]) {
-        if (this.accountPlan.domain == null || this.accountPlan.domain === '')
-          this.accountPlan.domain = doms[0].name;
-        this.defaults.domain = doms[0].name;
-      }
-    },
-    detectedTimezone(tz) {
-      if (tz && tz.timeZoneId) {
-        if (
-          this.accountPlan.timezone == null ||
-          this.accountPlan.timezone === ''
-        )
-          this.accountPlan.timezone = tz.timeZoneId;
-        if (this.defaults.timezone == null || this.defaults.timezone === '')
-          this.defaults.timezone = tz.timeZoneId;
-      }
-    },
-    detectedLocale(loc) {
-      if (loc) {
-        if (this.accountPlan.locale === null || this.accountPlan.locale === '')
-          this.accountPlan.locale = loc;
-        this.defaults.locale = loc;
-      }
-    },
-    nearestRegions(regions) {
-      if (regions) {
-        this.regions = regions;
-        if (
-          this.cloudRegionUuid === null ||
-          typeof regions.find((r) => r.uuid === this.cloudRegionUuid) ===
-            'undefined'
-        ) {
-          this.cloudRegionUuid = regions[0].uuid;
-        }
-        if (
-          this.defaults.region === '' ||
-          typeof regions.find((r) => r.uuid === this.defaults.region.uuid) ===
-            'undefined'
-        ) {
-          this.defaults.region = regions[0];
-        }
-      }
-    },
     accountPaymentMethods(pms) {
       if (pms) {
         const payMethods = [];

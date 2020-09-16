@@ -2,7 +2,10 @@
 <template>
   <div class="wrapper">
     <h3 class="text-center form-title">
-      {{ messages.label_welcome_message.parseExpression({ user }) }}
+      {{
+        messages.label_welcome_message &&
+          messages.label_welcome_message.parseExpression({ user })
+      }}
     </h3>
     <h3 class="d-flex align-items-center justify-content-center form-sub-title">
       <span class="text-center">
@@ -27,7 +30,7 @@
     <a class="how-it-works-section-link text-center d-block mt-5" href="#">
       {{ messages.how_it_works_title }}
     </a>
-    <AdvancedSettingsModal ref="settingsModal" />
+    <LaunchBubbleSettingsModal ref="settingsModal" />
   </div>
 </template>
 
@@ -58,28 +61,150 @@
 </style>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapGetters } from 'vuex';
 import Lottie from 'lottie-web';
 
 import { util } from '~/_helpers';
 import { Button } from '~/_components/shared';
-import { AdvancedSettingsModal } from '~/_components/modals';
+import { LaunchBubbleSettingsModal } from '~/_components/modals';
 
 export default {
   components: {
     Button,
-    AdvancedSettingsModal,
+    LaunchBubbleSettingsModal,
   },
 
-  data() {
-    return {
-      lottie: null,
-    };
-  },
+  data: () => ({
+    lottie: null,
+    user: util.currentUser(),
+    accountPlan: {
+      name: '',
+      domain: '',
+      locale: util.currentUser().locale,
+      timezone: '',
+      plan: 'bubble',
+      footprint: 'Worldwide',
+      sshKey: '',
+      paymentMethodObject: {
+        uuid: null,
+        paymentMethodType: null,
+        paymentInfo: null,
+      },
+      forkHost: '',
+      syncAccount: true,
+      launchLock: false,
+      sendErrors: true,
+      sendMetrics: true,
+    },
+    defaults: {
+      domain: '',
+      locale: 'en_US',
+      timezone: '',
+      plan: 'bubble',
+      footprint: 'Worldwide',
+      region: '',
+      sshKey: '',
+    },
+    flexRegion: true,
+    cloudRegionUuid: '',
+    networkType: 'bubble',
+    submitted: false,
+  }),
 
   computed: {
-    ...mapState('system', ['messages']),
-    ...mapState('account', ['user']),
+    ...mapState('system', [
+      'configs',
+      'messages',
+      'locales',
+      'timezones',
+      'detectedTimezone',
+    ]),
+    ...mapState('domains', ['domains']),
+    ...mapState('networks', ['nearestRegions', 'newNodeNotification']),
+    ...mapState('footprints', ['footprints']),
+    ...mapState('users', ['sshKeys']),
+    ...mapState('paymentMethods', ['accountPaymentMethods']),
+  },
+
+  methods: {
+    ...mapActions('domains', ['getAllDomains']),
+    ...mapActions('networks', ['getNearestRegions', 'addPlanAndStartNetwork']),
+    ...mapActions('footprints', ['getAllFootprints']),
+    ...mapActions('users', ['listSshKeysByUserId']),
+    ...mapGetters('networks', ['loading']),
+    ...mapActions('paymentMethods', ['getAllAccountPaymentMethods']),
+
+    openSettingsModal(ev) {
+      ev.preventDefault();
+      this.$refs.settingsModal.show();
+    },
+
+    setAccountPaymentMethod(apm) {
+      this.accountPlan.paymentMethodObject = {
+        uuid: apm.uuid,
+        paymentMethodType: null,
+        paymentInfo: null,
+      };
+      return false;
+    },
+
+    show() {
+      this.$modal.show('advanced-settings');
+    },
+    hide() {
+      this.$modal.hide('advanced-settings');
+    },
+
+    addSSHKey() {
+      this.$refs.sshKeyModal.show();
+    },
+
+    initDefaults() {
+      const currentUser = util.currentUser();
+      this.getAllAccountPaymentMethods({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
+    },
+
+    findRegion(uuid) {
+      if (this.nearestRegions) {
+        for (let i = 0; i < this.nearestRegions.length; i++) {
+          if (this.nearestRegions[i].uuid === uuid)
+            return this.nearestRegions[i];
+        }
+      }
+      if (uuid !== null) console.log('findRegion: uuid not found: ' + uuid);
+      return null;
+    },
+
+    launchBubble() {
+      if (this.paymentInfo || this.accountPlan.paymentMethodObject.uuid) {
+        const cloudRegion = this.findRegion(this.cloudRegionUuid);
+        if (cloudRegion === null) {
+          this.errors.add({
+            field: 'region',
+            msg: this.messages['err_region_notFound'],
+          });
+        } else {
+          if (this.configs.requireSendMetrics) {
+            this.accountPlan.sendErrors = true;
+            this.accountPlan.sendMetrics = true;
+          } else {
+            if (this.accountPlan.sendErrors === null)
+              this.accountPlan.sendErrors = true;
+            if (this.accountPlan.sendMetrics === null)
+              this.accountPlan.sendMetrics = true;
+          }
+          this.addPlanAndStartNetwork({
+            userId: this.user.uuid,
+            accountPlan: this.accountPlan,
+            cloud: cloudRegion.cloud,
+            region: cloudRegion.internalName,
+            exactRegion: !this.flexRegion,
+            messages: this.messages,
+            errors: this.errors,
+          });
+        }
+      }
+    },
   },
 
   mounted() {
@@ -90,19 +215,90 @@ export default {
       autoplay: true,
       path: '/rocket-launch.json',
     });
+    this.initDefaults();
   },
 
-  methods: {
-    openSettingsModal(ev) {
-      ev.preventDefault();
-      this.$refs.settingsModal.show();
+  watch: {
+    domains(doms) {
+      if (doms && doms[0]) {
+        if (this.accountPlan.domain == null || this.accountPlan.domain === '')
+          this.accountPlan.domain = doms[0].name;
+        this.defaults.domain = doms[0].name;
+      }
     },
 
-    launchBubble() {
-      
+    detectedTimezone(tz) {
+      if (tz && tz.timeZoneId) {
+        if (
+          this.accountPlan.timezone == null ||
+          this.accountPlan.timezone === ''
+        )
+          this.accountPlan.timezone = tz.timeZoneId;
+        if (this.defaults.timezone == null || this.defaults.timezone === '')
+          this.defaults.timezone = tz.timeZoneId;
+      }
+    },
+
+    detectedLocale(loc) {
+      if (loc) {
+        if (this.accountPlan.locale === null || this.accountPlan.locale === '')
+          this.accountPlan.locale = loc;
+        this.defaults.locale = loc;
+      }
+    },
+
+    newNodeNotification(nn) {
+      if (nn && nn.uuid) {
+        this.$router.push({
+          path: '/launching-bubble/' + nn.networkName,
+        });
+        this.submitted = false;
+      }
+    },
+
+    nearestRegions(regions) {
+      if (regions) {
+        this.regions = regions;
+        if (
+          this.cloudRegionUuid === null ||
+          typeof regions.find((r) => r.uuid === this.cloudRegionUuid) ===
+            'undefined'
+        ) {
+          this.cloudRegionUuid = regions[0].uuid;
+        }
+        if (
+          this.defaults.region === '' ||
+          typeof regions.find((r) => r.uuid === this.defaults.region.uuid) ===
+            'undefined'
+        ) {
+          this.defaults.region = regions[0];
+        }
+      }
+    },
+
+    accountPaymentMethods(pms) {
+      if (pms) {
+        const payMethods = [];
+        for (let i = 0; i < pms.length; i++) {
+          const pm = pms[i];
+          if (
+            (typeof pm.promotion === 'undefined' ||
+              pm.promotion === null ||
+              !pm.promotion) &&
+            (typeof pm.deleted === 'undefined' || pm.deleted === null)
+          ) {
+            payMethods.push(pm);
+          }
+        }
+        this.accountPayMethods = payMethods;
+        if (
+          this.accountPlan.paymentMethodObject.uuid === null &&
+          payMethods.length > 0
+        ) {
+          this.setAccountPaymentMethod(payMethods[0]);
+        }
+      }
     },
   },
-
-  watch: {},
 };
 </script>
