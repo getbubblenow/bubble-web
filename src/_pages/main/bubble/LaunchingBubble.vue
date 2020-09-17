@@ -24,7 +24,11 @@
       >
         <!-- adapted from: https://code-boxx.com/simple-vanilla-javascript-progress-bar/ -->
         <div v-if="stats.percent" class="progress-wrap">
-          <div class="progress-bar" :style="'width: '+stats.percent+'%'" :id="'progressBar_'+networkId"></div>
+          <div
+            class="progress-bar"
+            :style="'width: ' + stats.percent + '%'"
+            :id="'progressBar_' + networkId"
+          ></div>
           <div class="progress-text">
             {{
               messages.label_percent.parseMessage(this, {
@@ -38,7 +42,7 @@
         </div>
         <hr />
       </div>
-      <Button color="default" width="195" height="60">
+      <Button color="default" width="195" height="60" @click="deleteNet">
         {{ messages.button_cancel_lauch_bubble }}
       </Button>
     </div>
@@ -118,6 +122,9 @@ export default {
       refresher: null,
       networkId: this.$route.params.id,
       lottie: null,
+      timerID: null,
+      frameNumber: 0,
+      targetFrameNumber: 0,
     };
   },
 
@@ -148,6 +155,17 @@ export default {
       autoplay: false,
       path: '/launching-bubble.json',
     });
+    this.frameNumber = 0;
+    this.targetFrameNumber = 20;
+
+    setTimeout(() => {
+      this.timerID = setInterval(() => {
+        if (this.frameNumber < this.targetFrameNumber) {
+          console.log(this.frameNumber);
+          this.frameNumber++;
+        }
+      }, 100);
+    }, 2000);
   },
 
   beforeDestroy() {
@@ -245,6 +263,18 @@ export default {
         }
       }
     },
+
+    deleteNet() {
+      if (confirm(this.messages.confirmation_network_action_delete)) {
+        this.errors.clear();
+        this.deleteNetwork({
+          userId: this.user.uuid,
+          networkId: this.networkId,
+          messages: this.messages,
+          errors: this.errors,
+        });
+      }
+    },
   },
 
   watch: {
@@ -283,6 +313,7 @@ export default {
           this.stats.messageKey.startsWith('meter_completed_');
         if ((this.statsError && !isStatsErrorRetry) || isStatsCompleted) {
           this.clearRefresherInterval(this.refresher);
+          this.$router.push(`/bubble/${this.networkId}`);
         }
       } else {
         // status not found for our network
@@ -290,16 +321,20 @@ export default {
       }
 
       if (this.stats) {
-        this.lottie.goToAndStop(
-          (this.lottie.totalFrames / 100) * this.stats.percent,
-          true
-        );
+        this.targetFrameNumber = 20 + (30 / 100) * this.stats.percent;
       }
     },
 
     deletedNetworkUuid(uuid) {
       if (uuid && this.networkUuid && uuid === this.networkUuid) {
         this.$router.replace({ path: '/bubbles' });
+      }
+    },
+
+    frameNumber() {
+      this.lottie.goToAndStop(this.frameNumber, true);
+      if (this.frameNumber >= 50) {
+        clearInterval(this.timerID);
       }
     },
   },

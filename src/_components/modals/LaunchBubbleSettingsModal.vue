@@ -2,10 +2,10 @@
 <template>
   <modal
     name="advanced-settings"
-    :adaptive="true"
     width="90%"
     :maxWidth="600"
     height="auto"
+    scrollable
   >
     <a class="close-btn" @click="hide">
       <i class="fa fa-times"></i>
@@ -294,6 +294,12 @@
   top: 15px;
   right: 20px;
   font-size: 20px;
+}
+
+.vm--modal {
+  max-width: 600px;
+  left: 50% !important;
+  transform: translate(-50%, 0) !important;
 }
 </style>
 

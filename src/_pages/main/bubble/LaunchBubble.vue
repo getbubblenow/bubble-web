@@ -17,7 +17,13 @@
       class="d-flex flex-column align-items-center justify-content-center mt-5 mx-auto launch-bubble-wrapper"
     >
       <div ref="lottie" class="lottie"></div>
-      <Button color="default" width="80%" height="60" @click="launchBubble">
+      <Button
+        color="default"
+        width="80%"
+        height="60"
+        @click="launchBubble"
+        :disabled="loading()"
+      >
         {{ messages.button_label_launch_bubble }}
       </Button>
 
@@ -161,7 +167,11 @@ export default {
 
     initDefaults() {
       const currentUser = util.currentUser();
-      this.getAllAccountPaymentMethods({userId: currentUser.uuid, messages: this.messages, errors: this.errors});
+      this.getAllAccountPaymentMethods({
+        userId: currentUser.uuid,
+        messages: this.messages,
+        errors: this.errors,
+      });
     },
 
     findRegion(uuid) {
