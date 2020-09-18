@@ -12,7 +12,7 @@
           v-if="status.loggedIn !== true"
           class="d-flex justify-content-center align-items-center"
         >
-          <router-link to="/help" class="d-flex align-items-center">
+          <router-link to="/support" class="d-flex align-items-center">
             <Button headerLink>
               {{ messages.button_label_help }}
             </Button>
@@ -70,7 +70,7 @@
               {{ messages.label_menu_account }}
             </Button>
           </router-link>
-          <router-link to="/help" class="d-flex align-items-center">
+          <router-link to="/support" class="d-flex align-items-center">
             <Button headerLink>
               {{ messages.button_label_help }}
             </Button>
@@ -131,7 +131,7 @@
         <router-link to="/me" class="dropdown-item">
           {{ messages.label_menu_account }}
         </router-link>
-        <router-link class="dropdown-item" to="/help">
+        <router-link class="dropdown-item" to="/support">
           {{ messages.button_label_help }}
         </router-link>
         <router-link class="dropdown-item" to="/logout">

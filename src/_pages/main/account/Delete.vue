@@ -2,7 +2,7 @@
 <template>
   <div class="bubble-form">
     <h4 class="text-center form-title">
-      {{ messages.manage_account_delete_title }}
+      {{ messages.manage_account_delete_backup_title }}
     </h4>
 
     <span v-if="me && currentUser.name != 'root'">

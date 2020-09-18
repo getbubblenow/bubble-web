@@ -69,7 +69,7 @@ export const router = new Router({
     // { path: '/legal', component: LegalPage },
     // { path: '/support', component: SupportPage },
 
-    // { path: '/me', component: ProfilePage },
+    // { path: '/me/old', component: ProfilePage },
     // { path: '/me/policy', component: PolicyPage },
     {
       path: '/me/download/:uuid',
@@ -79,7 +79,7 @@ export const router = new Router({
       }),
     },
     { path: '/me/action', component: ActionPage },
-    // { path: '/me/changePassword', component: ChangePasswordPage },
+    // { path: '/me/changePassword/old', component: ChangePasswordPage },
     // { path: '/me/setPassword/:code', component: SetPasswordPage },
     // { path: '/me/keys', component: SshKeysPage },
     // { path: '/me/bills', component: BillsPage },

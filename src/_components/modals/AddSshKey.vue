@@ -134,6 +134,13 @@ export default {
 
     show() {
       this.$modal.show('add-ssh-key');
+
+      this.name = '';
+      this.sshPublicKey = '';
+      this.minExpiration = new Date().toISOString();
+      this.expiration = null;
+      this.timezone = this.detectedTimezone.timeZoneId;
+      this.submitted = false;
     },
     hide() {
       this.$modal.hide('add-ssh-key');

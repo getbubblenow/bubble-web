@@ -144,8 +144,14 @@ const actions = {
         commit('addSshKeyByUserIdRequest');
         return userService.addSshKeyByUserId(userId, sshKey, messages, errors)
             .then(
-                key => commit('addSshKeyByUserIdSuccess', key),
-                error => commit('addSshKeyByUserIdFailure', error)
+                key => {
+                    commit('addSshKeyByUserIdSuccess', key);
+                    return Promise.resolve();
+                },
+                error => {
+                    commit('addSshKeyByUserIdFailure', error);
+                    return Promise.reject();
+                }
             );
     },
 

@@ -2,6 +2,7 @@
 <template>
   <input
     v-bind="$attrs"
+    v-on="nativeEvents"
     v-model="content"
     @input="handleInput()"
     class="form-input"
@@ -18,6 +19,7 @@ export default {
       default: '',
     },
   },
+
   data() {
     return {
       content: this.value,
@@ -26,6 +28,13 @@ export default {
   watch: {
     value(v) {
       this.content = v;
+    },
+  },
+  computed: {
+    nativeEvents() {
+      return Object.keys(this.$listeners)
+        .filter((e) => e !== 'input')
+        .reduce((obj, v) => ({ ...obj, [v]: this.$listeners[v] }), {});
     },
   },
   methods: {

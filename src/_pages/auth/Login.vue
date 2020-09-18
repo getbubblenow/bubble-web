@@ -48,6 +48,7 @@
             'is-invalid': submitted && errors.has('password'),
           }"
           v-model="password"
+          @keyup.enter="submit"
           :placeholder="messages.field_label_enter_password"
         />
         <div
@@ -65,6 +66,7 @@
             'is-invalid': submitted && errors.has('totpToken'),
           }"
           v-model="totpToken"
+          @keyup.enter="submit"
           :placeholder="messages.field_label_totp_code"
         />
         <div
@@ -177,6 +179,7 @@ export default {
     ...mapActions('account', ['login', 'logout']),
 
     submit() {
+      console.log('submit');
       this.errors.clear();
       this.$v.$touch();
       this.submitted = true;
