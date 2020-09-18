@@ -104,14 +104,15 @@
                 <div v-if="showForkOption">
                 <!-- network type -->
                 <div class="form-group">
-                    <label for="networkType">{{messages.field_label_network_type}}</label>
-                    <select v-model="networkType" name="networkType" class="form-control">
-                        <option value="bubble">{{messages.field_label_network_type_regular}}</option>
-                        <option value="fork">{{messages.field_label_network_type_fork}}</option>
+                    <label for="launchType">{{messages.field_label_network_type}}</label>
+                    <select v-model="accountPlan.launchType" name="launchType" class="form-control">
+                        <option value="node">{{messages.field_label_network_type_regular}}</option>
+                        <option value="fork_sage">{{messages.field_label_network_type_fork_sage}}</option>
+                        <option value="fork_node">{{messages.field_label_network_type_fork_node}}</option>
                     </select>
                 </div>
                 <!-- fork host -->
-                <div v-if="networkType === 'fork'" class="form-group">
+                <div v-if="accountPlan.launchType === 'fork_sage' || accountPlan.launchType === 'fork_node'" class="form-group">
                     <label for="forkHost">{{messages.field_label_network_fork_host}}</label>
                     <input type="text" v-model="accountPlan.forkHost" name="forkHost" class="form-control" :class="{ 'is-invalid': submitted && errors.has('forkHost') }" />
                     <div v-if="submitted && errors.has('forkHost')" class="invalid-feedback d-block">{{ errors.first('forkHost') }}</div>
@@ -149,7 +150,7 @@
             </div>
             <div>
                 {{messages['plan_description_'+accountPlan.plan]}}
-                <div v-if="networkType === 'fork'"><hr/>{{messages.message_plan_fork_apps}}</div>
+                <div v-if="accountPlan.launchType === 'fork_sage' || accountPlan.launchType === 'fork_node'"><hr/>{{messages.message_plan_fork_apps}}</div>
                 <div v-else-if="selectedPlan && selectedPlan.apps && selectedPlan.apps.length > 0">
                     <div v-if="typeof selectedPlan.maxAccounts !== 'undefined' && selectedPlan.maxAccounts !== null && selectedPlan.maxAccounts === 1">&bullet; {{messages.message_plan_max_accounts_one}}</div>
                     <div v-else-if="typeof selectedPlan.maxAccounts !== 'undefined' && selectedPlan.maxAccounts !== null && selectedPlan.maxAccounts > 1">&bullet; {{messages.message_plan_max_accounts_multiple.parseExpression({max: selectedPlan.maxAccounts})}}</div>
@@ -283,7 +284,7 @@
 <!--                <p>{{messages.field_label_sync_account_description}}</p>-->
 <!--            </div>-->
             <!-- launch lock -->
-<!--            <div class="form-group" v-if="networkType !== 'fork'">-->
+<!--            <div class="form-group" v-if="accountPlan.launchType !== 'fork_sage' && accountPlan.launchType !== 'fork_node'">-->
 <!--                <label for="launchLock">{{messages.field_label_launch_lock}}</label>-->
 <!--                <input type="checkbox" id="launchLock" v-model="accountPlan.launchLock">-->
 <!--                <div v-if="submitted && errors.has('launchLock')" class="invalid-feedback d-block">{{ errors.first('launchLock') }}</div>-->
@@ -393,12 +394,12 @@
                     },
                     sshKey: '',
                     forkHost: '',
+                    launchType: 'node',
                     syncAccount: true,
                     launchLock: false,
                     sendErrors: true,
                     sendMetrics: true
                 },
-                networkType: 'bubble',
                 cloudRegionUuid: null,
                 regions: [],
                 customize: {
