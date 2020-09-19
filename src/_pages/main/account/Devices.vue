@@ -228,8 +228,11 @@
               <div v-if="device.status.lastHandshakeTime">
                 <hr />
                 {{ messages.label_field_device_connection_handshake }}:
+                <span v-if="device.status.lastHandshakeDay">
+                  {{ device.status.lastHandshakeDays }}{{ messages.units_days }}
+                </span>
                 <span
-                  v-if="
+                  v-else-if="
                     device.status.lastHandshakeHours &&
                       device.status.lastHandshakeMinutes
                   "

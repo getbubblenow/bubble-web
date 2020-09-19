@@ -145,7 +145,7 @@
             viewIsAvailable(view) {
                 if (typeof view.when === 'undefined' || view.when === null) return true;
                 try {
-                    return safeEval(view.when, {'configs': this.configs}) === true;
+                    return safeEval(view.when, {'configs': this.configs, 'account': this.user}) === true;
                 } catch (e) {
                     console.log('viewIsAvailable: error evaluating when='+view.when+': '+e);
                     return false;
@@ -171,9 +171,10 @@
                     const allConfigViews = a.dataConfig.configViews;
                     const appConfigViews = [];
                     for (let i=0; i<allConfigViews.length; i++) {
-                        if (typeof allConfigViews[i].root !== 'undefined' && allConfigViews[i].root !== null && allConfigViews[i].root === true) {
-                            if (this.viewIsAvailable(allConfigViews[i])) {
-                                appConfigViews.push(allConfigViews[i]);
+                      let configView = allConfigViews[i];
+                      if (typeof configView.root !== 'undefined' && configView.root !== null && configView.root === true) {
+                            if (this.viewIsAvailable(configView)) {
+                                appConfigViews.push(configView);
                             }
                         }
                     }

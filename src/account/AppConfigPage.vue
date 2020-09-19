@@ -199,7 +199,7 @@
             actionIsAvailable(action, row) {
                 if (typeof action.when === 'undefined' || action.when === null) return true;
                 try {
-                    return safeEval(action.when, {'item': row}) === true;
+                    return safeEval(action.when, {'item': row, 'account': this.user}) === true;
                 } catch (e) {
                     console.log('actionIsAvailable: error evaluating when='+action.when+' for item='+JSON.stringify(row)+': '+e);
                     return false;
