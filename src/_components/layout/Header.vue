@@ -1,6 +1,6 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
-  <div class="header d-flex align-items-center justify-content-center">
+  <header class="header d-flex align-items-center justify-content-center">
     <div class="d-flex justify-content-center align-items-center container ">
       <router-link to="/">
         <img src="/small-BubbleLogo-Horizontal-BlackText.png" height="40" />
@@ -139,7 +139,7 @@
         </router-link>
       </div>
     </div>
-  </div>
+  </header>
 </template>
 
 <style lang="scss" scoped>

@@ -62,23 +62,12 @@ const newNetworkChildren = [
 export const router = new Router({
   mode: 'history',
   routes: [
-
     // existing pages
-    { path: '', component: DashboardPage },
-    { path: '/', component: DashboardPage },
     // { path: '/legal', component: LegalPage },
     // { path: '/support', component: SupportPage },
 
     // { path: '/me/old', component: ProfilePage },
     // { path: '/me/policy', component: PolicyPage },
-    {
-      path: '/me/download/:uuid',
-      redirect: (r) => ({
-        path: '/me/policy',
-        query: { download: r.params.uuid },
-      }),
-    },
-    { path: '/me/action', component: ActionPage },
     // { path: '/me/changePassword/old', component: ChangePasswordPage },
     // { path: '/me/setPassword/:code', component: SetPasswordPage },
     // { path: '/me/keys', component: SshKeysPage },
@@ -89,69 +78,152 @@ export const router = new Router({
     //   children: paymentMethodsChildren,
     // },
     // { path: '/devices', component: DevicesPage },
-    { path: '/apps', component: AppsPage },
-    { path: '/app/:app', component: AppPage },
-    { path: '/app/:app/config/:view', component: AppConfigPage },
-    { path: '/app/:app/config/:view/:item', component: AppConfigPage },
-    { path: '/app/:app/view/:view', component: AppDataViewPage },
-    { path: '/app/:app/site/:site', component: AppSitePage },
-    { path: '/app/:app/site/:site/view/:view', component: AppDataViewPage },
-    { path: '/notifications', component: NotificationsPage },
-    {
-      path: '/bubbles',
-      component: NetworksPage,
-      children: [
-        {
-          path: '',
-          component: NewNetworkPage,
-          children: newNetworkChildren,
-        },
-      ],
-    },
-    {
-      path: '/new_bubble',
-      component: NewNetworkPage,
-      children: newNetworkChildren,
-    },
-    { path: '/bubble/:id', component: NetworkPage },
-    { path: '/action', component: ActionPage },
-    { path: '/resetPassword/:code', component: SetPasswordPage },
 
-    { path: '/activate', component: ActivationPage },
     // {
     //   path: '/register',
     //   component: RegisterPage,
     //   children: paymentMethodsChildren,
     // },
-    { path: '/auth', component: MultifactorAuthPage },
     // { path: '/login', component: LoginPage },
-    { path: '/logout', component: LogoutPage },
     // { path: '/forgotPassword', component: ForgotPasswordPage },
     // { path: '/appLogin', component: AppLoginPage },
     // { path: '/restore', component: RestorePage },
-
-    { path: '/admin/accounts', component: AccountsPage },
-    { path: '/admin/new_account', component: ProfilePage },
-    { path: '/admin/accounts/:id', component: ProfilePage },
-    { path: '/admin/accounts/:id/policy', component: PolicyPage },
-    {
-      path: '/admin/accounts/:id/changePassword',
-      component: ChangePasswordPage,
-    },
-    { path: '/admin/accounts/:id/keys', component: SshKeysPage },
-    { path: '/admin/accounts/:id/bills', component: BillsPage },
-    {
-      path: '/admin/accounts/:id/payment',
-      component: PaymentMethodsPage,
-      children: paymentMethodsChildren,
-    },
-    { path: '/admin/model', component: ModelSetupPage },
 
     // new route
     {
       path: '',
       component: () => import('~/_pages/Layout'),
       children: [
+        {
+          path: '',
+          component: () => import('~/_pages/main/Layout'),
+          children: [
+            { path: '', component: DashboardPage },
+            {
+              path: 'me/download/:uuid',
+              redirect: (r) => ({
+                path: 'me/policy',
+                query: { download: r.params.uuid },
+              }),
+            },
+            { path: 'me/action', component: ActionPage },
+            { path: 'apps', component: AppsPage },
+            { path: 'app/:app', component: AppPage },
+            { path: 'app/:app/config/:view', component: AppConfigPage },
+            {
+              path: 'app/:app/config/:view/:item',
+              component: AppConfigPage,
+            },
+            { path: 'app/:app/view/:view', component: AppDataViewPage },
+            { path: 'app/:app/site/:site', component: AppSitePage },
+            {
+              path: 'app/:app/site/:site/view/:view',
+              component: AppDataViewPage,
+            },
+            { path: 'notifications', component: NotificationsPage },
+            {
+              path: 'bubbles',
+              component: NetworksPage,
+              children: [
+                {
+                  path: '',
+                  component: NewNetworkPage,
+                  children: newNetworkChildren,
+                },
+              ],
+            },
+            {
+              path: 'new_bubble',
+              component: NewNetworkPage,
+              children: newNetworkChildren,
+            },
+            { path: 'bubble/:id', component: NetworkPage },
+            { path: 'action', component: ActionPage },
+            { path: 'resetPassword/:code', component: SetPasswordPage },
+
+            { path: 'activate', component: ActivationPage },
+            { path: 'auth', component: MultifactorAuthPage },
+            { path: 'admin/accounts', component: AccountsPage },
+            { path: 'admin/new_account', component: ProfilePage },
+            { path: 'admin/accounts/:id', component: ProfilePage },
+            { path: 'admin/accounts/:id/policy', component: PolicyPage },
+            {
+              path: 'admin/accounts/:id/changePassword',
+              component: ChangePasswordPage,
+            },
+            { path: 'admin/accounts/:id/keys', component: SshKeysPage },
+            { path: 'admin/accounts/:id/bills', component: BillsPage },
+            {
+              path: 'admin/accounts/:id/payment',
+              component: PaymentMethodsPage,
+              children: paymentMethodsChildren,
+            },
+            { path: 'admin/model', component: ModelSetupPage },
+            {
+              path: 'me',
+              exact: true,
+              component: () => import('~/_pages/main/account/MyAccount'),
+            },
+            {
+              path: 'me/changePassword',
+              component: () => import('~/_pages/main/account/ChangePassword'),
+            },
+            {
+              path: 'me/setPassword/:code',
+              component: () => import('~/_pages/main/account/SetPassword'),
+            },
+            {
+              path: 'me/keys',
+              component: () => import('~/_pages/main/account/ManageSSH'),
+            },
+            {
+              path: 'me/payment',
+              component: () => import('~/_pages/main/account/PaymentMethods'),
+            },
+            {
+              path: 'me/bills',
+              component: () => import('~/_pages/main/account/Bills'),
+            },
+            {
+              path: 'me/policy',
+              component: () => import('~/_pages/main/account/Policy'),
+            },
+            {
+              path: 'me/delete',
+              component: () => import('~/_pages/main/account/Delete'),
+            },
+
+            {
+              path: 'devices',
+              component: () => import('~/_pages/main/account/Devices'),
+            },
+
+            {
+              path: 'bubble/:id',
+              component: () => import('~/_pages/main/bubble/Network'),
+            },
+            {
+              path: 'restore',
+              component: () => import('~/_pages/main/bubble/Restore'),
+            },
+            {
+              path: 'legal',
+              component: () => import('~/_pages/main/account/Legal'),
+            },
+            {
+              path: 'support',
+              component: () => import('~/_pages/main/account/Support'),
+            },
+            {
+              path: 'launch-bubble',
+              component: () => import('~/_pages/main/bubble/LaunchBubble'),
+            },
+            {
+              path: 'launching-bubble/:id',
+              component: () => import('~/_pages/main/bubble/LaunchingBubble'),
+            },
+          ],
+        },
         {
           path: '',
           component: () => import('~/_pages/auth/Layout'),
@@ -172,98 +244,22 @@ export const router = new Router({
               path: 'appLogin',
               component: () => import('~/_pages/auth/AppLogin'),
             },
-          ],
-        },
-        {
-          path: '',
-          component: () => import('~/_pages/main/Layout'),
-          children: [
             {
-              path: '',
-              component: () => import('~/_pages/main/account/Layout'),
-              children: [
-                {
-                  path: 'verifyEmail',
-                  component: () => import('~/_pages/main/account/VerifyEmail'),
-                },
-                {
-                  path: 'payment',
-                  component: () => import('~/_pages/main/account/Payment'),
-                },
-                {
-                  path: 'me',
-                  exact: true,
-                  component: () => import('~/_pages/main/account/MyAccount'),
-                },
-                {
-                  path: 'me/changePassword',
-                  component: () =>
-                    import('~/_pages/main/account/ChangePassword'),
-                },
-                {
-                  path: 'me/setPassword/:code',
-                  component: () => import('~/_pages/main/account/SetPassword'),
-                },
-                {
-                  path: 'me/keys',
-                  component: () => import('~/_pages/main/account/ManageSSH'),
-                },
-                {
-                  path: 'me/payment',
-                  component: () =>
-                    import('~/_pages/main/account/PaymentMethods'),
-                },
-                {
-                  path: 'me/bills',
-                  component: () => import('~/_pages/main/account/Bills'),
-                },
-                {
-                  path: 'me/policy',
-                  component: () => import('~/_pages/main/account/Policy'),
-                },
-                {
-                  path: 'me/delete',
-                  component: () => import('~/_pages/main/account/Delete'),
-                },
-
-                {
-                  path: 'devices',
-                  component: () => import('~/_pages/main/account/Devices'),
-                },
-
-                {
-                  path: 'bubble/:id',
-                  component: () => import('~/_pages/main/bubble/Network'),
-                },
-                {
-                  path: 'restore',
-                  component: () => import('~/_pages/main/bubble/Restore'),
-                },
-                {
-                  path: 'legal',
-                  component: () => import('~/_pages/main/account/Legal'),
-                },
-                {
-                  path: 'support',
-                  component: () => import('~/_pages/main/account/Support'),
-                },
-              ],
+              path: 'verifyEmail',
+              component: () => import('~/_pages/auth/VerifyEmail'),
             },
             {
-              path: 'launch-bubble',
-              component: () => import('~/_pages/main/bubble/LaunchBubble'),
+              path: 'payment',
+              component: () => import('~/_pages/auth/Payment'),
             },
-            {
-              path: 'launching-bubble/:id',
-              component: () => import('~/_pages/main/bubble/LaunchingBubble'),
-            },
+            { path: 'logout', component: () => import('~/auth/LogoutPage') },
           ],
         },
       ],
     },
 
     // otherwise redirect to dashboard
-    { path: '*', redirect: '/' },
+    { path: '*', redirect: '' },
   ],
 });
 
@@ -281,10 +277,10 @@ const publicPages = [
   '/legal',
 
   // new Pages
-  '/new_pages',
 ];
 
 router.beforeEach((to, from, next) => {
+  console.log('to', to);
   const authRequired =
     !publicPages.includes(to.path) &&
     publicPages.filter((p) => to.path.startsWith(p)).length === 0;

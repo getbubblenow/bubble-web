@@ -163,7 +163,7 @@
 </template>
 
 <style lang="scss" scoped>
-@import '../../../_scss/components/form';
+@import '../../_scss/components/form';
 
 .features-section-link {
   color: $vivid-navy;

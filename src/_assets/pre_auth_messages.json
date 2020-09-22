@@ -1,2 +1,9 @@
 {
+  "footer_links": "get_help,legal_stuff,about_bubble",
+  "title_get_help": "Get Help",
+  "title_legal_stuff": "Legal Stuff",
+  "title_about_bubble": "About Bubble",
+  "link_get_help": "https://example.com/get_help",
+  "link_legal_stuff": "https://example.com/legal_stuff",
+  "link_about_bubble": "https://example.com/about_bubble"
 }

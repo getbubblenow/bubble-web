@@ -8,7 +8,7 @@
       <span class="text-center white-text">
         {{ messages.resend_verify_email_label }}
       </span>
-      <a class="resend-btn" href="#">
+      <a class="resend-btn" href="#" @click="resendVerification(firstContact)">
         {{ messages.button_label_resend_verify_email }}
       </a>
     </h4>
@@ -53,18 +53,31 @@
 </style>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 import Lottie from 'lottie-web';
 
+import { util } from '~/_helpers'
 import { Features } from '~/_components/sections';
+
+// convenience methods
+import { isAuthenticator, isNotAuthenticator } from '~/_store/users.module';
+window.isAuthenticator = isAuthenticator;
+window.isNotAuthenticator = isNotAuthenticator;
 
 export default {
   components: {
     Features,
   },
 
+  data() {
+    return {
+      firstContact: null,
+    };
+  },
+
   computed: {
     ...mapState('system', ['messages']),
+    ...mapState('users', ['policy']),
   },
 
   mounted() {
@@ -75,6 +88,38 @@ export default {
       autoplay: true,
       path: '/green_email_sent.json',
     });
+  },
+
+  methods: {
+    ...mapActions('account', ['resendVerificationCode']),
+
+    getFirstContact(policy) {
+      if (policy && policy.accountContacts) {
+        const contacts = policy.accountContacts;
+        for (let i = 0; i < contacts.length; i++) {
+          if (isNotAuthenticator(contacts[i])) return contacts[i];
+        }
+        return null;
+      }
+      return null;
+    },
+
+    resendVerification(contact) {
+      console.log(contact);
+      this.resendVerificationCode({
+        userId: util.currentUser().uuid,
+        contact: contact,
+        messages: this.messages,
+        errors: this.errors,
+      });
+      return false; // do not follow the click
+    },
+  },
+
+  watch: {
+    policy(p) {
+      this.firstContact = this.getFirstContact(p);
+    },
   },
 };
 </script>

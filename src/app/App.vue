@@ -1,18 +1,15 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
-  <div v-if="isNewPage" class="page-container">
-    <Header></Header>
-
+  <div class="page-container">
     <router-view></router-view>
     <vue-snotify></vue-snotify>
+    <totp-modal />
   </div>
-  <div v-else>
+  <!-- <div v-else>
     <Header></Header>
     <div v-if="!configs"><img :src="loadingImgSrc" /></div>
 
     <div v-else class="jumbotron">
-      <totp-modal />
-
       <table
         v-if="
           this.user !== null &&
@@ -106,14 +103,14 @@
         >
       </div>
     </div>
-  </div>
+  </div> -->
 </template>
 
 <style lang="scss">
 @import '../_scss/base';
 
 .page-container {
-  height: 100vh;
+  min-height: 100vh;
 }
 </style>
 
@@ -121,13 +118,9 @@
 import { mapState, mapActions, mapGetters } from 'vuex';
 import { util } from '~/_helpers';
 import { loadingImgSrc } from '~/_store';
-import { Header } from '~/_components/layout';
 
 export default {
   name: 'app',
-  components: {
-    Header,
-  },
   data() {
     return {
       showLocaleSelector: false,
@@ -197,7 +190,7 @@ export default {
         '/support',
         '/legal',
       ];
-      
+
       return (
         newPages.includes(this.$route.path) ||
         newPages.filter((p) => this.$route.path.startsWith(p)).length

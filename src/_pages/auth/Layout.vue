@@ -1,6 +1,8 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
   <div class="background w-100 h-100">
+    <Header></Header>
+
     <div
       :class="backgroundClass"
       class="auth-layout d-flex flex-column content"
