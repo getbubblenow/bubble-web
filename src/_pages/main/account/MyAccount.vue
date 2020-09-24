@@ -1,13 +1,12 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
   <div>
-    <!--- We've Got You Covered Section --->
     <h1 class="title text-center">
       {{ messages.title_my_account }}
     </h1>
-    <div class="row" v-if="messages && messages.manage_account_actions">
+    <div class="row" v-if="messages && manage_account_actions">
       <div
-        v-for="(item, index) in messages.manage_account_actions.split(',')"
+        v-for="(item, index) in manage_account_actions"
         :key="index"
         class="col-lg-6 col-md-6 col-sm-12 my-4 px-3"
       >
@@ -58,13 +57,31 @@
 <script>
 import { mapState } from 'vuex';
 import { Card } from '~/_components/shared';
+import { util } from '~/_helpers';
 
 export default {
+  data() {
+    return { currentUser: util.currentUser() }
+  },
   components: {
     Card,
   },
   computed: {
-    ...mapState('system', ['messages']),
+    ...mapState('system', ['messages', 'configs']),
+    manage_account_actions: function () {
+      const account_actions = this.configs.bubbleNode === true ? 'manage_account_node_actions' : 'manage_account_sage_actions';
+      const actions = this.messages[account_actions].split(',');
+      if (this.currentUser.admin && this.currentUser.firstAdmin) {
+        const delete_index = actions.indexOf('delete');
+        return delete_index === -1 ? actions : actions.splice(delete_index,1);
+      }
+      return actions;
+    }
   },
+  methods: {
+    show_action: function(item) {
+      return !(item === 'delete' && this.currentUser.admin && this.currentUser.firstAdmin);
+    }
+  }
 };
 </script>
