@@ -6,8 +6,8 @@
       <Sidebar />
       <div class="flex-grow-1 p-4">
         <header>
-          <p class="mb-0">{{ messages.label_homepage_welcome }},</p>
-          <p class="name">{{ currentUser.name }} 👋</p>
+<!--          <p class="mb-0">{{ messages.label_homepage_welcome }},</p>-->
+<!--          <p class="name">{{ currentUser.name }} 👋</p>-->
         </header>
         <main>
           <router-view></router-view>
