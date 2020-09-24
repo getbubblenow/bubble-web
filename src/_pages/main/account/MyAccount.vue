@@ -71,12 +71,14 @@ export default {
     manage_account_actions: function () {
       if (this.messages) {
         const account_actions = this.configs.bubbleNode === true ? 'manage_account_node_actions' : 'manage_account_sage_actions';
-        const actions = this.messages[account_actions].split(',');
-        if (this.currentUser.admin && this.currentUser.firstAdmin) {
-          const delete_index = actions.indexOf('delete');
-          if (delete_index !== -1) actions.splice(delete_index, 1);
+        if (this.messages[account_actions]) {
+          const actions = this.messages[account_actions].split(',');
+          if (this.currentUser.admin && this.currentUser.firstAdmin) {
+            const delete_index = actions.indexOf('delete');
+            if (delete_index !== -1) actions.splice(delete_index, 1);
+          }
+          return actions;
         }
-        return actions;
       }
     }
   },
