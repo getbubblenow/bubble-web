@@ -56,7 +56,7 @@
 import { mapState, mapActions } from 'vuex';
 import Lottie from 'lottie-web';
 
-import { util } from '~/_helpers'
+import { util } from '~/_helpers';
 import { Features } from '~/_components/sections';
 
 // convenience methods

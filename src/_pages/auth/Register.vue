@@ -220,6 +220,7 @@ export default {
       paymentMethodObject: null,
       confirmPassword: '',
       submitted: false,
+      preferredPlan: null,
     };
   },
 
@@ -314,6 +315,7 @@ export default {
             receivePromotionalMessages: this.receivePromotionalMessages,
             agreeToTerms: this.agreeToTerms,
             promoCode: this.promoCode,
+            preferredPlan: this.preferredPlan,
           },
           messages: this.messages,
           errors: this.errors,
@@ -346,7 +348,7 @@ export default {
     },
     plan(p) {
       if (p.uuid) {
-        this.user.preferredPlan = p.uuid;
+        this.preferredPlan = p.uuid;
       }
     },
     configs(configs) {

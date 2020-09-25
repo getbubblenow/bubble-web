@@ -31,7 +31,11 @@
 
       <!-- Navigation -->
       <div class="navigation">
-        <router-link to="/bubble" class="navigation-item" @click.native="closeMenu()">
+        <router-link
+          to="/bubble"
+          class="navigation-item"
+          @click.native="closeMenu()"
+        >
           <i class="fa fa-home icon icon-home"></i>
           <span>{{ messages.label_menu_network }}</span>
         </router-link>
@@ -72,16 +76,24 @@
           <span>{{ messages.label_menu_settings }}</span>
         </router-link> -->
 
-        <router-link to="/support" class="navigation-item" @click.native="closeMenu()">
+        <router-link
+          to="/support"
+          class="navigation-item"
+          @click.native="closeMenu()"
+        >
           <i class="fa fa-question-circle icon icon-help"></i>
           <span>{{ messages.label_menu_help }}</span>
         </router-link>
       </div>
       <!-- Upgrade Plan -->
 
-      <div class="flex-grow-1"></div>
+      <!-- <div class="flex-grow-1"></div> -->
       <!-- Logout -->
-      <router-link to="/logout" class="logout-button" @click.native="closeMenu()">
+      <router-link
+        to="/logout"
+        class="logout-button"
+        @click.native="closeMenu()"
+      >
         <Button color="outline" block>
           {{ messages.log_out }}
         </Button>
@@ -281,7 +293,7 @@ export default {
     closeMenu() {
       console.log('click.nativeed');
       this.menuVisible = false;
-    }
+    },
   },
 };
 </script>

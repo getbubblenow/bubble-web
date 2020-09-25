@@ -92,28 +92,6 @@ export const router = new Router({
           children: [
             { path: '', component: DashboardPage },
             {
-              path: 'me/download/:uuid',
-              redirect: (r) => ({
-                path: 'me/policy',
-                query: { download: r.params.uuid },
-              }),
-            },
-            { path: 'me/action', component: ActionPage },
-            { path: 'apps', component: AppsPage },
-            { path: 'app/:app', component: AppPage },
-            { path: 'app/:app/config/:view', component: AppConfigPage },
-            {
-              path: 'app/:app/config/:view/:item',
-              component: AppConfigPage,
-            },
-            { path: 'app/:app/view/:view', component: AppDataViewPage },
-            { path: 'app/:app/site/:site', component: AppSitePage },
-            {
-              path: 'app/:app/site/:site/view/:view',
-              component: AppDataViewPage,
-            },
-            { path: 'notifications', component: NotificationsPage },
-            {
               path: 'bubble',
               component: () => import('~/_pages/main/bubble/MyBubble'),
             },
@@ -293,7 +271,7 @@ const publicPages = [
   '/activate',
   '/legal',
 
-  // new Pages
+  '/me/action',
 ];
 
 router.beforeEach((to, from, next) => {
