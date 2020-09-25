@@ -246,7 +246,7 @@ const getters = {
     });
     if (configs.sageLauncher) {
       dashApps.push({
-        href: '/bubbles',
+        href: '/bubble',
         title: messages.label_menu_networks,
         icon: messages.label_menu_networks_icon,
         index: 1,
@@ -295,7 +295,7 @@ const getters = {
         index: 2,
       });
       adminApps.push({
-        href: '/admin/bubbles',
+        href: '/admin/bubble',
         title: messages.label_menu_admin_networks,
         icon: messages.label_menu_admin_networks_icon,
         index: 3,

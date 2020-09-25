@@ -9,7 +9,7 @@
         v-for="device in availableDevices"
         :key="device"
         download
-        href=""
+        :href="appLink(device)"
       >
         <img :src="`/${device}.png`" />
         <span>{{ messages[`label_device_${device}`] }}</span>
@@ -103,14 +103,37 @@ import { mapState } from 'vuex';
 
 export default {
   computed: {
-    ...mapState('system', ['messages']),
+    ...mapState('system', ['messages', 'appLinks']),
 
     availableDevices() {
-      return this.messages.available_devices ? this.messages.available_devices.split(',') : [];
+      return this.messages.available_devices
+        ? this.messages.available_devices.split(',')
+        : [];
     },
 
     footerLinks() {
-      return this.messages.footer_links ? this.messages.footer_links.split(',') : [];
+      return this.messages.footer_links
+        ? this.messages.footer_links.split(',')
+        : [];
+    },
+  },
+  methods: {
+    appLink(type) {
+      if (!this.appLinks) return '';
+      switch (type) {
+        case 'iphone':
+          return this.appLinks['ios'];
+        case 'android':
+          return this.appLinks['android'];
+        case 'mac_computer':
+          return this.appLinks['macos'];
+        case 'windows_computer':
+          return this.appLinks['windows'];
+        case 'linux_computer':
+          return this.appLinks['linux'];
+        default:
+          return '';
+      }
     },
   },
 };

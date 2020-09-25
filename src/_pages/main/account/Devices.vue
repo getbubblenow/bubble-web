@@ -1,402 +1,128 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
-  <div class="bubble-form">
+  <div>
     <em v-if="loading && loading.devices">{{ messages.loading_devices }}</em>
     <div v-if="devices && devices.length > 0">
       <h2>{{ messages.table_title_devices }}</h2>
-      <table border="1">
-        <thead>
-          <tr>
-            <th nowrap="nowrap">{{ messages.label_field_device_name }}</th>
-            <!--                    <th nowrap="nowrap">{{messages.label_field_device_type}}</th>-->
-            <th nowrap="nowrap">{{ messages.label_field_device_app }}</th>
-            <!--                    <th nowrap="nowrap">{{messages.label_field_device_enabled}}</th>-->
-            <th>{{ messages.label_field_device_vpn_config }}</th>
-            <th nowrap="nowrap">
-              {{ messages.label_field_device_certificate }}
-            </th>
-            <th nowrap="nowrap">
-              {{ messages.label_field_device_security_level }}
-            </th>
-            <th nowrap="nowrap">
-              {{ messages.label_field_device_connection }}
-            </th>
-            <!--                    <th>{{messages.label_field_device_ctime}}</th>-->
-            <th>{{ messages.label_field_device_help }}</th>
-            <th><!-- delete --></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="device in devices">
-            <td nowrap="nowrap">{{ device.name }}</td>
-            <!--                    <td nowrap="nowrap">-->
-            <!--                        <i :class="messages['device_type_icon_'+device.deviceType]+' bubble-app-icon'"></i><br/>-->
-            <!--                        {{messages['device_type_'+device.deviceType]}}-->
-            <!--                    </td>-->
-            <td align="center">
-              <a
-                v-if="appLinks"
-                target="_blank"
-                rel="noopener noreferrer"
-                :href="appLinks[device.deviceType]"
-              >
-                <i
-                  :class="
-                    messages['device_type_icon_' + device.deviceType] +
-                      ' bubble-app-icon'
-                  "
-                ></i
-                ><br />
-                {{ messages.message_download_app }}
-              </a>
-            </td>
-            <!--                    <td>{{messages['message_'+device.enabled]}}</td>-->
-            <td>
-              <div
-                v-if="displayVpnConfig[device.uuid] === true"
-                class="device-vpn-config-div"
-              >
-                <h3>{{ device.name }}</h3>
-                <hr />
-
-                <div
-                  v-if="
-                    qrCodeImageBase64 &&
-                      messages['device_type_vpn_' + device.deviceType] ===
-                        'show_qr_code'
-                  "
-                >
-                  <img :src="'data:image/png;base64,' + qrCodeImageBase64" />
-                  <div
-                    v-if="errors.has('deviceQRcode')"
-                    class="invalid-feedback d-block"
-                  >
-                    {{ errors.first('deviceQRcode') }}
-                  </div>
-                </div>
-                <div
-                  v-else-if="
-                    vpnConfBase64 &&
-                      messages['device_type_vpn_' + device.deviceType] ===
-                        'download_conf'
-                  "
-                >
-                  <Button
-                    color="default"
-                    v-if="vpnConfBase64"
-                    @click="
-                      util.downloadURI(
-                        'data:text/plain;base64,' + vpnConfBase64,
-                        vpnConfFileName
-                      )
-                    "
-                  >
-                    {{ messages.message_device_vpn_download_conf }}
-                  </Button>
-                  <div
-                    v-if="errors.has('deviceVpnConf')"
-                    class="invalid-feedback d-block"
-                  >
-                    {{ errors.first('deviceVpnConf') }}
-                  </div>
-                </div>
-                <div v-else>
-                  <h5>{{ messages.message_device_vpn_unavailable }}</h5>
-                </div>
-                <hr />
-                <Button
-                  color="default"
-                  @click="hideVpnConfig()"
-                  class="btn btn-primary"
-                >
-                  {{ messages.button_label_close_device_vpn_config }}
-                </Button>
-              </div>
-              <div
+      <div class="row">
+        <div
+          class="col-12 col-md-6 col-lg-4 col-xl-3"
+          v-for="(device, key) in devices"
+          :key="key"
+        >
+          <div class="device">
+            <img
+              :src="`/device-${device.deviceType}.png`"
+              class="device-image"
+            />
+            <p class="device-text">
+              {{ device.name }}
+            </p>
+            <div v-if="device.status.lastHandshakeTime" class="device-text">
+              <hr />
+              {{ messages.label_field_device_connection_handshake }}:
+              <span v-if="device.status.lastHandshakeDays">
+                {{ device.status.lastHandshakeDays }}{{ messages.units_days }}
+              </span>
+              <span
                 v-else-if="
-                  messages[
-                    '!button_label_vpn_config_' +
-                      messages['device_type_vpn_' + device.deviceType]
-                  ]
+                  device.status.lastHandshakeHours &&
+                    device.status.lastHandshakeMinutes
                 "
               >
-                <Button color="default" @click="showVpnConfig(device.uuid)">
-                  {{
-                    messages[
-                      'button_label_vpn_config_' +
-                        messages['device_type_vpn_' + device.deviceType]
-                    ]
-                  }}
-                </Button>
-              </div>
-              <div v-else>
-                {{ messages.message_device_vpn_unavailable }}
-              </div>
-            </td>
-            <td>
-              <a :href="'/api/auth/cacert?deviceType=' + device.deviceType">
-                {{ messages.message_download_ca_cert }}
-              </a>
-            </td>
-            <td>
-              <form v-if="configs.securityLevels" @submit.prevent="false">
-                <input type="hidden" name="deviceId" :value="device.uuid" />
-                <v-select
-                  v-model="device.securityLevel"
-                  @change="setSecurityLevel($event)"
-                  :options="configs.securityLevels"
-                >
-                  <template v-slot:option="option">
-                    {{ messages['device_security_level_' + option.label] }}
-                  </template>
-                  <template v-slot:selected-option="option">
-                    {{ messages['device_security_level_' + option.label] }}
-                  </template>
-                </v-select>
-              </form>
-            </td>
-            <td class="device-connection-status">
-              <div v-if="device.status.ip">
-                {{ device.status.ip }}
-                <div v-if="device.status.location">
-                  <hr />
-                  <span
-                    v-if="
-                      device.status.location.city &&
-                        device.status.location.region &&
-                        device.status.location.country
-                    "
-                  >
-                    {{ device.status.location.city }},
-                    {{ device.status.location.region }},
-                    {{ messages['country_' + device.status.location.country] }}
-                  </span>
-                  <span
-                    v-else-if="
+                {{ device.status.lastHandshakeHours
+                }}{{ messages.units_hours_short }},
+                {{ device.status.lastHandshakeMinutes
+                }}{{ messages.units_minutes_short }}
+              </span>
+              <span v-else-if="device.status.lastHandshakeHours">
+                {{ device.status.lastHandshakeHours
+                }}{{ messages.units_hours_short }}
+              </span>
+              <span
+                v-else-if="
+                  device.status.lastHandshakeMinutes &&
+                    device.status.lastHandshakeSeconds
+                "
+              >
+                {{ device.status.lastHandshakeMinutes
+                }}{{ messages.units_minutes_short }},
+                {{ device.status.lastHandshakeSeconds
+                }}{{ messages.units_seconds_short }}
+              </span>
+              <span v-else-if="device.status.lastHandshakeMinutes">
+                {{ device.status.lastHandshakeMinutes
+                }}{{ messages.units_minutes_short }}
+              </span>
+              <span v-else-if="device.status.lastHandshakeSeconds">
+                {{ device.status.lastHandshakeSeconds
+                }}{{ messages.units_seconds_short }}
+              </span>
+              {{ messages.label_field_device_connection_handshake_ago }}
+            </div>
+            <div v-if="device.status.ip" class="device-text">
+              {{ device.status.ip }}
+              <div v-if="device.status.location">
+                <hr />
+                <span
+                  v-if="
+                    device.status.location.city &&
                       device.status.location.region &&
-                        device.status.location.country
-                    "
-                  >
-                    {{ device.status.location.region }},
-                    {{ messages['country_' + device.status.location.country] }}
-                  </span>
-                  <span
-                    v-else-if="
-                      device.status.location.city &&
-                        device.status.location.country
-                    "
-                  >
-                    {{ device.status.location.city }},
-                    {{ messages['country_' + device.status.location.country] }}
-                  </span>
-                  <span v-else-if="device.status.location.country">
-                    {{
-                      messages['country_' + device.status.location.country]
-                    }}</span
-                  >
-                  <span
-                    v-else-if="
-                      device.status.location.city &&
-                        device.status.location.region
-                    "
-                  >
-                    {{ device.status.location.city }},
-                    {{ device.status.location.region }}
-                  </span>
-                  <span v-else-if="device.status.location.region">
-                    {{ device.status.location.region }}</span
-                  >
-                  <span v-else-if="device.status.location.city">
-                    {{ device.status.location.city }}</span
-                  >
-                </div>
-              </div>
-              <div
-                v-if="device.status.bytesSent || device.status.bytesReceived"
-              >
-                <hr />
-                <div v-if="device.status.bytesSent">
-                  {{ device.status.bytesSent }}{{ device.status.sentUnits }}
-                  {{ messages.label_field_device_transfer_sent }}
-                </div>
-                <div v-if="device.status.bytesReceived">
-                  {{ device.status.bytesReceived
-                  }}{{ device.status.receivedUnits }}
-                  {{ messages.label_field_device_transfer_received }}
-                </div>
-              </div>
-              <div v-if="device.status.lastHandshakeTime">
-                <hr />
-                {{ messages.label_field_device_connection_handshake }}:
-                <span v-if="device.status.lastHandshakeDay">
-                  {{ device.status.lastHandshakeDays }}{{ messages.units_days }}
+                      device.status.location.country
+                  "
+                >
+                  {{ device.status.location.city }},
+                  {{ device.status.location.region }},
+                  {{ messages['country_' + device.status.location.country] }}
                 </span>
                 <span
                   v-else-if="
-                    device.status.lastHandshakeHours &&
-                      device.status.lastHandshakeMinutes
+                    device.status.location.region &&
+                      device.status.location.country
                   "
                 >
-                  {{ device.status.lastHandshakeHours
-                  }}{{ messages.units_hours_short }},
-                  {{ device.status.lastHandshakeMinutes
-                  }}{{ messages.units_minutes_short }}
-                </span>
-                <span v-else-if="device.status.lastHandshakeHours">
-                  {{ device.status.lastHandshakeHours }}
-                  {{ messages.units_hours_short }}
+                  {{ device.status.location.region }},
+                  {{ messages['country_' + device.status.location.country] }}
                 </span>
                 <span
                   v-else-if="
-                    device.status.lastHandshakeMinutes &&
-                      device.status.lastHandshakeSeconds
+                    device.status.location.city &&
+                      device.status.location.country
                   "
                 >
-                  {{ device.status.lastHandshakeMinutes }}
-                  {{ messages.units_minutes_short }},
-                  {{ device.status.lastHandshakeSeconds }}
-                  {{ messages.units_seconds_short }}
+                  {{ device.status.location.city }},
+                  {{ messages['country_' + device.status.location.country] }}
                 </span>
-                <span v-else-if="device.status.lastHandshakeMinutes">
-                  {{ device.status.lastHandshakeMinutes }}
-                  {{ messages.units_minutes_short }}
+                <span v-else-if="device.status.location.country">
+                  {{ messages['country_' + device.status.location.country] }}
                 </span>
-                <span v-else-if="device.status.lastHandshakeSeconds">
-                  {{ device.status.lastHandshakeSeconds }}
-                  {{ messages.units_seconds_short }}
-                </span>
-                {{ messages.label_field_device_connection_handshake_ago }}
-              </div>
-            </td>
-            <!--                    <td nowrap="nowrap">{{messages.label_device_ctime_format.parseDateMessage(device.ctime, messages)}}</td>-->
-            <td>
-              <div
-                v-if="displayDeviceHelp[device.uuid] === true"
-                class="device-help-div"
-              >
-                <div
-                  v-html="
-                    messages['device_type_' + device.deviceType + '_help_html']
+                <span
+                  v-else-if="
+                    device.status.location.city && device.status.location.region
                   "
-                ></div>
-                <Button
-                  color="default"
-                  @click="hideDeviceHelp()"
-                  class="btn btn-primary"
                 >
-                  {{ messages.button_label_close_device_help }}
-                </Button>
+                  {{ device.status.location.city }},
+                  {{ device.status.location.region }}
+                </span>
+                <span v-else-if="device.status.location.region">
+                  {{ device.status.location.region }}
+                </span>
+                <span v-else-if="device.status.location.city">
+                  {{ device.status.location.city }}
+                </span>
               </div>
-              <div v-else>
-                <Button color="default" @click="showDeviceHelp(device.uuid)">
-                  {{ messages.label_field_device_help }}
-                </Button>
-              </div>
-            </td>
-            <td>
-              <i
-                @click="removeDevice(device.uuid)"
-                aria-hidden="true"
-                :class="messages.button_label_remove_device_icon"
-                :title="messages.button_label_remove_device"
-              ></i>
-              <span class="sr-only">{{
-                messages.button_label_remove_device
-              }}</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <hr />
-
-    <form @submit.prevent="addDevice()">
-      <h4>{{ messages.form_title_add_device }}</h4>
-
-      <div class="form-group">
-        <Input
-          v-model="deviceName"
-          name="name"
-          class="form-control"
-          :placeholder="messages.label_field_device_name"
-        />
-        <div
-          v-if="submitted && errors.has('name')"
-          class="invalid-feedback d-block"
-        >
-          {{ errors.first('name') }}
-        </div>
-        <div
-          v-if="submitted && errors.has('deviceName')"
-          class="invalid-feedback d-block"
-        >
-          {{ errors.first('deviceName') }}
-        </div>
-      </div>
-
-      <div class="form-group" v-if="addableDeviceTypes">
-        <v-select
-          v-model="deviceType"
-          name="deviceType"
-          :placeholder="messages.label_field_device_type"
-          :options="addableDeviceTypes"
-        >
-          <template v-slot:option="option">
-            {{ messages['device_type_' + option.label] }}
-          </template>
-          <template v-slot:selected-option="option">
-            {{ messages.label_field_device_type }}:
-            {{ messages['device_type_' + option.label] }}
-          </template>
-        </v-select>
-      </div>
-
-      <hr />
-      <div class="form-group">
-        <Button
-          color="default"
-          type="submit"
-          class="btn btn-primary"
-          :disabled="loading || !addDeviceReady"
-        >
-          {{ messages.button_label_add_device }}
-        </Button>
-        <img v-show="loading" :src="loadingImgSrc" />
-      </div>
-    </form>
-
-    <hr />
-
-    <div v-if="certDeviceTypes">
-      <table border="0" width="100%">
-        <tr>
-          <td colspan="5">
-            <h4>{{ messages.message_download_ca_cert }}</h4>
-          </td>
-        </tr>
-        <tr>
-          <td
-            v-for="certDevice in certDeviceTypes"
-            align="center"
-            :width="certDeviceWidth + '%'"
-          >
-            <a :href="'/api/auth/cacert?deviceType=' + certDevice">
-              <i
-                :class="
-                  messages['device_type_icon_' + certDevice] +
-                    ' bubble-app-icon'
-                "
-              ></i
-              ><br />
-              {{ messages['device_type_' + certDevice] }}
+            </div>
+            <a @click="showDetails(device)" class="device-details">
+              {{ messages.label_button_detail }}
             </a>
-          </td>
-        </tr>
-      </table>
-
-      <hr />
+          </div>
+        </div>
+      </div>
     </div>
+    <div v-else>
+      {{ messages.no_devices_added }}
+    </div>
+    <DeviceDetailModal ref="deviceDetail" @delete="onDeleteDevice" />
   </div>
 </template>
 
@@ -405,6 +131,30 @@
 
 .bubble-form {
   width: 800px;
+}
+
+.device {
+  display: flex;
+  padding: 30px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.device-image {
+  height: 80px;
+  margin-bottom: 10px;
+}
+
+.device-text {
+  color: #666;
+  font-size: 14px;
+  line-height: 20px;
+  margin-bottom: 8px;
+}
+
+.device-details {
+  color: #221fe0 !important;
+  font-size: 14px;
 }
 </style>
 
@@ -415,24 +165,19 @@ import config from 'config';
 import { loadingImgSrc } from '~/_store';
 
 import { Input, Button } from '~/_components/shared';
+import { DeviceDetailModal } from '~/_components/modals';
 
 export default {
   components: {
     Input,
     Button,
+    DeviceDetailModal,
   },
   data() {
     return {
       user: util.currentUser(),
       userId: util.currentUser().uuid,
-      submitted: false,
-      deviceName: null,
-      deviceType: null,
-      displayVpnConfig: {},
-      displayDeviceHelp: {},
-      config: config,
       loadingImgSrc: loadingImgSrc,
-      util: util,
     };
   },
   computed: {
@@ -445,47 +190,9 @@ export default {
     ]),
     ...mapState('system', ['messages', 'appLinks', 'configs']),
     ...mapGetters('devices', ['loading']),
-    vpnConfFileName: function() {
-      if (this.configs && this.configs.networkUuid) {
-        return 'bubble-' + this.configs.networkUuid.split('-')[0] + '-vpn.conf';
-      } else {
-        return 'vpn.conf';
-      }
-    },
-    addDeviceReady: function() {
-      return (
-        this.deviceName !== null &&
-        this.deviceName !== '' &&
-        this.deviceType !== null &&
-        this.deviceType !== ''
-      );
-    },
-    addableDeviceTypes: function() {
-      if (this.messages && this.messages['!addable_device_types']) {
-        return this.messages['addable_device_types'].split('|');
-      }
-      return [];
-    },
-    addableDeviceWidth: function() {
-      return 100.0 / this.addableDeviceTypes.length;
-    },
-    certDeviceTypes: function() {
-      if (this.messages && this.messages['!cert_device_types']) {
-        return this.messages['cert_device_types'].split('|');
-      }
-      return [];
-    },
-    certDeviceWidth: function() {
-      return 100.0 / this.certDeviceTypes.length;
-    },
   },
   created() {
     this.getDevicesByUserId({
-      userId: this.userId,
-      messages: this.messages,
-      errors: this.errors,
-    });
-    this.getAllDeviceTypesByUserId({
       userId: this.userId,
       messages: this.messages,
       errors: this.errors,
@@ -494,103 +201,21 @@ export default {
     if (user) this.getAppLinks(user.locale);
     this.loadSystemConfigs();
   },
-  mounted() {
-    window.addEventListener('keyup', (ev) => {
-      if (ev.key === 'Escape') {
-        this.hideVpnConfig();
-        this.hideDeviceHelp();
-      }
-    });
-  },
   methods: {
-    ...mapActions('devices', [
-      'getAllDeviceTypesByUserId',
-      'getDevicesByUserId',
-      'addDeviceByUserId',
-      'removeDeviceByUserId',
-      'getDeviceQRcodeById',
-      'getDeviceVPNconfById',
-      'setDeviceSecurityLevel',
-    ]),
+    ...mapActions('devices', ['getDevicesByUserId', 'setDeviceSecurityLevel']),
     ...mapActions('system', ['getAppLinks', 'loadSystemConfigs']),
-    addDevice() {
-      console.log('add device');
-      this.errors.clear();
-      this.submitted = true;
-      this.addDeviceByUserId({
-        userId: this.userId,
-        device: {
-          name: this.deviceName,
-          deviceType: this.deviceType,
-        },
-        messages: this.messages,
-        errors: this.errors,
-      });
-    },
-    removeDevice(id) {
-      this.errors.clear();
-      this.submitted = true;
-      this.removeDeviceByUserId({
-        userId: this.userId,
-        deviceId: id,
-        messages: this.messages,
-        errors: this.errors,
-      });
-    },
-    setSecurityLevel(event) {
-      this.setDeviceSecurityLevel({
-        userId: this.userId,
-        deviceId: event.target.form.deviceId.value,
-        securityLevel: event.target.value,
-        messages: this.messages,
-        errors: this.errors,
-      });
-    },
-    showVpnConfig(id) {
-      this.hideDeviceHelp();
-      const show = {};
-      show[id] = true;
-      this.errors.clear();
-      this.getDeviceQRcodeById({
-        userId: this.userId,
-        deviceId: id,
-        messages: this.messages,
-        errors: this.errors,
-      });
-      this.getDeviceVPNconfById({
-        userId: this.userId,
-        deviceId: id,
-        messages: this.messages,
-        errors: this.errors,
-      });
-      this.displayVpnConfig = Object.assign({}, show);
-    },
-    hideVpnConfig() {
-      this.displayVpnConfig = {};
+
+    showDetails(device) {
+      this.$refs.deviceDetail.show(device);
     },
 
-    showDeviceHelp(id) {
-      this.hideVpnConfig();
-      this.displayDeviceHelp = {};
-      this.displayDeviceHelp[id] = true;
-    },
-    hideDeviceHelp() {
-      this.displayDeviceHelp = {};
-    },
-  },
-  watch: {
-    device(dev) {
-      if (dev) {
-        // after device added, clear device fields
-        this.deviceName = null;
-        this.deviceType = null;
-        if (dev.uuid) this.showVpnConfig(dev.uuid);
-        this.getDevicesByUserId({
-          userId: this.userId,
-          messages: this.messages,
-          errors: this.errors,
-        });
-      }
+    onDeleteDevice() {
+      this.$refs.deviceDetail.hide();
+      this.getDevicesByUserId({
+        userId: this.userId,
+        messages: this.messages,
+        errors: this.errors,
+      });
     },
   },
 };

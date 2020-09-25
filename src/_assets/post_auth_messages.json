@@ -1,5 +1,14 @@
 {
   "label_homepage_welcome": "Hello",
   "label_menu_help": "Help",
-  "label_menu_settings": "Settings"
+  "label_menu_settings": "Settings",
+  "no_devices_added": "You don't have any devices added yet.",
+  "label_button_detail": "Details",
+  "warning": "warning",
+  "warning_delete_bubble": "If you delete this device, Internet service will no longer work while Bubble is connected.",
+  "label_add_device_back": "To add this device back to your bubble",
+  "steps_add_device_back": "Open the Bubble App on the device|If you are signed in, first sign out|Sign in again your Bubble",
+  "confirm_delete_device": "Are you sure you want to delete this device?",
+  "yes": "yes",
+  "no": "no"
 }

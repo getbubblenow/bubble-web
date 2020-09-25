@@ -14,7 +14,7 @@
       :class="{ 'menu-invisible': !menuVisible }"
     >
       <!-- Profile -->
-      <router-link to="/me">
+      <router-link to="/me" @click.native="closeMenu()">
         <div class="profile">
           <img
             :src="`https://www.gravatar.com/avatar/${userHash}?r=pg`"
@@ -31,30 +31,61 @@
 
       <!-- Navigation -->
       <div class="navigation">
-        <div class="navigation-item active">
+        <router-link to="/bubble" class="navigation-item" @click.native="closeMenu()">
           <i class="fa fa-home icon icon-home"></i>
           <span>{{ messages.label_menu_network }}</span>
-        </div>
-        <div class="navigation-item">
+        </router-link>
+
+        <router-link
+          to="/devices"
+          v-if="!configs.sageLauncher"
+          class="navigation-item"
+        >
           <i class="fa fa-tablet icon icon-devices"></i>
           <span>{{ messages.label_menu_devices }}</span>
-        </div>
-        <div class="navigation-item">
+        </router-link>
+
+        <router-link
+          to="/apps"
+          v-if="!configs.sageLauncher"
+          class="navigation-item"
+        >
+          <i class="fa fa-smile icon icon-apps"></i>
+          <span>{{ messages.label_menu_apps }}</span>
+        </router-link>
+
+        <router-link
+          to="/admin/accounts"
+          v-if="!configs.sageLauncher"
+          class="navigation-item"
+        >
+          <i class="fa fa-users icon icon-users"></i>
+
+          <span>
+            {{ messages.label_menu_admin_users }}
+          </span>
+        </router-link>
+
+        <!-- settings -->
+        <!-- <router-link class="navigation-item">
           <i class="fa fa-cog icon icon-settings"></i>
           <span>{{ messages.label_menu_settings }}</span>
-        </div>
-        <div class="navigation-item">
+        </router-link> -->
+
+        <router-link to="/support" class="navigation-item" @click.native="closeMenu()">
           <i class="fa fa-question-circle icon icon-help"></i>
           <span>{{ messages.label_menu_help }}</span>
-        </div>
+        </router-link>
       </div>
       <!-- Upgrade Plan -->
 
       <div class="flex-grow-1"></div>
       <!-- Logout -->
-      <Button color="outline" class="logout-button">
-        {{ messages.log_out }}
-      </Button>
+      <router-link to="/logout" class="logout-button" @click.native="closeMenu()">
+        <Button color="outline" block>
+          {{ messages.log_out }}
+        </Button>
+      </router-link>
     </div>
   </aside>
 </template>
@@ -171,7 +202,7 @@
     margin-left: 20px;
   }
 
-  &.active {
+  &.router-link-active {
     background-color: #66cda4;
     color: white;
     border-radius: 20px;
@@ -195,6 +226,7 @@
 
 .icon {
   font-size: 20px;
+  width: 20px;
 }
 
 .icon-home {
@@ -202,6 +234,12 @@
 }
 .icon-devices {
   color: #4b53df;
+}
+.icon-apps {
+  color: #9916df;
+}
+.icon-users {
+  color: #2ed1a1;
 }
 .icon-settings {
   color: #e6458a;
@@ -229,7 +267,7 @@ export default {
   }),
 
   computed: {
-    ...mapState('system', ['messages']),
+    ...mapState('system', ['messages', 'configs']),
 
     userHash() {
       return md5(this.currentUser.email);
@@ -240,6 +278,10 @@ export default {
     toggleMenu() {
       this.menuVisible = !this.menuVisible;
     },
+    closeMenu() {
+      console.log('click.nativeed');
+      this.menuVisible = false;
+    }
   },
 };
 </script>

@@ -1,6 +1,6 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
-  <div v-if="network" class="bubble-form">
+  <div v-if="network">
     <h4>
       {{ network.nickname }} -
       <i>{{ messages['msg_network_state_' + network.state] }}</i>
@@ -12,8 +12,7 @@
 
     <h6
       v-if="
-        !isSelfNet &&
-          (isInReadyToRestoreState || network.state === 'running')
+        !isSelfNet && (isInReadyToRestoreState || network.state === 'running')
       "
     >
       <Button
@@ -42,6 +41,8 @@
             network.state === 'restoring')
       "
     >
+      <div ref="lottie" class="lottie"></div>
+
       <!-- adapted from: https://code-boxx.com/simple-vanilla-javascript-progress-bar/ -->
       <div v-if="stats.percent" class="progress-wrap">
         <div
@@ -80,7 +81,8 @@
         <table border="0" width="100%">
           <tr>
             <td
-              v-for="deviceType in addableDeviceTypes"
+              v-for="(deviceType, key) in addableDeviceTypes"
+              :key="key"
               align="center"
               :width="addableDeviceWidth + '%'"
             >
@@ -394,12 +396,14 @@
 @import '../../../_scss/components/form';
 @import '../../../_scss/breakpoints';
 
-.bubble-form {
-  width: 800px;
+.lottie {
+  width: 100%;
+  max-width: 500px;
 }
 </style>
 
 <script>
+import Lottie from 'lottie-web';
 import { mapState, mapActions, mapGetters } from 'vuex';
 import { util } from '~/_helpers';
 import { loadingImgSrc } from '~/_store';
@@ -427,8 +431,16 @@ export default {
       upgradeRefresher: null,
       logsExpirationDays: null,
       backupDownloadRefresher: null,
+
+      lottie: null,
+      timerID: null,
+      frameNumber: 0,
+      targetFrameNumber: 0,
     };
   },
+
+  mounted() {},
+
   computed: {
     ...mapState('networks', [
       'network',
@@ -577,6 +589,23 @@ export default {
       'upgrade',
     ]),
     refreshStatus(userId) {
+      if (!this.lottie && this.$refs.lottie) {
+        this.lottie = Lottie.loadAnimation({
+          container: this.$refs.lottie,
+          renderer: '',
+          loop: false,
+          autoplay: false,
+          path: '/launching-bubble.json',
+        });
+        this.frameNumber = 0;
+        this.targetFrameNumber = 20;
+
+        this.timerID = setInterval(() => {
+          if (this.frameNumber < this.targetFrameNumber) {
+            this.frameNumber++;
+          }
+        }, 100);
+      }
       this.getNetworkById({
         userId: userId,
         networkId: this.networkId,
@@ -757,6 +786,7 @@ export default {
       this.upgrade();
     },
   },
+
   created() {
     const user = util.currentUser();
     this.refreshStatus(user.uuid);
@@ -765,17 +795,18 @@ export default {
     this.getAppLinks(user.locale);
     this.loadSystemConfigs();
   },
+
   beforeDestroy() {
     this.clearRefresherInterval(this.refresher);
     this.clearRefresherInterval(this.stopRefresher);
     this.clearRefresherInterval(this.backupDownloadRefresher);
     this.resetRestoreKey();
   },
+
   watch: {
-    network(net) {
+    network(net, oldNet) {
       if (net) {
-        if (net.uuid === 'Not Found')
-          this.$router.replace({ path: '/bubbles' });
+        if (net.uuid === 'Not Found') this.$router.replace({ path: '/bubble' });
         this.networkUuid = net.uuid;
         if (net.state !== 'stopping')
           this.clearRefresherInterval(this.stopRefresher);
@@ -814,10 +845,22 @@ export default {
         // status not found for our network
         this.clearRefresherInterval(this.refresher);
       }
+
+      if (this.stats) {
+        this.targetFrameNumber = 20 + (30 / 100) * this.stats.percent;
+      }
     },
+
+    frameNumber() {
+      this.lottie.goToAndStop(this.frameNumber, true);
+      if (this.frameNumber >= 50) {
+        clearInterval(this.timerID);
+      }
+    },
+
     deletedNetworkUuid(uuid) {
       if (uuid && this.networkUuid && uuid === this.networkUuid) {
-        this.$router.replace({ path: '/bubbles' });
+        this.$router.replace({ path: '/bubble' });
       }
     },
     configs(c) {

@@ -99,19 +99,19 @@ const actions = {
                 systemConfigs.bubbleNode === false ||
                 systemConfigs.sageLauncher === true
               ) {
-                router.replace('/bubbles');
+                router.replace('/bubble');
               } else if (systemConfigs.bubbleNode === true) {
                 router.replace('/devices');
               } else {
                 router.replace('/');
               }
             } else {
-              console.log(
-                'account.login: landing page==' +
-                  JSON.stringify(landing) +
-                  ', systemConfigs.bubbleNode==' +
-                  systemConfigs.bubbleNode
-              );
+              // console.log(
+              //   'account.login: landing page==' +
+              //     JSON.stringify(landing) +
+              //     ', systemConfigs.bubbleNode==' +
+              //     systemConfigs.bubbleNode
+              // );
               util.resetLandingPage();
               router.replace(landing.fullPath);
             }

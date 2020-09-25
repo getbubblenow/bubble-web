@@ -33,7 +33,7 @@
           </router-link>
         </div>
         <div v-else class="d-flex justify-content-center align-items-center">
-          <router-link to="/bubbles" class="d-flex align-items-center">
+          <router-link to="/bubble" class="d-flex align-items-center">
             <Button headerLink>
               {{ messages.label_menu_network }}
             </Button>
@@ -104,7 +104,7 @@
         </router-link>
       </div>
       <div v-else>
-        <router-link class="dropdown-item" to="/bubbles">
+        <router-link class="dropdown-item" to="/bubble">
           {{ messages.label_menu_network }}
         </router-link>
         <router-link

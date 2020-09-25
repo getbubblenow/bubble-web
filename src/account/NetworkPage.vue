@@ -447,7 +447,7 @@
         watch: {
             network (net) {
                 if (net) {
-                    if (net.uuid === 'Not Found') this.$router.replace({path: '/bubbles'});
+                    if (net.uuid === 'Not Found') this.$router.replace({path: '/bubble'});
                     this.networkUuid = net.uuid;
                     if (net.state !== 'stopping') this.clearRefresherInterval(this.stopRefresher);
                 }
@@ -483,7 +483,7 @@
             },
             deletedNetworkUuid (uuid) {
                 if (uuid && this.networkUuid && (uuid === this.networkUuid)) {
-                    this.$router.replace({path: '/bubbles'});
+                    this.$router.replace({path: '/bubble'});
                 }
             },
             configs (c) {

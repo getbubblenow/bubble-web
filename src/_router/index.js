@@ -16,7 +16,7 @@ import DashboardPage from '~/account/DashboardPage';
 import ProfilePage from '~/account/profile/ProfilePage';
 import ActionPage from '~/account/profile/ActionPage';
 import PolicyPage from '~/account/profile/PolicyPage';
-// import DevicesPage from '~/account/DevicesPage';
+import DevicesPage from '~/account/DevicesPage';
 import AppsPage from '~/account/AppsPage';
 import AppPage from '~/account/AppPage';
 import BillsPage from '~/account/payment/BillsPage';
@@ -49,16 +49,6 @@ const paymentMethods = {
 
 const paymentMethodsChildren = [{ path: '', components: paymentMethods }];
 
-const newNetworkChildren = [
-  {
-    path: '',
-    components: {
-      default: NewNetworkPage,
-      ...paymentMethods,
-    },
-  },
-];
-
 export const router = new Router({
   mode: 'history',
   routes: [
@@ -77,7 +67,7 @@ export const router = new Router({
     //   component: PaymentMethodsPage,
     //   children: paymentMethodsChildren,
     // },
-    // { path: '/devices', component: DevicesPage },
+    { path: '/devices/old', component: DevicesPage },
 
     // {
     //   path: '/register',
@@ -90,6 +80,8 @@ export const router = new Router({
     // { path: '/restore', component: RestorePage },
 
     // new route
+    { path: '', redirect: '/bubble', exact: true },
+
     {
       path: '',
       component: () => import('~/_pages/Layout'),
@@ -122,22 +114,13 @@ export const router = new Router({
             },
             { path: 'notifications', component: NotificationsPage },
             {
-              path: 'bubbles',
-              component: NetworksPage,
-              children: [
-                {
-                  path: '',
-                  component: NewNetworkPage,
-                  children: newNetworkChildren,
-                },
-              ],
+              path: 'bubble',
+              component: () => import('~/_pages/main/bubble/MyBubble'),
             },
             {
-              path: 'new_bubble',
-              component: NewNetworkPage,
-              children: newNetworkChildren,
+              path: 'bubble/:id',
+              component: () => import('~/_pages/main/bubble/Network'),
             },
-            { path: 'bubble/:id', component: NetworkPage },
             { path: 'action', component: ActionPage },
             { path: 'resetPassword/:code', component: SetPasswordPage },
 
@@ -214,14 +197,48 @@ export const router = new Router({
               path: 'support',
               component: () => import('~/_pages/main/account/Support'),
             },
+          ],
+        },
+        {
+          path: '',
+          component: () => import('~/_pages/auth/Layout'),
+          children: [
+            { path: '', component: DashboardPage },
             {
-              path: 'launch-bubble',
-              component: () => import('~/_pages/main/bubble/LaunchBubble'),
+              path: 'me/download/:uuid',
+              redirect: (r) => ({
+                path: 'me/policy',
+                query: { download: r.params.uuid },
+              }),
+            },
+            { path: 'me/action', component: ActionPage },
+            { path: 'apps', component: AppsPage },
+            { path: 'app/:app', component: AppPage },
+            { path: 'app/:app/config/:view', component: AppConfigPage },
+            {
+              path: 'app/:app/config/:view/:item',
+              component: AppConfigPage,
+            },
+            { path: 'app/:app/view/:view', component: AppDataViewPage },
+            { path: 'app/:app/site/:site', component: AppSitePage },
+            {
+              path: 'app/:app/site/:site/view/:view',
+              component: AppDataViewPage,
+            },
+            { path: 'notifications', component: NotificationsPage },
+            {
+              path: 'appLogin',
+              component: () => import('~/_pages/auth/AppLogin'),
             },
             {
-              path: 'launching-bubble/:id',
-              component: () => import('~/_pages/main/bubble/LaunchingBubble'),
+              path: 'verifyEmail',
+              component: () => import('~/_pages/auth/VerifyEmail'),
             },
+            {
+              path: 'payment',
+              component: () => import('~/_pages/auth/Payment'),
+            },
+            { path: 'logout', component: () => import('~/auth/LogoutPage') },
           ],
         },
         {
@@ -280,7 +297,6 @@ const publicPages = [
 ];
 
 router.beforeEach((to, from, next) => {
-  console.log('to', to);
   const authRequired =
     !publicPages.includes(to.path) &&
     publicPages.filter((p) => to.path.startsWith(p)).length === 0;

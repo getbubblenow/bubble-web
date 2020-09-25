@@ -260,7 +260,7 @@ export default {
     newNodeNotification(nn) {
       if (nn && nn.uuid) {
         this.$router.push({
-          path: '/launching-bubble/' + nn.networkName,
+          path: '/bubble/' + nn.networkName,
         });
         this.submitted = false;
       }

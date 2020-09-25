@@ -174,28 +174,6 @@ export default {
     isInRestoringMode() {
       return this.configs ? this.configs.awaitingRestore : undefined;
     },
-    isNewPage() {
-      const newPages = [
-        '/login',
-        '/forgotPassword',
-        '/register',
-        '/appLogin',
-        '/verifyEmail',
-        '/payment',
-        '/me',
-        '/devices',
-        '/launch-bubble',
-        '/launching-bubble',
-        '/restore',
-        '/support',
-        '/legal',
-      ];
-
-      return (
-        newPages.includes(this.$route.path) ||
-        newPages.filter((p) => this.$route.path.startsWith(p)).length
-      );
-    },
   },
   methods: {
     ...mapActions({ clearAlert: 'alert/clear' }),
