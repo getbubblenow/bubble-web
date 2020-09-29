@@ -59,6 +59,7 @@ export default {
     ...mapActions('paymentMethods', ['getAllAccountPaymentMethods']),
 
     initDefaults() {
+      this.currentUser = util.currentUser();
       const selectedLocale =
         this.currentUser !== null &&
         typeof this.currentUser.locale !== 'undefined' &&
@@ -120,20 +121,15 @@ export default {
 
   watch: {
     $route() {
-      this.isPageAvailable =
-        !this.currentUser ||
-        this.$route.path === '/me/action' ||
-        this.$route.path === '/logout' ||
-        this.$route.path === '/verifyEmail' ||
-        ((this.verifiedContacts || this.currentUser.admin) &&
-          (!this.configs.paymentsEnabled ||
-            this.hasPaymentMethod === true ||
-            this.$route.path === '/payment'));
+      this.$nextTick(() => {
+        this.initDefaults();
+      });
     },
 
     policy(p) {
       this.verifiedContacts = this.hasVerifiedContact(p);
       const currentUser = util.currentUser();
+      if (!currentUser) return;
       if (!this.verifiedContacts && !currentUser.admin) {
         this.navigateToVerifyEmail();
         if (this.verifiedContactRefresher === null) {
@@ -162,7 +158,11 @@ export default {
     },
 
     accountPaymentMethods(pms, oldpms) {
-      if (pms && this.configs.paymentsEnabled) {
+      if (
+        pms &&
+        this.configs.paymentsEnabled &&
+        (this.verifiedContacts || (this.currentUser && this.currentUser.admin))
+      ) {
         const payMethods = [];
         for (let i = 0; i < pms.length; i++) {
           const pm = pms[i];
