@@ -34,26 +34,13 @@ export default {
     },
     payMethods: null,
     hasPaymentMethod: false,
+    isPageAvailable: false,
   }),
 
   computed: {
     ...mapState('users', ['policy']),
     ...mapState('paymentMethods', ['accountPaymentMethods']),
     ...mapState('system', ['configs', 'messages']),
-
-    isPageAvailable() {
-      console.log('current user', this.currentUser);
-      return (
-        !this.currentUser ||
-        ((this.verifiedContacts ||
-          this.currentUser.admin ||
-          this.$route.path === '/verifyEmail' ||
-          this.$route.path === '/me/action') &&
-          (!this.configs.paymentsEnabled ||
-            this.hasPaymentMethod === true ||
-            this.$route.path === '/payment'))
-      );
-    },
   },
 
   created() {
@@ -85,6 +72,16 @@ export default {
           errors: this.errors,
         });
       }
+
+      this.isPageAvailable =
+        !this.currentUser ||
+        this.$route.path === '/me/action' ||
+        this.$route.path === '/logout' ||
+        this.$route.path === '/verifyEmail' ||
+        ((this.verifiedContacts || this.currentUser.admin) &&
+          (!this.configs.paymentsEnabled ||
+            this.hasPaymentMethod === true ||
+            this.$route.path === '/payment'));
     },
 
     hasVerifiedContact(policy) {
@@ -122,6 +119,18 @@ export default {
   },
 
   watch: {
+    $route() {
+      this.isPageAvailable =
+        !this.currentUser ||
+        this.$route.path === '/me/action' ||
+        this.$route.path === '/logout' ||
+        this.$route.path === '/verifyEmail' ||
+        ((this.verifiedContacts || this.currentUser.admin) &&
+          (!this.configs.paymentsEnabled ||
+            this.hasPaymentMethod === true ||
+            this.$route.path === '/payment'));
+    },
+
     policy(p) {
       this.verifiedContacts = this.hasVerifiedContact(p);
       const currentUser = util.currentUser();
