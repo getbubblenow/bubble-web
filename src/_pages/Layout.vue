@@ -115,6 +115,8 @@ export default {
         this.$route.path === '/verifyEmail'
       ) {
         this.$router.push('/');
+      } else {
+        this.initDefaults();
       }
     },
   },
