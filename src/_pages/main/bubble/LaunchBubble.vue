@@ -89,6 +89,7 @@ export default {
       locale: util.currentUser().locale,
       timezone: '',
       plan: 'bubble',
+      launchType: 'node',
       footprint: 'Worldwide',
       sshKey: '',
       paymentMethodObject: {
@@ -167,6 +168,7 @@ export default {
 
     initDefaults() {
       const currentUser = util.currentUser();
+      this.accountPlan.name = currentUser.email.split('@')[0];
       this.getAllAccountPaymentMethods({
         userId: currentUser.uuid,
         messages: this.messages,

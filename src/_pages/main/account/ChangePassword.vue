@@ -11,9 +11,19 @@
     </h4>
 
     <form class="bubble-form" @submit.prevent="changePass">
+      <div
+        v-if="submitted && alertType && alertMessage"
+        class="alert"
+        :class="alertType"
+      >
+        {{ alertMessage }}
+      </div>
       <div v-if="me && requiredExternalAuthContacts.length > 0">
         <div class="form-group">
-          <div v-for="(contact, key) in requiredExternalAuthContacts" :key="key">
+          <div
+            v-for="(contact, key) in requiredExternalAuthContacts"
+            :key="key"
+          >
             {{ messages['field_label_' + contact.type] }}: {{ contact.info }}
           </div>
         </div>
@@ -109,7 +119,7 @@
         @click="changePass"
         :disabled="loading()"
       >
-        {{ messages.button_label_change_password }}
+        {{ messages.button_label_resetPassword }}
       </Button>
     </form>
   </div>
@@ -168,6 +178,7 @@ export default {
   computed: {
     ...mapState('users', ['user', 'policy', 'changePasswordResponse']),
     ...mapState('system', ['messages']),
+    ...mapState('alert', { alertType: 'type', alertMessage: 'message' }),
   },
   methods: {
     ...mapActions({ alertSuccess: 'alert/success', alertError: 'alert/error' }),

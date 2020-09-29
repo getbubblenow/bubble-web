@@ -24,7 +24,7 @@
             v-validate="'required'"
             :placeholder="messages.field_label_network_type"
             :options="networkTypeOptions"
-            v-model="networkType"
+            v-model="accountPlan.launchType"
             label="name"
             :reduce="(option) => option.value"
           >
@@ -37,7 +37,14 @@
         </div>
       </div>
       <!-- fork host -->
-      <div v-if="showForkOption && networkType === 'fork'" class="form-group">
+      <div
+        v-if="
+          showForkOption &&
+            (accountPlan.launchType === 'fork_sage' ||
+              accountPlan.launchType === 'fork_node')
+        "
+        class="form-group"
+      >
         <Input
           type="text"
           v-model="accountPlan.forkHost"
@@ -324,6 +331,7 @@ export default {
     accountPlan: {
       name: '',
       domain: '',
+      launchType: 'node',
       locale: util.currentUser().locale,
       timezone: '',
       plan: 'bubble',
@@ -351,7 +359,6 @@ export default {
     },
     flexRegion: true,
     cloudRegionUuid: '',
-    networkType: 'bubble',
     submitted: false,
   }),
 
@@ -387,8 +394,12 @@ export default {
           value: 'bubble',
         },
         {
-          name: this.messages.field_label_network_type_fork,
-          value: 'fork',
+          name: this.messages.field_label_network_type_fork_sage,
+          value: 'fork_sage',
+        },
+        {
+          name: this.messages.field_label_network_type_fork_node,
+          value: 'fork_node',
         },
       ];
     },
@@ -456,6 +467,11 @@ export default {
       return false;
     },
 
+    getDefaultName() {
+      const currentUser = util.currentUser();
+      return currentUser.email.split('@')[0];
+    },
+
     show() {
       this.$modal.show('advanced-settings');
     },
@@ -469,6 +485,7 @@ export default {
 
     initDefaults() {
       const currentUser = util.currentUser();
+      this.accountPlan.name = this.getDefaultName();
 
       this.getAllDomains({
         userId: currentUser.uuid,
@@ -581,6 +598,14 @@ export default {
   },
 
   watch: {
+    'accountPlan.name'(newVal) {
+      console.log('--changed--', newVal);
+      if (newVal === '') {
+        this.$nextTick(() => {
+          this.accountPlan.name = this.getDefaultName();
+        });
+      }
+    },
     domains(doms) {
       if (doms && doms[0]) {
         if (this.accountPlan.domain == null || this.accountPlan.domain === '')
@@ -612,7 +637,7 @@ export default {
     newNodeNotification(nn) {
       if (nn && nn.uuid) {
         this.$router.push({
-          path: '/launching-bubble/' + nn.networkName,
+          path: '/bubble/' + nn.networkName,
         });
         this.submitted = false;
       }
