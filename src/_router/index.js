@@ -189,6 +189,15 @@ export const router = new Router({
                 query: { download: r.params.uuid },
               }),
             },
+            { path: 'login', component: () => import('~/_pages/auth/Login') },
+            {
+              path: 'forgotPassword',
+              component: () => import('~/_pages/auth/ForgotPassword'),
+            },
+            {
+              path: 'register',
+              component: () => import('~/_pages/auth/Register'),
+            },
             { path: 'me/action', component: ActionPage },
             { path: 'apps', component: AppsPage },
             { path: 'app/:app', component: AppPage },
@@ -204,37 +213,6 @@ export const router = new Router({
               component: AppDataViewPage,
             },
             { path: 'notifications', component: NotificationsPage },
-            {
-              path: 'appLogin',
-              component: () => import('~/_pages/auth/AppLogin'),
-            },
-            {
-              path: 'verifyEmail',
-              component: () => import('~/_pages/auth/VerifyEmail'),
-            },
-            {
-              path: 'payment',
-              component: () => import('~/_pages/auth/Payment'),
-            },
-            { path: 'logout', component: () => import('~/auth/LogoutPage') },
-          ],
-        },
-        {
-          path: '',
-          component: () => import('~/_pages/auth/Layout'),
-          children: [
-            {
-              path: 'login',
-              component: () => import('~/_pages/auth/Login'),
-            },
-            {
-              path: 'forgotPassword',
-              component: () => import('~/_pages/auth/ForgotPassword'),
-            },
-            {
-              path: 'register',
-              component: () => import('~/_pages/auth/Register'),
-            },
             {
               path: 'appLogin',
               component: () => import('~/_pages/auth/AppLogin'),

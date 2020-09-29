@@ -33,6 +33,7 @@ export default {
       sendMetrics: true,
     },
     payMethods: null,
+    hasPaymentMethod: false,
   }),
 
   computed: {
@@ -41,8 +42,16 @@ export default {
     ...mapState('system', ['configs', 'messages']),
 
     isPageAvailable() {
+      console.log('current user', this.currentUser);
       return (
-        !this.currentUser || (this.verifiedContacts || this.currentUser.admin)
+        !this.currentUser ||
+        ((this.verifiedContacts ||
+          this.currentUser.admin ||
+          this.$route.path === '/verifyEmail' ||
+          this.$route.path === '/me/action') &&
+          (!this.configs.paymentsEnabled ||
+            this.hasPaymentMethod === true ||
+            this.$route.path === '/payment'))
       );
     },
   },
@@ -162,6 +171,7 @@ export default {
           this.accountPlan.paymentMethodObject.uuid === null &&
           payMethods.length > 0
         ) {
+          this.hasPaymentMethod = true;
           this.navigateToDashboard();
         } else {
           this.navigateToPaymentPage();

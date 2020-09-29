@@ -1,13 +1,13 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
-  <div class="container-fluid" v-if="isPageAvailable">
+  <div class="container-fluid">
     <img src="/bubble_bkgrnd.png" alt="" class="background-image" />
     <div class="content">
       <Sidebar />
       <div class="flex-grow-1 p-4">
         <header>
-<!--          <p class="mb-0">{{ messages.label_homepage_welcome }},</p>-->
-<!--          <p class="name">{{ currentUser.name }} 👋</p>-->
+          <!--          <p class="mb-0">{{ messages.label_homepage_welcome }},</p>-->
+          <!--          <p class="name">{{ currentUser.name }} 👋</p>-->
         </header>
         <main>
           <router-view></router-view>
@@ -91,47 +91,18 @@ export default {
 
   data: () => ({
     currentUser: null,
-    hasPaymentMethod: false,
   }),
 
   computed: {
     ...mapState('system', ['configs', 'messages']),
-
-    isPageAvailable() {
-      return !this.configs.paymentsEnabled || this.hasPaymentMethod;
-    },
   },
 
   created() {
     this.currentUser = util.currentUser();
   },
 
-  mounted() {
-    if (this.configs.paymentsEnabled) {
-      this.hasPaymentMethod = true;
-    }
-    if (this.accountPaymentMethods && this.configs.paymentsEnabled) {
-      const payMethods = [];
-      Array.from(this.accountPaymentMethods).forEach((pm) => {
-        if (
-          (typeof pm.promotion === 'undefined' ||
-            pm.promotion === null ||
-            !pm.promotion) &&
-          (typeof pm.deleted === 'undefined' || pm.deleted === null)
-        ) {
-          payMethods.push(pm);
-        }
-      });
+  mounted() {},
 
-      if (payMethods.length > 0) {
-        this.hasPaymentMethod = true;
-      }
-    }
-  },
-
-  methods: {
-    ...mapActions('paymentMethods', ['getAllAccountPaymentMethods']),
-    ...mapState('paymentMethods', ['accountPaymentMethods']),
-  },
+  methods: {},
 };
 </script>

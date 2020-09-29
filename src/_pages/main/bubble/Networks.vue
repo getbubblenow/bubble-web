@@ -102,9 +102,7 @@ export default {
   watch: {
     networks(nets) {
       if (nets && nets.length) {
-        if (nets.length === 0) {
-          this.$router.replace({ path: '/new_bubble' });
-        } else if (nets.length === 1 && util.currentUser().admin !== true) {
+        if (nets.length === 1 && util.currentUser().admin !== true) {
           this.$router.replace({ path: '/bubble/' + nets[0].name });
         }
       }

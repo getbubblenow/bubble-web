@@ -164,11 +164,17 @@ const actions = {
         (error) => commit('restoreFailure', systemConfigs, error)
       );
   },
-  restoreFromPackage({ commit }, { shortKey, backupFileRef, password, systemConfigs, messages, errors }) {
+  restoreFromPackage(
+    { commit },
+    { shortKey, backupFileRef, password, systemConfigs, messages, errors }
+  ) {
     commit('restoreRequest', systemConfigs);
-    userService.restoreFromPackage(shortKey, backupFileRef, password, messages, errors)
-               .then(ok => commit('restoreSuccess', systemConfigs),
-                     error => commit('restoreFailure', systemConfigs, error));
+    userService
+      .restoreFromPackage(shortKey, backupFileRef, password, messages, errors)
+      .then(
+        (ok) => commit('restoreSuccess', systemConfigs),
+        (error) => commit('restoreFailure', systemConfigs, error)
+      );
   },
   forgotPassword({ commit }, { username, messages, errors }) {
     commit('forgotPasswordRequest');
@@ -187,7 +193,7 @@ const actions = {
     userService.register(user, messages, errors).then(
       (user) => {
         commit('registerSuccess', user);
-        router.push('/new_bubble');
+        router.push('/bubble');
         setTimeout(() => {
           // display success message after route change completes
           dispatch('alert/success', messages.alert_registration_success, {
@@ -315,7 +321,11 @@ const mutations = {
   },
   checkSessionRequest(state) {},
   checkSessionSuccess(state, user) {
-    console.log('checkSessionSuccess', state.user.preferredPlan, user.preferredPlan);
+    console.log(
+      'checkSessionSuccess',
+      state.user.preferredPlan,
+      user.preferredPlan
+    );
     if (user.token) {
       if (util.currentUser() === null) {
         // we must have logged out while this request was in flight... do nothing
@@ -410,15 +420,21 @@ const mutations = {
   },
 
   restoreRequest(state, systemConfigs) {
-    state.status = Object.assign({}, state.status, { uploadingRestoreRequestData: true });
+    state.status = Object.assign({}, state.status, {
+      uploadingRestoreRequestData: true,
+    });
   },
   restoreSuccess(state, systemConfigs) {
-    state.status = Object.assign({}, state.status, { uploadingRestoreRequestData: false });
+    state.status = Object.assign({}, state.status, {
+      uploadingRestoreRequestData: false,
+    });
     systemConfigs.restoreInProgress = true;
     systemConfigs.awaitingRestore = false;
   },
   restoreFailure(state, systemConfigs, error) {
-    state.status = Object.assign({}, state.status, { uploadingRestoreRequestData: false });
+    state.status = Object.assign({}, state.status, {
+      uploadingRestoreRequestData: false,
+    });
     systemConfigs.restoreInProgress = false;
     console.log('restore failed: ' + JSON.stringify(error));
   },
