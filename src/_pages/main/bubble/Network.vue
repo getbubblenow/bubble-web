@@ -336,6 +336,35 @@
       </div>
     </div>
 
+    <form @submit.prevent="updateProfile">
+      <h3>{{ messages.field_label_auto_update_policy }}</h3>
+
+      <Checkbox
+        v-if="user.admin"
+        class="mb-3"
+        id="autoUpdatePolicy.jarUpdates"
+        v-model="autoUpdatePolicy.jarUpdates"
+        :label="messages.field_label_auto_update_jar"
+      />
+      <Checkbox
+        id="autoUpdatePolicy.appUpdates"
+        class="mb-3"
+        v-model="autoUpdatePolicy.appUpdates"
+        :label="messages.field_label_auto_update_apps"
+      />
+      <div class="form-group">
+        <Button
+          color="default"
+          type="submit"
+          class="btn btn-primary"
+          :disabled="loadingUser()"
+        >
+          {{ messages.button_label_update_policy }}
+        </Button>
+        <img v-show="loadingUser()" :src="loadingImgSrc" />
+      </div>
+    </form>
+
     <div v-if="configs.sageLauncher">
       <div class="text-danger">
         <h4>{{ messages.title_network_danger_zone }}</h4>
@@ -408,12 +437,13 @@ import { mapState, mapActions, mapGetters } from 'vuex';
 import { util } from '~/_helpers';
 import { loadingImgSrc } from '~/_store';
 
-import { Button, Input } from '~/_components/shared';
+import { Button, Input, Checkbox } from '~/_components/shared';
 
 export default {
   components: {
     Button,
     Input,
+    Checkbox,
   },
   data() {
     return {
@@ -431,6 +461,10 @@ export default {
       upgradeRefresher: null,
       logsExpirationDays: null,
       backupDownloadRefresher: null,
+      autoUpdatePolicy: {
+        jarUpdates: true,
+        appUpdates: true,
+      },
 
       lottie: null,
       timerID: null,
@@ -588,6 +622,9 @@ export default {
       'checkForUpgrade',
       'upgrade',
     ]),
+    ...mapActions('users', ['updateUser']),
+    ...mapGetters('users', { loadingUser: 'loading' }),
+
     refreshStatus(userId) {
       if (!this.lottie && this.$refs.lottie) {
         this.lottie = Lottie.loadAnimation({
@@ -785,6 +822,18 @@ export default {
     doUpgrade() {
       this.upgrade();
     },
+    updateProfile() {
+      this.errors.clear();
+      this.submitted = true;
+      this.updateUser({
+        user: {
+          email: this.user.email,
+          autoUpdatePolicy: this.autoUpdatePolicy,
+        },
+        messages: this.messages,
+        errors: this.errors,
+      });
+    },
   },
 
   created() {
@@ -794,6 +843,8 @@ export default {
     this.restoreKeyCode = this.$route.query.keys_code;
     this.getAppLinks(user.locale);
     this.loadSystemConfigs();
+
+    this.autoUpdatePolicy = user.autoUpdatePolicy;
   },
 
   beforeDestroy() {

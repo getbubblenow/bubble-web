@@ -56,7 +56,7 @@ export const router = new Router({
     // { path: '/legal', component: LegalPage },
     // { path: '/support', component: SupportPage },
 
-    // { path: '/me/old', component: ProfilePage },
+    { path: '/me/old', component: ProfilePage },
     // { path: '/me/policy', component: PolicyPage },
     // { path: '/me/changePassword/old', component: ChangePasswordPage },
     // { path: '/me/setPassword/:code', component: SetPasswordPage },

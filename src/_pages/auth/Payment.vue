@@ -277,7 +277,14 @@ export default {
             priceMinorUnits: this.plans[i].price % 100,
           });
         }
-        this.bubblePlan = this.plans[0].name;
+        const matchingPlan = this.plans.find(
+          (plan) => plan.uuid === this.user.preferredPlan
+        );
+        if (matchingPlan) {
+          this.bubblePlan = matchingPlan.name;
+        } else {
+          this.bubblePlan = this.plans[0].name;
+        }
       }
       return plans_array;
     },

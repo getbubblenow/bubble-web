@@ -66,7 +66,11 @@ export default {
         this.currentUser.locale !== null
           ? this.currentUser.locale
           : 'detect';
-      if (this.currentUser && !this.currentUser.admin) {
+      if (
+        this.currentUser &&
+        !this.currentUser.admin &&
+        !this.verifiedContacts
+      ) {
         this.getPolicyByUserId({
           userId: this.currentUser.uuid,
           messages: this.messages,
@@ -76,6 +80,7 @@ export default {
 
       this.isPageAvailable =
         !this.currentUser ||
+        this.$route.path === '/login' ||
         this.$route.path === '/me/action' ||
         this.$route.path === '/logout' ||
         this.$route.path === '/verifyEmail' ||
@@ -106,6 +111,8 @@ export default {
     navigateToPaymentPage() {
       if (this.$route.path !== '/payment') {
         this.$router.push('/payment');
+      } else {
+        this.initDefaults();
       }
     },
 

@@ -938,9 +938,7 @@
         <Checkbox
           id="receiveLoginNotifications"
           v-model="newContact.receiveLoginNotifications"
-          :label="
-            messages.field_label_policy_contact_receiveLoginNotifications
-          "
+          :label="messages.field_label_policy_contact_receiveLoginNotifications"
         />
       </div>
       <div
@@ -1004,6 +1002,52 @@
           :disabled="loading() || !newContactValid"
         >
           {{ messages.button_label_add_contact }}
+        </Button>
+        <img v-show="loading()" :src="loadingImgSrc" />
+      </div>
+    </form>
+
+    <hr />
+    <form
+      @submit.prevent="updateProfile"
+      v-if="configs.showBlockStatsSupported || currentUser.admin === true"
+    >
+      <div v-if="configs.showBlockStatsSupported" class="form-group">
+        <Checkbox
+          id="showBlockStats"
+          v-model="profile.showBlockStats"
+          :label="messages.field_label_show_block_stats"
+        />
+        <div
+          v-if="submitted && errors.has('showBlockStats')"
+          class="invalid-feedback d-block"
+        >
+          {{ errors.first('showBlockStats') }}
+        </div>
+      </div>
+      <!-- sync password -->
+      <div v-if="currentUser.admin === true" class="form-group">
+        <Checkbox
+          id="sync"
+          v-model="profile.sync"
+          :label="messages.field_label_sync_account"
+        />
+        <div
+          v-if="submitted && errors.has('sync')"
+          class="invalid-feedback d-block"
+        >
+          {{ errors.first('sync') }}
+        </div>
+        <p>{{ messages.field_label_sync_account_description }}</p>
+      </div>
+      <div class="form-group">
+        <Button
+          color="default"
+          type="submit"
+          class="btn btn-primary"
+          :disabled="loading()"
+        >
+          {{ messages.button_label_update_policy }}
         </Button>
         <img v-show="loading()" :src="loadingImgSrc" />
       </div>
@@ -1082,11 +1126,18 @@ export default {
       watchedPolicy: null,
       showDownloadMessages: false,
       loadingImgSrc: loadingImgSrc,
+
+      profile: {
+        email: null,
+        sync: null,
+        showBlockStats: null,
+      },
     };
   },
   computed: {
     ...mapState('account', ['actionStatus', 'status']),
     ...mapState('system', [
+      'configs',
       'messages',
       'accountDeletionOptions',
       'timeDurationOptions',
@@ -1140,6 +1191,7 @@ export default {
     ]),
     ...mapActions('users', [
       'getUserById',
+      'updateUser',
       'getPolicyByUserId',
       'updatePolicyByUserId',
       'addPolicyContactByUserId',
@@ -1172,6 +1224,15 @@ export default {
             this.authenticatorTimeoutUnits
           ),
         },
+        messages: this.messages,
+        errors: this.errors,
+      });
+    },
+    updateProfile() {
+      this.errors.clear();
+      this.submitted = true;
+      this.updateUser({
+        user: this.profile,
         messages: this.messages,
         errors: this.errors,
       });
@@ -1456,6 +1517,10 @@ export default {
         errors: this.errors,
       });
     }
+
+    this.profile.email = this.currentUser.email;
+    this.profile.showBlockStats = this.currentUser.showBlockStats;
+    this.profile.sync = this.currentUser.sync;
   },
 };
 </script>
