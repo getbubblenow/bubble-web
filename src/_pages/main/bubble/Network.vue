@@ -336,7 +336,9 @@
       </div>
     </div>
 
-    <form @submit.prevent="updateProfile">
+    <hr />
+
+    <form v-if="!configs.sageLauncher" @submit.prevent="updateProfile">
       <h3>{{ messages.field_label_auto_update_policy }}</h3>
 
       <Checkbox
@@ -405,6 +407,7 @@
         </div>
         <br />
       </span>
+
       <div style="border: 2px solid #000;">
         <Button
           color="default"

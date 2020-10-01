@@ -33,7 +33,9 @@
         </template>
       </v-select>
 
-      <div class="d-flex align-items-center justify-content-center mb-3">
+      <div
+        class="d-flex align-items-center justify-content-center mb-3 flex-wrap"
+      >
         <a
           v-if="appLinks"
           target="_blank"

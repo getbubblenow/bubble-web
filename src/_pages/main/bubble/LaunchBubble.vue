@@ -24,7 +24,11 @@
         @click="launchBubble"
         :disabled="loading()"
       >
-        {{ messages.button_label_launch_bubble }}
+        {{
+          submitted === true && loading()
+            ? messages.button_label_launching_bubble
+            : messages.button_label_launch_bubble
+        }}
       </Button>
 
       <a class="mt-3 btn-modal" href="#" @click="openSettingsModal">
@@ -205,6 +209,7 @@ export default {
             if (this.accountPlan.sendMetrics === null)
               this.accountPlan.sendMetrics = true;
           }
+          this.submitted = true;
           this.addPlanAndStartNetwork({
             userId: this.user.uuid,
             accountPlan: this.accountPlan,

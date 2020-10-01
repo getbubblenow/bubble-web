@@ -282,7 +282,11 @@
             @click="launchBubble"
             :disabled="loading() || !isComplete"
           >
-            {{ messages.button_label_launch }}
+            {{
+              submitted === true && loading()
+                ? messages.button_label_launching_bubble
+                : messages.button_label_launch_bubble
+            }}
           </Button>
         </div>
       </div>

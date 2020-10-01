@@ -21,7 +21,7 @@
         class="text-white link"
         v-for="item in footerLinks"
         :key="item"
-        :to="messages[`link_${item}`]"
+        :href="messages[`link_${item}`]"
       >
         {{ messages[`title_${item}`] }}
       </a>

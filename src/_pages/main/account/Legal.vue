@@ -11,7 +11,7 @@
         :key="index"
         class="col-lg-6 col-md-6 col-sm-12 my-4 px-3"
       >
-        <a :href="messages[`legal_${item}_link`]">
+        <a :href="messages[`legal_${item}_link`]" target="_blank">
           <div class="h-100 card-container">
             <div class="d-flex justify-content-between align-items-center">
               <span>{{ messages[`legal_${item}`] }}</span>

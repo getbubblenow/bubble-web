@@ -19,10 +19,14 @@
               {{ device.name }}
             </p>
             <div v-if="device.status.lastHandshakeTime" class="device-text">
-              <hr />
               {{ messages.label_field_device_connection_handshake }}:
               <span v-if="device.status.lastHandshakeDays">
-                {{ device.status.lastHandshakeDays }}{{ messages.units_days }}
+                {{ device.status.lastHandshakeDays }}&nbsp;
+                {{
+                  device.status.lastHandshakeDays === 1
+                    ? messages.units_day
+                    : messages.units_days
+                }}
               </span>
               <span
                 v-else-if="
@@ -62,55 +66,53 @@
             </div>
             <div v-if="device.status.ip" class="device-text">
               {{ device.status.ip }}
-              <div v-if="device.status.location">
-                <hr />
-                <span
-                  v-if="
-                    device.status.location.city &&
-                      device.status.location.region &&
-                      device.status.location.country
-                  "
-                >
-                  {{ device.status.location.city }},
-                  {{ device.status.location.region }},
-                  {{ messages['country_' + device.status.location.country] }}
-                </span>
-                <span
-                  v-else-if="
+            </div>
+            <div v-if="device.status.location" class="device-text">
+              <span
+                v-if="
+                  device.status.location.city &&
                     device.status.location.region &&
-                      device.status.location.country
-                  "
-                >
-                  {{ device.status.location.region }},
-                  {{ messages['country_' + device.status.location.country] }}
-                </span>
-                <span
-                  v-else-if="
-                    device.status.location.city &&
-                      device.status.location.country
-                  "
-                >
-                  {{ device.status.location.city }},
-                  {{ messages['country_' + device.status.location.country] }}
-                </span>
-                <span v-else-if="device.status.location.country">
-                  {{ messages['country_' + device.status.location.country] }}
-                </span>
-                <span
-                  v-else-if="
-                    device.status.location.city && device.status.location.region
-                  "
-                >
-                  {{ device.status.location.city }},
-                  {{ device.status.location.region }}
-                </span>
-                <span v-else-if="device.status.location.region">
-                  {{ device.status.location.region }}
-                </span>
-                <span v-else-if="device.status.location.city">
-                  {{ device.status.location.city }}
-                </span>
-              </div>
+                    device.status.location.country
+                "
+              >
+                {{ device.status.location.city }},
+                {{ device.status.location.region }},
+                {{ messages['country_' + device.status.location.country] }}
+              </span>
+              <span
+                v-else-if="
+                  device.status.location.region &&
+                    device.status.location.country
+                "
+              >
+                {{ device.status.location.region }},
+                {{ messages['country_' + device.status.location.country] }}
+              </span>
+              <span
+                v-else-if="
+                  device.status.location.city && device.status.location.country
+                "
+              >
+                {{ device.status.location.city }},
+                {{ messages['country_' + device.status.location.country] }}
+              </span>
+              <span v-else-if="device.status.location.country">
+                {{ messages['country_' + device.status.location.country] }}
+              </span>
+              <span
+                v-else-if="
+                  device.status.location.city && device.status.location.region
+                "
+              >
+                {{ device.status.location.city }},
+                {{ device.status.location.region }}
+              </span>
+              <span v-else-if="device.status.location.region">
+                {{ device.status.location.region }}
+              </span>
+              <span v-else-if="device.status.location.city">
+                {{ device.status.location.city }}
+              </span>
             </div>
             <a @click="showDetails(device)" class="device-details">
               {{ messages.label_button_detail }}
@@ -147,7 +149,7 @@
 
 .device-text {
   color: #666;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 20px;
   margin-bottom: 8px;
 }
