@@ -99,6 +99,10 @@ export const router = new Router({
               path: 'bubble/:id',
               component: () => import('~/_pages/main/bubble/Network'),
             },
+            {
+              path: 'new_bubble',
+              component: NewNetworkPage,
+            },
             { path: 'action', component: ActionPage },
             { path: 'resetPassword/:code', component: SetPasswordPage },
 

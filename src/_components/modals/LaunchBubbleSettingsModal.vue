@@ -89,6 +89,49 @@
         </div>
       </div>
 
+      <div class="form-group" v-if="planObjects">
+        <v-select
+          v-model="accountPlan.plan"
+          name="plan"
+          :class="{ 'is-invalid': submitted && errors.has('plan') }"
+          :options="planObjects"
+          label="name"
+          :placeholder="messages.field_label_plan"
+          :reduce="(option) => option.name"
+        >
+          <template v-slot:option="option">
+            <span>
+              {{ messages['plan_name_' + option.name] }} -
+              {{
+                messages.price_format.parseExpression({
+                  messages: messages,
+                  ...option,
+                })
+              }}
+            </span>
+          </template>
+          <template v-slot:selected-option="option">
+            <span>
+              {{ messages.field_label_plan }}:
+              {{ messages['plan_name_' + option.name] }} -
+              {{
+                messages.price_format.parseExpression({
+                  messages: messages,
+                  ...selectedPlan,
+                  ...option,
+                })
+              }}
+            </span>
+          </template>
+        </v-select>
+        <div
+          v-if="submitted && errors.has('plan')"
+          class="invalid-feedback d-block"
+        >
+          {{ errors.first('plan') }}
+        </div>
+      </div>
+
       <div class="form-group" v-if="domains">
         <v-select
           :clearable="false"
@@ -249,6 +292,7 @@
         </div>
         <p>{{ messages.field_label_send_errors_description }}</p>
       </div>
+
       <!-- metrics reporting -->
       <div
         class="form-group"
@@ -375,6 +419,7 @@ export default {
       'detectedTimezone',
     ]),
     ...mapState('domains', ['domains']),
+    ...mapState('plans', ['plans']),
     ...mapState('networks', ['nearestRegions', 'newNodeNotification']),
     ...mapState('footprints', ['footprints']),
     ...mapState('users', ['sshKeys']),
@@ -389,6 +434,30 @@ export default {
         });
       }
       return tz_objects;
+    },
+
+    planObjects: function() {
+      const plans_array = [];
+      if (this.plans) {
+        for (let i = 0; i < this.plans.length; i++) {
+          plans_array.push({
+            ...this.plans[i],
+            localName: this.messages['plan_name_' + this.plans[i].name],
+            description: this.messages[
+              'plan_description_' + this.plans[i].name
+            ],
+            priceMajorUnits: this.plans[i].price / 100,
+            priceMinorUnits: this.plans[i].price % 100,
+          });
+        }
+      }
+      return plans_array;
+    },
+
+    selectedPlan: function() {
+      return this.accountPlan && this.accountPlan.plan
+        ? this.findPlan(this.accountPlan.plan)
+        : null;
     },
 
     networkTypeOptions: function() {
@@ -460,7 +529,18 @@ export default {
     ...mapActions('footprints', ['getAllFootprints']),
     ...mapActions('users', ['listSshKeysByUserId']),
     ...mapGetters('networks', ['loading']),
+    ...mapActions('plans', ['getAllPlans']),
     ...mapActions('paymentMethods', ['getAllAccountPaymentMethods']),
+
+    findPlan(name) {
+      const plans = this.planObjects;
+      if (plans) {
+        for (let i = 0; i < plans.length; i++) {
+          if (plans[i].name === name) return plans[i];
+        }
+      }
+      return null;
+    },
 
     setAccountPaymentMethod(apm) {
       this.accountPlan.paymentMethodObject = {
@@ -511,6 +591,7 @@ export default {
         messages: this.messages,
         errors: this.errors,
       });
+      this.getAllPlans(this.messages, this.errors);
       this.onUpdateSSH();
     },
 
@@ -603,7 +684,6 @@ export default {
 
   watch: {
     'accountPlan.name'(newVal) {
-      console.log('--changed--', newVal);
       if (newVal === '') {
         this.$nextTick(() => {
           this.accountPlan.name = this.getDefaultName();
@@ -687,6 +767,22 @@ export default {
           payMethods.length > 0
         ) {
           this.setAccountPaymentMethod(payMethods[0]);
+        }
+      }
+    },
+
+    plans(p) {
+      if (p) {
+        if (this.user && this.user.preferredPlan) {
+          const plans = this.planObjects;
+          if (plans) {
+            for (let i = 0; i < plans.length; i++) {
+              if (plans[i].uuid === this.user.preferredPlan) {
+                this.defaults.plan = plans[i].name;
+                this.accountPlan.plan = plans[i].name;
+              }
+            }
+          }
         }
       }
     },

@@ -1131,6 +1131,7 @@ export default {
         email: null,
         sync: null,
         showBlockStats: null,
+        admin: null,
       },
     };
   },
@@ -1188,6 +1189,7 @@ export default {
       'resendVerificationCode',
       'requestAccountDownload',
       'downloadAccount',
+      'checkSession',
     ]),
     ...mapActions('users', [
       'getUserById',
@@ -1198,6 +1200,7 @@ export default {
       'removePolicyContactByUserId',
     ]),
     ...mapGetters('users', ['loading']),
+
     isAuthenticator(val) {
       return window.isAuthenticator(val);
     },
@@ -1235,6 +1238,11 @@ export default {
         user: this.profile,
         messages: this.messages,
         errors: this.errors,
+      }).then(() => {
+        this.checkSession({
+          messages: this.messages,
+          errors: this.errors,
+        });
       });
     },
     addContact(e) {
@@ -1521,6 +1529,7 @@ export default {
     this.profile.email = this.currentUser.email;
     this.profile.showBlockStats = this.currentUser.showBlockStats;
     this.profile.sync = this.currentUser.sync;
+    this.profile.admin = this.currentUser.admin;
   },
 };
 </script>

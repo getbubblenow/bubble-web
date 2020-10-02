@@ -135,6 +135,7 @@ export default {
     ...mapState('footprints', ['footprints']),
     ...mapState('users', ['sshKeys']),
     ...mapState('paymentMethods', ['accountPaymentMethods']),
+    ...mapState('plans', ['plans']),
   },
 
   methods: {
@@ -143,6 +144,7 @@ export default {
     ...mapActions('footprints', ['getAllFootprints']),
     ...mapActions('users', ['listSshKeysByUserId']),
     ...mapGetters('networks', ['loading']),
+    ...mapActions('plans', ['getAllPlans']),
     ...mapActions('paymentMethods', ['getAllAccountPaymentMethods']),
 
     openSettingsModal(ev) {
@@ -175,6 +177,10 @@ export default {
       this.accountPlan.name = currentUser.email.split('@')[0];
       this.getAllAccountPaymentMethods({
         userId: currentUser.uuid,
+        messages: this.messages,
+        errors: this.errors,
+      });
+      this.getAllPlans({
         messages: this.messages,
         errors: this.errors,
       });
@@ -313,6 +319,21 @@ export default {
           payMethods.length > 0
         ) {
           this.setAccountPaymentMethod(payMethods[0]);
+        }
+      }
+    },
+    plans(p) {
+      if (p) {
+        if (this.user && this.user.preferredPlan) {
+          const plans = this.planObjects;
+          if (plans) {
+            for (let i = 0; i < plans.length; i++) {
+              if (plans[i].uuid === this.user.preferredPlan) {
+                this.defaults.plan = plans[i].name;
+                this.accountPlan.plan = plans[i].name;
+              }
+            }
+          }
         }
       }
     },

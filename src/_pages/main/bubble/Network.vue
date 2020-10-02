@@ -627,6 +627,7 @@ export default {
     ]),
     ...mapActions('users', ['updateUser']),
     ...mapGetters('users', { loadingUser: 'loading' }),
+    ...mapActions('account', ['checkSession']),
 
     refreshStatus(userId) {
       if (!this.lottie && this.$refs.lottie) {
@@ -832,9 +833,15 @@ export default {
         user: {
           email: this.user.email,
           autoUpdatePolicy: this.autoUpdatePolicy,
+          admin: this.user.admin,
         },
         messages: this.messages,
         errors: this.errors,
+      }).then(() => {
+        this.checkSession({
+          messages: this.messages,
+          errors: this.errors,
+        });
       });
     },
   },

@@ -12,7 +12,7 @@
         class="col-lg-6 col-md-6 col-sm-12 my-4 px-3"
         v-if="configs && configs.support && configs.support.site"
       >
-        <a :href="configs.support.site">
+        <a :href="configs.support.site" target="_blank">
           <div class="h-100 card-container">
             <div class="d-flex justify-content-between align-items-center">
               <span>{{ messages.support_site_link }}</span>

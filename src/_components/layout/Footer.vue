@@ -22,6 +22,9 @@
         v-for="item in footerLinks"
         :key="item"
         :href="messages[`link_${item}`]"
+        :target="
+          messages[`link_${item}`].startsWith('http') ? '_blank' : '_self'
+        "
       >
         {{ messages[`title_${item}`] }}
       </a>

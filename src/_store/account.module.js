@@ -193,7 +193,7 @@ const actions = {
     userService.register(user, messages, errors).then(
       (user) => {
         commit('registerSuccess', user);
-        router.push('/bubble');
+        router.push('/verifyEmail');
         setTimeout(() => {
           // display success message after route change completes
           dispatch('alert/success', messages.alert_registration_success, {
@@ -321,12 +321,8 @@ const mutations = {
   },
   checkSessionRequest(state) {},
   checkSessionSuccess(state, user) {
-    console.log(
-      'checkSessionSuccess',
-      state.user.preferredPlan,
-      user.preferredPlan
-    );
-    if (user.token) {
+    console.log('checkSessionSuccess', state.user.preferredPlan, user);
+    if (user) {
       if (util.currentUser() === null) {
         // we must have logged out while this request was in flight... do nothing
         state.user = null;
