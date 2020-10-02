@@ -43,7 +43,7 @@
         <hr />
       </div>
       <Button color="default" width="195" height="60" @click="deleteNet">
-        {{ messages.button_cancel_lauch_bubble }}
+        {{ messages.button_cancel_launch_bubble }}
       </Button>
     </div>
 
