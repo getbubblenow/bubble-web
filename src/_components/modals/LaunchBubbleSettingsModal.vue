@@ -464,7 +464,7 @@ export default {
       return [
         {
           name: this.messages.field_label_network_type_regular,
-          value: 'bubble',
+          value: 'node',
         },
         {
           name: this.messages.field_label_network_type_fork_sage,
