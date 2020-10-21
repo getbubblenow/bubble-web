@@ -138,6 +138,7 @@
           v-validate="'required'"
           :placeholder="messages.field_label_network_domain"
           :options="domains"
+          :reduce="d => d.name"
           v-model="accountPlan.domain"
           label="name"
         >
