@@ -1,6 +1,6 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
-  <aside class="sidebar">
+  <aside v-if="currentUser && currentUser.name" class="sidebar">
     <!-- Logo -->
     <div class="d-flex align-items-center logo">
       <router-link to="/">
@@ -275,7 +275,7 @@ export default {
   },
 
   data: () => ({
-    currentUser: util.currentUser(),
+    currentUser: util.currentUser() || {name: null, email: null},
     menuVisible: false,
   }),
 
