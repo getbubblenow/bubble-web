@@ -28,7 +28,7 @@
       >
         <template v-slot:selected-option="option">
           <span>
-            {{ messages.label_field_device_security_level }}: {{ option.label }}
+            {{ messages.label_field_device_security_level }}: {{ messages['device_security_level_'+option.label] }}
           </span>
         </template>
       </v-select>
