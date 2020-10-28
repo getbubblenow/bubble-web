@@ -9,7 +9,8 @@
         class="device"
         v-for="device in availableDevices"
         :key="device"
-        download
+        target="_blank"
+        rel="noopener noreferrer"
         :href="appLink(device)"
       >
         <img :src="`/${device}.png`" />
@@ -130,7 +131,7 @@ export default {
         case 'android':
           return this.appLinks['android'];
         case 'mac_computer':
-          return this.appLinks['macos'];
+          return this.appLinks['macosx'];
         case 'windows_computer':
           return this.appLinks['windows'];
         case 'linux_computer':
