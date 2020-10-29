@@ -97,7 +97,7 @@
           :options="planObjects"
           label="name"
           :placeholder="messages.field_label_plan"
-          :reduce="(option) => option.name"
+          :reduce="(option) => option.uuid"
         >
           <template v-slot:option="option">
             <span>
