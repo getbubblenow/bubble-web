@@ -633,6 +633,7 @@
             regionDistance (uuid) {
                 const region = this.findRegion(uuid);
                 if (region === null) return null;
+                if (region.distance === -1) return '';
                 return "(~"+parseInt(region.distance/1000)+" "+this.messages.msg_km_distance_away+")";
             },
             findPlan(name) {

@@ -615,6 +615,7 @@ export default {
     regionDistance(uuid) {
       const region = this.findRegion(uuid);
       if (region === null) return null;
+      if (region.distance === -1) return '';
       return (
         '(~' +
         +(region.distance / 1000).toFixed(0) +
