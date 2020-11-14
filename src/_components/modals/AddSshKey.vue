@@ -139,7 +139,6 @@ export default {
       this.sshPublicKey = '';
       this.minExpiration = new Date().toISOString();
       this.expiration = null;
-      this.timezone = this.detectedTimezone.timeZoneId;
       this.submitted = false;
     },
     hide() {

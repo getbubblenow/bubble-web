@@ -47,7 +47,7 @@ const actions = {
   },
   checkSession({ commit }, { messages, errors }) {
     commit('checkSessionRequest');
-    userService.getMe(messages, errors).then(
+    return userService.getMe(messages, errors).then(
       (user) => commit('checkSessionSuccess', user),
       (error) => {
         commit('checkSessionFailure', error);

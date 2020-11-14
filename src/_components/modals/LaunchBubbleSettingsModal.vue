@@ -138,7 +138,7 @@
           v-validate="'required'"
           :placeholder="messages.field_label_network_domain"
           :options="domains"
-          :reduce="d => d.name"
+          :reduce="(d) => d.name"
           v-model="accountPlan.domain"
           label="name"
         >
@@ -775,6 +775,7 @@ export default {
 
     plans(p) {
       if (p) {
+        console.log('plans', JSON.stringify(this.user));
         if (this.user && this.user.preferredPlan) {
           const plans = this.planObjects;
           if (plans) {

@@ -334,6 +334,8 @@ export default {
             this.checkSession({
               messages: this.messages,
               errors: this.errors,
+            }).then(() => {
+              this.$router.push('/');
             });
           });
         }

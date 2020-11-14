@@ -190,7 +190,7 @@ export default {
           payMethods.length > 0
         ) {
           this.hasPaymentMethod = true;
-          this.navigateToDashboard();
+          this.initDefaults();
         } else {
           this.navigateToPaymentPage();
         }
