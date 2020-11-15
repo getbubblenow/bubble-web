@@ -264,7 +264,7 @@
                     domain: this.domainActivationObject()
                 };
                 for (let cloud in this.cloudsEnabled) {
-                    if (this.cloudsEnabled.hasOwnProperty(cloud)) {
+                    if (this.cloudsEnabled.hasOwnProperty(cloud) && this.cloudsEnabled[cloud]) {
                         activation.cloudConfigs[cloud] = {
                             config: this.configValues[cloud],
                             credentials: this.credentialValues[cloud]
