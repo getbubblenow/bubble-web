@@ -68,7 +68,7 @@
           {{ confirmPasswordErrors.join(', ') }}
         </span>
       </div>
-      <div class="form-group">
+      <div class="form-group" v-show="configs.promoCodePolicy !== 'disabled'">
         <Input
           class="form-control"
           v-model="promoCode"
@@ -87,7 +87,7 @@
           {{ errors.first('promoCode') }}
         </div>
       </div>
-      <a :href="messages.message_request_promoCode_link" target="_blank">
+      <a :href="messages.message_request_promoCode_link" target="_blank" v-if="configs.promoCodePolicy !== 'disabled'">
         {{ messages.message_request_promoCode }}
       </a>
 
@@ -132,15 +132,15 @@
         </div>
       </div>
 
-      <div class="form-separator"></div>
+      <div class="form-separator" v-if="!configs.localNetwork"></div>
 
-      <div class="form-group my-3">
+      <div class="form-group my-3" v-if="!configs.localNetwork">
         <Checkbox
           v-model="receiveInformationalMessages"
           :label="messages.field_label_sendInformation"
         />
       </div>
-      <div class="form-group my-3">
+      <div class="form-group my-3" v-if="!configs.localNetwork">
         <Checkbox
           v-model="receivePromotionalMessages"
           :label="messages.field_label_sendNews"
@@ -188,7 +188,6 @@ export default {
     Button,
     Input,
     Checkbox,
-
     Features,
   },
 
@@ -198,9 +197,6 @@ export default {
     password: { required, minLength: minLength(8) },
     confirmPassword: {
       sameAsPassword: sameAs('password'),
-    },
-    promoCode: {
-      required,
     },
     agreeToTerms: {
       required,
@@ -264,6 +260,9 @@ export default {
 
     promoCodeErrors() {
       const errors = [];
+      if (typeof this.$v.promoCode === 'undefined') {
+        return errors;
+      }
       if (!this.$v.promoCode.$dirty) return errors;
       !this.$v.promoCode.required &&
         errors.push(this.messages['err_promoCode_required']);
@@ -317,6 +316,8 @@ export default {
             promoCode: this.promoCode,
             preferredPlan: this.preferredPlan,
           },
+          local: this.configs.localNetwork,
+          payment: this.configs.paymentsEnabled,
           messages: this.messages,
           errors: this.errors,
         });

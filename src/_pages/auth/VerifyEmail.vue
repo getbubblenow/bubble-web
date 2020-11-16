@@ -76,7 +76,7 @@ export default {
   },
 
   computed: {
-    ...mapState('system', ['messages']),
+    ...mapState('system', ['messages', 'configs']),
     ...mapState('users', ['policy']),
   },
 

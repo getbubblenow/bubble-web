@@ -139,7 +139,7 @@ export default {
       this.verifiedContacts = this.hasVerifiedContact(p);
       const currentUser = util.currentUser();
       if (!currentUser) return;
-      if (!this.verifiedContacts && !currentUser.admin) {
+      if (!this.verifiedContacts && !currentUser.admin && !this.configs.localNetwork) {
         this.navigateToVerifyEmail();
         if (this.verifiedContactRefresher === null) {
           const vue = this;
@@ -153,12 +153,14 @@ export default {
           }, 5000);
         }
       } else {
-        const currentUser = util.currentUser();
-        this.getAllAccountPaymentMethods({
-          userId: currentUser.uuid,
-          messages: this.messages,
-          errors: this.errors,
-        });
+        if (this.configs.paymentsEnabled && !this.configs.localNetwork) {
+          const currentUser = util.currentUser();
+          this.getAllAccountPaymentMethods({
+            userId: currentUser.uuid,
+            messages: this.messages,
+            errors: this.errors,
+          });
+        }
         if (this.verifiedContactRefresher !== null) {
           window.clearInterval(this.verifiedContactRefresher);
           this.verifiedContactRefresher = null;

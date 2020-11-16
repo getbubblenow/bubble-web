@@ -188,12 +188,18 @@ const actions = {
       }
     );
   },
-  register({ dispatch, commit }, { user, messages, errors }) {
+  register({ dispatch, commit }, { user, local, payment, messages, errors }) {
     commit('registerRequest', user);
     userService.register(user, messages, errors).then(
       (user) => {
         commit('registerSuccess', user);
-        router.push('/verifyEmail');
+        if (!local) {
+          router.push('/verifyEmail');
+        } else if (payment) {
+          router.push('/payment');
+        } else {
+          router.push('/');
+        }
         setTimeout(() => {
           // display success message after route change completes
           dispatch('alert/success', messages.alert_registration_success, {

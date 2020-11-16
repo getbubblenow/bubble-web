@@ -16,6 +16,7 @@ const state = {
     networkUuid: null,
     allowRegistration: false,
     paymentsEnabled: false,
+    localNetwork: false,
     sageLauncher: false,
     bubbleNode: null,
     entityClasses: [],
