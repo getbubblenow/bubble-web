@@ -58,6 +58,20 @@ export default {
     ...mapActions('users', ['getPolicyByUserId']),
     ...mapActions('paymentMethods', ['getAllAccountPaymentMethods']),
 
+    setPageAvailability() {
+      this.isPageAvailable =
+          !this.currentUser ||
+          this.configs.localNetwork ||
+          this.$route.path === '/login' ||
+          this.$route.path === '/me/action' ||
+          this.$route.path === '/logout' ||
+          this.$route.path === '/verifyEmail' ||
+          ((this.verifiedContacts || this.currentUser.admin) &&
+              (!this.configs.paymentsEnabled ||
+                  this.hasPaymentMethod === true ||
+                  this.$route.path === '/payment'));
+    },
+
     initDefaults() {
       this.currentUser = util.currentUser();
       const selectedLocale =
@@ -77,17 +91,7 @@ export default {
           errors: this.errors,
         });
       }
-
-      this.isPageAvailable =
-        !this.currentUser ||
-        this.$route.path === '/login' ||
-        this.$route.path === '/me/action' ||
-        this.$route.path === '/logout' ||
-        this.$route.path === '/verifyEmail' ||
-        ((this.verifiedContacts || this.currentUser.admin) &&
-          (!this.configs.paymentsEnabled ||
-            this.hasPaymentMethod === true ||
-            this.$route.path === '/payment'));
+      this.setPageAvailability();
     },
 
     hasVerifiedContact(policy) {
@@ -126,6 +130,13 @@ export default {
         this.initDefaults();
       }
     },
+
+    stopVerifyRefresher() {
+      if (this.verifiedContactRefresher !== null) {
+        window.clearInterval(this.verifiedContactRefresher);
+        this.verifiedContactRefresher = null;
+      }
+    }
   },
 
   watch: {
@@ -139,32 +150,43 @@ export default {
       this.verifiedContacts = this.hasVerifiedContact(p);
       const currentUser = util.currentUser();
       if (!currentUser) return;
-      if (!this.verifiedContacts && !currentUser.admin && !this.configs.localNetwork) {
-        this.navigateToVerifyEmail();
-        if (this.verifiedContactRefresher === null) {
-          const vue = this;
-          const currentUser = util.currentUser();
-          this.verifiedContactRefresher = window.setInterval(() => {
-            vue.getPolicyByUserId({
-              userId: currentUser.uuid,
-              messages: vue.messages,
-              errors: vue.errors,
-            });
-          }, 5000);
-        }
+      if (this.configs.localNetwork) {
+        this.verifiedContacts = true;
+        this.stopVerifyRefresher();
+        this.setPageAvailability();
       } else {
-        if (this.configs.paymentsEnabled && !this.configs.localNetwork) {
-          const currentUser = util.currentUser();
-          this.getAllAccountPaymentMethods({
-            userId: currentUser.uuid,
-            messages: this.messages,
-            errors: this.errors,
-          });
+        if (!this.verifiedContacts && !currentUser.admin) {
+          this.navigateToVerifyEmail();
+          if (this.verifiedContactRefresher === null) {
+            const vue = this;
+            const currentUser = util.currentUser();
+            this.verifiedContactRefresher = window.setInterval(() => {
+              vue.getPolicyByUserId({
+                userId: currentUser.uuid,
+                messages: vue.messages,
+                errors: vue.errors,
+              });
+            }, 5000);
+          }
+        } else {
+          if (this.configs.paymentsEnabled && !this.configs.localNetwork) {
+            const currentUser = util.currentUser();
+            this.getAllAccountPaymentMethods({
+              userId: currentUser.uuid,
+              messages: this.messages,
+              errors: this.errors,
+            });
+          }
+          this.stopVerifyRefresher()
         }
-        if (this.verifiedContactRefresher !== null) {
-          window.clearInterval(this.verifiedContactRefresher);
-          this.verifiedContactRefresher = null;
-        }
+      }
+    },
+
+    configs (cfgs) {
+      if (cfgs && cfgs.localNetwork) {
+        this.verifiedContacts = true;
+        this.stopVerifyRefresher();
+        this.setPageAvailability();
       }
     },
 
