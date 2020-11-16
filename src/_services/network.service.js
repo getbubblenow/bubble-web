@@ -48,9 +48,15 @@ function startNetwork(userId, planId, cloud, region, exactRegion, messages, erro
     return fetch(`${config.apiUrl}/users/${userId}/networks/${planId}/actions/start${cloudAndRegion}`, util.postWithAuth()).then(util.handleCrudResponse(messages, errors));
 }
 
-function forkNetwork(userId, planId, forkHost, cloud, region, exactRegion, messages, errors) {
-    const cloudAndRegion = getCloudAndRegion(cloud, region, exactRegion);
-    return fetch(`${config.apiUrl}/users/${userId}/networks/${planId}/actions/fork/${forkHost}${cloudAndRegion}`, util.putWithAuth()).then(util.handleCrudResponse(messages, errors));
+function forkNetwork(userId, planId, forkHost, adminEmail, cloud, region, exactRegion, messages, errors) {
+    const forkRequest = {
+        fqdn: forkHost,
+        adminEmail: adminEmail,
+        cloud: cloud,
+        region: region,
+        exactRegion: exactRegion
+    };
+    return fetch(`${config.apiUrl}/users/${userId}/networks/${planId}/actions/fork`, util.putWithAuth(forkRequest)).then(util.handleCrudResponse(messages, errors));
 }
 
 function getStatusesByNetworkId(userId, networkId, messages, errors) {
