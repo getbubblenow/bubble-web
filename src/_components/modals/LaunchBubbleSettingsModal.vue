@@ -36,7 +36,7 @@
           </v-select>
         </div>
       </div>
-      <!-- fork host -->
+      <!-- fork host and admin name -->
       <div
         v-if="
           showForkOption &&
@@ -68,6 +68,25 @@
         <p
           class="text-center description"
           v-html="messages.field_description_network_fork_host"
+        />
+
+        <Input
+          type="text"
+          v-model="accountPlan.adminEmail"
+          name="adminEmail"
+          :placeholder="messages.field_label_network_admin_email"
+          class="form-control"
+          :class="{ 'is-invalid': submitted && errors.has('adminEmail') }"
+        />
+        <div
+          v-if="submitted && errors.has('adminEmail')"
+          class="invalid-feedback d-block"
+        >
+          {{ errors.first('adminEmail') }}
+        </div>
+        <p
+          class="text-center description"
+          v-html="messages.field_description_network_admin_email"
         />
       </div>
       <!-- OR, name -->
@@ -392,6 +411,7 @@ export default {
         paymentInfo: null,
       },
       forkHost: '',
+      adminEmail: '',
       syncAccount: true,
       launchLock: false,
       sendErrors: true,
@@ -480,7 +500,7 @@ export default {
 
     isComplete() {
       return (
-        (this.accountPlan.name !== '' || this.accountPlan.forkHost !== '') &&
+        (this.accountPlan.name !== '' || (this.accountPlan.forkHost !== '' && this.accountPlan.adminEmail !== '')) &&
         this.accountPlan.domain !== '' &&
         this.accountPlan.locale !== '' &&
         this.accountPlan.timezone !== '' &&

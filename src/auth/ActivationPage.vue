@@ -4,7 +4,7 @@
         <h2>{{messages.form_title_activation}}</h2>
         <form @submit.prevent="submitActivation">
             <div class="form-group">
-                <label for="name">{{messages.field_label_username}}</label>
+                <label for="name">{{messages.field_label_email}}</label>
                 <input type="text" v-model="name" v-validate="'required'" name="name" class="form-control" :class="{ 'is-invalid': submitted && errors.has('name') }" />
                 <div v-if="submitted && errors.has('name')" class="invalid-feedback d-block">{{ errors.first('name') }}</div>
             </div>
@@ -116,7 +116,7 @@
                 submitted: false,
                 cloudTemplates: null,
 
-                name: 'root',
+                name: 'root@local.local',
                 password: null,
                 description: 'root user',
 
