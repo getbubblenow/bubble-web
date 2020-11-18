@@ -37,9 +37,11 @@
     </div>
 
     <!--- How it works Section --->
+    <!--
     <a class="how-it-works-section-link text-center d-block mt-5" href="#">
       {{ messages.how_it_works_title }}
     </a>
+    -->
     <LaunchBubbleSettingsModal ref="settingsModal" />
   </div>
 </template>
