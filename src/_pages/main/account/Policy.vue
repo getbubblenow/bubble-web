@@ -195,7 +195,12 @@
 
       <hr />
       <div class="form-group">
-        <Button color="default" class="btn btn-primary" :disabled="loading()">
+        <Button
+          color="default"
+          class="btn btn-primary"
+          :disabled="loading()"
+          type="submit"
+        >
           {{ messages.button_label_update_policy }}
         </Button>
         <img v-show="loading()" :src="loadingImgSrc" />
