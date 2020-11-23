@@ -28,7 +28,10 @@ export const util = {
 
     userLoggedIn: function() { return !!util.currentUser(); },
 
-    logout: function() { return localStorage.clear(); },
+    logout: function() {
+        location.reload();
+        return localStorage.clear();
+    },
 
     authHeader: function() {
         let user = util.currentUser();
@@ -164,8 +167,7 @@ export const util = {
                     if (response.status === 401) {                        
                         console.log('handlePlaintextResponse: unauthenticated request: ' + JSON.stringify(data));
                         util.logout();
-                        vue.$route.replace('/login');
-                    
+
                     } else if (response.status === 404) {
                         // todo: show nicer error message
                         console.log('handlePlaintextResponse: received 404: ' + (errData.resource || errData));

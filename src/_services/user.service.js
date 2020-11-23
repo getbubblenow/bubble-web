@@ -89,7 +89,8 @@ function logout(messages, errors) {
         return Promise.resolve();
     }
     return fetch(`${config.apiUrl}/auth/logout`, util.getWithAuth())
-        .then(util.handleCrudResponse(messages, errors));
+        .then(util.handleCrudResponse(messages, errors))
+        .then(() => window.location.replace('/login'));
 }
 
 function forgotPassword(username, messages, errors) {
@@ -247,7 +248,6 @@ function handleAuthResponse(messages, errors) {
                 if (response.status === 401) {
                     // auto logout if 401 response returned from api
                     logout();
-                    location.reload(true);
 
                 } else if (response.status === 404) {
                     // username or password was incorrect
