@@ -399,7 +399,7 @@ export default {
     accountPlan: {
       name: '',
       domain: '',
-      launchType: 'node',
+      launchType: null,
       locale: util.currentUser().locale,
       timezone: '',
       plan: 'bubble',
@@ -482,20 +482,28 @@ export default {
     },
 
     networkTypeOptions: function() {
-      return [
-        {
+      const opts = [];
+      if (!(this.configs.localNetwork === true)) {
+        opts.push({
           name: this.messages.field_label_network_type_regular,
           value: 'node',
-        },
-        {
-          name: this.messages.field_label_network_type_fork_sage,
-          value: 'fork_sage',
-        },
-        {
-          name: this.messages.field_label_network_type_fork_node,
-          value: 'fork_node',
-        },
-      ];
+        });
+        if (this.accountPlan.launchType === null) {
+          this.accountPlan.launchType = 'node';
+        }
+      }
+      opts.push({
+        name: this.messages.field_label_network_type_fork_sage,
+        value: 'fork_sage',
+      });
+      opts.push({
+        name: this.messages.field_label_network_type_fork_node,
+        value: 'fork_node',
+      });
+      if (this.accountPlan.launchType === null) {
+        this.accountPlan.launchType = 'fork_node';
+      }
+      return opts;
     },
 
     isComplete() {
