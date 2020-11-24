@@ -34,6 +34,11 @@
               </span>
             </template>
           </v-select>
+          <p
+              class="text-center description"
+              v-html="messages.field_description_network_type"
+          />
+
         </div>
       </div>
       <!-- fork host and admin name -->
