@@ -625,7 +625,10 @@ export default {
         messages: this.messages,
         errors: this.errors,
       });
-      this.getAllPlans(this.messages, this.errors);
+      this.getAllPlans({
+        messages: this.messages,
+        errors: this.errors,
+      });
       this.onUpdateSSH();
     },
 
@@ -821,7 +824,7 @@ export default {
           }
         }
       }
-    },
-  },
+    }
+  }
 };
 </script>

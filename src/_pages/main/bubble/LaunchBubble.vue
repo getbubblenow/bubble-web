@@ -137,7 +137,7 @@ export default {
     ...mapState('footprints', ['footprints']),
     ...mapState('users', ['sshKeys']),
     ...mapState('paymentMethods', ['accountPaymentMethods']),
-    ...mapState('plans', ['plans']),
+    ...mapState('plans', ['plans'])
   },
 
   methods: {
@@ -327,7 +327,7 @@ export default {
     plans(p) {
       if (p) {
         if (this.user && this.user.preferredPlan) {
-          const plans = this.planObjects;
+          const plans = p;
           if (plans) {
             for (let i = 0; i < plans.length; i++) {
               if (plans[i].uuid === this.user.preferredPlan) {
@@ -338,7 +338,7 @@ export default {
           }
         }
       }
-    },
-  },
+    }
+  }
 };
 </script>
