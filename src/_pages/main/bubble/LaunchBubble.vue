@@ -329,12 +329,16 @@ export default {
         if (this.user && this.user.preferredPlan) {
           const plans = p;
           if (plans) {
+            let found = false;
             for (let i = 0; i < plans.length; i++) {
-              if (plans[i].uuid === this.user.preferredPlan) {
-                this.defaults.plan = plans[i].name;
-                this.accountPlan.plan = plans[i].name;
+              const plan = plans[i];
+              if (plan.uuid === this.user.preferredPlan) {
+                found = true;
+                this.defaults.plan = plan.name;
+                this.accountPlan.plan = plan.name;
               }
             }
+            if (!found) console.warn('watch.plans: plan not found: '+this.user.preferredPlan);
           }
         }
       }
