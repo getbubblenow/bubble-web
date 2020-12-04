@@ -18,17 +18,19 @@
       </a>
     </div>
     <div class="links">
-      <a
-        class="text-white link"
-        v-for="item in footerLinks"
-        :key="item"
-        :href="messages[`link_${item}`]"
-        :target="
-          messages[`link_${item}`].startsWith('http') ? '_blank' : '_self'
-        "
-      >
-        {{ messages[`title_${item}`] }}
-      </a>
+      <div class="link" v-for="item in footerLinks" :key="item">
+        <a
+          class="text-white"
+          v-if="messages[`link${item}`].startsWith('http')"
+          :href="messages[`link_${item}`]"
+          target="_blank"
+        >
+          {{ messages[`title_${item}`] }}
+        </a>
+        <router-link v-else :to="messages[`link_${item}`]" class="text-white">
+          {{ messages[`title_${item}`] }}
+        </router-link>
+      </div>
     </div>
   </footer>
 </template>

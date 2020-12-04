@@ -1,9 +1,9 @@
 <!-- Copyright (c) 2020 Bubble, Inc. All rights reserved. For personal (non-commercial) use, see license: https://getbubblenow.com/bubble-license/ -->
 <template>
   <div>
-    <h1 class="title text-center white-text">{{ messages.title_support }}</h1>
+    <h1 class="title text-center">{{ messages.title_support }}</h1>
     <hr />
-    <h5 class="text-center white-text">
+    <h5 class="text-center">
       {{ messages.support_preamble }}
     </h5>
     <hr />
