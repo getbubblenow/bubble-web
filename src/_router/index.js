@@ -252,6 +252,7 @@ const publicPages = [
   '/auth',
   '/activate',
   '/legal',
+  '/support',
 
   '/me/action',
 ];
