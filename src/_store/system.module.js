@@ -210,11 +210,8 @@ const actions = {
           (error) => commit('checkForUpgradeFailure', error)
         );
     } else {
-      console.log(
-        'checkForUpgrade: already checked (' +
-          state.upgradeCheck +
-          '), not checking again'
-      );
+      commit('checkForUpgradeFailure', null)
+      console.log('checkForUpgrade: already checked (' + state.upgradeCheck + '), not checking again');
     }
   },
   upgrade({ commit }) {
@@ -535,6 +532,7 @@ const mutations = {
   },
   checkForUpgradeFailure(state, error) {
     state.error = error;
+    state.upgradeCheck = null;
   },
 
   upgradeRequest(state) {},
