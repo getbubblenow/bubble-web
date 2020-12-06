@@ -72,7 +72,8 @@ export default {
       if (this.messages) {
         const account_actions = this.configs.bubbleNode === true ? 'manage_account_node_actions' : 'manage_account_sage_actions';
         if (this.messages[account_actions]) {
-          const actions = this.messages[account_actions].split(',');
+          const vue = this;
+          const actions = this.messages[account_actions].split(',').filter(a => vue.configs.paymentsEnabled ? a : a !== 'billing' && a !== 'payment');
           if (this.currentUser.admin && this.currentUser.firstAdmin) {
             const delete_index = actions.indexOf('delete');
             if (delete_index !== -1) actions.splice(delete_index, 1);
