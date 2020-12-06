@@ -21,7 +21,7 @@
       <div class="link" v-for="item in footerLinks" :key="item">
         <a
           class="text-white"
-          v-if="messages[`link${item}`].startsWith('http')"
+          v-if="messages[`link_${item}`].startsWith('http')"
           :href="messages[`link_${item}`]"
           target="_blank"
         >
