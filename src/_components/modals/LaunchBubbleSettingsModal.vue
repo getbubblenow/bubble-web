@@ -512,17 +512,18 @@ export default {
     },
 
     isComplete() {
-      return (
-        (this.accountPlan.name !== '' || (this.accountPlan.forkHost !== '' && this.accountPlan.adminEmail !== '')) &&
-        this.accountPlan.domain !== '' &&
-        this.accountPlan.locale !== '' &&
-        this.accountPlan.timezone !== '' &&
-        this.accountPlan.plan !== '' &&
-        this.accountPlan.footprint !== '' &&
-        ((this.accountPlan.paymentMethodObject.paymentMethodType != null &&
-          this.accountPlan.paymentMethodObject.paymentInfo != null) ||
-          this.accountPlan.paymentMethodObject.uuid != null)
-      );
+      return ((
+          this.accountPlan.name !== '' || (this.accountPlan.forkHost !== '' && this.accountPlan.adminEmail !== '')) &&
+          this.accountPlan.domain !== '' &&
+          this.accountPlan.locale !== '' &&
+          this.accountPlan.timezone !== '' &&
+          this.accountPlan.plan !== '' &&
+          this.accountPlan.footprint !== '' &&
+          (this.configs.paymentsEnabled === false ||
+              ((this.accountPlan.paymentMethodObject.paymentMethodType != null &&
+                  this.accountPlan.paymentMethodObject.paymentInfo != null) ||
+                  this.accountPlan.paymentMethodObject.uuid != null)
+          ));
     },
 
     localeTexts: function() {
@@ -683,7 +684,7 @@ export default {
       this.errors.clear();
       this.$validator.validate().then((valid) => {
         if (valid) {
-          if (this.paymentInfo || this.accountPlan.paymentMethodObject.uuid) {
+          if (this.configs.paymentsEnabled === false || this.paymentInfo || this.accountPlan.paymentMethodObject.uuid) {
             const cloudRegion = this.findRegion(this.cloudRegionUuid);
             if (cloudRegion === null) {
               this.errors.add({
