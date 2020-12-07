@@ -92,6 +92,10 @@ export const router = new Router({
           children: [
             { path: '', component: DashboardPage },
             {
+              path: 'apidocs',
+              component: () => import('~/_pages/other/ApiDoc'),
+            },
+            {
               path: 'bubble',
               component: () => import('~/_pages/main/bubble/MyBubble'),
             },
@@ -253,6 +257,7 @@ const publicPages = [
   '/activate',
   '/legal',
   '/support',
+  '/apidocs',
 
   '/me/action',
 ];
