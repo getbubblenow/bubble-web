@@ -35,10 +35,9 @@
             </template>
           </v-select>
           <p
-              class="text-center description"
-              v-html="messages.field_description_network_type"
+            class="text-center description"
+            v-html="messages.field_description_network_type"
           />
-
         </div>
       </div>
       <!-- fork host and admin name -->
@@ -266,6 +265,8 @@
         <v-select
           :clearable="false"
           :placeholder="messages.field_label_network_ssh_key"
+          v-model="accountPlan.sshKey"
+          :reduce="(options) => options.uuid"
           :options="sshKeys"
         >
           <template v-slot:selected-option="option">
@@ -512,18 +513,20 @@ export default {
     },
 
     isComplete() {
-      return ((
-          this.accountPlan.name !== '' || (this.accountPlan.forkHost !== '' && this.accountPlan.adminEmail !== '')) &&
-          this.accountPlan.domain !== '' &&
-          this.accountPlan.locale !== '' &&
-          this.accountPlan.timezone !== '' &&
-          this.accountPlan.plan !== '' &&
-          this.accountPlan.footprint !== '' &&
-          (this.configs.paymentsEnabled === false ||
-              ((this.accountPlan.paymentMethodObject.paymentMethodType != null &&
-                  this.accountPlan.paymentMethodObject.paymentInfo != null) ||
-                  this.accountPlan.paymentMethodObject.uuid != null)
-          ));
+      return (
+        (this.accountPlan.name !== '' ||
+          (this.accountPlan.forkHost !== '' &&
+            this.accountPlan.adminEmail !== '')) &&
+        this.accountPlan.domain !== '' &&
+        this.accountPlan.locale !== '' &&
+        this.accountPlan.timezone !== '' &&
+        this.accountPlan.plan !== '' &&
+        this.accountPlan.footprint !== '' &&
+        (this.configs.paymentsEnabled === false ||
+          ((this.accountPlan.paymentMethodObject.paymentMethodType != null &&
+            this.accountPlan.paymentMethodObject.paymentInfo != null) ||
+            this.accountPlan.paymentMethodObject.uuid != null))
+      );
     },
 
     localeTexts: function() {
@@ -684,7 +687,11 @@ export default {
       this.errors.clear();
       this.$validator.validate().then((valid) => {
         if (valid) {
-          if (this.configs.paymentsEnabled === false || this.paymentInfo || this.accountPlan.paymentMethodObject.uuid) {
+          if (
+            this.configs.paymentsEnabled === false ||
+            this.paymentInfo ||
+            this.accountPlan.paymentMethodObject.uuid
+          ) {
             const cloudRegion = this.findRegion(this.cloudRegionUuid);
             if (cloudRegion === null) {
               this.errors.add({
@@ -825,7 +832,7 @@ export default {
           }
         }
       }
-    }
-  }
+    },
+  },
 };
 </script>
