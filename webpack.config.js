@@ -10,7 +10,6 @@ module.exports = (env) => ({
   resolve: {
     extensions: ['.js', '.vue'],
   },
-  entry: './src/index.js',
   module: {
     rules: [
       {
