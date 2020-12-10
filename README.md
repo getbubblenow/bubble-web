@@ -30,8 +30,26 @@ To perform a production build, run:
 webpack --mode=production
 ```
 
-# Enable Hot Reloading
-If you have a Bubble API running, you can update the web UI without restarting the server.
+# Run Webapp with a Remote Bubble API Server
+To connect to a remote Bubble API, set the `BUBBLE_API` environment variable and run:
+```shell script
+BUBBLE_API=https://bubble-api.example.com/api npm start 
+```
+This will run a local web server where you can use the webapp. The local web server will
+proxy API calls to the remote Bubble API server.
+
+# Run Webapp with a Local Bubble API Server
+To run the backend API locally, run this from the `bubble` directory (one level above `bubble-web`):
+```shell script
+./bin/run.sh
+```
+If this is the first time you have run the Bubble API, you will need to
+[activate](https://git.bubblev.org/bubblev/bubble/src/branch/master/docs/activation.md) it.
+
+## Enable Hot Reloading
+If you have a Bubble API running locally, you can update the web UI without restarting
+the server.
+
 Set the `BUBBLE_ASSETS_DIR` environment variable in the Bubble environment file to be the
 path to the `bubble-web/dist` directory, then start the API server. It will serve static
 assets from that directory, so you can update the webapp just by overwriting those files
@@ -43,13 +61,6 @@ to point to the correct location of your `bubble-web/dist` directory):
 export BUBBLE_ASSETS_DIR=/path/to/bubble-web/dist
 ```
 
-# Run the API Server
-To run the backend API, run this from the `bubble` directory (one level above `bubble-web`):
-```shell script
-./bin/run.sh
-```
-
-# Use the Webapp!
 You can now use and test the frontend.
 
 If you make changes to the frontend code, you can simply run `webpack` again and
