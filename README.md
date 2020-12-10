@@ -11,7 +11,7 @@ files for this code are in the [vue-vuex-registration-login-example-docs](vue-vu
 # Install Requirements
 If you've ever built the Bubble API jar, you have already run `npm install` and can skip this step.
 
-If you're not sure, it is safe to run it again, from this (the `bubble-web`) directory:
+If you're not sure, it's safe to run again. In the `bubble-web` directory, run:
 ```shell script
 npm install
 ```
