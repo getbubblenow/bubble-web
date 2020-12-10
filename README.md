@@ -1,4 +1,5 @@
-# bubble-web
+bubble-web
+==========
 
 Bubble frontend VueJS web application
 
@@ -7,19 +8,49 @@ The initial basis for the bubble-web frontend was Jason Watmore's wonderfully we
 The [LICENSE](vue-vuex-registration-login-example-docs/LICENSE) and [README.md](vue-vuex-registration-login-example-docs/README.md)
 files for this code are in the [vue-vuex-registration-login-example-docs](vue-vuex-registration-login-example-docs) directory.
 
-To use this frontend with a Bubble API:
+# Install Requirements
+If you've ever built the Bubble API jar, you have already run `npm install` and can skip this step.
 
-Build it:
+If you're not sure, it is safe to run it again, from this (the `bubble-web`) directory:
+```shell script
+npm install
+```
 
-    npm install
-    webpack
+# Build the Webapp
+Bubble uses [webpack](https://webpack.js.org/) to build the Bubble VueJS webapp.
 
-In your `${HOME}/.bubble-test.env` file, add this line (fix the path to point to the correct location of your `bubble-web/dist` directory):
+In the `bubble-web` directory, run this to build the webapp:
+```shell script
+webpack
+```
+The output files will be in the `bubble-web/dist` directory.
 
-    export BUBBLE_ASSETS_DIR=/path/to/bubble-web/dist
+To perform a production build, run:
+```shell script
+webpack --mode=production
+```
 
-In the `bubble/bubble-server` directory, run the test named `bubble.test.dev.DevServerTest`, which will run the API and perform initial activation.
+# Enable Hot Reloading
+If you have a Bubble API running, you can update the web UI without restarting the server.
+Set the `BUBBLE_ASSETS_DIR` environment variable in the Bubble environment file to be the
+path to the `bubble-web/dist` directory, then start the API server. It will serve static
+assets from that directory, so you can update the webapp just by overwriting those files
+via `webpack`.
 
-    mvn -Dtest=bubble.test.dev.DevServerTest test
+To enable hot reloading: in your `${HOME}/.bubble.env` file, add this line (fix the path
+to point to the correct location of your `bubble-web/dist` directory):
+```shell script
+export BUBBLE_ASSETS_DIR=/path/to/bubble-web/dist
+```
 
-You can now test the frontend. If you make changes to the frontend code, you can simply run `webpack` again and reload the page in your browser.
+# Run the API Server
+To run the backend API, run this from the `bubble` directory (one level above `bubble-web`):
+```shell script
+./bin/run.sh
+```
+
+# Use the Webapp!
+You can now use and test the frontend.
+
+If you make changes to the frontend code, you can simply run `webpack` again and
+reload the page in your browser.
