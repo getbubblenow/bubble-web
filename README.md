@@ -17,23 +17,24 @@ npm install
 ```
 
 # Build the Webapp
-Bubble uses [webpack](https://webpack.js.org/) to build the Bubble VueJS webapp.
+Bubble uses [npm](https://www.npmjs.com/) and [webpack](https://webpack.js.org/)
+to build the Bubble VueJS webapp.
 
 In the `bubble-web` directory, run this to build the webapp:
 ```shell script
-webpack
+npm run build
 ```
 The output files will be in the `bubble-web/dist` directory.
 
-To perform a production build, run:
+To perform a development build (for example, so the VueJS firefox/chrome plugin will work), run:
 ```shell script
-webpack --mode=production
+npm run dev-build
 ```
 
 # Run Webapp with a Remote Bubble API Server
 To connect to a remote Bubble API, set the `BUBBLE_API` environment variable and run:
 ```shell script
-BUBBLE_API=https://bubble-api.example.com/api npm start 
+BUBBLE_API=https://bubble-api.example.com/api npm run start
 ```
 This will run a local web server where you can use the webapp. The local web server will
 proxy API calls to the remote Bubble API server.

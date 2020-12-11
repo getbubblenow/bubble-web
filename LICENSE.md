@@ -1,7 +1,7 @@
 # Copyright (C) 2020 Bubble, Inc.
 
 ## For ANY commercial use of this software
-All rights are reserved. Please contact licensing@bubblev.com for more information.
+All rights are reserved. Please contact licensing@getbubblenow.com for more information.
 
 ## For individuals and not-for-profit organizations
 If you are an individual person or a not-for-profit organization, and your usage of this software is entirely 
@@ -10,7 +10,7 @@ summarized below and reprinted in full thereafter.
 
 ```text
         Bubble - a privacy-first VPN
-        Copyright (C) 2019 Bubble, Inc.
+        Copyright (C) 2020 Bubble, Inc.
     
         This program is free software: you can redistribute it and/or modify
         it under the terms of the GNU Affero General Public License as published by
